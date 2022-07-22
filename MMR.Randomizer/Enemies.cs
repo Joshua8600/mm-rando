@@ -319,7 +319,9 @@ namespace MMR.Randomizer
                 piratesExteriorScene.Maps[0].Actors[13].ChangeActor(GameObjects.Actor.Empty, modifyOld: true); // dangeon object so no grotto, empty for now
                 // todo: 14/16 are also torches, we dont really need both here
 
-
+                // this torch is too close to spider, constantly actors get stuck, just move the damn torch
+                var swampSpiderHouseScene = RomData.SceneList.Find(u => u.File == GameObjects.Scene.SwampSpiderHouse.FileID());
+                swampSpiderHouseScene.Maps[3].Actors[3].Position.x = -480;
             }
         }
 
@@ -408,6 +410,10 @@ namespace MMR.Randomizer
 
         public static void DisableAllLocationRestrictions()
         {
+            // 19 = top of clock tower: if you can soar out its a problme
+            // 54 = sword school: hookshot can lock the player
+            var ignore_scenes = new List<int> { 0x19, 0x54};
+
             // TODO fix: dont allow soaring on clocktower, dont allow hookshot in dojo
 
             /// player item restrictions is a unique list in the code file (for some reason)
@@ -416,12 +422,18 @@ namespace MMR.Randomizer
             var codeFile = RomData.MMFileList[31].Data;
             while (tableOffset < 0x119DC4)
             {
-                // 0 offset is the scene value (why though)
-                codeFile[tableOffset + 1] = 0x00;
-                codeFile[tableOffset + 2] = 0x00;
-                codeFile[tableOffset + 3] = 0x00;
+                if (! ignore_scenes.Contains(codeFile[tableOffset + 0]))
+                {
+                    // 0 offset is the scene value
+                    codeFile[tableOffset + 1] = 0x00;
+                    codeFile[tableOffset + 2] = 0x00;
+                    codeFile[tableOffset + 3] = 0x00;
+                }
+
                 tableOffset += 4;
             }
+
+            // todo re-disable item restrictions on the tower
         }
 
         private static void FixScarecrowTalk()
@@ -1280,9 +1292,9 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Item_Etcetera)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Grog)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.BadBat, GameObjects.Actor.Cow)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.TwinIslands, GameObjects.Actor.Wolfos, GameObjects.Actor.BigPoe)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.AstralObservatory, GameObjects.Actor.Torch, GameObjects.Actor.ObjSwitch)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.BombFlower)) continue;
 
                 //TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.FlyingPot);
@@ -2689,7 +2701,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 35.1\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 35.2\n");
                 }
             }
             catch (Exception e)
