@@ -1817,6 +1817,20 @@ namespace MMR.Randomizer
                         picDebug += "- [" + item.ToString() + "]\n";
                     }
 
+                    itemPool = new List<Item>();
+                    AddAllItems(itemPool);
+                    var notRandomized = oldPic.ItemList.Except(itemPool);
+                    if (notRandomized.Count() > 0)
+                    {
+                        picDebug += "\nthis PIC has items that were NOT RANDOMIZED\n";
+                    }
+
+                    notRandomized = oldPic.CheckList.Except(itemPool);
+                    if (notRandomized.Count() > 0)
+                    {
+                        picDebug += "\nthis PIC has checks that were NOT RANDOMIZED\n";
+                    }
+
                     throw new Exception("Error: Plando failed to build with this seed\n combo name: [" + pic.Name + "]\n\n" + picDebug);
                 }
 
