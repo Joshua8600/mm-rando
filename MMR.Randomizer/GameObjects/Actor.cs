@@ -102,13 +102,12 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x1B30)]
         [FileID(48)]
         [ObjectListIndex(0x9)]
-        // 0xFF00 is switch flags, booo
-        //[GroundVariants(1)] //issue: used for replacement, puts ground enemies in air
+        //[GroundVariants(1)] //issue: also used for replacement, puts ground enemies in air so we cannot
         [FlyingVariants(1)]
         // 81 is trapped in ice, floats back up to the ceiling after melting
-        [GroundVariants(0x81)] // todo limit?
-        [VariantsWithRoomMax(max:2, variant:0x81)]
-        [RespawningVariants(variant:0x81)] // if they fly away after melt they might not come down, so not killable
+        [GroundVariants(0x81)]
+        [VariantsWithRoomMax(max:1, variant:0x81)] // have to limit because it can block and I don't have variant blocking
+        [RespawningVariants(variant:0x81)] // if they fly away after melt they might not come down (bug), so not killable
         [SwitchFlagsPlacement(mask: 0xFF, shift: 8)]
         //[EnemizerScenesPlacementBlock(Scene.TerminaField)] // temporary, melting them can unmelt the north ice block, but why
         WallMaster = 0xA, // En_Wallmas
@@ -600,14 +599,15 @@ namespace MMR.Randomizer.GameObjects
         [FileID(93)]
         [ObjectListIndex(0x75)]
         // 0x8000 removes the freeze timer, like market town in OOT
-        // 0x7F00 is a switch flag check ???
-        // 0x5/6/7 have different actionfuncs, dont seem to do anything..?
         // 3 is invisible, 2 is squatting
         // 4 spawns inside of an ice block
-        [GroundVariants(0x7F07,0x7F05,0x7F06, 0x7F03, 0x7F04, 0x8005, 0x8006, 0x8007, 0x8003)]
+        // 0x5/6/7 dance if the player wears a mask
+        // 0xFFFE is -2 = gibdo, does not stun
+        // 0xFFFE is -3 = gibdo that rises out of the coffin, from OOT, does not stun and looks weird so we wont use until I find a way to combine with a fake chest
+        [GroundVariants(0x7F07,0x7F05,0x7F06, 0x7F03, 0x7F04, 0x8005, 0x8006, 0x8007, 0x8003, 0xFFFE)]
         [VariantsWithRoomMax(max: 3, variant: 0x7F07, 0x7F05, 0x7F06, 0x7F02, 0x8005, 0x8006, 0x8007, 0x7F04)]
-        [VariantsWithRoomMax(max: 1, variant: 0x7F03, 0x8003)]
-        [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
+        [VariantsWithRoomMax(max: 1, variant: 0x7F03, 0x8003, 0xFFFE)]
+        [SwitchFlagsPlacement(mask: 0x7F, shift: 8)] // 0xFF00 is read, but only 0x7F of that gets set on death, never checked
         [EnemizerScenesExcluded(Scene.IkanaCanyon, Scene.BeneathTheWell)] // gibdo locations, but share the same object so gets detected
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // slows us down too much
         ReDead = 0x4C, // En_Rd
@@ -730,11 +730,13 @@ namespace MMR.Randomizer.GameObjects
         Empty5D = 0x5D,
         Empty5E = 0x5E,
 
-        //[ActorizerEnabled] // broken: crash, does NOT use paths
-        // thought it might be that the actor's memory is just huge because it has 20 effects, but we measure that now // nope still crash
+        [ActorizerEnabled]
         [FileID(102)]
         [ObjectListIndex(0x280)]
         [FlyingVariants(1)]
+        //[GroundVariants(1)] // testing
+        // needs limits because it can overload the dyna 
+        [VariantsWithRoomMax(max:3, variant:0, 1)]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
         [UnkillableAllVariants]
         MajoraBalloonSewer = 0x5F, // En_Encount2
@@ -955,7 +957,7 @@ namespace MMR.Randomizer.GameObjects
         // todo finish testing
         [EnemizerEnabled]
         [FileID(131)]
-        [ObjectListIndex(0003)]
+        [ObjectListIndex(3)]
         // 3 is vanilla wall of flames, 0 spits a single flame that chases you
         [WallVariants(0, 3)]
         [UnkillableAllVariants]
@@ -1009,10 +1011,22 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesExcluded(Scene.Grottos)] // dont remove from peahat grotto
         GrassBush = 0x90, // En_Kusa
 
-        // bad idea to move because beans have paths
+        // this one might be a pain... without modification it looks like the actor wants to be doubled up on top of itself
+        [ActorizerEnabled]
         [FileID(136)]
         [ObjectListIndex(0xEE)]
+        // 8 is unused crack in the wall, only exists in unused ranch setup
+        // uses Z rot as a param, unknown use
+        // 0xC000 unk, can change draw type
+        // 0x80 determins if switch flags are active, great..
+        [GroundVariants(0x4000, 0x8000)]
+        [WallVariants(0x4000, 0x8000)]
+        // c and 0 crash without a path to follow, but with a path they instant kill which is odd...
+        // havent documented enough to know why
+        //[PathingVariants(0x4000)] // TODO figure out if I even can get this to work
+        [PathingTypeVarsPlacement(mask: 0x3F, shift: 8)] // 0x3F00
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
+        //[EnemizerScenesExcluded()] // we can actually just use generic params to avoid this
         SoftSoilAndBeans = 0x91, // Obj_Bean
 
         [ActorizerEnabled]
@@ -2971,10 +2985,15 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x2940)]
         [FileID(435)]
         [ObjectListIndex(0x75)]
-        [GroundVariants(0x1E9, 0x1F4, 0x208, 0x214, 0x224, 0x236, 0x247, 0x253, 0x262, 0x275, 0x283, 0x291, 0x2A0)]
+        // params: switch flag(xFF0) and item used(0xF)
+        // 8 is bigpo, 0 is blue pot, 7 is hot spring, 9 is milk
+        [GroundVariants(1,2,3,4,5,6)]
+        [RespawningAllVariants] // only to stop them from showing up in places where you need to kill them, since its a hastle
         [EnemizerScenesExcluded(Scene.BeneathTheWell, Scene.IkanaCanyon)]
-        [EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.Grottos)] // slows down player too much in a race setting
-        GibdoWell = 0x1DA,
+        [EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.Grottos,
+            Scene.GoronRacetrack, Scene.GoronRacetrack)] // slows down player too much in a race setting
+        [SwitchFlagsPlacement(mask: 0xFF, shift: 4)]
+        GibdoWell = 0x1DA, // En_Talk_Gibud
 
         [FileID(436)]
         [ObjectListIndex(0x1B8)]
@@ -3267,12 +3286,14 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1ED)]
         DeepPython = 0x206, // En_Dragon
 
-        //[ActorizerEnabled] // spawns but invisible, can hit it but cannot see it in TF
+        // bad for ground variant because this actor only draws chain + gong, not the frame, that is part of the scene mesh
+        [ActorizerEnabled] // spawns but invisible, can hit it but cannot see it in TF
         // hmm, sword school special object is dungeon_keep
         [FileID(478)]
         [ObjectListIndex(0x1EE)]
-        [GroundVariants(0)]
+        [WallVariants(0)] // none
         [UnkillableAllVariants]
+        [EnemizerScenesExcluded(Scene.SwordsmansSchool)] // object used for multiple actors
         Gong = 0x207, // Obj_Dora
 
         [EnemizerEnabled]
@@ -3441,19 +3462,34 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x12E)]
         [PathingVariants(0x1F, 0xEA, 0x04EA, 0x81F, 0x8EA, 0xC1F, 0xCEA, 0x101F, 0x104B, 0x10EA,
                 0x144B, 0x14EA, 0x18EA, 0x284B, 0x28EB, 0x30EB, 0x34EB, 0x38EB, 0x3CEB, 0x4C24)]
+        // path == 0x3F ignores path, just stands in one spot
+        // 0x02 always looks forward for boats or something, FC00 will hear you and turn to look at you
+        [GroundVariants(0xFC00, 0xFC20)] 
+        [VariantsWithRoomMax(max: 2, variant: 0xFC00)]
+        [VariantsWithRoomMax(max: 1, variant: 0x1F, 0xEA, 0x04EA, 0x81F, 0x8EA, 0xC1F, 0xCEA, 0x101F, 0x104B, 0x10EA,
+                0x144B, 0x14EA, 0x18EA, 0x284B, 0x28EB, 0x30EB, 0x34EB, 0x38EB, 0x3CEB, 0x4C24)]
         [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
         [PathingKickoutAddrVarsPlacement(mask:0x1F, shift: 0x0)]
-        [UnkillableAllVariants]
+        [RespawningAllVariants] // think they count as enemy, so can't put places
         [EnemizerScenesPlacementBlock(Scene.SouthClockTown, Scene.SwampSpiderHouse)]
         [EnemizerScenesExcluded(Scene.PiratesFortressRooms)] // because the ones in the hookshot room need to stay around
         PatrollingPirate = 0x21E, // En_Ge2
 
-        // romani talking to cremia only
+        // romani talking to cremia and dinner and sleeping in bed
+        [ActorizerEnabled]
         [FileID(502)]
         [ObjectListIndex(0xB7)]
-        RomaniTalkingToCremia = 0x21F, // En_Ma_Yts
+        // 0xF000 is type
+        // 0xF000 is just standing there, wont talk or do anything
+        // 0x2000 is asleep night 2 in bed
+        // 0x3000 is credits cutscene, except without the cutscene they just stare in a straight line
+        [GroundVariants(0x1000, 0x2000, 0xF000, 0x3FF)]
+        [VariantsWithRoomMax(max: 1, variant: 0x2000)]
+        [VariantsWithRoomMax(max: 0, variant: 0x30FF)] // boring cutscene version just stares into the distance, do not re-shuffle
+        [EnemizerScenesExcluded(Scene.RanchBuildings)]
+        [UnkillableAllVariants]
+        Romani2 = 0x21F, // En_Ma_Yts
 
-        // todo
         [ActorizerEnabled]
         [FileID(503)]
         [ObjectListIndex(0xA7)]
@@ -3930,7 +3966,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesExcluded(Scene.GreatBayCoast, Scene.ZoraCape)]
         Seagulls = 0x267, // En_Tanron4
 
-        //todo test these
+        // wont spawn, actor not documented, some weird morita bullshit
         [FileID(575)]
         [ObjectListIndex(0x15B)]
         DestructablePartsOfTwinmoldsArena = 0x268, // En_Tanron5
@@ -3938,9 +3974,6 @@ namespace MMR.Randomizer.GameObjects
         //[ActorizerEnabled] // this actor is EMPTY the code has nothing in it
         [FileID(576)]
         [ObjectListIndex(0x1EB)]
-        // m2c suggests either param 1 or 2 could work
-        // 1 spins in circles like giant bee, 2 did not spawn
-        [FlyingVariants(2)]
         En_Tanron6 = 0x269, // En_Tanron6
 
         // TODO: make this version a companion instead, so we have fewer of these guys placed everywhere
@@ -4122,11 +4155,13 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)]
         PamelaHouseFatherInteractions = 0x284, // Obj_Mu_Pict
 
-        //todo explore
+        // keg breaking ceiling in ikana, no use for it
         [FileID(604)]
         [ObjectListIndex(0x236)]
-        IkanaCastleObjects = 0x285, // Bg_Ikninside
-        
+        [SwitchFlagsPlacement(mask: 0x7F, shift: 9)]
+        IkanaCastleKegCieling = 0x285, // Bg_Ikninside
+
+        // assumed to be the stage lights in the Mikau healing thing
         [FileID(605)]
         [ObjectListIndex(0x255)]
         Eff_Zoraband = 0x286, // Eff_Zoraband
