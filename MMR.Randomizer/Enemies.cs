@@ -961,7 +961,8 @@ namespace MMR.Randomizer
             // there is a worthless mushroom here, lets make TWO peahats :]
             var newPeahat = grottosScene.Maps[13].Actors[3];
             newPeahat.ChangeActor(GameObjects.Actor.Peahat, vars: 0, modifyOld: true);
-            newPeahat.Position = new vec16(5010, -20, 600); // move over near peahat one
+            //newPeahat.Position = new vec16(5010, -20, 600); // move over near peahat one
+            newPeahat.Position = new vec16(5010, -10, 600); // move over near peahat one
 
             // straight jp grotto has only one object, padding of scene data means there is space for an object right behind it that we can use
             //  we can use the second object to give this area a chest by taking one of the useless mushrooms and changing it
@@ -1292,11 +1293,12 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.ClayPot)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.TreasureChest)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.LotteryShop, GameObjects.Actor.Clock, GameObjects.Actor.Gong)) continue;
-               // if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.ClayPot)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.OOTPotionShopMan)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.PatrollingPirate)) continue;
+                if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.CutsceneZelda)) continue;
+                if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.OOTPotionShopMan)) continue;
+                if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.TreasureChest)) continue;
+                if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBaba, GameObjects.Actor.OOTPotionShopMan)) continue;
 
                 //TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.FlyingPot);
                 #endif
@@ -1399,7 +1401,6 @@ namespace MMR.Randomizer
                 thisSceneData.ActorsPerObject.Add(thisSceneData.Actors.FindAll(u => u.OldObjectID == thisSceneData.Objects[objectIndex]));
                 // get a list of matching actors that can fit in the place of the previous actor
                 var objectHasFairyDroppingEnemy = fairyDroppingActors.Any(u => u.ObjectIndex() == thisSceneData.Objects[objectIndex]);
-                //var newCandiateList = GetMatchPool(thisSceneData, objectHasFairyDroppingEnemy).ToList(); // why the extra convert?
                 var newCandiateList = GetMatchPool(thisSceneData, thisSceneData.ActorsPerObject[objectIndex], objectHasFairyDroppingEnemy);
                 var candidateTest = newCandiateList.Find(u => u.Variants.Count == 0);
                 if (candidateTest != null)
@@ -2730,7 +2731,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 36.1\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 36.2\n");
                 }
             }
             catch (Exception e)
