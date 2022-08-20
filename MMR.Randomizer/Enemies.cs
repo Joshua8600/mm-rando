@@ -235,6 +235,7 @@ namespace MMR.Randomizer
             ExpandGoronShineObjects();
             RandomlySwapOutZoraBandMember();
             ExpandGoronRaceObjects();
+            SplitSpiderGrottoSkulltulaObject();
 
             Shinanigans();
         }
@@ -1060,6 +1061,23 @@ namespace MMR.Randomizer
             goronRaceRoom0Data[0x6B9] = 8; // increase object list to 8
         }
 
+        public static void SplitSpiderGrottoSkulltulaObject()
+        {
+            // in the spider grotto, we have a skullwalltula on the web and a skulltula hanging from the ceiling
+            // this scene room has 3 objects, one is dekubaba, wasted
+            // in order to split the actor, however, I have to change the actor to something else and give it a different object
+
+            if (!ReplacementListContains(GameObjects.Actor.Skulltula)) return;
+
+            var grottoScene = RomData.SceneList.Find(u => u.File == GameObjects.Scene.Grottos.FileID());
+            var spiderRoom = grottoScene.Maps[1];
+
+            spiderRoom.Objects[2] = GameObjects.Actor.SkulltulaDummy.ObjectIndex();
+            spiderRoom.Actors[1].ChangeActor(GameObjects.Actor.SkulltulaDummy, vars:0, modifyOld: true);
+            spiderRoom.Actors[1].Position.y = 200; // way too high in the ceiling, bring down a touch
+        }
+
+
         #endregion
 
         public static List<GameObjects.Actor> GetSceneFairyDroppingEnemyTypes(SceneEnemizerData thisSceneData)
@@ -1297,13 +1315,13 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.TreasureChest)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.TreasureChest)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.LotteryShop, GameObjects.Actor.Clock, GameObjects.Actor.Gong)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.CutsceneZelda)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.OOTPotionShopMan)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.TreasureChest)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBaba, GameObjects.Actor.OOTPotionShopMan)) continue;
-                if (TestHardSetObject(GameObjects.Scene.MilkRoad, GameObjects.Actor.MilkroadCarpenter, GameObjects.Actor.KotakeOnBroom)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.MilkRoad, GameObjects.Actor.MilkroadCarpenter, GameObjects.Actor.KotakeOnBroom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.IkanaCastle, GameObjects.Actor.Skulltula, GameObjects.Actor.MajoraBalloonSewer)) continue;
 
                 //TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.FlyingPot);
@@ -2737,7 +2755,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 36.4\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 36.5\n");
                 }
             }
             catch (Exception e)
