@@ -239,8 +239,9 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 2, variant: 0)]
         // crashes if placed on an actor that has cutscene data, because it tries to use that cutscene data as its intro cutscen
         [EnemizerScenesExcluded(Scene.SecretShrine)] // issue: spawn is too high, needs to be lowered
+        // these are no longer problem spawns because we now dynamically remove the cutscene from new dino spawns
         //[EnemizerScenesPlacementBlock(Scene.BeneathGraveyard, Scene.DekuShrine, Scene.ClockTowerInterior)] // crash in graveyard
-        [EnemizerScenesPlacementBlock(Scene.ClockTowerInterior)]
+        //[EnemizerScenesPlacementBlock(Scene.ClockTowerInterior)]
         Dinofos = 0x19,
 
         [FileID(59)]
@@ -1158,6 +1159,7 @@ namespace MMR.Randomizer.GameObjects
         Unused_Item_Inbox = 0x9E, // Item_Inbox
 
         // pirate that tells leader they cant get near the eggs because of seasnakes
+        // we can use though as-is though it seems
         [ActorizerEnabled]
         [FileID(146)]
         [ObjectListIndex(0xE6)]
@@ -1431,10 +1433,13 @@ namespace MMR.Randomizer.GameObjects
         // trading post version is 1
         // wish I could spawn the ones that dance so they are always dancing when the player gets there
         [GroundVariants(1, 0x2800, 0x11D)]
-        [VariantsWithRoomMax(max: 5, variant: 1)]
+        [VariantsWithRoomMax(max: 1, variant: 1)]
+        [VariantsWithRoomMax(max: 0, variant: 0x11D)]
+        [VariantsWithRoomMax(max: 0, variant: 0x2800)] // below ground to replace, we want above ground placement only
         [UnkillableAllVariants]
         // crash: if you teach song to him in TF the ice block cutscene triggers
-        [EnemizerScenesPlacementBlock(Scene.TerminaField)]
+        // if you try to teach him a song with more than one it can lock
+        [EnemizerScenesPlacementBlock(Scene.TradingPost, Scene.TerminaField)]
         [EnemizerScenesExcluded(Scene.TradingPost, Scene.TwinIslands, Scene.SnowheadTemple, Scene.StoneTower,
             Scene.PathToSnowhead)]//, Scene.AstralObservatory)] // re-disable this if playing Entrando
         Scarecrow = 0xCA, // En_Kakasi
@@ -3543,10 +3548,13 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0x1F, 0xEA, 0x04EA, 0x81F, 0x8EA, 0xC1F, 0xCEA, 0x101F, 0x104B, 0x10EA,
                 0x144B, 0x14EA, 0x18EA, 0x284B, 0x28EB, 0x30EB, 0x34EB, 0x38EB, 0x3CEB, 0x4C24)]
         [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
+        // if kickout is 1F it does nothing? interesting
         [PathingKickoutAddrVarsPlacement(mask:0x1F, shift: 0x0)]
         [RespawningAllVariants] // think they count as enemy, so can't put places
         [EnemizerScenesExcluded(Scene.PiratesFortressRooms)] // because the ones in the hookshot room need to stay around
-        [EnemizerScenesPlacementBlock(Scene.SouthClockTown, Scene.SwampSpiderHouse, Scene.MayorsResidence, Scene.RanchBuildings)]
+        // this actor is blocked from grotto deku baba because the kickout is crash, not sure why yet its a scene_table thing
+        [EnemizerScenesPlacementBlock(Scene.SouthClockTown, Scene.SwampSpiderHouse, Scene.MayorsResidence, Scene.RanchBuildings,
+            Scene.DekuPlayground, Scene.DekuShrine)]
         PatrollingPirate = 0x21E, // En_Ge2
 
         [ActorizerEnabled] // romani talking to cremia and dinner and sleeping in bed
