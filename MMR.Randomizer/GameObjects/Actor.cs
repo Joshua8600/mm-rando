@@ -652,7 +652,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.SwampSpiderHouse, Scene.OceanSpiderHouse,
             Scene.StockPotInn, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
-            Scene.BeneathTheWell)]
+            Scene.BeneathTheWell, Scene.StoneTower)]
         //*/
         UnusedStoneTowerStoneElevator = 0x4D, // Bg_F40_Flift
 
@@ -1434,7 +1434,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.GoronRacetrack, Scene.WaterfallRapids, Scene.GormanTrack, Scene.RoadToIkana, Scene.IkanaCastle, Scene.BeneathGraveyard,
             Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
-            Scene.StockPotInn, Scene.BeneathTheWell)]
+            Scene.StockPotInn, Scene.BeneathTheWell, Scene.StoneTower)]
         //*/
         UnusedStoneTowerPlatform = 0xC7, // Bg_F40_Swlift
 
@@ -1610,12 +1610,12 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x3E40)]
         [FileID(222)]
         [ObjectListIndex(0x141)]
-        // params: 0x1 is winter coat, 0x800 is with ice block
+        // params: 0x1 is winter coat, 0x80 is with ice block
         // ice block versions are limited because they are complicated collision and really long draw distance
         [GroundVariants(0xFF01, 0xFF81, 0xFF00, 0xFF80)]
         // they don't respawn, but if placed on a spawn next to a wall they can get pushed back out
         // so we do not want to put them in rooms where you have to clear all enemies
-        [RespawningVariants(0xFF01, 0xFF81)] 
+        [RespawningVariants(0xFF80, 0xFF81)] 
         [VariantsWithRoomMax(max: 1, variant: 0xFF81)]
         [VariantsWithRoomMax(max: 1, variant: 0xFF80)]
         Wolfos = 0xEC, // En_Wf
@@ -2883,7 +2883,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesPlacementBlock(Scene.StoneTower, Scene.DekuPlayground)] // dyna crash possible
         ClocktowerGearsAndOrgan = 0x1B6, // Bg_Ctower_Gear
 
-       // [ActorizerEnabled] // disabled since talking is softlock, need to figure that out
+        // [ActorizerEnabled] // disabled since talking is softlock, need to figure that out
         [FileID(403)]
         [ObjectListIndex(0x18F)]
         // nothing in the other params other than path, the starting animation and stuff are all hardcoded to entrance
@@ -3582,7 +3582,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesExcluded(Scene.PiratesFortressRooms)] // because the ones in the hookshot room need to stay around
         // this actor is blocked from grotto deku baba because the kickout is crash, not sure why yet its a scene_table thing
         [EnemizerScenesPlacementBlock(Scene.SouthClockTown, Scene.SwampSpiderHouse, Scene.MayorsResidence, Scene.RanchBuildings,
-            Scene.DekuPlayground, Scene.DekuShrine)]
+            Scene.DekuPlayground, Scene.DekuShrine, Scene.TradingPost)]
         PatrollingPirate = 0x21E, // En_Ge2
 
         [ActorizerEnabled] // romani talking to cremia and dinner and sleeping in bed
