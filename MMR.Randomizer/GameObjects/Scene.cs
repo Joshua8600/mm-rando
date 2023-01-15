@@ -95,11 +95,12 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x16)]
         [ClearEnemyPuzzleRooms(4, 7)]// basement lava
         [FairyDroppingEnemies(1, 2)] // eygore
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RealBombchu,
+            Actor.WarpDoor)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Beamos,
             Actor.IkanaGravestone, Actor.Bumper, Actor.En_Ani)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Hiploop,
             Actor.En_Ani, Actor.Bumper, Actor.Tijo)]
-
         StoneTowerTemple = 0x13,
 
         [FileID(1188)]
@@ -225,6 +226,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1304)]
         [SceneInternalId(0x2B)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // can block the stairs
+            Actor.IceBlock)] // the big one can be too big
         DekuPalace = 0x28,
 
         [FileID(1308)]
@@ -504,6 +507,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1502)]
         [SceneInternalId(0x68)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SmithyGoronAndGo,
+            Actor.PatrollingPirate, Actor.DekuPatrolGuard)]
         BombShop = 0x65,
 
         [FileID(1504)]
