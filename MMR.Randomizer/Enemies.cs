@@ -41,7 +41,8 @@ namespace MMR.Randomizer
         // and some adjustments we need to make based on where it gets placed in vram
         public int actorID = 0;
         public int objID   = 0;
-        public int fileID  = 0;
+        public int fileID = 0;
+        public int objectFid = 0;
 
         // if all new actor, we meed to know where the old vram start was when we shift VRAM for the actor
         public uint buildVramStart = 0;
@@ -222,17 +223,6 @@ namespace MMR.Randomizer
             // special edge cases for actors that would be hard to enum auto because of variants or scenes
             // TODO replace these eventually
 
-            if (scene.SceneEnum == GameObjects.Scene.IkanaGraveyard)
-            {
-                if (testActor == GameObjects.Actor.BadBat || testActor == GameObjects.Actor.Dampe)
-                {
-                    var crimsonRupReplacementItem = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.CollectableIkanaGraveyardDay2Bats1).Item;
-                    if ( ! ItemUtils.IsJunk(crimsonRupReplacementItem))
-                    {
-                        return true;
-                    }
-                }
-            }
             if (testActor == GameObjects.Actor.Tingle)
             {
                 // TODO we need to make sure one of them sticks around IF we need the photo
@@ -283,19 +273,6 @@ namespace MMR.Randomizer
                     return true;
                 }
             }
-            if (scene.SceneEnum == GameObjects.Scene.BombShop && testActor == GameObjects.Actor.GoronSGoro) // keg goron
-            {
-                // hard coded because this goron is multiple actors in different places
-                var eponaSongItem = _randomized.ItemList.Single(item => item.NewLocation == GameObjects.Item.SongEpona).Item;
-                var alienDefItem = _randomized.ItemList.Single(item => item.NewLocation == GameObjects.Item.ItemBottleAliens).Item;
-                var cariageDefItem = _randomized.ItemList.Single(item => item.NewLocation == GameObjects.Item.MaskCircusLeader).Item;
-
-                if ( ! ItemUtils.IsJunk(eponaSongItem) || ! ItemUtils.IsJunk(alienDefItem) || ! ItemUtils.IsJunk(cariageDefItem))
-                {
-                    return true;
-                }
-
-            }
             if ((scene.SceneEnum == GameObjects.Scene.GoronVillage || scene.SceneEnum == GameObjects.Scene.GoronVillageSpring)
                 && testActor == GameObjects.Actor.SmithyGoronAndGo) // smithy goron
             {
@@ -322,35 +299,16 @@ namespace MMR.Randomizer
 
                 }// else: randomize all
             }
-            if(scene.SceneEnum == GameObjects.Scene.SwampSpiderHouse && testActor == GameObjects.Actor.Seth1)
-            {
-                // hard coded because we dont want to change the standing up and staring at the sky seth1
-                var maskOfTruthItem = _randomized.ItemList.Single(item => item.NewLocation == GameObjects.Item.MaskTruth).Item;
-                if ( ! ItemUtils.IsJunk(maskOfTruthItem))
-                {
-                    return true;
-                }
-            }
-            if (scene.SceneEnum == GameObjects.Scene.StockPotInn && testActor == GameObjects.Actor.Anju)
-            {
-                var roomKeyItem = _randomized.ItemList.Single(item => item.NewLocation == GameObjects.Item.TradeItemRoomKey).Item;
-                var letterToKafeiItem = _randomized.ItemList.Single(item => item.NewLocation == GameObjects.Item.TradeItemKafeiLetter).Item;
-                var coupleMaskItem = _randomized.ItemList.Single(item => item.NewLocation == GameObjects.Item.MaskCouple).Item;
-                if (!ItemUtils.IsJunk(roomKeyItem) || !ItemUtils.IsJunk(letterToKafeiItem) || !ItemUtils.IsJunk(coupleMaskItem))
-                {
-                    return true;
-                }
-            }
 
             return false;
         }
 
 
-        public static List<int> GetSceneEnemyObjects(Scene scene)
+        public static List<int> GetSceneEnemyObjects(SceneEnemizerData thisSceneData)
         {
             /// Gets all objects in a scene.
             /// this is separate from actor because actors and objects are a different list in the scene/room data
-
+            var scene = thisSceneData.Scene;
             var objList = new List<int>();
             for (var m = 0; m < scene.Maps.Count(); m++)
             {
@@ -366,8 +324,13 @@ namespace MMR.Randomizer
                        //&& !objList.Contains(matchingEnemy.ObjectIndex())                          // not already extracted from this scene
                        && !matchingEnemy.ScenesRandomizationExcluded().Contains(scene.SceneEnum)) // not excluded from being extracted from this scene
                     {
-                        
-                        if ( ! ObjectIsCheckBlocked(scene, matchingEnemy))
+
+                        if (ObjectIsCheckBlocked(scene, matchingEnemy))
+                        {
+                            thisSceneData.Actors.RemoveAll(act => act.ObjectID == obj);
+                            //thisSceneData.ActorsPerObject.
+                        }
+                        else
                         {
                             objList.Add(matchingEnemy.ObjectIndex());
                         }
@@ -601,12 +564,29 @@ namespace MMR.Randomizer
                 dekuPalaceScene.Maps[2].Actors[25].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: 0x7F);
                 dekuPalaceScene.Maps[2].Actors[26].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: dekuPalaceScene.Maps[2].Actors[26].Rotation.y);
 
-                // we can make him stronger
+                // goron underwater mode
                 var playerFile = RomData.MMFileList[GameObjects.Actor.Player.FileListIndex()].Data;
+                // changes made to function func_8083BB4C
                 ReadWriteUtils.Arr_WriteU32(playerFile, Dest: 0xE20C, val: 0x00000000); // 80834140 -> NOP
                 ReadWriteUtils.Arr_WriteU32(playerFile, Dest: 0xE214, val: 0x00000000); // 
-                ReadWriteUtils.Arr_WriteU32(playerFile, Dest: 0xE220, val: 0x00000000); // 
+                ReadWriteUtils.Arr_WriteU32(playerFile, Dest: 0xE220, val: 0x00000000); //
 
+                // no water restrictions
+                //var codeFile = RomData.MMFileList[31].Data;
+                //ReadWriteUtils.Arr_WriteU32(codeFile, Dest: 0x06AEF0, val: 0x00000000); // nop the store byte FF which would disable the buttons
+
+
+                // for now, remove all form restrictions to see what works and what does not work anymore
+                /*
+                var startLoc = 0x11C950;
+                var endLoc = 0x11CB8C;
+                var i = startLoc;
+                while (i < endLoc)
+                {
+                    codeFile[i] = 0xFF;
+                    i++;
+                }
+                // */
                 // RecreateFishing();
             }
 
@@ -1579,13 +1559,13 @@ namespace MMR.Randomizer
         {
             /// New actors can have switch flags, these are normally tailored to the scene so one actor could step on another
 
-            thisSceneData.Log.AppendLine($"------------------------------------------------- ");
-            thisSceneData.Log.AppendLine($"  Switch flags: ");
+            //thisSceneData.Log.AppendLine($"------------------------------------------------- ");
+            //thisSceneData.Log.AppendLine($"  Switch flags: ");
 
             List<int> claimedSwitchFlags = new List<int>();
             for (int mapIndex = 0; mapIndex < thisSceneData.Scene.Maps.Count; ++mapIndex)
             {
-                thisSceneData.Log.AppendLine($" ======( MAP {mapIndex.ToString("X2")} )======");
+                //thisSceneData.Log.AppendLine($" ======( MAP {mapIndex.ToString("X2")} )======");
                 for (int actorNumber = 0; actorNumber < thisSceneData.Scene.Maps[mapIndex].Actors.Count; ++actorNumber)
                 {
                     var mapActor = thisSceneData.Scene.Maps[mapIndex].Actors[actorNumber];
@@ -1593,7 +1573,7 @@ namespace MMR.Randomizer
                     if (flags >= 0)
                     {
                         claimedSwitchFlags.Add(flags);
-                        thisSceneData.Log.AppendLine($"  [{actorNumber}][{mapActor.ActorEnum}] has flags: [{flags}]");
+                        //thisSceneData.Log.AppendLine($"  [{actorNumber}][{mapActor.ActorEnum}] has flags: [{flags}]");
                     }
 
                 }
@@ -1630,13 +1610,13 @@ namespace MMR.Randomizer
         {
             /// Like switch flags, we want to avoid stepping on previously existing treasure flags
 
-            thisSceneData.Log.AppendLine($"------------------------------------------------- ");
-            thisSceneData.Log.AppendLine($"  Treasure Flags: ");
+            //thisSceneData.Log.AppendLine($"------------------------------------------------- ");
+            //thisSceneData.Log.AppendLine($"  Treasure Flags: ");
 
             var claimedTreasureFlags = new List<int>();
             for (int mapIndex = 0; mapIndex < thisSceneData.Scene.Maps.Count; ++mapIndex)
             {
-                thisSceneData.Log.AppendLine($" ======( MAP {mapIndex.ToString("X2")} )======");
+                //thisSceneData.Log.AppendLine($" ======( MAP {mapIndex.ToString("X2")} )======");
                 for (int actorIndex = 0; actorIndex < thisSceneData.Scene.Maps[mapIndex].Actors.Count; ++actorIndex)
                 {
                     var mapActor = thisSceneData.Scene.Maps[mapIndex].Actors[actorIndex];
@@ -1644,7 +1624,7 @@ namespace MMR.Randomizer
                     if (flags >= 0)
                     {
                         claimedTreasureFlags.Add(flags);
-                        thisSceneData.Log.AppendLine($"  [{actorIndex}][{mapActor.ActorEnum}] has flags: [{flags}]");
+                        //thisSceneData.Log.AppendLine($"  [{actorIndex}][{mapActor.ActorEnum}] has flags: [{flags}]");
                     }
                 }
             }
@@ -1716,9 +1696,9 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BetaVampireGirl)) continue;
-                if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Treee, GameObjects.Actor.BeanSeller)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.WarpDoor)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.PatrollingPirate)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TouristCenter, GameObjects.Actor.SwampTouristGuide, GameObjects.Actor.SmithyGoronAndGo)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.PatrollingPirate)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.CutsceneZelda)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DragonFly, GameObjects.Actor.WarpDoor)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.Desbreko, GameObjects.Actor.UnusedPirateElevator)) continue;
@@ -2452,7 +2432,7 @@ namespace MMR.Randomizer
             }
             WriteOutput("time to get scene enemies: " + GET_TIME(thisSceneData.StartTime) + "ms");
 
-            thisSceneData.Objects = GetSceneEnemyObjects(scene);
+            thisSceneData.Objects = GetSceneEnemyObjects(thisSceneData);
             var sceneObjectLimit = SceneUtils.GetSceneObjectBankSize(scene.SceneEnum);
             WriteOutput(" time to get scene objects: " + GET_TIME(thisSceneData.StartTime) + "ms");
 
@@ -2715,9 +2695,13 @@ namespace MMR.Randomizer
                 {
                     newInjectedActor.objID = value;
                 }
-                else if (command == "file_id")
+                else if (command == "file_id" || command == "actor_fid")
                 {
                     newInjectedActor.fileID = Convert.ToInt32(valueStr, fromBase: 10);
+                }
+                else if (command == "object_fid")
+                {
+                    newInjectedActor.objectFid = Convert.ToInt32(valueStr, fromBase: 10);
                 }
 
                 var uvalue = Convert.ToUInt32(valueStr, fromBase: 16);
@@ -2758,7 +2742,12 @@ namespace MMR.Randomizer
 
             if ( ! Directory.Exists(directory)) return;
 
+            uint END_VANILLA_OBJ_SEGMENT = 0x01E5E600;
+
             InjectedActors.Clear();
+            var codeFile = RomData.MMFileList[31].Data;
+            var objectTableOffset = 0x11CC80;
+
 
             foreach (string filePath in Directory.GetFiles(directory, "*.mmra"))
             {
@@ -2795,8 +2784,45 @@ namespace MMR.Randomizer
                             }
 
                             var injectedActor = ParseMMRAMeta(new StreamReader(metaFileEntry.Open(), Encoding.Default).ReadToEnd());
-
                             injectedActor.filename = filePath; // debugging
+
+                            // check for duplicate actor
+                            var copyOvlFileSearch = InjectedActors.Find(act => act.fileID == injectedActor.fileID);
+                            if (copyOvlFileSearch != null)
+                            {
+                                throw new Exception("\n\n" +
+                                    "ERROR (Actor Inject):\n" +
+                                    " Two separate actor files are trying to overwrite the same file.\n" +
+                                    "File 1: " + injectedActor.filename + "\n" +
+                                    "File 2: " + copyOvlFileSearch.filename + "\n\n" +
+                                    "Please remove one before building another seed.\n");
+                            }
+
+                            // we need to inject actors if we find them
+                            // TODO move this to a "load all objects" separate function where we rank them by size
+                            // so we can re-use some old spots instead of just extending
+                            var objectFileEntry = zip.GetEntry(filename + ".object");
+                            if (objectFileEntry != null) // object included
+                            {
+                                newBinLen = ((int)objectFileEntry.Length) + ((int)objectFileEntry.Length % 0x10); // dma padding
+                                var objectData = new byte[newBinLen];
+                                objectFileEntry.Open().Read(objectData, 0, objectData.Length);
+
+                                RomData.MMFileList[injectedActor.objectFid].Data = objectData;
+                                RomData.MMFileList[injectedActor.objectFid].WasEdited = true;
+
+                                // we need to update the object table with the size of the new object
+                                uint newSegmentROMStart = END_VANILLA_OBJ_SEGMENT;
+                                uint newSegmentROMEnd = newSegmentROMStart + (uint) objectData.Length;
+                                if (newSegmentROMEnd > 0x02000000)
+                                {
+                                    throw new Exception("Object segment overflow, reduce your actors that use custom objects");
+                                }
+                                END_VANILLA_OBJ_SEGMENT = newSegmentROMEnd;
+                                ReadWriteUtils.Arr_WriteU32(codeFile, (objectTableOffset + (2 * 4 * injectedActor.objID)), newSegmentROMStart);
+                                ReadWriteUtils.Arr_WriteU32(codeFile, (objectTableOffset + (2 * 4 * injectedActor.objID + 4)), newSegmentROMEnd);
+                            }
+
 
                             InjectedActors.Add(injectedActor);
 
@@ -3172,7 +3198,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 43.1\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 44.4\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

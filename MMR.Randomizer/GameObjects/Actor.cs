@@ -550,7 +550,8 @@ namespace MMR.Randomizer.GameObjects
         // bush: 0xFF0B, small tree: 0xFF02
         // big tree: 0xFF00, big tree with shop man in it: 0x0A1A
         // 17,18 are leaf particles
-        [GroundVariants(0xFF00, 0xFF01, 0xFF02, 0xFF0B, // normal vanilla varieties
+        [GroundVariants(0xFF00, 0xFF01, 0xFF02,  // normal vanilla varieties
+            0xFF0B, 0xFF0D, // Bushes
             0x0A1A, 0xFF1A, // spawns with EnAni in the tree (if the object exists)
             0xA, // really big ugly tree from OOT adult kakariko?
             0xF, // even bigger bush, was this EVER used? even in OOT?
@@ -668,7 +669,7 @@ namespace MMR.Randomizer.GameObjects
         [FlyingToGroundHeightAdjustment(200)]
         ///* 
         [EnemizerScenesPlacementBlock(
-            Scene.Grottos, Scene.AstralObservatory, Scene.ZoraHallRooms, Scene.PiratesFortressRooms,
+            Scene.Grottos, Scene.AstralObservatory, Scene.ZoraHallRooms, Scene.PiratesFortressRooms, Scene.DekuPalace,
             Scene.DekuShrine, Scene.GoronRacetrack, Scene.WaterfallRapids, Scene.GormanTrack, Scene.GoronRacetrack,
             Scene.RoadToIkana, Scene.IkanaCastle, Scene.BeneathGraveyard, Scene.DampesHouse,
             Scene.SwampSpiderHouse, Scene.OceanSpiderHouse,
@@ -855,7 +856,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x99)]
         [CheckRestricted(Item.ShopItemGormanBrosMilk, Item.MaskGaro)]
         [GroundVariants(0xFE03, 0xFE04)]
-        [VariantsWithRoomMax(max:0, 0xFE03, 0xFE04)] // inf loop if only one and not two
+        [VariantsWithRoomMax(max: 0, 0xFE03, 0xFE04)] // inf loop if only one and not two
         [UnkillableAllVariants]
         GormanBros = 0x67, // En_In
 
@@ -1175,7 +1176,7 @@ namespace MMR.Randomizer.GameObjects
         // 0X03 is a walking type
         [GroundVariants(1, 2,
             0)] // in mayor meeting
-        [VariantsWithRoomMax(max:0, variant:0)]
+        [VariantsWithRoomMax(max: 0, variant: 0)]
         [PathingVariants(0x603, 0x503)]
         [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)]
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0090)]
@@ -1376,7 +1377,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x140)]
         [CheckRestricted(Item.MundaneItemHoneyAndDarlingPurpleRupee, Item.HeartPieceHoneyAndDarling)]
         [GroundVariants(0)]
-        [VariantsWithRoomMax(0,0)] // crash on spawn without its platform
+        [VariantsWithRoomMax(0, 0)] // crash on spawn without its platform
         [UnkillableAllVariants]
         HoneyAndDarling = 0xB5, // En_Fu
 
@@ -1536,8 +1537,13 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(mask: 0x7F, shift: 9)]
         Obj_Roomtimer = 0xD3, // Obj_Roomtimer
 
+        [ActorizerEnabled]
         [FileID(178)]
         [ObjectListIndex(0x127)]
+        [CheckRestricted(Item.MaskTruth)]
+        [FlyingVariants(0x0)]
+        [OnlyOneActorPerRoom]
+        [UnkillableAllVariants]
         CursedSwampSpiderhouseMan = 0xD4, // En_Ssh
 
         EmptyD5 = 0xD5, // EmptyD5
@@ -1733,19 +1739,23 @@ namespace MMR.Randomizer.GameObjects
         [RespawningAllVariants] // yes really
         [FlyingToGroundHeightAdjustment(150)]
         [VariantsWithRoomMax(max: 7, variant: 0, 1)]
-        Guay = 0xF1,
+        Guay = 0xF1, // En_Crow
 
         EmptyF2 = 0xF2,
 
         [ActorizerEnabled]
         [FileID(227)]
         [ObjectListIndex(0x146)]
+        [CheckRestricted(Scene.BeneathTheWell, variant: 0x0, Item.ItemWellCowMilk)]
+        [CheckRestricted(Scene.RanchBuildings, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
+        [CheckRestricted(Scene.RomaniRanch, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
+        [CheckRestricted(Scene.Grottos, variant: 0x0, Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
         [GroundVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [WallVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [UnkillableAllVariants]
-        [EnemizerScenesExcluded(Scene.RanchBuildings, Scene.RomaniRanch, Scene.Grottos, Scene.BeneathTheWell)]
-        [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.DekuShrine)] // blocking enemy
-        Cow = 0xF3,
+        //[EnemizerScenesExcluded(Scene.RanchBuildings, Scene.RomaniRanch, Scene.Grottos, Scene.BeneathTheWell)]
+        [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.DekuShrine)] // blocking the way
+        Cow = 0xF3, // En_Cow
 
         EmptyF4 = 0xF4,
         EmptyF5 = 0xF5,
@@ -1969,7 +1979,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x110)]
         [CheckRestricted(Item.ItemNotebook)]
         [GroundVariants(0x510, 0x10)]
-        [VariantsWithRoomMax(max:0, variant: 0x510, 0x10)] // does not spawn except in cutscenes, dont place it will be empty
+        [VariantsWithRoomMax(max: 0, variant: 0x510, 0x10)] // does not spawn except in cutscenes, dont place it will be empty
         [UnkillableAllVariants]
         JimboTheStalker = 0x11C, // En_Bom_Bowl_Man
 
@@ -1980,7 +1990,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.TownShootingGallery, 0xFF01, Item.UpgradeBiggestQuiver)]
         [GroundVariants(0x000F, 0xFF01)]
         //[VariantsWithRoomMax(max:0, 0x000F, 0xFF01)] // assumption, you cannot see their legs
-        [VariantsWithRoomMax(max:3, variant: 0x000F, 0xFF01)]
+        [VariantsWithRoomMax(max: 3, variant: 0x000F, 0xFF01)]
         [UnkillableAllVariants]
         ArcheryMiniGameMan = 0x11D, // En_Syateki_Man
 
@@ -2113,7 +2123,7 @@ namespace MMR.Randomizer.GameObjects
         //[ActorizerEnabled] // wont spawn because the required item objects are likely missing
         [FileID(276)]
         [ObjectListIndex(0xD0)]
-        [CheckRestricted(Scene.BombShop, variant:02,
+        [CheckRestricted(Scene.BombShop, variant: 02,
             Item.ShopItemBombsBomb10, Item.ShopItemBombsBombchu10, Item.ItemBombBag, Item.UpgradeBigBombBag)]
         [CheckRestricted(Scene.ZoraHallRooms, variant: 0x3E0,
             Item.ShopItemZoraArrow10, Item.ShopItemZoraRedPotion, Item.ShopItemZoraShield)]
@@ -2122,7 +2132,7 @@ namespace MMR.Randomizer.GameObjects
         // 2 is bombshop, 3E0 is zora shopf
         [GroundVariants(0x3E0, // zora shop
             0x3E1, // goron shop
-            0x2   )] // bomb shop
+            0x2)] // bomb shop
         [UnkillableAllVariants]
         ShopSeller = 0x135, // En_Sob1
 
@@ -2139,7 +2149,7 @@ namespace MMR.Randomizer.GameObjects
         // 0x7FA1: jumping goron, 0x7FC1 stretching goron pair
         // 0x7F81: single leg stretch goron, 0x7F81 single amr stretch goron
         //[GroundVariants(0x8, 0x7FE2)]
-        [GroundVariants( 0x8, // smithy
+        [GroundVariants(0x8, // smithy
             0x7FE2, 0x7F85, 0x7F86, 0x7F87,
             0x7FA1, 0x7FC1, 0x7F81, 0x7FF2)] // racetrack
         [VariantsWithRoomMax(max: 1,
@@ -2347,9 +2357,11 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x1500)]
         [FileID(313)]
         [ObjectListIndex(0x172)]
-        [FlyingVariants(0xFF34, 0xFF02, 0xFF03, 0x0102, 0x0103, 0xFF01)]
-        [WallVariants(0xFF9F, 0x019F)]
-        // one of these is sit on the wall bat from rtss: FF03/01/9F
+        [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT, Item.CollectableIkanaGraveyardDay2Bats1)]
+        [FlyingVariants(0xFF34,
+            0xFF02, 0xFF03, 0x0102, 0x0103, // graveyard
+            0xFF01)]
+        [WallVariants(0xFF9F, 0x019F)] // 19F graveyard
         [VariantsWithRoomMax(max: 1, 0xFF34)] // swarm
         [FlyingToGroundHeightAdjustment(150)]
         //[EnemizerScenesExcluded(Scene.IkanaGraveyard)] // need bats for dampe day 2 check
@@ -2653,7 +2665,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [EnemizerScenesExcluded(Scene.Woodfall, Scene.DekuPalace, Scene.WoodfallTemple, Scene.OdolwasLair,
             Scene.EastClockTown, Scene.NorthClockTown, Scene.IkanaCastle, Scene.SnowheadTemple)]
-        DekuFlower = 0x183,
+        DekuFlower = 0x183, // Obj_Etcetera
 
         [EnemizerEnabled] // AI gets confused, backwalks forever, pathing?
         [ActorInitVarOffset(0x445C)]
@@ -2670,7 +2682,8 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [FileID(351)]
         [ObjectListIndex(0xBB)]
-        [WaterVariants(0x2002, 0x2006, 0x200B, 0x2003, 0x2004, 0x2005, 0x200C)]
+        [WaterVariants(0x2002, 0x2003, 0x2004, 0x2005, 0x2006, 0x200B, 0x200C, 0x200D)]
+        //[FlyingVariants(0x101E, 0x100D, 0x1011, 0x1019, 0x1014)] // loads more, think there are flags here
         // if I had a hanging from cieling thing like spiders this would work fine
         //[WallVariants(0x100D,  0x110E, 0x1011, 0x1014, 0x1016, 0x1017, 0x1019)]
         [UnkillableAllVariants] // actorcat PROP, not detected as enemy
@@ -2686,7 +2699,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x18E)]
         [CheckRestricted(Item.ItemPictobox)]
         [GroundVariants(0)]
-        [VariantsWithRoomMax(0,0)] // crash reason unk
+        [VariantsWithRoomMax(0, 0)] // crash reason unk
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         InjuredKoume = 0x187, // En_Tru
@@ -2846,12 +2859,12 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled] // regular romani
         [FileID(379)]
         [ObjectListIndex(0xB7)] // 100 and FF00
-        //[CheckRestricted(Item.SongEpona, Item.ItemBottleAliens, Item.MaskCircusLeader)]
-        [PathingVariants(0xFF00, 0x100)] // all vanilla are 0xB7
+        [CheckRestricted(Item.SongEpona, Item.ItemBottleAliens)]
+        [PathingVariants(0xFF00, 0x100)]
         [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)] //zzz
         [UnkillableAllVariants]
         //[EnemizerScenesExcluded(Scene.RomaniRanch, Scene.RanchBuildings)]
-        Romani1 = 0x1A4, // En_Ma4
+        RomaniWithBow = 0x1A4, // En_Ma4
 
         // twig?
         [FileID(380)]
@@ -3061,13 +3074,14 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1AB)]
         CuriosityShopMan = 0x1C4, // En_Fsn
 
-        //[ActorizerEnabled]
+        [ActorizerEnabled]
         [FileID(416)]
         [ObjectListIndex(0x1AC)]
         // this is not enough because he is boat master
         [CheckRestricted(Item.HeartPiecePictobox, Item.MundaneItemPictographContestBlueRupee, Item.MundaneItemPictographContestRedRupee)]
-        [GroundVariants(0)]
-        [VariantsWithRoomMax(0, 0)] // not sure he should be put places without legs
+        [GroundVariants(0)] // he has LEGS
+        //[VariantsWithRoomMax(0, 0)]
+        [EnemizerScenesExcluded(Scene.TouristCenter)]
         [UnkillableAllVariants]
         SwampTouristGuide = 0x1C5, // En_Shn
 
@@ -3093,6 +3107,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1E5)]
         En_Lift_Nuts = 0x1C9, // En_Lift_Nuts
 
+        // TODO try with new actor rando, ignore placement until I create a version that does not move
         //[ActorizerEnabled] //busted
         [FileID(420)]
         [ObjectListIndex(0x1AF)]
@@ -3100,6 +3115,8 @@ namespace MMR.Randomizer.GameObjects
         Dampe = 0x1CA, // En_Tk
 
         Empty1CB = 0x1CB,
+
+        // is this the west clocktown stairs?
         [FileID(421)]
         [ObjectListIndex(0x1B0)]
         Bg_Market_Step = 0x1CC, // Bg_Market_Step
@@ -3212,15 +3229,20 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1BB)]
         Goht = 0x1DD, // Boss_Hakugin
 
+        [ActorizerEnabled]
         [FileID(439)]
         [ObjectListIndex(0x144)]
+        [CheckRestricted(Item.HeartPiecePoeHut)]
+        [GroundVariants(0x0)]
         [SwitchFlagsPlacement(mask: 0xFF, shift: 3)] // 0x7F8
+        [UnkillableAllVariants]
+        [EnemizerScenesExcluded(Scene.IkanaCanyon, Scene.SecretShrine)]
         SpiritHouseOwner = 0x1DE, // En_Gb2
 
         // unused monkey instrument prompt
         [FileID(440)]
         [ObjectListIndex(0x1)]
-        En_Onpuman = 0x1DF, // En_Onpuman
+        Unused_EnOnpuman = 0x1DF, // En_Onpuman
 
         [FileID(441)]
         [ObjectListIndex(0x1BF)]
@@ -3229,7 +3251,7 @@ namespace MMR.Randomizer.GameObjects
         // Unused seahourse spawner
         [FileID(442)]
         [ObjectListIndex(0x1)]
-        Unused_En_Tag_Obj = 0x1E1, // En_Tag_Obj
+        Unused_EnTagObj = 0x1E1, // En_Tag_Obj
 
         [FileID(443)]
         [ObjectListIndex(0x1C1)]
@@ -3348,9 +3370,10 @@ namespace MMR.Randomizer.GameObjects
         [FileID(457)]
         [ActorInstanceSize(0x2018)]
         [ObjectListIndex(0x1D7)]
+        [CheckRestricted(Item.HeartPieceLabFish)]
         [WaterVariants(0)]
         [UnkillableAllVariants]
-        [EnemizerScenesExcluded(Scene.MarineLab)]
+        //[EnemizerScenesExcluded(Scene.MarineLab)]
         [EnemizerScenesPlacementBlock(Scene.GreatBayCoast, Scene.ZoraCape)] // issue: if both fish and labfish spawn, they eat, and cutscene locks
         LabFish = 0x1F1, // En_Fish2
 
@@ -3387,11 +3410,15 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(461)]
         [ObjectListIndex(0x1CE)]
+        [CheckRestricted(Item.SongNewWaveBossaNova)]
         // 2000 is hookshot room, 1A00 is twin barrel, 0x1E00 is barrel room, 1C00 is last room
         // the three at pinnacle rock are 0x1400, 0x1600, 0x1800
         // 0 loaded fine, what happens if we load smaller values? can we have 3 or more?
-        [WaterVariants(0x0, 0x1000, 0x1200, 0x1300, 0x1500, 0x1700)]
+        [WaterVariants(0x0, 0x1000, 0x1200, 0x1300, 0x1500, 0x1700, // non-vanilla
+            0x1200, 0x1400, 0x1600, // pinnacle
+            0x1C00, 0x1A00, 0x1E00, 0x2000)] // pirates
         [VariantsWithRoomMax(max: 1, variant: 0x0, 0x1000, 0x1200, 0x1300, 0x1500, 0x1700)]
+        [VariantsWithRoomMax(max: 0, variant: 0x0, 0x1400, 0x1600, 0x1500, 0x1C00, 0x1A00, 0x1E00, 0x2000)]
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 9)]
         ZoraEgg = 0x1F5, // En_Zoraegg
@@ -3431,8 +3458,14 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesExcluded(Scene.WoodfallTemple, Scene.DekuKingChamber)] // if her object is not in the king chamber no cutscene after bottle delivery
         DekuPrincess = 0x1FC, // En_Dnp
 
+        [ActorizerEnabled]
         [FileID(469)]
         [ObjectListIndex(0x1D5)]
+        [GroundVariants(0xFFFF)]
+        [VariantsWithRoomMax(max: 0, 0xFFFF)]
+        [EnemizerScenesExcluded(Scene.Snowhead)]
+        [OnlyOneActorPerRoom]
+        [UnkillableAllVariants]
         SnowheadBiggoron = 0x1FD, // En_Dai
 
         [FileID(470)]
@@ -3447,7 +3480,7 @@ namespace MMR.Randomizer.GameObjects
 
         // the wackest actor that controls the whole alien invasion event, and a lot of stuff at ranch
         [FileID(472)]
-        [ObjectListIndex(0x1)]
+        [ObjectListIndex(0x1)] // multiple object
         AllAlienEventActors = 0x200, // En_Invadepoh
 
         //[ActorizerEnabled] // softlock if you enter the song teach cutscene, which in rando is proximity
@@ -3467,7 +3500,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInstanceSize(0x3C8)]
         [ObjectListIndex(0xE2)]
         // to nuke ONLY in stockpot, hardcoded
-        //[CheckRestricted(Item.TradeItemRoomKey, Item.TradeItemKafeiLetter, Item.MaskCouple)]
+        [CheckRestricted(Scene.StockPotInn, variant: 2, Item.TradeItemRoomKey, Item.TradeItemKafeiLetter, Item.MaskCouple)]
         // 8001 is pathing to laundrypool
         [GroundVariants(2 // inn
             )]
@@ -3515,12 +3548,14 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [FileID(479)]
         [ObjectListIndex(0x1F1)]
+        [CheckRestricted(Scene.BeneathTheWell, variant: 0xFF00, Item.BottleCatchBigPoe)]
+        [CheckRestricted(Scene.BeneathGraveyard, variant: 0xFF01, Item.BottleCatchBigPoe, Item.ItemBottleDampe)]
         // params: 0xFF00 is switch flags, if switch flag is exactly 0xFF then switch flags are ignored
         //    0xFF is type, where 0 is well, 1 is suppmoned in dampe house, 2/3/4 are dampe fire subtypes
         // we should be able to use 0xFF00... but rando changes something that makes dampe po spawn instant and well po has a cutscene
         [FlyingVariants(0xFF01)]
         [GroundVariants(0xFF01)]
-        [EnemizerScenesExcluded(Scene.BeneathTheWell, Scene.DampesHouse)] // well and dampe house must be vanilla for scoopsanity
+        //[EnemizerScenesExcluded(Scene.BeneathTheWell, Scene.DampesHouse)] // well and dampe house must be vanilla for scoopsanity
         //[OnlyOneActorPerRoom]
         [VariantsWithRoomMax(max: 2, variant: 0xFF01, 0xFF00)]
         //[UnkillableAllVariants] // only 1, the one with a no-respawn flag, spawns readily, so for now, assume the player kills one and can't kill another
@@ -3557,15 +3592,14 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0xFE04, Item.UpgradeGiantWallet, Item.MundaneItemOceanSpiderHouseDay2PurpleRupee, Item.MundaneItemOceanSpiderHouseDay3RedRupee)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0xFE05, Item.UpgradeGiantWallet, Item.MundaneItemOceanSpiderHouseDay2PurpleRupee, Item.MundaneItemOceanSpiderHouseDay3RedRupee)]
         //[CheckRestricted(Item.MaskTruth)] // but we want to only change the one that is spiderhouse... hardcoded
-        // 0xFF02 is before you finish swamp spiderhouse
-        // 0xFF03 crashes on approach
-        // FE04/5 doesn't spawn, probably until you finish the spiderhouse
+        // 0xFF02 is cured swamp spiderhouse (Object: 0xD9)
+        // FE04/5 is oceanspiderhouse before and after wallet
         // FE03 is in SCT, he stares up at the moon, except doesn't know where the moon is, can face the wrong way
         // FE01 doesn't want to spawn, hmm, 02 is swamp spiderhouse, likely doesn't want to spawn either until house is cleared
         [GroundVariants(0xFE03, // staring at the moon
             0xFF02, // swamp spiderhouse
             0xFE04, 0xFE05)] // ocean spiderhouse
-        [VariantsWithRoomMax(max:0, variant: 0xFF02, 0xFE04, 0xFE05)] // temp disable, as double object actor is broken
+        [VariantsWithRoomMax(max: 0, variant: 0xFF02, 0xFE04, 0xFE05)] // temp disable, as double object actor is broken
         [UnkillableAllVariants]
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
             variant: 2, 9)]
@@ -3573,7 +3607,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesPlacementBlock(Scene.Grottos, Scene.InvertedStoneTower, Scene.BeneathGraveyard, Scene.BeneathTheWell,
             Scene.GoronShrine, Scene.IkanaCastle, Scene.OceanSpiderHouse, Scene.SwampSpiderHouse,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.InvertedStoneTowerTemple, Scene.Woodfall)]
-        Seth1 = 0x20B, // En_Sth, the green shirt guy, "Seth"? spiderhouses, hands waving at you from telescope guy
+        Seth1 = 0x20B, // En_Sth, the green shirt guy from SCT that runs to Oceanspiderhouse to hide, also cured guy in Swamp spiderhouse
 
         [FileID(483)]
         [ObjectListIndex(0x1F4)]
@@ -3597,15 +3631,15 @@ namespace MMR.Randomizer.GameObjects
         [WallVariants(0x3F)] // 3F has no cutscene, no camera concerns
         [GroundVariants(0x3F)] // kinda silly
         [UnkillableAllVariants]
-        [EnemizerScenesExcluded(Scene.OceanSpiderHouse)] // object is shared with multiple actors in this scene, breaks whole area
+        [EnemizerScenesExcluded(Scene.OceanSpiderHouse)] // object is shared with multiple actors in this scene, breaks whole area to remove
         [TreasureFlagsPlacement(mask: 0x7F, shift: 2)]
         SkullKidPainting = 0x210, // En_Kin2_Picture
 
-        //todo?
         [FileID(488)]
         [ObjectListIndex(0x1F5)]
         OceanSpiderhouseMovableShelf = 0x211, // Bg_Kin2_Shelf
 
+        // kinda want to try randomizing, but I need to check against ALL checks in the graveyard, kinda hard to do
         [FileID(489)]
         [ObjectListIndex(0x142)]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
@@ -3689,7 +3723,7 @@ namespace MMR.Randomizer.GameObjects
         // Aviels room: 0xCB1
         // path == 0x3F ignores path, just stands in one spot
         // in testing, 2 is not bonkable... so why does FC01 not bonk?, should be type 0
-        // 0xE0 is type
+        // 0xE0 >> 5 is type
         // 0 GERUDO_PURPLE_TYPE_CUTSCENE, // CANNOT BONK in some cases
         // 1 (2) GERUDO_PURPLE_TYPE_BOAT_SENTRY, //!< on boats
         // 2 (4) GERUDO_PURPLE_TYPE_AVEIL_GUARD,
@@ -3697,7 +3731,7 @@ namespace MMR.Randomizer.GameObjects
         // 0x02 always looks forward for boats or something, FC00 will hear you and turn to look at you
         [PathingVariants(0x1F, 0xEA, 0x04EA, 0x81F, 0x8EA, 0xC1F, 0xCEA, 0x101F, 0x104B, 0x10EA,
                 0x144B, 0x14EA, 0x18EA, 0x284B, 0x28EB, 0x30EB, 0x34EB, 0x38EB, 0x3CEB, 0x4C24)]
-        [GroundVariants(0xFC20, 0xFC40, 0xFCE0)]
+        //[GroundVariants(0xFC20, 0xFC40 /*, 0xFCE0 */)]
         [VariantsWithRoomMax(max: 0, variant: 0x4C24, 0xFC00, 0xFC01, 0x81F, 0xC1F)] // only type 7 (0xE0) should be bonkable
         [VariantsWithRoomMax(max: 1, variant: 0xFC00)]
         [VariantsWithRoomMax(max: 1, variant: 0x1F, 0xEA, 0x04EA, 0x8EA, 0xCEA, 0x101F, 0x104B, 0x10EA,
@@ -3761,8 +3795,13 @@ namespace MMR.Randomizer.GameObjects
              Scene.GreatBayCoast, Scene.ZoraCape, Scene.IkanaCanyon, Scene.StoneTower, Scene.InvertedStoneTower)]
         OwlStatue = 0x223, // Obj_Warpstone
 
+        [ActorizerEnabled]
         [FileID(507)]
         [ObjectListIndex(0x206)]
+        [CheckRestricted(Item.MaskZora)]
+        [WaterVariants(0x80F, 0xC0F, 0x100F)]
+        [VariantsWithRoomMax(max:0, variant: 0x80F, 0xC0F, 0x100F)]
+        [UnkillableAllVariants]
         Mikau = 0x224, // En_Zog
 
         [FileID(508)]
@@ -3833,6 +3872,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x20E)]
         Obj_Boat = 0x22C, // Obj_Boat
 
+        // ignored because of how borring it is, need way to restrict these
         [FileID(516)]
         [ObjectListIndex(0x250)]
         // switch flags
@@ -3884,8 +3924,9 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(523)]
         [ObjectListIndex(0x23A)]
-        [GroundVariants(0x050B)] // sitting in mayors office
-        [VariantsWithRoomMax(max:0, variant:0x050B)] // we dont want a sitting npc to be placed places, just replace, also talking to is softlock, and we cannot modify because rando needs this actor for things
+        [CheckRestricted(Scene.MilkBar, variant:0x3FFF, Item.MaskCircusLeader)]
+        [GroundVariants(0x050B, 0x3FFF)] // sitting in mayors office
+        [VariantsWithRoomMax(max:0, variant:0x050B, 0x3FFF)] // we dont want a sitting npc to be placed places, just replace, also talking to is softlock, and we cannot modify because rando needs this actor for things
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(mask:0x7F, shift:0)]
         [EnemizerScenesExcluded(Scene.MilkBar)]
@@ -4004,6 +4045,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(537)]        
         [ObjectListIndex(0xA1)]
+        [CheckRestricted(Scene.BombShop, variant:ActorConst.ANY_VARIANT, Item.SongEpona, Item.ItemBottleAliens, Item.MaskCircusLeader)]
         // 9 is the one that sells you kegs
         // 1 and 1E0 just stand around talking
         // assumption 0xF is talking ID
@@ -4109,7 +4151,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(553)]
         [ObjectListIndex(0x22B)]
-        [CheckRestricted(Item.HeartContainerGreatBay)] // lol lets see what happens
+        [CheckRestricted(Item.MundaneItemLuluBadPictographBlueRupee, Item.MundaneItemLuluGoodPictographRedRupee)]
         // E01 is rehersal
         [GroundVariants(0xFE0F)]
         [WaterVariants(0xFE0F)]
@@ -4188,12 +4230,17 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
         IkanaCanyonHookshotStump = 0x25E, // Obj_HsStump
 
-        //[ActorizerEnabled] // doesn't spawn with a flower, looks silly
-        // HEY the other actors, that make flowers, we can use them for dual deku, would require custom code to put them on top of each other
+        // placing them in the world is dumb since they dont spawn their own flower, but we can fix that with custom actor code
+        [ActorizerEnabled] // doesn't spawn with a flower, looks silly
         [FileID(566)]
         [ObjectListIndex(0x12B)]
+        [CheckRestricted(Item.MaskTruth)] // no idea which one is the important one... bleh
         [GroundVariants(0x584)]
+        [VariantsWithRoomMax(max:0, variant:0x584)] // place only custom, not Vanilla
+        [PathingTypeVarsPlacement(mask:0x7F, shift:0)]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
+        [CompanionActor(DekuFlower, ourVariant: -1, variant: 0x17F)]
+        [CompanionActor(GrassRockCluster, ourVariant: -1, variant: 0x801)]
         [UnkillableAllVariants] // I think?
         SleepingScrub = 0x25F, // En_Hidden_Nuts
 
@@ -4658,8 +4705,12 @@ namespace MMR.Randomizer.GameObjects
 
         // seriously? this is a different actor?
         // they are all sitting down though, so boring for now until we add actor moving for ledge sitting
+        [ActorizerEnabled]
         [FileID(636)]
         [ObjectListIndex(0x142)]
+        [CheckRestricted(Item.HeartPieceOceanSpiderHouse)]
+        [GroundVariants(0xF001, 0xF002, 0xF003, 0xF004, 0xF005, 0xF006)]
+        [VariantsWithRoomMax(max: 1, variant:0xF001, 0xF002, 0xF003, 0xF004, 0xF005, 0xF006)]
         StalchildHintGiver = 0x2A5, // En_Hint_Skb
 
         // ??

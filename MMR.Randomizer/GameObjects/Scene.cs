@@ -227,7 +227,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1304)]
         [SceneInternalId(0x2B)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // can block the stairs
-            Actor.IceBlock)] // the big one can be too big
+            Actor.IceBlock,  // the big one can be too big
+            Actor.Dexihand)] // if it grabs you as you fall into a grotto hole it can hardlock
         DekuPalace = 0x28,
 
         [FileID(1308)]
@@ -282,9 +283,10 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1332)]
         [SceneInternalId(0x38)]
-        //[EnemizerSceneEnemyReplacementBlock(Actor.Leever, Actor.PoeBalloon)] // .. why?
         [EnemizerSceneEnemyReplacementBlock(Actor.LikeLike,
-            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.Tijo, Actor.Bombiwa, Actor.BronzeBoulder)]
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.Tijo,
+            Actor.Bombiwa, Actor.BronzeBoulder,
+            Actor.RegularZora, Actor.SwimmingZora, Actor.WarpDoor)]
         ZoraCape = 0x35,
 
         [FileID(1334)]
@@ -532,6 +534,9 @@ namespace MMR.Randomizer.GameObjects
             Actor.ClocktowerGearsAndOrgan, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // organ is huge, covers the mayor's door
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
             Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BomberHideoutGuard,
+                Actor.Peahat, Actor.Tijo, Actor.ArmosStatue, Actor.ClocktowerGearsAndOrgan, Actor.CircleOfFire, Actor.GibdoWell, // worried about big blocking actors
+                Actor.Wolfos)]
         EastClockTown = 0x69,
 
         [FileID(1512)]
