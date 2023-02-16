@@ -208,9 +208,12 @@ namespace MMR.Randomizer
                     var restrictedChecks = restriction.Checks;
                     for (int checkIndex = 0; checkIndex < restrictedChecks.Count; checkIndex++)
                     {
+                        if (_randomized.ItemList == null) return true; // vanilla logic
+
                         // TODO: make it random rather than yes/no
                         var itemInCheck = _randomized.ItemList.Find(item => item.NewLocation == restrictedChecks[checkIndex]).Item;
-                        var itemIsNotJunk = (itemInCheck != GameObjects.Item.IceTrap) && (junkCategories.Contains((GameObjects.ItemCategory)itemInCheck.ItemCategory()) == false);
+                        //var itemIsNotJunk = (itemInCheck != GameObjects.Item.IceTrap) && (junkCategories.Contains((GameObjects.ItemCategory)itemInCheck.ItemCategory()) == false);
+                        var itemIsNotJunk = ! ItemUtils.IsJunk(itemInCheck);
                         if (itemIsNotJunk)
                         {
                             return true;
@@ -319,20 +322,23 @@ namespace MMR.Randomizer
 
                     if (objList.Contains(obj)) { continue; } // already known
 
-                    var matchingEnemy = VanillaEnemyList.Find(act => act.ObjectIndex() == obj);
-                    if (matchingEnemy > 0                                                         // exists in the list of enemies we want to change
+                    //var matchingEnemy = VanillaEnemyList.Find(act => act.ObjectIndex() == obj);
+                    Actor matchingEnemy = thisSceneData.Actors.Find(act => act.ObjectID == obj);
+                    if (matchingEnemy == null) continue;
+
+                    GameObjects.Actor matchingEnum = matchingEnemy.ActorEnum;
+                    if (matchingEnum > 0                                                         // exists in the list of enemies we want to change
                        //&& !objList.Contains(matchingEnemy.ObjectIndex())                          // not already extracted from this scene
-                       && !matchingEnemy.ScenesRandomizationExcluded().Contains(scene.SceneEnum)) // not excluded from being extracted from this scene
+                       && !matchingEnum.ScenesRandomizationExcluded().Contains(scene.SceneEnum)) // not excluded from being extracted from this scene
                     {
 
-                        if (ObjectIsCheckBlocked(scene, matchingEnemy))
+                        if (ObjectIsCheckBlocked(scene, matchingEnum))
                         {
                             thisSceneData.Actors.RemoveAll(act => act.ObjectID == obj);
-                            //thisSceneData.ActorsPerObject.
                         }
                         else
                         {
-                            objList.Add(matchingEnemy.ObjectIndex());
+                            objList.Add(matchingEnum.ObjectIndex());
                         }
                         // else: ignore, the actors will remain vanilla
                     }
@@ -423,6 +429,13 @@ namespace MMR.Randomizer
             terminafieldScene.Maps[0].Actors[110].Position.y = -280; // fixes the leever spawn is too low (bombchu explode)
             terminafieldScene.Maps[0].Actors[121].Position.y = -280; // fixes the leever spawn is too low (bombchu explode)
             terminafieldScene.Maps[0].Actors[153].Position.y = -280; // fixes the leever spawn is too low (bombchu explode)
+
+            // the south field dekubaba to the east is facing south, because in vanilla its direction does not matter
+            // rotate to face out of the field
+            var southDekubaba = terminafieldScene.Maps[0].Actors[45];
+            southDekubaba.Rotation.y = ActorUtils.MergeRotationAndFlags(180 , flags: southDekubaba.Rotation.y); // fixes the leever spawn is too low (bombchu explode)
+            southDekubaba = terminafieldScene.Maps[0].Actors[44];
+            southDekubaba.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: southDekubaba.Rotation.y); // fixes the leever spawn is too low (bombchu explode)
 
             // the two wolfos spawn in twin islands spawn off scew, 
             //   redead falls through the floor when you approach them with this skew
@@ -518,6 +531,13 @@ namespace MMR.Randomizer
 
                 // behind table should be facing table
                 tradingPost.Maps[0].Actors[4].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 210, flags: tradingPost.Maps[0].Actors[2].Rotation.y);
+
+                // we cannot randomize gorman brothers without randomizing their chasing horse counterparts
+                // except, this scene has an almost unused object: kanban, for the square sign you can only access if you go through the second fense
+                // what if we turn tht into the same actor as the tree, and turn the second object into a second ingo
+                var gormanTrack = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GormanTrack.FileID());
+                gormanTrack.Maps[0].Objects[11] = GameObjects.Actor.GormanBros.ObjectIndex();
+                gormanTrack.Maps[0].Actors[75].ChangeActor(GameObjects.Actor.Treee, vars: 0xFF02, modifyOld: true);
             }
         }
 
@@ -572,9 +592,8 @@ namespace MMR.Randomizer
                 ReadWriteUtils.Arr_WriteU32(playerFile, Dest: 0xE220, val: 0x00000000); //
 
                 // no water restrictions
-                //var codeFile = RomData.MMFileList[31].Data;
+                var codeFile = RomData.MMFileList[31].Data;
                 //ReadWriteUtils.Arr_WriteU32(codeFile, Dest: 0x06AEF0, val: 0x00000000); // nop the store byte FF which would disable the buttons
-
 
                 // for now, remove all form restrictions to see what works and what does not work anymore
                 /*
@@ -588,6 +607,14 @@ namespace MMR.Randomizer
                 }
                 // */
                 // RecreateFishing();
+
+
+                // can we just boost the dynapoly memory size?
+                // data locations:
+                // default 23000 is an ORI at 3da8, a4 for tope byte
+                // IsSmallMemScene is F000 at 3d58
+                // termina field is in data at sSceneMemList, not sure exact space
+                //ReadWriteUtils.Arr_WriteU32(codeFile, 0x3DA8, 0x2);
             }
 
             // testing why zrotation can be so broken for grottos
@@ -643,6 +670,10 @@ namespace MMR.Randomizer
             RomUtils.CheckCompressed(GameObjects.Actor.PowderKeg.FileListIndex());
             var kegFile = RomData.MMFileList[GameObjects.Actor.PowderKeg.FileListIndex()].Data;
             kegFile[0x1FF5] |= 0x02; // add ACTOR_FLAG_20000, makes it heavy 
+
+
+
+
 
             //PrintActorValues();
         }
@@ -1696,7 +1727,7 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.PatrollingPirate)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.ArcheryMiniGameMan)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TouristCenter, GameObjects.Actor.SwampTouristGuide, GameObjects.Actor.SmithyGoronAndGo)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.PatrollingPirate)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.CutsceneZelda)) continue;
@@ -3151,13 +3182,8 @@ namespace MMR.Randomizer
 
                 // for dingus that want moonwarp, re-enable dekupalace
                 var SceneSkip = new GameObjects.Scene[] {
-                    GameObjects.Scene.GreatBayCutscene,
-                    GameObjects.Scene.SwampShootingGallery,
-                    GameObjects.Scene.TownShootingGallery,
                     GameObjects.Scene.GiantsChamber,
-                    GameObjects.Scene.SakonsHideout,
-                    GameObjects.Scene.CutsceneMap,
-                    GameObjects.Scene.MilkBar };// , GameObjects.Scene.DekuPalace };
+                    GameObjects.Scene.SakonsHideout };// , GameObjects.Scene.DekuPalace };
 
                 PrepareEnemyLists();
                 SceneUtils.ReadSceneTable();
@@ -3208,7 +3234,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 44.4\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 45.3\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

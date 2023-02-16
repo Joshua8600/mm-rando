@@ -123,13 +123,31 @@ namespace MMR.Randomizer.Utils
                 {
                     var fileText = File.ReadAllText(filePath);
                     var workingList = JsonConvert.DeserializeObject<List<PlandoMusicCombo>>(fileText);
+
+                    if (workingList == null)
+                        throw new Exception($"MusicPlando: Plando file [{filePath}] failed to parse"); // not sure this one isnt an exception
+                    foreach (var plandoEvent in workingList)
+                    {
+                        if (plandoEvent.SongsList == null)
+                        {
+                            throw new Exception($"MusicPlando: Plando file\n [{filePath}]\n" +
+                                $" has a broken SongsList for event:\n [{plandoEvent.Name}]");
+                        }
+                        if (plandoEvent.SlotsList == null)
+                        {
+                            throw new Exception($"MusicPlando: Plando file\n [{filePath}]\n" +
+                                $" has a broken SlotsList for event:\n [{plandoEvent.Name}]");
+                        }
+
+                    }
+
                     musicPlandoList = musicPlandoList.Concat(workingList).ToList();
                 }
                 catch (Exception ex)
                 {
                     Debug.Print("Error: exception occurred reading plando file: " + ex.ToString());
                     #if DEBUG
-                      throw new Exception("plando file read error: " + ex.ToString() + " file: " + Path.GetFileName(filePath));
+                      throw new Exception($"plando file read error: " + ex.ToString() + " file: " + Path.GetFileName(filePath));
                     #endif
                 }
             }
@@ -164,8 +182,8 @@ namespace MMR.Randomizer.Utils
                     }
                     else if (! RomData.SequenceList.Any(u => u.Name == i))
                     {
-                        DebugOut("Song does not exist in sequence pool, did you misspell the song Name? " + i);
-                        musicCombo.SongsList.Remove(i);
+                        throw new Exception("Music Plando Error: " +
+                            "Song does not exist in sequence pool, did you misspell the song Name? \n" + i);
                     }
                 }
 
@@ -179,20 +197,20 @@ namespace MMR.Randomizer.Utils
                     }
                     else if (!RomData.TargetSequences.Any(u => u.Name == i))
                     {
-                        DebugOut("Slot does not exist in slot pool, did you misspell the slot Name or forget to add it to seqs.txt? " + i);
-                        musicCombo.SlotsList.Remove(i);
+                        throw new Exception("Music Plando Error: " +
+                            "Slot does not exist in slot pool, did you misspell the slot Name or forget to add it to seqs.txt? \n" + i);
                     }
                 }
 
                 if (musicCombo.SongsList.Count == 0)
                 {
-                    DebugOut("Plando Music Combo is starved, all songs have already been placed: " + musicCombo.Name);
-                    continue;
+                    throw new Exception("Music Plando Error: " +
+                        "Plando Music Combo is starved, all songs have already been placed: \n" + musicCombo.Name);
                 }
                 if (musicCombo.SlotsList.Count == 0)
                 {
-                    DebugOut("Plando Music Combo is starved, all slots are already filled: " + musicCombo.Name);
-                    continue;
+                    throw new Exception("Music Plando Error: " +
+                        "Plando Music Combo is starved, all slots are already filled: \n" + musicCombo.Name);
                 }
 
                 if (musicCombo.ItemDrawCount <= -1 || musicCombo.ItemDrawCount > musicCombo.SongsList.Count)

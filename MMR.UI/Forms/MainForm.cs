@@ -66,13 +66,17 @@ namespace MMR.UI.Forms
             Manual = new ManualForm();
             About = new AboutForm();
             HudConfig = new HudConfigForm();
+
+            this.AllowDrop = true;
+            this.DragEnter += new DragEventHandler(Main_ItemDragEnter);
+            this.DragDrop += new DragEventHandler(Main_ItemDragDrop);
+
             this.KeyPreview = true;
             this.KeyDown += MainForm_KeyDown_CtrlS;
-
             #if DEBUG
             Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + DEBUG ON";
             #else
-            Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + Isghj's Enemizer Test 44.4";
+            Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + Isghj's Enemizer Test 45.3";
             #endif
 
             var args = Environment.GetCommandLineArgs();
@@ -101,7 +105,6 @@ namespace MMR.UI.Forms
             // Main Settings
             TooltipBuilder.SetTooltip(cMode, "Select mode of logic:\n - Casual: The randomization logic ensures that the game can be beaten casually.\n - Using glitches: The randomization logic allows for placement of items that are only obtainable using known glitches.\n - Vanilla Layout: All items are left vanilla.\n - User logic: Upload your own custom logic to be used in the randomization.\n - No logic: Completely random, no guarantee the game is beatable.");
 
-            TooltipBuilder.SetTooltip(cBespokeItemPlacementOrder, "When enabled, items will be placed in a specific order designed to widen the variety in the generated seeds. When disabled, items will be placed in the default order.");
             TooltipBuilder.SetTooltip(cMixSongs, "Enable songs being placed among items in the randomization pool.");
             TooltipBuilder.SetTooltip(cProgressiveUpgrades, "Enable swords, wallets, magic, bomb bags and quivers to be found in the intended order.");
             TooltipBuilder.SetTooltip(cDEnt, "Enable randomization of dungeon entrances. \n\nStone Tower Temple is always vanilla, but Inverted Stone Tower Temple is randomized.");
@@ -795,7 +798,47 @@ namespace MMR.UI.Forms
             _configuration.CosmeticSettings.Instruments[form] = value;
         }
 
-#region Forms Code
+        protected void Main_ItemDragEnter(object sender, DragEventArgs e)
+        {
+            // required for drag and drop to work
+            if (e.Data.GetDataPresent(DataFormats.FileDrop) ||
+                e.Data.GetDataPresent(DataFormats.UnicodeText) || e.Data.GetDataPresent(DataFormats.Text))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        protected void Main_ItemDragDrop(object sender, DragEventArgs e)
+        {
+            /// If the player DragAndDrops patch files, settings files, or seed values into the GUI I want them to auto load
+
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // can drop multiple files, for now just one
+            if (files != null && files.Length == 1)
+            {
+                var filename = files[0];
+                if (filename.Substring(filename.Length - 4) == ".mmr")
+                {
+                    this.ttOutput.SelectedTab = this.tpPatchSettings;
+
+                    this.tPatch.Text = filename;
+                }
+
+                else if (filename.Substring(filename.Length - 5) == ".json")
+                {
+                    LoadSettings(filename); // error handling should already be contained within, right?
+                }
+
+            }
+
+            string seedText = (string)e.Data.GetData(DataFormats.Text);
+            int intTest;
+            if (seedText != null && int.TryParse(seedText, out intTest))
+            {
+                this.tSeed.Text = seedText;
+            }
+        }
+
+        #region Forms Code
 
         private void mmrMain_Load(object sender, EventArgs e)
         {
@@ -1101,7 +1144,7 @@ namespace MMR.UI.Forms
             cVC.Checked = _configuration.OutputSettings.OutputVC;
             cPatch.Checked = _configuration.OutputSettings.GeneratePatch;
 
-            cBespokeItemPlacementOrder.Checked = _configuration.GameplaySettings.BespokeItemPlacementOrder;
+            cItemPlacement.SelectedIndex = (int)_configuration.GameplaySettings.ItemPlacement;
             cMixSongs.Checked = _configuration.GameplaySettings.AddSongs;
             cProgressiveUpgrades.Checked = _configuration.GameplaySettings.ProgressiveUpgrades;
             cDEnt.Checked = _configuration.GameplaySettings.RandomizeDungeonEntrances;
@@ -1621,7 +1664,6 @@ namespace MMR.UI.Forms
                                 "Lensless Walls/Ceilings",
                                 "Pinnacle Rock without Seahorse",
                                 "Run Through Poisoned Water",
-                                "Quest Item Extra Storage",
                                 "Scarecrow's Song",
                                 "Take Damage",
                                 "WFT 2nd Floor Skip",
@@ -1724,12 +1766,13 @@ namespace MMR.UI.Forms
 
         private void UpdateNumTricksEnabled()
         {
-            lNumTricksEnabled.Text = $"{_configuration.GameplaySettings.EnabledTricks.Count} tricks enabled";
+            var count = _configuration.GameplaySettings.EnabledTricks.Count;
+            lNumTricksEnabled.Text = $"{count} trick{(count != 1 ? "s" : "")} enabled";
         }
 
-        private void cBespokeItemPlacementOrder_CheckedChanged(object sender, EventArgs e)
+        private void cItemPlacement_SelectedIndexChanged(object sender, EventArgs e)
         {
-            UpdateSingleSetting(() => _configuration.GameplaySettings.BespokeItemPlacementOrder = cBespokeItemPlacementOrder.Checked);
+            UpdateSingleSetting(() => _configuration.GameplaySettings.ItemPlacement = (ItemPlacement)cItemPlacement.SelectedIndex);
         }
 
         private void cClockSpeed_SelectedIndexChanged(object sender, EventArgs e)
@@ -1851,7 +1894,7 @@ namespace MMR.UI.Forms
         {
             var vanillaMode = _configuration.GameplaySettings.LogicMode == LogicMode.Vanilla;
             cMixSongs.Enabled = !vanillaMode;
-            cBespokeItemPlacementOrder.Enabled = !vanillaMode;
+            cItemPlacement.Enabled = !vanillaMode;
             cProgressiveUpgrades.Enabled = !vanillaMode;
             foreach (Control control in tabItemPool.Controls)
             {
@@ -1955,7 +1998,7 @@ namespace MMR.UI.Forms
             cMixSongs.Enabled = v;
             cProgressiveUpgrades.Enabled = v;
             cEnemy.Enabled = v;
-            cBespokeItemPlacementOrder.Enabled = v;
+            cItemPlacement.Enabled = v;
 
             //bHumanTunic.Enabled = v;
             tFormCosmetics.Enabled = v;

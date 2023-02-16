@@ -78,8 +78,6 @@ namespace MMR.Randomizer
             // songtest filename token allows music makers and users to force a song into a MMR seed for recording/testing
             SequenceUtils.CheckSongTest(unassigned, log);
 
-            SequenceUtils.CheckSongForce(unassigned, log, random);
-
             // music plando, user has selected they want an easier time specifying where and what songs are placed in specific spots
             var plandoPlacements = PlandoUtils.GetRandomizedSongPlacements(random, log);
             foreach ((var song, var slot) in plandoPlacements)
@@ -2492,7 +2490,7 @@ namespace MMR.Randomizer
                             .EndTextBox()
                             .CompileTimeWrap((wrapped) =>
                             {
-                                wrapped.Text("He said he's steal my ")
+                                wrapped.Text("He said he'd steal my ")
                                 .Red(moonsTearItem.DisplayName())
                                 .Text("... There was no stopping him.")
                                 ;
@@ -3427,12 +3425,11 @@ namespace MMR.Randomizer
                 progressReporter.ReportProgress(65, "Writing speedups...");
                 WriteSpeedUps(messageTable);
 
-
-                progressReporter.ReportProgress(6, "Writing items...");
-                WriteItems(messageTable);
-
-                progressReporter.ReportProgress(67, "Writing enemies...");
+                progressReporter.ReportProgress(66, "Writing enemies...");
                 WriteEnemies(outputSettings);
+
+                progressReporter.ReportProgress(67, "Writing items...");
+                WriteItems(messageTable);
 
                 WriteMiscHacks();
 
