@@ -86,6 +86,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple)]
         [SwitchFlagsPlacementZRot]
         [TreasureFlagsPlacement(mask: 0x1F, shift: 0)]
+        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // asummed dyna crash
         TreasureChest = 0x6, // En_Box
 
         [FileID(45)]
@@ -677,7 +678,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.StockPotInn, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
             Scene.SouthernSwamp, // dyna crash, remove if we get dyna overload detection working
-            Scene.BeneathTheWell, Scene.StoneTower)]
+            Scene.BeneathTheWell, Scene.IkanaGraveyard, Scene.StoneTower)]
         //*/
         UnusedStoneTowerStoneElevator = 0x4D, // Bg_F40_Flift
 
@@ -1124,7 +1125,8 @@ namespace MMR.Randomizer.GameObjects
             variant: 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)] // regular unhidden grottos
         [UnkillableAllVariants] // not enemy actor group, no fairy no clear room
         [EnemizerScenesExcluded(Scene.TerminaField, Scene.GreatBayCoast, Scene.ZoraCape, Scene.Grottos)]
-        [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.DekuShrine)] // blocking enemies
+        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard, // too much dyna (unverified)
+            Scene.Woodfall, Scene.DekuShrine)] // blocking enemies
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
         Bombiwa = 0x92, // Obj_Bombiwa
 
@@ -1482,7 +1484,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.GoronRacetrack, Scene.WaterfallRapids, Scene.GormanTrack, Scene.RoadToIkana, Scene.IkanaCastle, Scene.BeneathGraveyard,
             Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
-            Scene.StockPotInn, Scene.BeneathTheWell, Scene.StoneTower)]
+            Scene.StockPotInn, Scene.BeneathTheWell, Scene.IkanaGraveyard, Scene.StoneTower)]
         //*/
         [SwitchFlagsPlacement(mask: 0xFF, shift: 0)]
         UnusedStoneTowerPlatform = 0xC7, // Bg_F40_Swlift
@@ -1759,11 +1761,13 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.BeneathTheWell, variant: 0x0, Item.ItemWellCowMilk)]
         [CheckRestricted(Scene.RanchBuildings, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
         [CheckRestricted(Scene.RomaniRanch, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
+        // bugged
         [CheckRestricted(Scene.Grottos, variant: 0x0, Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
         [GroundVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [WallVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [UnkillableAllVariants]
         //[EnemizerScenesExcluded(Scene.RanchBuildings, Scene.RomaniRanch, Scene.Grottos, Scene.BeneathTheWell)]
+        [EnemizerScenesExcluded(Scene.Grottos)]
         [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.DekuShrine)] // blocking the way
         Cow = 0xF3, // En_Cow
 
@@ -1861,6 +1865,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 4, variant: 0x7E)] // 11 overloaded gorman race track
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
+        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // too much dyna
         ArmosStatue = 0x105, // Obj_Armos
 
         [ActorizerEnabled]
@@ -2179,7 +2184,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesExcluded(Scene.GoronVillage, Scene.GoronVillageSpring)] // dont randomize smithy
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x3F5F)]
-        SmithyGoronAndGo = 0x138, // En_Go
+        GoGoron = 0x138, // En_Go
 
         Empty139 = 0x139,
 
@@ -3007,7 +3012,8 @@ namespace MMR.Randomizer.GameObjects
         //  instead we modified it and inject changes to get it working
         [FileID(402)]
         [ObjectListIndex(0x88)]
-        [EnemizerScenesPlacementBlock(Scene.StoneTower, Scene.DekuPlayground)] // dyna crash possible
+        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard, // dyna crash possible
+            Scene.StoneTower, Scene.DekuPlayground)] // dyna crash possible
         ClocktowerGearsAndOrgan = 0x1B6, // Bg_Ctower_Gear
 
         // [ActorizerEnabled] // disabled since talking is softlock, need to figure that out
@@ -3100,7 +3106,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(415)]
         [ObjectListIndex(0x1AB)]
-        [CheckRestricted(Scene.CuriosityShop, variant:0x1, Item.MaskKeaton, Item.TradeItemMamaLetter)]
+        [CheckRestricted(Scene.CuriosityShop, variant:0x1, Item.MaskKeaton, Item.TradeItemMamaLetter, Item.MaskAllNight)]
         // zero is selling in the shop, 1 is giving behind the place
         [GroundVariants(0x1)] // wedding and standing around indoors
         //[OnlyOneActorPerRoom]
@@ -3730,6 +3736,7 @@ namespace MMR.Randomizer.GameObjects
         [WallVariants(0)]
         [UnkillableAllVariants]
         [EnemizerScenesExcluded(Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple)]
+        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // too much dyna
         StoneTowerMirror = 0x219, // Bg_Ikana_Mirror
 
         [FileID(497)]
@@ -3810,9 +3817,10 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(503)]
         [ObjectListIndex(0xA7)]
-        [GroundVariants(0,
+        [CheckRestricted(Scene.TerminaField, variant:0x40FF, Item.MaskCircusLeader)]
+        [GroundVariants(0, // standing around day 1 is type 0
             0x40FF, // wedding
-            0x00FF)] // standing around day 1 is type 0, bottom 0xFF is unknown, not used in code?
+            0x00FF)] // bottom 0xFF is unknown, not used in code?
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         Cremia = 0x220, // En_Ma_Yto
@@ -3839,6 +3847,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesExcluded(Scene.SouthClockTown, Scene.MilkRoad, Scene.WestClockTown,
              Scene.Woodfall, Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.MountainVillage, Scene.MountainVillageSpring, Scene.Snowhead,
              Scene.GreatBayCoast, Scene.ZoraCape, Scene.IkanaCanyon, Scene.StoneTower, Scene.InvertedStoneTower)]
+        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // assumed dyna overflow
         OwlStatue = 0x223, // Obj_Warpstone
 
         [ActorizerEnabled]
@@ -3908,7 +3917,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x0)]
         [WaterVariants(0x0)]
         [VariantsWithRoomMax(variant: 0, max: 1)]
-        [EnemizerScenesPlacementBlock(Scene.StoneTower, // too much dyna
+        [EnemizerScenesPlacementBlock(Scene.StoneTower, Scene.IkanaGraveyard, // too much dyna
             Scene.SouthernSwamp, Scene.SouthernSwampClear,
             Scene.GormanTrack, Scene.DekuTrial)] // blocking potentially
         [UnkillableAllVariants]
@@ -4789,6 +4798,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Item.HeartPieceOceanSpiderHouse)]
         [GroundVariants(0xF001, 0xF002, 0xF003, 0xF004, 0xF005, 0xF006)]
         [VariantsWithRoomMax(max: 1, variant:0xF001, 0xF002, 0xF003, 0xF004, 0xF005, 0xF006)]
+        [UnkillableAllVariants] // not enemy actor category
         StalchildHintGiver = 0x2A5, // En_Hint_Skb
 
         // ??
