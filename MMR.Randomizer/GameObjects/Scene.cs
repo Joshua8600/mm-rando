@@ -63,10 +63,14 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x07)]
         [ClearEnemyPuzzleRooms(7, 13)] // 7:dodongo, 13:peahat
         [EnemizerSceneEnemyReplacementBlock(Actor.Peahat, // hidden or very weak enemies suck here, but they are very common in this slot
-            Actor.Bo, Actor.Nejiron, Actor.RedBubble, Actor.Leever, Actor.Wolfos, Actor.Beamos)] // beamos is just because bomb locking this check early is prime seed killer
+            Actor.Beamos, // beamos is just because bomb locking this check early is prime seed killer
+            Actor.Bo, Actor.Leever, // annoying boring enemies, need to spawn like 10
+            //Actor.Nejiron, Actor.RedBubble, 
+            Actor.IceBlock)] // blocking actors
         [EnemizerSceneEnemyReplacementBlock(Actor.DekuBabaWithered, // grottos are common, this can get silly
             Actor.Peahat, Actor.Beamos, Actor.LikeLike, Actor.Freezard, Actor.WarpDoor,
-            Actor.Bumper, Actor.UnusedStoneTowerStoneElevator, Actor.UnusedStoneTowerPlatform, Actor.ClocktowerGearsAndOrgan /*, Actor.PatrollingPirate */ )]
+            Actor.Bumper, Actor.UnusedStoneTowerStoneElevator, Actor.UnusedStoneTowerPlatform, Actor.IceBlock,
+            Actor.ClocktowerGearsAndOrgan /*, Actor.PatrollingPirate */ )]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BioDekuBaba,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // they can extend so far they can block the door leading out
         Grottos = 0x0A,
@@ -185,11 +189,17 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1256)]
         [SceneInternalId(0x22)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Carpenter, // can cover a switch, don't allow problem actors
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)]
         MilkRoad = 0x1F,
 
         [FileID(1258)]
         [SceneInternalId(0x23)]
         [ClearEnemyPuzzleRooms(0, 1, 2)] // three pirate minibosses
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SpikedMine,
+            Actor.LabFish)] // crash unknown reason, float math error
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ZoraEgg,
+            Actor.Tijo, Actor.Bombiwa, Actor.Bumper)] // blocking a chest
         PiratesFortressRooms = 0x20, // tag: Sewer
 
         [FileID(1276)]
@@ -237,6 +247,19 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1308)]
         [SceneInternalId(0x2C)]
+        // these actors are only seen in the credits, we should block all large object actors from these spots to save generation time
+        [EnemizerSceneEnemyReplacementBlock(Actor.ViscenMoonLeaveCutscene, 
+            Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        ///*
+        [EnemizerSceneEnemyReplacementBlock(Actor.MutoMoonLeaveCutscene,
+                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.AnjusGrandmaCredits,
+                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.AnjuMotherWedding,
+                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.CuriosityShopMan,
+                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        //*/
         MountainSmithy = 0x29,
 
         [FileID(1310)]
@@ -301,6 +324,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1336)]
         [SceneInternalId(0x3B)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.Torch,
+            Actor.ClocktowerGearsAndOrgan)]
         PiratesFortressExterior = 0x38,
 
         [FileID(1338)]
@@ -399,7 +424,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1414)]
         [SceneInternalId(0x4F)]
-        //[ClearEnemyPuzzleRooms( unk )] // ignored by enemizer right now anyway
+        [ClearEnemyPuzzleRooms( 0x1 )] // the guantlet is only one big room
         SakonsHideout = 0x4C,
 
         [FileID(1417)]

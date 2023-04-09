@@ -469,7 +469,8 @@ namespace MMR.Randomizer.GameObjects
 
         Empty37 = 0x37,
 
-        [ActorizerEnabled]
+        // Boss blue warp
+        //[ActorizerEnabled] // kinda boring, needs to be modified to it can appear after you clear the room and take you places that are interesting
         [ObjectListIndex(0x3E)]
         [FileID(78)]
         // params: type is 0xFF, address offset for type 0 is 0xFF00
@@ -504,8 +505,11 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x1D30)]
         [FileID(81)]
         [ObjectListIndex(0x40)]
+        // 0 runs away
+        // 1 is passive
+        // 2 is hit once and die
         [GroundVariants(0xFF02, 0xFF00, 0xFF01)]
-        [UnkillableVariants(0xFF01)]
+        [RespawningVariants(0xFF01)] // doesnt seem to stop enemies, so it counts as enemy
         [CompanionActor(DekuFlower, ourVariant: -1, variant: 0x7F, 0x17F)] // do you think they make them or trade like hermitcrabs?
         [EnemizerScenesExcluded(Scene.Woodfall)]//, Scene.DekuPalace)]
         MadShrub = 0x3B, // En_Dekunuts
@@ -1394,7 +1398,7 @@ namespace MMR.Randomizer.GameObjects
         EmptyB7 = 0xB7,
 
         // unused water vortex from water temple
-        [ActorizerEnabled]
+        //[ActorizerEnabled] // we have a modified fix one now, adjusts height to water
         [FileID(163)]
         [WaterVariants(0)]
         [ObjectListIndex(0x106)]
@@ -1758,16 +1762,16 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(227)]
         [ObjectListIndex(0x146)]
-        [CheckRestricted(Scene.BeneathTheWell, variant: 0x0, Item.ItemWellCowMilk)]
-        [CheckRestricted(Scene.RanchBuildings, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
-        [CheckRestricted(Scene.RomaniRanch, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
-        // bugged
-        [CheckRestricted(Scene.Grottos, variant: 0x0, Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
+        // bugged: milksanity breaks these actors params and sometimes their types
+        //[CheckRestricted(Scene.BeneathTheWell, variant: 0x0, Item.ItemWellCowMilk)]
+        //[CheckRestricted(Scene.RanchBuildings, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
+        //[CheckRestricted(Scene.RomaniRanch, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
+        //[CheckRestricted(Scene.Grottos, variant: 0x0, Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
         [GroundVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [WallVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [UnkillableAllVariants]
-        //[EnemizerScenesExcluded(Scene.RanchBuildings, Scene.RomaniRanch, Scene.Grottos, Scene.BeneathTheWell)]
-        [EnemizerScenesExcluded(Scene.Grottos)]
+        [EnemizerScenesExcluded(Scene.RanchBuildings, Scene.RomaniRanch, Scene.Grottos, Scene.BeneathTheWell)]
+        //[EnemizerScenesExcluded(Scene.Grottos)]
         [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.DekuShrine)] // blocking the way
         Cow = 0xF3, // En_Cow
 
@@ -2174,11 +2178,12 @@ namespace MMR.Randomizer.GameObjects
             0x7FE2, 0x7F85, 0x7F86, 0x7F87,
             0x7FA1, 0x7FC1, 0x7F81, 0x7FF2, // racetrack
             0x7F82, 0x7F92, // praising darmani in cutscene
-            0x7F84, 0x7F94)] // outside of darmani's grave
+            0x7F84, 0x7F94 )] // outside of darmani's grave
         [VariantsWithRoomMax(max: 1,
             0x7FE2, 0x7F85, 0x7F86, 0x7F87,
             0x7F82, 0x7F92)]
         [VariantsWithRoomMax(max: 0, variant: 0x8, // too big
+            0x7F84, 0x7F94, // the two outside of darmani race need to be on the same thing
             0x7F82, 0x7F92)] // crash? reason unknown
         [UnkillableAllVariants]
         //[EnemizerScenesExcluded(Scene.GoronVillage, Scene.GoronVillageSpring)] // dont randomize smithy
@@ -2296,7 +2301,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x16B)]
         [WaterVariants(0x0F00, 0x0300)]
         [OnlyOneActorPerRoom]
-        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.ZoraCape)] // massive lag
+        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.ZoraCape, Scene.GreatBayCoast)] // massive lag
         Desbreko = 0x14B, // En_Pr (Pirana?)
 
         [FileID(298)]
@@ -2377,8 +2382,19 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)]
         En_Test2 = 0x158, // En_Test2
 
+        [ActorizerEnabled]
         [FileID(311)]
         [ObjectListIndex(0x1C)]
+        [CheckRestricted(Scene.IkanaCanyon, variant: -1, check: Item.MaskCouple)]
+        [CheckRestricted(Scene.EastClockTown, variant: -1, check: Item.MaskCouple)]
+        [CheckRestricted(Scene.SouthClockTown, variant: 0x1E3, check: Item.MaskCouple, Item.TradeItemPendant, Item.MaskKeaton, Item.TradeItemMamaLetter)]
+        [CheckRestricted(Scene.LaundryPool, variant: -1, check: Item.MaskCouple, Item.TradeItemPendant, Item.MaskKeaton, Item.TradeItemMamaLetter)]
+        // E2 is hidden in ikana somewhere?? since its path its prob running after final hours or something
+        [PathingVariants(0x100, 0x1E2, 0x1E3, 0x1E4)]
+        [PathingTypeVarsPlacement(mask:0x1F, shift:0)]
+        // assumed all are hardcoded to hell
+        [VariantsWithRoomMax(max:0, variant: 0x100, 0x1E2, 0x1E3, 0x1E4)]
+        [UnkillableAllVariants]
         Kafei = 0x159, // En_Test3
 
         [FileID(312)]
@@ -2438,7 +2454,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x26C)]
         GiantsChamberColumn = 0x161, // Dm_Statue
 
-        //[ActorizerEnabled] // temp disabled fighting collider issues
+        //[ActorizerEnabled] // this actor was turned into a companion instead, would show up too often because its gameplaykeep
         [FileID(320)]
         [ActorInstanceSize(0x2AC)] // 1AC, raised to reduce chance of getting
         [ObjectListIndex(0x1)]
@@ -2645,7 +2661,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(343)]
         [ObjectListIndex(0x107)]
-        [CheckRestricted(Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma)]
+        [CheckRestricted(Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat)]
         [GroundVariants(0)] // no params
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
@@ -2709,6 +2725,7 @@ namespace MMR.Randomizer.GameObjects
         [PathingTypeVarsPlacement(mask: 0x3F, shift: 0)]
         [OnlyOneActorPerRoom]
         [EnemizerScenesExcluded(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
+        [EnemizerScenesPlacementBlock(Scene.TerminaField)] // nothing wrong, just no place to put and huge object slows generation down
         [SwitchFlagsPlacement(mask: 0x7F, shift: 6)]
         Eyegore = 0x184, // En_Egol
 
@@ -3006,6 +3023,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0x2)]
         [UnkillableAllVariants]
         [OnlyOneActorPerRoom]
+        [EnemizerScenesPlacementBlock(Scene.TerminaField)] // TF has object size issues, this is the largest object, this is here just to speed up
         HappyMaskSalesman = 0x1B5, // En_Osn
 
         //[ActorizerEnabled] // issue: cannot place organ because its waiting for the cutscene part to appear, also no hitbox
@@ -3090,9 +3108,9 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(413)]
         [ObjectListIndex(0x1A9)]
+        [CheckRestricted(Item.MundaneItemSeahorse)]
         [GroundVariants(0x001, 0x100, 0x101)]
         // limit variants?
-        [CheckRestricted(Item.MundaneItemSeahorse)]
         [UnkillableAllVariants]
         GreatBayFisherman = 0x1C2, // En_Tsn
 
@@ -3106,10 +3124,15 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(415)]
         [ObjectListIndex(0x1AB)]
-        [CheckRestricted(Scene.CuriosityShop, variant:0x1, Item.MaskKeaton, Item.TradeItemMamaLetter, Item.MaskAllNight)]
+        [CheckRestricted(Scene.CuriosityShop, variant:0x1,
+            Item.MaskKeaton, Item.TradeItemMamaLetter,
+            Item.MaskAllNight,
+            Item.MundaneItemCuriosityShopBlueRupee, Item.MundaneItemCuriosityShopGoldRupee, Item.MundaneItemCuriosityShopPurpleRupee, Item.MundaneItemCuriosityShopRedRupee)]
         // zero is selling in the shop, 1 is giving behind the place
-        [GroundVariants(0x1)] // wedding and standing around indoors
+        //[GroundVariants(0x1)] // wedding and standing around indoors
+        [GroundVariants(0x0)] // inside of shop
         //[OnlyOneActorPerRoom]
+        [VariantsWithRoomMax(max:0, variant:1)] // wedding version is the same as day 3, gives too many checks
         [UnkillableAllVariants]
         CuriosityShopMan = 0x1C4, // En_Fsn
 
@@ -3118,7 +3141,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1AC)]
         // this is not enough because he is boat master
         [CheckRestricted(Item.HeartPiecePictobox, Item.MundaneItemPictographContestBlueRupee, Item.MundaneItemPictographContestRedRupee)]
-        [GroundVariants(0)] // he has LEGS
+        [GroundVariants(0)] // he has LEGS :O
         //[VariantsWithRoomMax(0, 0)]
         [EnemizerScenesExcluded(Scene.TouristCenter)]
         [UnkillableAllVariants]
@@ -3159,6 +3182,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0, variant: 0xFFF3, 0x814)] // dont put the digg spots without a digger its just weird, thats weird
         [SwitchFlagsPlacement(mask: 0x7F, shift: 4)]
         [UnkillableAllVariants]
+        [VariantsWithRoomMax(max: 0, variant: 0x1, 0x10, 0xFFF3, 0x12, 0x814)] // too hard coded right now to work correct
         Dampe = 0x1CA, // En_Tk
 
         Empty1CB = 0x1CB,
@@ -3192,16 +3216,17 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x1)]
         Mir_Ray2 = 0x1D0, // Mir_Ray2
 
+        // TODO lookup parametsr
         [EnemizerEnabled]
         [ActorInitVarOffset(0x1FD0)]
         [FileID(426)]
         [ObjectListIndex(0x1B5)]
         // dont know what the differences are
         [WallVariants(0x1932, 0x3FFF)] // dont know what the differences are
-        [GroundVariants(0x1932, 0x3FFF)]
+        [GroundVariants(0x1932, 0x3FFF, 0x191E)]
         [VariantsWithRoomMax(max: 8, variant: 0x1932, 0x3FFF)]
-        [EnemizerScenesExcluded(Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple, Scene.GreatBayTemple, Scene.InvertedStoneTowerTemple)]
-        //[EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.GoronRacetrack)]
+        //[EnemizerScenesExcluded(Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple, Scene.GreatBayTemple, Scene.InvertedStoneTowerTemple)]
+        [EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.GoronRacetrack)]
         Dexihand = 0x1D1, // ???'s water logged brother
 
         [FileID(427)]
@@ -3223,7 +3248,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(430)]
         [ObjectListIndex(0x107)]
-        [CheckRestricted(Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma)]
+        [CheckRestricted(Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat)]
         [GroundVariants(0x0)] // 0: sitting in his room?
         //[VariantsWithRoomMax()]
         [UnkillableAllVariants]
@@ -3531,14 +3556,18 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)] // multiple object
         AllAlienEventActors = 0x200, // En_Invadepoh
 
-        //[ActorizerEnabled] // softlock if you enter the song teach cutscene, which in rando is proximity
+        [ActorizerEnabled]
         [FileID(473)]
         [ObjectListIndex(0x1DF)]
+        [CheckRestricted(Scene.GoronShrine, variant: 0x3FF1, Item.SongLullaby)]
+        [CheckRestricted(Scene.GoronRacetrack, variant: 0x3FF1, Item.ItemBottleGoronRace)]
+        //[CheckRestricted(Scene.TwinIslandsSpring, variant: 0x3FF1, Item.ItemBottleGoronRace)] // not sure this is required
         //[GroundVariants(0x1400)] // all other versions are 0x13** or 0x1402
         // 0x3FF1 does not spawn in winter, even in other scenes
         [GroundVariants(0x3FF1)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
+        [VariantsWithRoomMax(max:0, variant: 0x3FF1)] // softlock if you enter the song teach cutscene, which in rando is proximity
         [EnemizerScenesExcluded(Scene.GoronShrine, Scene.GoronRacetrack, Scene.TwinIslandsSpring)]
         [SwitchFlagsPlacement(mask: 0x3F, shift: 8)]
         GoronKid = 0x201, // En_Gk
@@ -3736,7 +3765,8 @@ namespace MMR.Randomizer.GameObjects
         [WallVariants(0)]
         [UnkillableAllVariants]
         [EnemizerScenesExcluded(Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple)]
-        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // too much dyna
+        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard, // too much dyna
+                                      Scene.TerminaField)] // no place to put, just wastes generation time
         StoneTowerMirror = 0x219, // Bg_Ikana_Mirror
 
         [FileID(497)]
@@ -3817,12 +3847,13 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(503)]
         [ObjectListIndex(0xA7)]
-        [CheckRestricted(Scene.TerminaField, variant:0x40FF, Item.MaskCircusLeader)]
+        [CheckRestricted(Scene.TerminaField, variant:0x40FF, Item.MaskRomani)]
         [GroundVariants(0, // standing around day 1 is type 0
             0x40FF, // wedding
             0x00FF)] // bottom 0xFF is unknown, not used in code?
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
+        [VariantsWithRoomMax(max:0, 0, 0x40FF, 0x00FF)]
         Cremia = 0x220, // En_Ma_Yto
 
         [FileID(504)]
@@ -3996,28 +4027,39 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x2CA0)]  // combat music disable does not work
         [FileID(524)]
         [ObjectListIndex(0x75)]
+        [CheckRestricted(Item.MaskGibdo)]
         [PathingVariants(0, 0x81, 0x82, 0x83, 0x84, 0x85)]
         [PathingTypeVarsPlacement(mask:0xFF00, shift:8)]
         [UnkillableAllVariants]
-        [EnemizerScenesExcluded(Scene.IkanaCanyon)] // dont replace the train
+        //[EnemizerScenesExcluded(Scene.IkanaCanyon)] // dont replace the train
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // might block everything
         GibdoIkana = 0x235, // En_Railgibud
 
+        [EnemizerEnabled] // does not spawn outside of ikana
         [FileID(525)]
+        [CheckRestricted(Item.MaskBlast)]
         [ObjectListIndex(0xDF)]
+        [PathingVariants(0x2FF)]
+        [PathingTypeVarsPlacement(mask: 0x3F00, shift: 8)]
+        [VariantsWithRoomMax(max:0, variant: 0x2FF)] // probably time gated to hell
+        [UnkillableAllVariants]
         BombShopLady = 0x236, // En_Baba
 
-        //[ActorizerEnabled] // does not spawn, even the daytime frollicing one
+        [ActorizerEnabled] // does not spawn, even the daytime frollicing one
         // both of his vars are paths, sooo I'm guessing his behavior is hard coded
         [ObjectListIndex(0xE3)]
         [FileID(526)]
-        // dont replace any: for one, this object is used by multiple actors
+        [CheckRestricted(Scene.NorthClockTown, variant: 0x83FF, Item.MaskBlast, Item.MaskAllNight)]
+        [CheckRestricted(Scene.IkanaCanyon, variant: 0x85FF, Item.MaskCouple)]
+        // cannot remove because he shares objects with the bank
+        //[CheckRestricted(Scene.WestClockTown, variant: 0x83FF, Item.MaskBlast, Item.MaskAllNight)]
         // can't replace the one in west clocktown without killing bank
         // can't replace the one in ikana without killing the kafei quest (even if they are different rooms)
-        [PathingVariants(0x85FF)]
+        [PathingVariants(0x85FF, 0x83FF)]
         [PathingTypeVarsPlacement(mask:0x7E00, shift:9)]
+        [VariantsWithRoomMax(max:0, variant: 0x85FF, 0x83FF)]
         [UnkillableAllVariants]
-        [EnemizerScenesExcluded(Scene.NorthClockTown, Scene.WestClockTown, Scene.IkanaCanyon)]
+        [EnemizerScenesExcluded(/* Scene.NorthClockTown, */ Scene.WestClockTown/* , Scene.IkanaCanyon*/)]
         Sakon = 0x237, // En_Suttari
 
         [ActorizerEnabled]
@@ -4511,7 +4553,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x26A)] // double object actor
         // uhhh code has no params, where did FE01 come from?
         [GroundVariants(0x0)]
-        //[VariantsWithRoomMax(max:0, variant:0x0)] // temp disable as double object actors are borken
+        [VariantsWithRoomMax(max:3, variant:0x0)] // temp disable as double object actors are borken
         [UnkillableAllVariants]
         [EnemizerScenesExcluded(Scene.TerminaField)]
         // This is the seth you see in the telescope on grottos, same animation as cured skultula man in kak
