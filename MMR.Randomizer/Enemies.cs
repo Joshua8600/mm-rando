@@ -365,8 +365,10 @@ namespace MMR.Randomizer
 
         private static void EnemizerEarlyFixes()
         {
-            // changes before randomization
+            /// Changes before randomization
+            
             FixSpecificLikeLikeTypes();
+            FixSpecificTektiteTypes();
             EnableDampeHouseWallMaster();
             EnableTwinIslandsSpringSkullfish();
             FixSouthernSwampDekuBaba();
@@ -514,8 +516,11 @@ namespace MMR.Randomizer
 
                 // Jim the bomber actually spawns within the tree to the north... move is spawn over a bit
                 var northClockTown = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.NorthClockTown.FileID());
-                northClockTown.Maps[0].Actors[26].Position.x = -740;
-                northClockTown.Maps[0].Actors[26].Position.z = -1790;
+                var jimDuringTheGame = northClockTown.Maps[0].Actors[26];
+                jimDuringTheGame.Position.x = -740;
+                jimDuringTheGame.Position.z = -1790;
+                // and rotate to face outwards not toward the wall
+                jimDuringTheGame.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: (180 - 20), flags: jimDuringTheGame.Rotation.y);
 
                 // the tree itself needs to be rotated as its facing the wall
                 northClockTown.Maps[0].Actors[21].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 135, northClockTown.Maps[0].Actors[21].Rotation.y);
@@ -774,6 +779,13 @@ namespace MMR.Randomizer
 
             var movedToWaterFall = southernswampScene.Maps[2].Actors[3];
             movedToWaterFall.Position = new vec16(4240, -2, -1270); // placement: near waterfall
+
+            Scene clearSwampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwampClear.FileID());
+            clearSwampScene.Maps[0].Actors[4].Position = new vec16(1686, 23, 416); // moved to pier
+            clearSwampScene.Maps[0].Actors[6].Position = new vec16(1663, 5, -103); // moved out front a big
+            clearSwampScene.Maps[2].Actors[2].Position = new vec16(3001, 8, -1070);
+            clearSwampScene.Maps[2].Actors[3].Position = new vec16(4288, 11, -1312);
+
         }
 
         private static void FixRoadToSouthernSwampBadBat()
@@ -824,6 +836,12 @@ namespace MMR.Randomizer
             coastScene.Maps[1].Actors[43].Variants[0] = 2;
             coastScene.Maps[1].Actors[44].Variants[0] = 2;
             coastScene.Maps[1].Actors[46].Variants[0] = 2;
+        }
+
+        private static void FixSpecificTektiteTypes()
+        {
+            var twinIslandsSpring = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TwinIslandsSpring.FileID());
+            twinIslandsSpring.Maps[0].Actors[2].Variants[0] = 0xFFFD;
         }
 
         private static void EnableDampeHouseWallMaster()
@@ -1573,7 +1591,7 @@ namespace MMR.Randomizer
         public static void FixBrokenActorSpawnCutscenes(SceneEnemizerData thisSceneData)
         {
             /// Each Actor spawn gets one cutscene in the scene/room data
-            /// if a dinofos is spanwed, and has a cutscene from the room spawn data, it plays the cutscene
+            /// if a dinofos is spawned, and has a cutscene from the room spawn data, it plays the cutscene
             /// (supposed to be the drop from ceiling cutscene) but it breaks the game
             /// so we have to disable it for any new dinofos spawns to avoid
             /// also other trouble actors that can take that cutscene and do things we dont want
@@ -1581,7 +1599,8 @@ namespace MMR.Randomizer
             var listTroubleActorsObj = new List<int> {
                 GameObjects.Actor.Dinofos.ObjectIndex(),
                 GameObjects.Actor.Scarecrow.ObjectIndex(),
-                GameObjects.Actor.PatrollingPirate.ObjectIndex()
+                GameObjects.Actor.PatrollingPirate.ObjectIndex(),
+                GameObjects.Actor.GossipStone.ObjectIndex()
             };
 
             var actorObjectsDetected = thisSceneData.ChosenReplacementObjects.Find(v => listTroubleActorsObj.Contains(v.ChosenV)) != null;
@@ -1594,10 +1613,11 @@ namespace MMR.Randomizer
                 GameObjects.Actor.Scarecrow,
                 GameObjects.Actor.PatrollingPirate,
                 GameObjects.Actor.Tingle,
-                GameObjects.Actor.GrottoHole
+                GameObjects.Actor.GrottoHole,
+                GameObjects.Actor.GossipStone
             };
 
-            for (int i = 0; i < thisSceneData.Actors.Count(); i++)
+            for (int i = 0; i < thisSceneData.Actors.Count(); i++) // thisSceneData.Actors is only the actors we change
             {
                 var testActor = thisSceneData.Actors[i];
                 if (listTroubleActors.Contains(testActor.ActorEnum))
@@ -1787,14 +1807,14 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoGoron)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.RedBubble)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TouristCenter, GameObjects.Actor.SwampTouristGuide, GameObjects.Actor.SmithyGoronAndGo)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.IkanaGraveyard, GameObjects.Actor.BadBat, GameObjects.Actor.StoneTowerMirror)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.BioDekuBaba, GameObjects.Actor.En_Stream)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DragonFly, GameObjects.Actor.WarpDoor)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.Desbreko, GameObjects.Actor.UnusedPirateElevator)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.Dodongo, GameObjects.Actor.DeathArmos)) continue;
-                if (TestHardSetObject(GameObjects.Scene.GoronVillage, GameObjects.Actor.Tektite, GameObjects.Actor.BetaVampireGirl)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthernSwampClear, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.DeathArmos)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.Keese)) continue;
+                if (TestHardSetObject(GameObjects.Scene.NorthClockTown, GameObjects.Actor.BombersBlueHat, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.Torch, GameObjects.Actor.WarpDoor)) continue;
 
                 //TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.FlyingPot);
@@ -3358,7 +3378,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 46.0\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 46.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
