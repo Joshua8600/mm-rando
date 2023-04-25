@@ -30,22 +30,24 @@ namespace MMR.Randomizer.GameObjects
         // like, goron punch crator, or moon tear
         En_Test = 0x1, // En_Test
 
+        // invididual shop items
         [FileID(40)]
         [ObjectListIndex(0x1)]
-        En_GirlA = 0x2,
+        En_GirlA = 0x2, // En_GirlA
 
+        // enemy body parts spawned during death?
         [FileID(41)]
         [ObjectListIndex(0x1)]
-        En_Part = 0x3,
+        En_Part = 0x3, // En_Part
 
         //[EnemizerEnabled] // we dont want as an actual actor, we want as a companion
         [FileID(42)]
         [ObjectListIndex(1)] // gameplay_keep obj 1
-                             // 0x83F0 is tiny candle light
-                             //[GroundVariants(0x83F0, 0x27F5)] // TODO finish checking the rest of possible variations
-                             // 0x7F4 is the bright yellow light of the graveyard smash
-                             // 0x7FF is cyan/blue flames of road to ikana, FE is goron graveyard blue,
-                             // 83F0 is dampe house candle
+        // 0x83F0 is tiny candle light
+        //[GroundVariants(0x83F0, 0x27F5)] // TODO finish checking the rest of possible variations
+        // 0x7F4 is the bright yellow light of the graveyard smash
+        // 0x7FF is cyan/blue flames of road to ikana, FE is goron graveyard blue,
+        // 83F0 is dampe house candle
         [GroundVariants(0x7F4, 0x7FE)]
         [UnkillableAllVariants]
         [EnemizerScenesExcluded(Scene.Woodfall)]
@@ -202,9 +204,10 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x12)]
         // FE are road to mountain village type AND greatbay type
         // FD is underground, FE can be both but now, for detection, FD is water only
-        [GroundVariants(0xFFFD, 0xFFFF)] // FF does not exist in MM vanilla, red variety
+        // FF does not exist in MM vanilla, red variety
+        [GroundVariants(0xFFFD, 0xFFFF)] 
         [WaterVariants(0xFFFE)]
-        Tektite = 0x12,
+        Tektite = 0x12, // En_Tite
 
         Empty13 = 0x13,
 
@@ -253,7 +256,7 @@ namespace MMR.Randomizer.GameObjects
         // these are no longer problem spawns because we now dynamically remove the cutscene from new dino spawns
         //[EnemizerScenesPlacementBlock(Scene.BeneathGraveyard, Scene.DekuShrine, Scene.ClockTowerInterior)] // crash in graveyard
         //[EnemizerScenesPlacementBlock(Scene.ClockTowerInterior)]
-        Dinofos = 0x19,
+        Dinofos = 0x19, // En_Dinofos
 
         [FileID(59)]
         [ObjectListIndex(0x5F)]
@@ -401,10 +404,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 10, variant: 0xFF)]
         [FlyingToGroundHeightAdjustment(100)]
         [RespawningAllVariants] // they do NOT respawn, this is temporary: light arrow req makes them difficult to kill early in the game
-        //[EnemizerScenesExcluded(Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple)]
-        // this old list of crash locations is for pathing versions, which we no longer use
-        //[EnemizerScenesPlacementBlock(Scene.AstralObservatory, Scene.RoadToIkana, Scene.Woodfall, Scene.PathToMountainVillage, Scene.IkanaCastle,
-        //    Scene.MountainVillageSpring, Scene.BeneathGraveyard, Scene.DekuShrine, Scene.IkanaGraveyard )] // known crash locations
+        [EnemizerScenesPlacementBlock(Scene.SouthernSwampClear)]
         DeathArmos = 0x2D, // En_Famos
 
         Empty2E = 0x2E,
@@ -3124,15 +3124,20 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(415)]
         [ObjectListIndex(0x1AB)]
-        [CheckRestricted(Scene.CuriosityShop, variant:0x1,
+        [CheckRestricted(Scene.CuriosityShop, variant: 0x1,
+            Item.MaskKeaton, Item.TradeItemMamaLetter,
+            Item.MaskAllNight,
+            Item.MundaneItemCuriosityShopBlueRupee, Item.MundaneItemCuriosityShopGoldRupee, Item.MundaneItemCuriosityShopPurpleRupee, Item.MundaneItemCuriosityShopRedRupee)]
+        [CheckRestricted(Scene.CuriosityShop, variant: 0x0,
             Item.MaskKeaton, Item.TradeItemMamaLetter,
             Item.MaskAllNight,
             Item.MundaneItemCuriosityShopBlueRupee, Item.MundaneItemCuriosityShopGoldRupee, Item.MundaneItemCuriosityShopPurpleRupee, Item.MundaneItemCuriosityShopRedRupee)]
         // zero is selling in the shop, 1 is giving behind the place
         //[GroundVariants(0x1)] // wedding and standing around indoors
-        [GroundVariants(0x0)] // inside of shop
-        //[OnlyOneActorPerRoom]
-        [VariantsWithRoomMax(max:0, variant:1)] // wedding version is the same as day 3, gives too many checks
+        [GroundVariants(0x0, // inside of shop
+            0x1)] // wedding
+        [OnlyOneActorPerRoom]
+        [VariantsWithRoomMax(max:0, variant:0x0, 0x1)] // wedding version is the same as day 3, gives too many checks
         [UnkillableAllVariants]
         CuriosityShopMan = 0x1C4, // En_Fsn
 
@@ -3935,7 +3940,9 @@ namespace MMR.Randomizer.GameObjects
         // both 0 and 0xFF on oposite sides
         [CheckRestricted(Scene.NorthClockTown, variant: 0, Item.HeartPieceNorthClockTown)]
         [GroundVariants(0x0, 0xFF, 0x80FF)]
-        [VariantsWithRoomMax(max: 2, variant: 0x0, 0xFF, 0x80FF)]
+        [VariantsWithRoomMax(max: 1, variant: 0x0, 0xFF, 0x80FF)]
+        [EnemizerScenesPlacementBlock(Scene.SouthernSwampClear,// known dyna issues
+            Scene.StoneTower, Scene.StoneTowerTemple, Scene.SouthernSwamp)] // assumed issues
         [UnkillableAllVariants]
         UglyTree = 0x229, // Obj_Tree
 
@@ -4035,9 +4042,9 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // might block everything
         GibdoIkana = 0x235, // En_Railgibud
 
-        [EnemizerEnabled] // does not spawn outside of ikana
+        [ActorizerEnabled] // does not spawn outside of ikana
         [FileID(525)]
-        [CheckRestricted(Item.MaskBlast)]
+        [CheckRestricted(Item.MaskBlast, Item.MaskAllNight)]
         [ObjectListIndex(0xDF)]
         [PathingVariants(0x2FF)]
         [PathingTypeVarsPlacement(mask: 0x3F00, shift: 8)]
@@ -4629,7 +4636,12 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(600)]
         [ObjectListIndex(0x110)]
-        [CheckRestricted(Item.ItemNotebook)]
+        [CheckRestricted(Item.ItemNotebook,
+            Item.TradeItemMoonTear,
+            Item.CollectableTerminaFieldTelescopeGuay1,
+            Item.HeartPieceTerminaBusinessScrub,
+            Item.CollectableAstralObservatoryObservatoryBombersHideoutPot1, Item.CollectableAstralObservatoryObservatoryBombersHideoutPot2
+            )]
         [GroundVariants(0x0)]
         [UnkillableAllVariants]
         BomberHideoutGuard = 0x281, // En_Bombers2
