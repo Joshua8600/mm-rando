@@ -317,17 +317,20 @@ namespace MMR.Randomizer.Utils
                             {
                                 delimitingChar = '\n';
                             }
+
                             foreach (var line in categoryData.Split(delimitingChar))
                             {
+                                if (line == null || line.Length == 0) continue; // They probably left an extra comma at the end, not an error just ignore
+
                                 try
                                 {
                                     categoriesList.Add(Convert.ToInt32(line.Trim(), 16));
                                 }
                                 catch // empty line wont convert or bad category value, ignore
                                 {
-                                    #if RELEASE
-                                    continue; // Release ignores music bugs and keeps going
-                                    #endif
+                                    //#if RELEASE
+                                    //continue; // Release ignores music bugs and keeps going
+                                    //#endif
                                     throw new Exception($"Error: Categories cannot be read: {currentSong.Name}");
                                 }
                             }
@@ -498,7 +501,6 @@ namespace MMR.Randomizer.Utils
                 ConvertSequenceSlotToPointer(0x70, 0x0B); // point call the giants( cutscene confronting skullkid) at healed
                 ConvertSequenceSlotToPointer(0x7B, 0x0D); // point maskreveal, the song that plays when the mask shows its alive during moon cutscene, at aliens
                 ConvertSequenceSlotToPointer(0x7D, 0x05); // point reunion at clocktower
-                ConvertSequenceSlotToPointer(0x0B, 0x05); // point healing cutscene at clocktower
             }
 
             // if ocarina is NOT randomized, pointerize skullkid's seq since it gets used nowhere
@@ -995,7 +997,7 @@ namespace MMR.Randomizer.Utils
                 log.AppendLine(" * [" + RemainingSong.Name + "] with categories [" + String.Join(",", RemainingSong.Type) + "]");
             }
             WriteSongLog(log, settings);
-            throw new Exception("Cannot randomize music on this seed with available music: " + targetSlot.PreviousSlot.ToString("X"));
+            throw new Exception($"Cannot randomize music on this seed with available music: \nSlot Name:[{targetSlot.Name}] PreviousSlot: [{targetSlot.Replaces.ToString("X")}]");
         }
 
         public static void WriteSongLog(StringBuilder log, OutputSettings settings)

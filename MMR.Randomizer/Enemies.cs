@@ -170,6 +170,7 @@ namespace MMR.Randomizer
                             // TODO: type lookup is not always accurate
                             mapActor.Type = matchingEnemy.GetType(mapActor.OldVariant);
                             mapActor.AllVariants = Actor.BuildVariantList(matchingEnemy);
+                            mapActor.Blockable = mapActor.ActorEnum.IsBlockable(scene.SceneEnum, actorNumber);
                             sceneEnemyList.Add(mapActor);
                         }
                     }
@@ -382,7 +383,7 @@ namespace MMR.Randomizer
 
             ExtendGrottoDirectIndexByte();
             ShortenChickenPatience();
-            FixSeth2();
+            //FixSeth2();
             AllowGuruGuruOutside();
             RemoveSTTUnusedPoe();
             FixSilverIshi();
@@ -686,9 +687,10 @@ namespace MMR.Randomizer
             tfScene.Maps[0].Objects[0] = SMALLEST_OBJ;
 
             // HEAVY BOM
-            RomUtils.CheckCompressed(GameObjects.Actor.PowderKeg.FileListIndex());
-            var kegFile = RomData.MMFileList[GameObjects.Actor.PowderKeg.FileListIndex()].Data;
-            kegFile[0x1FF5] |= 0x02; // add ACTOR_FLAG_20000, makes it heavy 
+            // you idiot, this is both kegs and regular bombs, you need to set the flag for just kegs with a code change or bombs are heavy too
+            //RomUtils.CheckCompressed(GameObjects.Actor.PowderKeg.FileListIndex());
+            //var kegFile = RomData.MMFileList[GameObjects.Actor.PowderKeg.FileListIndex()].Data;
+            //kegFile[0x1FF5] |= 0x02; // add ACTOR_FLAG_20000, makes it heavy 
 
 
 
@@ -1600,7 +1602,13 @@ namespace MMR.Randomizer
                 GameObjects.Actor.Dinofos.ObjectIndex(),
                 GameObjects.Actor.Scarecrow.ObjectIndex(),
                 GameObjects.Actor.PatrollingPirate.ObjectIndex(),
-                GameObjects.Actor.GossipStone.ObjectIndex()
+                GameObjects.Actor.GossipStone.ObjectIndex(),
+                GameObjects.Actor.LabFish.ObjectIndex(),
+                GameObjects.Actor.Lightblock.ObjectIndex(),
+                GameObjects.Actor.SkullKidPainting.ObjectIndex(),
+                GameObjects.Actor.LaundryPoolBell.ObjectIndex(),
+                GameObjects.Actor.AnjusGrandmaCredits.ObjectIndex(),
+                GameObjects.Actor.GoronWithGeroMask.ObjectIndex()
             };
 
             var actorObjectsDetected = thisSceneData.ChosenReplacementObjects.Find(v => listTroubleActorsObj.Contains(v.ChosenV)) != null;
@@ -1614,7 +1622,13 @@ namespace MMR.Randomizer
                 GameObjects.Actor.PatrollingPirate,
                 GameObjects.Actor.Tingle,
                 GameObjects.Actor.GrottoHole,
-                GameObjects.Actor.GossipStone
+                GameObjects.Actor.GossipStone,
+                GameObjects.Actor.LabFish,
+                GameObjects.Actor.Lightblock,
+                GameObjects.Actor.SkullKidPainting,
+                GameObjects.Actor.LaundryPoolBell,
+                GameObjects.Actor.AnjusGrandmaCredits,
+                GameObjects.Actor.GoronWithGeroMask
             };
 
             for (int i = 0; i < thisSceneData.Actors.Count(); i++) // thisSceneData.Actors is only the actors we change
@@ -1689,6 +1703,17 @@ namespace MMR.Randomizer
 
                 }
             }
+            for (int doorNumber = 0; doorNumber < thisSceneData.Scene.Doors.Count; ++doorNumber)
+            {
+                var sceneDoor = thisSceneData.Scene.Doors[doorNumber];
+                var flags = ActorUtils.GetActorSwitchFlags(sceneDoor, (short)sceneDoor.OldVariant);
+                if (flags >= 0)
+                {
+                    claimedSwitchFlags.Add(flags);
+                    thisSceneData.Log.AppendLine($"  [{doorNumber}][{sceneDoor.ActorEnum}] has flags: [{flags}]");
+                }
+            }
+
 
             // change all new actors with switch flags to some flag not yet used
             var usableSwitches = new List<int>();
@@ -1807,15 +1832,15 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.RedBubble)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Seth2)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TouristCenter, GameObjects.Actor.SwampTouristGuide, GameObjects.Actor.SmithyGoronAndGo)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.IkanaGraveyard, GameObjects.Actor.BadBat, GameObjects.Actor.StoneTowerMirror)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.BioDekuBaba, GameObjects.Actor.En_Stream)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.BioDekuBaba, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DragonFly, GameObjects.Actor.WarpDoor)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.SouthernSwampClear, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.DeathArmos)) continue;
-                if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.Keese)) continue;
-                if (TestHardSetObject(GameObjects.Scene.NorthClockTown, GameObjects.Actor.BombersBlueHat, GameObjects.Actor.BeanSeller)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.Torch, GameObjects.Actor.WarpDoor)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.MilkRoad, GameObjects.Actor.MilkroadCarpenter, GameObjects.Actor.GoronWithGeroMask)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ZoraCape, GameObjects.Actor.LikeLike, GameObjects.Actor.LabFish)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.GateSoldier, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.DekuPatrolGuard, GameObjects.Actor.OOTPotionShopMan)) continue;
 
                 //TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.FlyingPot);
                 #endif
@@ -1918,12 +1943,15 @@ namespace MMR.Randomizer
             for (int objectIndex = 0; objectIndex < thisSceneData.Objects.Count; objectIndex++)
             {
                 // get a list of all enemies (in this room) that have the same OBJECT as our object that have an actor we also have
-                thisSceneData.ActorsPerObject.Add(thisSceneData.Actors.FindAll(act => act.OldObjectId == thisSceneData.Objects[objectIndex]));
+                var currentTargetActors = thisSceneData.Actors.FindAll(act => act.OldObjectId == thisSceneData.Objects[objectIndex]);
+                thisSceneData.ActorsPerObject.Add(currentTargetActors);
                 // we want to detect if this scene/actor combo can drop fairies early
                 var objectHasFairyDroppingEnemy = fairyDroppingActors.Any(act => act.ObjectIndex() == thisSceneData.Objects[objectIndex]);
+                var objectHasBlockingSensitivity = currentTargetActors.Any(actor => actor.Blockable == false);
                 // get a list of matching actors that can fit in the place of the previous actor
-                var newCandiateList = GetMatchPool(thisSceneData, thisSceneData.ActorsPerObject[objectIndex], objectHasFairyDroppingEnemy);
-                if (newCandiateList.Find(act => act.Variants.Count == 0) != null) // haven't gotten this error in awhile, but leaving here in case I break something
+                var newCandiateList = GetMatchPool(thisSceneData, thisSceneData.ActorsPerObject[objectIndex], objectHasFairyDroppingEnemy, objectHasBlockingSensitivity);
+                var sanityCheck = newCandiateList.Find(act => act.Variants.Count == 0);
+                if ( sanityCheck != null) // haven't gotten this error in awhile, but leaving here in case I break something
                 {
                     throw new Exception("GenActorCandidatees: zero variants detected");
                 }
@@ -1956,7 +1984,7 @@ namespace MMR.Randomizer
             }
         }
 
-        public static List<Actor> GetMatchPool(SceneEnemizerData thisSceneData, List<Actor> oldActors, bool containsFairyDroppingEnemy)
+        public static List<Actor> GetMatchPool(SceneEnemizerData thisSceneData, List<Actor> oldActors, bool containsFairyDroppingEnemy, bool hasBlockingSensitivity)
         {
             var reducedCandidateList = Actor.CopyActorList(thisSceneData.AcceptableCandidates);
             var enemyMatchesPool = new List<Actor>();
@@ -1982,7 +2010,7 @@ namespace MMR.Randomizer
                 ReplacementListRemove(reducedCandidateList, blockedActor);
             }
 
-            // todo does this NEED to be a double loop? does anything change per enemy copy that we should worry about?
+            // TODO does this NEED to be a double loop? does anything change per enemy copy that we should worry about?
             for (var oldActorIndex = 0; oldActorIndex < oldActors.Count; oldActorIndex++) // this is all copies of an enemy in a scene, so all bo or all guay
             {
                 var oldActor = oldActors[oldActorIndex];
@@ -2009,11 +2037,28 @@ namespace MMR.Randomizer
                                 continue; // can't put this enemy here: it has no non-respawning variants
                             }
                         }
+                        else if (oldActor.Blockable == false)
+                        {
+                            if (newEnemy.ActorEnum.GetAttribute<BlockingVariantsAll>() != null)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                newEnemy.Variants = compatibleVariants;
+                                newEnemy.RemoveBlockingTypes();
+                                if (newEnemy.Variants.Count == 0) // TODO refactor this into the overall flow
+                                {
+                                    continue;
+                                }
+                            }
+                        }
                         else
                         {
                             newEnemy.Variants = compatibleVariants;
                         }
 
+                        // ACCEPTABLE
                         enemyMatchesPool.Add(newEnemy);
                     }
                 } // for each candidate end
@@ -2040,6 +2085,7 @@ namespace MMR.Randomizer
                     if (roomActors.Count == 0) continue; // nothing to trim: no actors in this room
                     var roomIsClearPuzzleRoom = thisSceneData.Scene.SceneEnum.IsClearEnemyPuzzleRoom(roomIndex);
                     var roomFreeActors = GetRoomFreeActors(thisSceneData, roomIndex);
+
 
                     if (problemActor.OnlyOnePerRoom != null)
                     {
@@ -2069,7 +2115,8 @@ namespace MMR.Randomizer
             }
             else
             {
-                trimCandidates = roomActors.FindAll(act => act.Variants[0] == variant);
+                trimCandidates = roomActors.FindAll(act =>  act.ActorEnum == actorType.ActorEnum &&
+                                                            act.Variants[0] == variant);
             }
 
             if (trimCandidates != null && trimCandidates.Count > 1)
@@ -2093,6 +2140,14 @@ namespace MMR.Randomizer
                     }
                 }
 
+                // for now until I can be sure the code after this is working, always reserve one
+                if (removedCount == 0)
+                {
+                    var randomChoice = thisSceneData.RNG.Next(trimCandidates.Count);
+                    trimCandidates.RemoveAt(randomChoice);
+                    removedCount += 1;
+                }
+
                 // remove random enemies until max for variant is reached
                 int extraCullCapacity = (trimCandidates.Count >= 1) ? (trimCandidates.Count - 1) : (0);
                 var extraCullChosen = thisSceneData.RNG.Next(0, extraCullCapacity);
@@ -2102,6 +2157,7 @@ namespace MMR.Randomizer
                 }
 
                 // if the actor being trimmed is a free actor, remove from possible replacements
+                // TODO this should really already happen before we get this far? can we assume we will never cross dip?
                 var freeActorSearch = roomFreeActors.Find(act => act.ActorId == actorType.ActorId);
                 if (freeActorSearch != null)
                 {
@@ -2237,13 +2293,25 @@ namespace MMR.Randomizer
                     var testEnemyCompatibleVariants = oldActor.CompatibleVariants(testEnemy, thisSceneData.RNG);
                     if (testEnemyCompatibleVariants == null) continue;  // no type compatibility, skip
 
+                    if (oldActor.Blockable == false)
+                    {
+                        if (testEnemy.ActorEnum.GetAttribute<BlockingVariantsAll>() != null)
+                        {
+                            continue; // test actor is always blocking, oldactor cannot be blocked, continue to next actor
+                        }
+                        else
+                        {
+                            testEnemyCompatibleVariants = testEnemy.RemoveBlockingTypes();
+                        }
+                    }
+
                     var respawningVariants = testEnemy.RespawningVariants;
                     if ((oldActor.MustNotRespawn || roomIsClearPuzzleRoom) && respawningVariants != null)
                     {
                         testEnemyCompatibleVariants.RemoveAll(variant => respawningVariants.Contains(variant));
                     }
 
-                    if (testEnemyCompatibleVariants.Count == 0) continue;  // cannot use respawning enemies here, skip
+                    if (testEnemyCompatibleVariants.Count == 0) continue;  // no variants remain, leave
 
                     var enemyHasMaximums = testEnemy.HasVariantsWithRoomLimits();
                     var acceptableVariants = new List<int>();
@@ -2303,9 +2371,13 @@ namespace MMR.Randomizer
                 var companionAttrs = actor.ActorEnum.GetAttributes<CompanionActorAttribute>();
                 if (companionAttrs != null)
                 {
+                    var targetActors = thisSceneData.ActorsPerObject[objectIndex];
+
                     // if 4 or fewer total actors here, no companions, not enough regular actors anyway
                     // reminder: these are companions that fully mix into the actor list
-                    if (thisSceneData.ActorsPerObject[objectIndex].Count <= 3) continue;
+                    if (targetActors.Count <= 3) continue;
+
+                    var objectHasBlockingSensitivity = targetActors.Any(actor => actor.Blockable == false);
 
                     foreach (var companion in companionAttrs)
                     {
@@ -2313,14 +2385,16 @@ namespace MMR.Randomizer
                         if (cObj != 1 && cObj != actor.ObjectId && !thisSceneData.Objects.Contains(cObj))
                             continue;
 
+                        var companionType = companion.Companion;
                         // if its banned on this actor slot, also avoid
                         var blockedReplacementActors = thisSceneData.Scene.SceneEnum.GetBlockedReplacementActors(actor.OldActorEnum);
-                        if (blockedReplacementActors.Contains(companion.Companion))
+                        if (blockedReplacementActors.Contains(companionType) // blocked from being used as replacement
+                            || (objectHasBlockingSensitivity && companionType.IsBlockingActor())) // actor is bulky, blocks path
                         {
-                            continue; // blocked
+                            continue; // cannot use
                         }
 
-                        var newCompanion = new Actor(companion.Companion);
+                        var newCompanion = new Actor(companionType);
                         newCompanion.Variants = companion.Variants;
                         newCompanion.IsCompanion = true;
                         candidates.Add(newCompanion);
@@ -2702,7 +2776,7 @@ namespace MMR.Randomizer
                     //WriteOutput($"  match time: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
                     TrimAllActors(thisSceneData, previousyAssignedCandidate, temporaryMatchEnemyList);
-                   // WriteOutput($"  trim/free time: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
+                    // WriteOutput($"  trim/free time: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
                     previousyAssignedCandidate.Clear();
                 } // end for actors per object
@@ -3332,6 +3406,7 @@ namespace MMR.Randomizer
 
                 PrepareEnemyLists();
                 SceneUtils.ReadSceneTable();
+                SceneUtils.GetSceneHeaders();
                 SceneUtils.GetMaps();
                 SceneUtils.GetMapHeaders();
                 SceneUtils.GetActors();
@@ -3378,7 +3453,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 46.1\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 49.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

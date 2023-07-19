@@ -35,6 +35,7 @@ namespace MMR.Randomizer.Models.Rom
         public ActorType Type; 
         public bool IsCompanion = false;
         public bool previouslyMovedCompanion = false;
+        public bool Blockable = true;
 
         // used for vanilla actors (not for replacements)
         public int ActorSize; // todo
@@ -284,6 +285,9 @@ namespace MMR.Randomizer.Models.Rom
                 List<int> ourVariants   = this.AllVariants[(int)randomVariantType - 1].ToList();
                 List<int> theirVariants = otherActor.AllVariants[(int)randomVariantType - 1].ToList();
 
+                // TODO if both are zero, exit early
+                if (ourVariants.Count == 0 && theirVariants.Count == 0) continue;
+
                 // large chance of pathing enemies allowing ground or flying replacements
                 if (randomVariantType == ActorType.Pathing
                     && ourVariants.Contains(this.OldVariant) && theirVariants.Count == 0 && rng.Next(100) < 80)
@@ -471,6 +475,18 @@ namespace MMR.Randomizer.Models.Rom
             groundVariantEntry.AddRange(injectedActor.groundVariants.Except(groundVariantEntry));
             var flyingVariantEntry = this.AllVariants[(int)ActorType.Ground - 1];
             flyingVariantEntry.AddRange(injectedActor.flyingVariants.Except(flyingVariantEntry));
+        }
+
+
+        public List<int> RemoveBlockingTypes()
+        {
+            var blockingTypeVariants = this.ActorEnum.GetAttribute<BlockingVariantsAttribute>();
+            if (blockingTypeVariants != null)
+            {
+                this.Variants = this.Variants.Where(var => ! blockingTypeVariants.Variants.Contains(var)).ToList();
+            }
+
+            return this.Variants;
         }
     }
 }

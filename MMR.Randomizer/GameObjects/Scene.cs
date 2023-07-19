@@ -66,13 +66,16 @@ namespace MMR.Randomizer.GameObjects
             Actor.Beamos, // beamos is just because bomb locking this check early is prime seed killer
             Actor.Bo, Actor.Leever, // annoying boring enemies, need to spawn like 10
             //Actor.Nejiron, Actor.RedBubble, 
-            Actor.IceBlock)] // blocking actors
+            Actor.RegularIceBlock)] // blocking actors
         [EnemizerSceneEnemyReplacementBlock(Actor.DekuBabaWithered, // grottos are common, this can get silly
-            Actor.Peahat, Actor.Beamos, Actor.LikeLike, Actor.Freezard, Actor.WarpDoor,
-            Actor.Bumper, Actor.UnusedStoneTowerStoneElevator, Actor.UnusedStoneTowerPlatform, Actor.IceBlock,
-            Actor.ClocktowerGearsAndOrgan /*, Actor.PatrollingPirate */ )]
+            Actor.Peahat, Actor.Beamos, Actor.LikeLike, Actor.Freezard//, Actor.BomberHideoutGuard // annoying
+            //Actor.Bumper, Actor.UnusedStoneTowerStoneElevator, Actor.UnusedStoneTowerPlatform, Actor.RegularIceBlock,
+            /*Actor.ClocktowerGearsAndOrgan /*, Actor.PatrollingPirate */ )]
+        [EnemizerSceneBlockSensitive(Actor.DekuBabaWithered, -1)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BioDekuBaba,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // they can extend so far they can block the door leading out
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoldSkulltula,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can get the player locked behind them near the grotto stones
         Grottos = 0x0A,
 
         // Unused = 0x0B,
@@ -103,12 +106,14 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x16)]
         [ClearEnemyPuzzleRooms(4, 7)]// basement lava
         [FairyDroppingEnemies(1, 2)] // eygore
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RealBombchu,
-            Actor.WarpDoor)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RealBombchu,
+        //    Actor.WarpDoor)]
+        [EnemizerSceneBlockSensitive(Actor.RealBombchu, -1)] // chicken holder leads to a chest
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Beamos,
             Actor.IkanaGravestone, Actor.Bumper, Actor.En_Ani)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Hiploop,
-            Actor.En_Ani, Actor.Bumper, Actor.Tijo)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Hiploop,
+        //    Actor.En_Ani, Actor.Bumper, Actor.Tijo)]
+        [EnemizerSceneBlockSensitive(Actor.Hiploop, -1)]
         StoneTowerTemple = 0x13,
 
         [FileID(1188)]
@@ -140,12 +145,15 @@ namespace MMR.Randomizer.GameObjects
         [FairyDroppingEnemies(5, 22)] // east wing, beehive:22
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Dinofos, // weak enemies are kinda lame here
             Actor.Leever, Actor.ChuChu, Actor.DekuBabaWithered)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula, // weak enemies are kinda lame here
-            Actor.BigPoe)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula, 
+            Actor.BigPoe)] // I think this was an issue? other than being annoying I mean
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bo,
-            Actor.GibdoWell, Actor.DeathArmos)] // Rarely Killable
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper,
-            Actor.WarpDoor, Actor.ClocktowerGearsAndOrgan)] // Snapper spawns just on top of its chest, its possible a non-killable actor is placed int he wya
+            Actor.GibdoWell, Actor.DeathArmos // Rarely Killable
+            /*Actor.RegularIceBlock, Actor.Bombiwa, Actor.ClocktowerGearsAndOrgan */)] // blocking
+        [EnemizerSceneBlockSensitive(Actor.Bo, -1)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper,
+        //    Actor.WarpDoor, Actor.ClocktowerGearsAndOrgan)] // Snapper spawns just on top of its chest, its possible a non-killable actor is placed int he wya
+        [EnemizerSceneBlockSensitive(Actor.Snapper, -1)]
         WoodfallTemple = 0x18,
 
         [FileID(1222)]
@@ -172,24 +180,27 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x21)]
         // 11 dinofos room, 6/12 wizrobe
         [ClearEnemyPuzzleRooms(1, 2, 5, 6, 9)] // 1:wolfos room, 2: east freezard, 5: north freezard, 6: wizr1, 9:chu room
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Wolfos, // can cover a switch, don't allow problem actors
-            Actor.WarpDoor, Actor.WarpToTrialEntrance, Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.IkanaGravestone, Actor.Tijo)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Wolfos, // can cover a switch, don't allow problem actors
+        //    Actor.WarpDoor, Actor.WarpToTrialEntrance, Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.IkanaGravestone, Actor.Tijo)]
+        [EnemizerSceneBlockSensitive(Actor.Wolfos, -1)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RedBubble, // spawns in hot lava, keep wood enemies out
             Actor.Peahat, Actor.MadShrub, Actor.Postbox, Actor.DekuBaba, Actor.DekuBabaWithered, Actor.Freezard, Actor.Eeno, Actor.Wolfos, Actor.Dinofos, Actor.Snapper)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bo, // spawns in hot lava, keep wood enemies out
-            Actor.IceBlock, Actor.Bombiwa, Actor.IkanaCanyonHookshotStump, Actor.Rock)] // could block the fairy bubble
+            Actor.Bombiwa /* Actor.RegularIceBlock, Actor.IkanaCanyonHookshotStump, */ )] // could block the fairy bubble
+        [EnemizerSceneBlockSensitive(Actor.Bo, -1)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Freezard,
             Actor.PoeSisters, // weird behavior, if the killing blow of meg at long range can stop chests from spawning
             Actor.CircleOfFire, // if it gets placed on the one on top of a chest the player is screwed
             Actor.DragonFly, // if you kill it at long range or such that its dying body falls to first floor it wont count
             Actor.WarpDoor, // Cannot walk through them to get to the chest under
             Actor.Wolfos)] // wolfos: ice wolfos can push the regular actual dog backwards through the wall
+        [EnemizerSceneBlockSensitive(Actor.Freezard, 5)] // can block access to the elevator
         [FairyDroppingEnemies(11, 2, 3)] // dinofos 
         SnowheadTemple = 0x1E,
 
         [FileID(1256)]
         [SceneInternalId(0x22)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Carpenter, // can cover a switch, don't allow problem actors
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Carpenter,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)]
         MilkRoad = 0x1F,
 
@@ -198,8 +209,9 @@ namespace MMR.Randomizer.GameObjects
         [ClearEnemyPuzzleRooms(0, 1, 2)] // three pirate minibosses
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SpikedMine,
             Actor.LabFish)] // crash unknown reason, float math error
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ZoraEgg,
-            Actor.Tijo, Actor.Bombiwa, Actor.Bumper)] // blocking a chest
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ZoraEgg,
+        //    Actor.Tijo, Actor.Bombiwa, Actor.Bumper)] // blocking a chest
+        [EnemizerSceneBlockSensitive(Actor.ZoraEgg, -1)]
         PiratesFortressRooms = 0x20, // tag: Sewer
 
         [FileID(1276)]
@@ -217,21 +229,25 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1284)]
         [SceneInternalId(0x27)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // blocking a few skulltulla
-            Actor.StockpotBell, Actor.IkanaGravestone, Actor.Bombiwa, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
-            Actor.Bumper, Actor.ClocktowerGearsAndOrgan)]
+            Actor.Bombiwa //Actor.StockpotBell, Actor.IkanaGravestone,  Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
+            /*Actor.Bumper, Actor.ClocktowerGearsAndOrgan*/)]
+        [EnemizerSceneBlockSensitive(Actor.Torch, -1)]
         // old, should no longer be needed: Actor.En_Ani, Actor.GoronElder, Actor.Cow, Actor.Tijo , Actor.Postbox,
         SwampSpiderHouse = 0x24,
 
         [FileID(1291)]
         [SceneInternalId(0x28)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.SkulltulaDummy,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // Can block the ability to reach rafters to get a skulltoken
         OceanSpiderHouse = 0x25,
 
         [FileID(1298)]
         [SceneInternalId(0x29)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Scarecrow, // can block the stairs
             Actor.ClocktowerGearsAndOrgan)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // can block the stairs
-            Actor.ClocktowerGearsAndOrgan)]
+        //[EnemizerSceneEnemyReplacementBlock(Actor.Torch, // can block the stairs
+        //    Actor.ClocktowerGearsAndOrgan)]
+        [EnemizerSceneBlockSensitive(Actor.Torch, -1)]
         AstralObservatory = 0x26, // and sewer leading to it
 
         [FileID(1301)]
@@ -241,29 +257,35 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1304)]
         [SceneInternalId(0x2B)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // can block the stairs
-            Actor.IceBlock,  // the big one can be too big
+            //Actor.RegularIceBlock,  // the big one can be too big
             Actor.Dexihand)] // if it grabs you as you fall into a grotto hole it can hardlock
+        [EnemizerSceneBlockSensitive(Actor.Torch, -1)]
         DekuPalace = 0x28,
 
         [FileID(1308)]
         [SceneInternalId(0x2C)]
-        // these actors are only seen in the credits, we should block all large object actors from these spots to save generation time
-        [EnemizerSceneEnemyReplacementBlock(Actor.ViscenMoonLeaveCutscene, 
-            Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
-        ///*
-        [EnemizerSceneEnemyReplacementBlock(Actor.MutoMoonLeaveCutscene,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.AnjusGrandmaCredits,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.AnjuMotherWedding,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.CuriosityShopMan,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
-        //*/
         MountainSmithy = 0x29,
 
         [FileID(1310)]
         [SceneInternalId(0x2D)]
+        // this actor is mostly ignored, player might not even notice, dont waste lots of object budget on this thing
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ClayPot,
+            Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DekuBaba,
+            Actor.LikeLike)] // can grab you on grotto exit and softlock with only one heart, TODO make special code instead moving them?
+        // these actors are only seen in the credits, we should block all large object actors from these spots to save generation time
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ViscenMoonLeaveCutscene,
+            Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        ///*
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.MutoMoonLeaveCutscene,
+                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.AnjusGrandmaCredits,
+                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.AnjuMotherWedding,
+                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CuriosityShopMan,
+                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+        //*/
         TerminaField = 0x2A,
 
         [FileID(1312)]
@@ -304,16 +326,16 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1330)]
         [SceneInternalId(0x37)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Seagulls,
-            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can stop him from falling, beacuse of hte seagulls flying around him
-        // Seagulls
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can stop ting from falling
         GreatBayCoast = 0x34,
 
         [FileID(1332)]
         [SceneInternalId(0x38)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.LikeLike,
-            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.Tijo,
-            Actor.Bombiwa, Actor.BronzeBoulder, Actor.CircleOfFire,
-            Actor.RegularZora, Actor.SwimmingZora, Actor.WarpDoor)]
+        //[EnemizerSceneEnemyReplacementBlock(Actor.LikeLike,
+        //    Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.Tijo,
+        //    Actor.Bombiwa, Actor.BronzeBoulder, Actor.CircleOfFire,
+        //    Actor.RegularZora, Actor.SwimmingZora, Actor.WarpDoor)]
+        [EnemizerSceneBlockSensitive(Actor.LikeLike, -1)]
         ZoraCape = 0x35,
 
         [FileID(1334)]
@@ -325,7 +347,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1336)]
         [SceneInternalId(0x3B)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch,
-            Actor.ClocktowerGearsAndOrgan)]
+            Actor.ClocktowerGearsAndOrgan, Actor.RegularIceBlock)]
         PiratesFortressExterior = 0x38,
 
         [FileID(1338)]
@@ -363,6 +385,9 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1353)]
         [SceneInternalId(0x43)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.Dampe,
+            Actor.Treee)]// for some reason big poe in the first room can cause camera to lock, unknown reason
+        [EnemizerSceneBlockSensitive(Actor.Dampe, -1)]
         IkanaGraveyard = 0x40,
 
         [FileID(1356)]
@@ -373,6 +398,8 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x45)]
         //[EnemizerSceneEnemyReplacementBlock(Actor.DekuBabaWithered, // bit annoying 
         //    Actor.Peahat, Actor.LikeLike, Actor.Freezard)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.DragonFly, // blocks deku flying 
+            Actor.UnusedStoneTowerPlatform)]
         SouthernSwamp = 0x42,
 
         [FileID(1362)]
@@ -380,8 +407,9 @@ namespace MMR.Randomizer.GameObjects
         //  we want the hiploop to be non-blocking actors, making them killable with this flag does the job
         [FairyDroppingEnemies(24, 25, 26)] // hiploops
         [EnemizerSceneEnemyReplacementBlock(Actor.Hiploop, // respawning bo can show up here, but I dont want to mark the whole room to not place respawning enemies
-            Actor.Peahat, Actor.Seth1, Actor.Tijo, Actor.ArmosStatue, Actor.ClocktowerGearsAndOrgan, // blocking bridges
-            Actor.Wolfos)] // wolfos:iceblock
+            Actor.Peahat, Actor.BabaIsUnused //Actor.Seth1, Actor.Tijo, Actor.ArmosStatue, Actor.ClocktowerGearsAndOrgan, // blocking bridges
+            /* Actor.Wolfos */ )] // wolfos:iceblock
+        [EnemizerSceneBlockSensitive(Actor.Hiploop, -1)]
         Woodfall = 0x43,
 
         [FileID(1364)]
@@ -437,6 +465,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1421)]
         [SceneInternalId(0x52)]
+        [EnemizerSceneBlockSensitive(Actor.MadShrub, -1)]
         DekuShrine = 0x4F,
 
         [FileID(1431)]
@@ -469,6 +498,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1444)]
         [SceneInternalId(0x59)]
+        [EnemizerSceneBlockSensitive(Actor.BlueBubble, -1)]
         InvertedStoneTower = 0x56,
 
         [FileID(1446)]
@@ -505,10 +535,14 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1466)]
         [SceneInternalId(0x61)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Gorman,
-            Actor.StockpotBell, Actor.Bumper, Actor.CircleOfFire, Actor.LikeLike)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RosaSisters,
-            Actor.StockpotBell, Actor.Bumper, Actor.CircleOfFire, Actor.LightBlock,
-            Actor.Eyegore)]
+            /* Actor.StockpotBell, Actor.Bumper, Actor.CircleOfFire,*/ Actor.LikeLike)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Anju,
+        //    Actor.AnjusGrandma, Actor.AnjusGrandmaCredits)] // this this was just cutscenes, not the same bug
+        [EnemizerSceneBlockSensitive(Actor.Gorman, -1)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RosaSisters,
+        //    Actor.StockpotBell, Actor.Bumper, Actor.CircleOfFire, Actor.LightBlock,
+        //   Actor.Eyegore)]
+        [EnemizerSceneBlockSensitive(Actor.RosaSisters, -1)]
         StockPotInn = 0x5E,
 
         [FileID(1472)]
@@ -539,7 +573,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1502)]
         [SceneInternalId(0x68)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoGoron,
-            Actor.PatrollingPirate, Actor.DekuPatrolGuard)]
+            Actor.PatrollingPirate)]
         BombShop = 0x65,
 
         [FileID(1504)]
@@ -549,47 +583,67 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1506)]
         [SceneInternalId(0x6A)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Treee,
-            Actor.PoeBalloon, Actor.BigPoe, Actor.CircleOfFire, Actor.FloorMaster, Actor.LightBlock,
-            Actor.GibdoIkana, Actor.ReDead, Actor.GibdoWell, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)]
+            Actor.PoeBalloon, Actor.BigPoe, // Actor.FloorMaster,
+            //Actor.SleepingScrub, // too much dyna, spawns too many flowers and flower companions
+            Actor.GrassRockCluster // can spawn too many rocks
+            //Actor.GibdoIkana, Actor.ReDead, Actor.GibdoWell,
+            /* Actor.CircleOfFire, Actor.LightBlock, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator */)]
+        [EnemizerSceneBlockSensitive(Actor.Treee, -1)]
         GormanTrack = 0x67,
 
         [FileID(1508)]
         [SceneInternalId(0x6B)]
+        [EnemizerSceneBlockSensitive(Actor.BombFlower, -1)]
+        [EnemizerSceneBlockSensitive(Actor.UglyTree, -1)]
         GoronRacetrack = 0x68,
 
         [FileID(1510)]
         [SceneInternalId(0x6C)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Gorman,
-            Actor.ClocktowerGearsAndOrgan, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // organ is huge, covers the mayor's door
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Gorman,
+        //    Actor.ClocktowerGearsAndOrgan, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // organ is huge, covers the mayor's door
+        [EnemizerSceneBlockSensitive(Actor.Gorman, -1)] // was moved next to mayors door, large bodies can actually block this
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
             Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BomberHideoutGuard,
-                Actor.Peahat, Actor.Tijo, Actor.ArmosStatue, Actor.ClocktowerGearsAndOrgan, Actor.CircleOfFire, Actor.GibdoWell, Actor.IceBlock, // worried about big blocking actors
+                Actor.Peahat, Actor.Tijo, Actor.ArmosStatue, Actor.ClocktowerGearsAndOrgan, Actor.CircleOfFire, Actor.GibdoWell, Actor.RegularIceBlock, // worried about big blocking actors
                 Actor.Wolfos)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BombersYouChase,
-            Actor.IceBlock)] // large one can block teh whole path to hidden chest
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BombersYouChase,
+        //Actor.RegularIceBlock)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
+            Actor.LikeLike)] // If you start with one heart this can be a softlock
+        [EnemizerSceneBlockSensitive(Actor.BombersYouChase, -1)] // chicken holder leads to a chest
         EastClockTown = 0x69,
 
         [FileID(1512)]
         [SceneInternalId(0x6D)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
+        //    Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
-            Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
+            Actor.LikeLike)] // If you start with one heart this can be a softlock
+        [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         WestClockTown = 0x6A,
 
         [FileID(1514)]
         [SceneInternalId(0x6E)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
+        //    Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
+        [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
-            Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
+            Actor.LikeLike)] // If you start with one heart this can be a softlock
         NorthClockTown = 0x6B,
 
         [FileID(1516)]
         [SceneInternalId(0x6F)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Carpenter,
-            Actor.IceBlock, Actor.Bumper, Actor.CircleOfFire, Actor.GoronElder, Actor.LightBlock, // can block day 3 chest, TODO move it so we can re-enable
+        /*[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Carpenter,
+            Actor.RegularIceBlock, Actor.Bumper, Actor.CircleOfFire, Actor.GoronElder, Actor.LightBlock, // can block day 3 chest, TODO move it so we can re-enable
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, // chest can raise to match height,putting it out of reach
             Actor.PatrollingPirate)] // could be annoying, hard to leave
+        */
+        [EnemizerSceneBlockSensitive(Actor.Carpenter, -1)] // TODO figure out which one is the issue one
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
-            Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
+            Actor.PatrollingPirate, // could be annoying, hard to leave
+            Actor.LikeLike )] // If you start with one heart this can be a softlock
+        [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         SouthClockTown = 0x6C,
 
         [FileID(1518)]
