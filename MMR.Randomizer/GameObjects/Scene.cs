@@ -45,6 +45,9 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1137)]
         [SceneInternalId(0x00)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.Octarok,
+            Actor.Wolfos, // can attack you off the boat
+            Actor.LikeLike)] // can grab you on the boat ride
         SouthernSwampClear = 0x06,
 
         [FileID(1151)]
@@ -96,6 +99,9 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1171)]
         [SceneInternalId(0x14)]
+        // TODO come up with a way to make sure that one spot isn't blocking without hardcoding
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PatrollingPirate,
+            Actor.Obj_Iceblock)] // can block the stairs
         PiratesFortress = 0x11,
 
         [FileID(1173)]
@@ -105,7 +111,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1175)]
         [SceneInternalId(0x16)]
         [ClearEnemyPuzzleRooms(4, 7)]// basement lava
-        [FairyDroppingEnemies(1, 2)] // eygore
+        [FairyDroppingEnemies(roomNumber: 1, actorNumber: 2)] // eygore
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RealBombchu,
         //    Actor.WarpDoor)]
         [EnemizerSceneBlockSensitive(Actor.RealBombchu, -1)] // chicken holder leads to a chest
@@ -122,8 +128,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1190)]
         [SceneInternalId(0x18)]
-        [FairyDroppingEnemies(1, 3)] // eygore 
-        [FairyDroppingEnemies(1, 1)] // wizrobe
+        [FairyDroppingEnemies(roomNumber: 1, actorNumber: 3)] // eygore 
+        [FairyDroppingEnemies(roomNumber: 1, actorNumber: 1)] // wizrobe
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DeathArmos,
             Actor.PatrollingPirate)] // casual, causes a need for stone mask to procede through the temple
         InvertedStoneTowerTemple = 0x15,
@@ -139,17 +145,19 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1208)]
         [SceneInternalId(0x1B)]
         [ClearEnemyPuzzleRooms(4, 6, 7, 8, 9)] // 4: mapchest, 6: snapper room, 7: bow room, 8: BK, 9:dark
-        //[FairyDroppingEnemies(0,  )] 
-        [FairyDroppingEnemies(1, 4, 34)] // wooden flower room, deku baba and stray fairy in bubble
-        [FairyDroppingEnemies(3, 3)] // west wing, skulltula:3
-        [FairyDroppingEnemies(5, 22)] // east wing, beehive:22
+        [FairyDroppingEnemies(roomNumber: 1, actorNumber: 4, 34)] // wooden flower room, deku baba and stray fairy in bubble
+        [FairyDroppingEnemies(roomNumber: 3, actorNumber: 3)] // west wing, skulltula:3
+        [FairyDroppingEnemies(roomNumber: 5, actorNumber: 22)] // east wing, beehive:22
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Dinofos, // weak enemies are kinda lame here
             Actor.Leever, Actor.ChuChu, Actor.DekuBabaWithered)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula, 
             Actor.BigPoe)] // I think this was an issue? other than being annoying I mean
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bo,
-            Actor.GibdoWell, Actor.DeathArmos // Rarely Killable
+            Actor.GibdoWell, Actor.DeathArmos, // Rarely Killable
+            Actor.Keese // can bug out and fly out-of-bounds, difficult to kill
             /*Actor.RegularIceBlock, Actor.Bombiwa, Actor.ClocktowerGearsAndOrgan */)] // blocking
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DragonFly,
+            Actor.GiantBeee)] // issue being that the one that spins around and doesnt agro hard requires a ranged weapon because the spawn is so high
         [EnemizerSceneBlockSensitive(Actor.Bo, -1)]
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper,
         //    Actor.WarpDoor, Actor.ClocktowerGearsAndOrgan)] // Snapper spawns just on top of its chest, its possible a non-killable actor is placed int he wya
@@ -195,7 +203,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.WarpDoor, // Cannot walk through them to get to the chest under
             Actor.Wolfos)] // wolfos: ice wolfos can push the regular actual dog backwards through the wall
         [EnemizerSceneBlockSensitive(Actor.Freezard, 5)] // can block access to the elevator
-        [FairyDroppingEnemies(11, 2, 3)] // dinofos 
+        [FairyDroppingEnemies(roomNumber: 11, actorNumber: 2, 3)] // dinofos 
         SnowheadTemple = 0x1E,
 
         [FileID(1256)]
@@ -231,7 +239,11 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // blocking a few skulltulla
             Actor.Bombiwa //Actor.StockpotBell, Actor.IkanaGravestone,  Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
             /*Actor.Bumper, Actor.ClocktowerGearsAndOrgan*/)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.Bombiwa, // blocking a few skulltulla
+            Actor.Lulu //Actor.StockpotBell, Actor.IkanaGravestone,  Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
+            /*Actor.Bumper, Actor.ClocktowerGearsAndOrgan*/)]
         [EnemizerSceneBlockSensitive(Actor.Torch, -1)]
+        [EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)]
         // old, should no longer be needed: Actor.En_Ani, Actor.GoronElder, Actor.Cow, Actor.Tijo , Actor.Postbox,
         SwampSpiderHouse = 0x24,
 
@@ -305,6 +317,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1319)]
         [SceneInternalId(0x32)]
+        [EnemizerSceneBlockSensitive(Actor.GoronSGoro, -1)] // ice block can block shop
         GoronShrine = 0x2F,
 
         [FileID(1322)]
@@ -331,8 +344,9 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1332)]
         [SceneInternalId(0x38)]
-        //[EnemizerSceneEnemyReplacementBlock(Actor.LikeLike,
-        //    Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.Tijo,
+        [EnemizerSceneEnemyReplacementBlock(Actor.LikeLike,
+                    Actor.Japas, Actor.Bombiwa, Actor.BronzeBoulder)] // small blocking
+         //    Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.Tijo,
         //    Actor.Bombiwa, Actor.BronzeBoulder, Actor.CircleOfFire,
         //    Actor.RegularZora, Actor.SwimmingZora, Actor.WarpDoor)]
         [EnemizerSceneBlockSensitive(Actor.LikeLike, -1)]
@@ -372,6 +386,7 @@ namespace MMR.Randomizer.GameObjects
         // mirror blocks climbing
         [EnemizerSceneEnemyReplacementBlock(Actor.BadBat,
             Actor.Bo, Actor.StoneTowerMirror, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.SpiderWeb)]
+        [EnemizerSceneBlockSensitive(Actor.BadBat, -1)]
         RoadToSouthernSwamp = 0x3D,
 
         [FileID(1349)]
@@ -398,14 +413,15 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x45)]
         //[EnemizerSceneEnemyReplacementBlock(Actor.DekuBabaWithered, // bit annoying 
         //    Actor.Peahat, Actor.LikeLike, Actor.Freezard)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.DragonFly, // blocks deku flying 
-            Actor.UnusedStoneTowerPlatform)]
+        //[EnemizerSceneEnemyReplacementBlock(Actor.DragonFly, // blocks deku flying 
+        //    Actor.UnusedStoneTowerPlatform, Actor.UnusedPirateElevator)]
+        [EnemizerSceneBlockSensitive(Actor.DragonFly, -1)]
         SouthernSwamp = 0x42,
 
         [FileID(1362)]
         [SceneInternalId(0x46)]
         //  we want the hiploop to be non-blocking actors, making them killable with this flag does the job
-        [FairyDroppingEnemies(24, 25, 26)] // hiploops
+        [FairyDroppingEnemies(roomNumber: 24, actorNumber: 25, 26)] // hiploops
         [EnemizerSceneEnemyReplacementBlock(Actor.Hiploop, // respawning bo can show up here, but I dont want to mark the whole room to not place respawning enemies
             Actor.Peahat, Actor.BabaIsUnused //Actor.Seth1, Actor.Tijo, Actor.ArmosStatue, Actor.ClocktowerGearsAndOrgan, // blocking bridges
             /* Actor.Wolfos */ )] // wolfos:iceblock
@@ -425,8 +441,11 @@ namespace MMR.Randomizer.GameObjects
         //3: clear the biobabas, 5 is gekko, 8 is wart
         [ClearEnemyPuzzleRooms(3, 5, 7)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Skulltula,
-            Actor.BigPoe)]// for some reason big poe in the first room can cause camera to lock, unknown reason
-        [FairyDroppingEnemies(8, 7)] // skulltula in first room 
+            Actor.BigPoe)] // for some reason big poe in the first room can cause camera to lock, unknown reason
+        [EnemizerSceneEnemyReplacementBlock(Actor.Dexihand,
+            Actor.Bumper)] // can block the water channel
+        [FairyDroppingEnemies(roomNumber: 8, actorNumber: 7)] // skulltula in first room
+        [EnemizerSceneBlockSensitive(Actor.Dexihand, -1)]
         GreatBayTemple = 0x46,
 
         [FileID(1386)]
@@ -644,6 +663,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.PatrollingPirate, // could be annoying, hard to leave
             Actor.LikeLike )] // If you start with one heart this can be a softlock
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
+        [EnemizerSceneBlockSensitive(Actor.Kafei, -1)]
         SouthClockTown = 0x6C,
 
         [FileID(1518)]

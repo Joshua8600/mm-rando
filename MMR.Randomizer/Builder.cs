@@ -1138,10 +1138,10 @@ namespace MMR.Randomizer
             {
                 ResourceUtils.ApplyHack(Resources.mods.fierce_deity_anywhere);
 
-                // test if FD sword spin attack makes sense
-                RomUtils.CheckCompressed(38);
+                // Enable FD Spinattack, by removing the check to make sure link is human form
+                RomUtils.CheckCompressed(38); // ovl_player_actor
                 var playerFile = RomData.MMFileList[38].Data;
-                ReadWriteUtils.Arr_WriteU32(playerFile, 0x5880, 0x00000000); // branch on player->transoformation == FD -> NOP
+                ReadWriteUtils.Arr_WriteU32(playerFile, 0x5880, 0x00000000); // branch on player->transoformation != Human -> NOP
             }
 
             if (_randomized.Settings.ByoAmmo)
@@ -3500,20 +3500,21 @@ namespace MMR.Randomizer
 
                 if (outputSettings.GenerateROM)
                 {
-                    if (ROM.Length > 0x4000000) // over 64mb
+                    /*if (ROM.Length > 0x4000000) // over 64mb
                     {
                         throw new ROMOverflowException("64 MB", "hardware (Everdrive)");
-                    }
+                    }// */
                     progressReporter.ReportProgress(85, "Writing ROM...");
                     RomUtils.WriteROM(outputSettings.OutputROMFilename, ROM);
                 }
 
                 if (outputSettings.OutputVC)
                 {
+                    /* 
                     if (ROM.Length > 0x2000000) // over 32mb
                     {
                         throw new ROMOverflowException("32 MB", "WiiVC");
-                    }
+                    } // */
                     progressReporter.ReportProgress(90, "Writing VC...");
                     var fileName = Path.ChangeExtension(outputSettings.OutputROMFilename, "wad");
                     if (!Path.IsPathRooted(fileName))
