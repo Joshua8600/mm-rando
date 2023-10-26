@@ -424,7 +424,7 @@ namespace MMR.Randomizer
             FixSpecificTektiteTypes();
             EnableDampeHouseWallMaster();
             EnableTwinIslandsSpringSkullfish();
-            FixSouthernSwampDekuBaba();
+            FixSouthernSwampDekuBaba(rng);
             FixRoadToSouthernSwampBadBat();
             NudgeFlyingEnemiesForTingle();
             FixScarecrowTalk();
@@ -473,6 +473,7 @@ namespace MMR.Randomizer
             //goronVillageWinter.Maps[0].Objects[7] = GameObjects.Actor.GoGoron.ObjectIndex(); // square signpost
 
             FixKafeiPlacements();
+            MoveOssanIfRandomized();
         }
 
         #region Static Enemizer Changes and Fixes
@@ -831,7 +832,7 @@ namespace MMR.Randomizer
         ///   why? beacuse they are positioned in the elbow and its visually jarring when they spawn/despawn on room swap
         ///   its already noticable in vanilla, but with mixed enemy rando it can cause whole new enemies to pop in and out
         /// </summary>
-        public static void FixSouthernSwampDekuBaba()
+        public static void FixSouthernSwampDekuBaba(Random rng)
         {
             Scene southernswampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwamp.FileID());
 
@@ -861,6 +862,16 @@ namespace MMR.Randomizer
             clearSwampScene.Maps[2].Actors[2].Position = new vec16(3001, 8, -1070);
             clearSwampScene.Maps[2].Actors[3].Position = new vec16(4288, 11, -1312);
 
+            //if (rng.Next() % 100 >= 50)
+            {
+                // move the southern swamp octorok to the surface 
+                southernswampScene.Maps[0].Actors[3].Position.y = 0; // set to water height
+            }
+            //else
+            {
+                // leave on the bottom but change the type
+                // TODO add chance of floor bottom instead
+            }
         }
 
         private static void FixRoadToSouthernSwampBadBat()
@@ -1245,6 +1256,16 @@ namespace MMR.Randomizer
 
             // change object in the room to match new fake actors
             grottosScene.Maps[14].Objects[2] = (coinTossResultActor.actor).ObjectIndex();
+        }
+
+        public static void MoveOssanIfRandomized()
+        {
+            /// if ossan in trading post was randomized we want to move one of them, as there are two of the, assumed for late night
+            var tradingpostScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TradingPost.FileID());
+            var secondOssan = tradingpostScene.Maps[0].Actors[1];
+            if (secondOssan.ActorEnum != GameObjects.Actor.TradingPostShop) {
+                secondOssan.Position = new vec16(-35, 25, -154);
+            }
         }
 
         public static void FixKafeiPlacements()
@@ -3784,7 +3805,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 53.2\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 53.3\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

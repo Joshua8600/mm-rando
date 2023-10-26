@@ -105,6 +105,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x2A60)]
         [ObjectListIndex(0x5)]
         [WaterTopVariants(0xFF00)]
+        //[WaterBottomVariants(0xFF01)] // not safe check the params for safe params first
         [EnemizerScenesExcluded(Scene.IkanaCanyon, Scene.GreatBayTemple)]
         Octarok = 0x8, // En_Okuta
 
@@ -267,7 +268,8 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(59)]
         [ObjectListIndex(0x5F)]
-        [GroundVariants(0)]
+        [GroundVariants(0x0)]
+        [VariantsWithRoomMax(max:2, variant:0x0)] // Dyna
         [UnkillableAllVariants]
         Flagpole = 0x1A, // En_Hata
 
@@ -391,9 +393,18 @@ namespace MMR.Randomizer.GameObjects
 
         Empty29 = 0x29,
 
+        [ActorizerEnabled]
         [FileID(70)]
-        [ObjectListIndex(0x1)]
-        Ossan = 0x2A, // En_Ossan
+        // dual object actor
+        [ObjectListIndex(0x1AB)] // regular OSN, the other one is ANI
+        [CheckRestricted(Item.ShopItemTradingPostArrow30, Item.ShopItemTradingPostArrow50,
+            Item.ShopItemTradingPostFairy, Item.ShopItemTradingPostGreenPotion,
+            Item.ShopItemTradingPostNut10, Item.ShopItemTradingPostRedPotion,
+            Item.ShopItemTradingPostShield, Item.ShopItemTradingPostStick)]
+        [GroundVariants(0, 1)]
+        [VariantsWithRoomMax(max:0, variant:0, 1)]
+        [UnkillableAllVariants]
+        TradingPostShop = 0x2A, // En_Ossan
 
         Empty2B = 0x2B,
         Empty2C = 0x2C,
@@ -461,7 +472,6 @@ namespace MMR.Randomizer.GameObjects
         // uh oh, this one might be the biggest reason yet to have multiple object actors
         //[ActorizerEnabled]
         [FileID(77)]
-        // another cursed multi-object actor
         // I wanted the mailman bag on the wall for wall variants, but their position is deep into the shower/closet, bad for placment
         // good candidate for new actor
         //[ObjectListIndex(0x208)]
@@ -576,7 +586,7 @@ namespace MMR.Randomizer.GameObjects
             0x7)] // yellow tree, fall colors? dying?
         [VariantsWithRoomMax(max: 0, variant: 0xFF0D)] // 0xFF0D crashes TF do not use (is from the cucco shack)
         [VariantsWithRoomMax(max: 1, variant: 0xA1A, 0xFF1A)] // has EnAni, more than one is odd
-        [VariantsWithRoomMax(max: 1, variant: 0xA)] // UGLY
+        [VariantsWithRoomMax(max: 1, variant: 0xA)] // UGLY is also BG
         //[GroundVariants(0xFF01, 0xFF1A)] //testing
         [UnkillableAllVariants]
         [BlockingVariantsAll]
@@ -2671,8 +2681,11 @@ namespace MMR.Randomizer.GameObjects
         [FileID(326)]
         [ObjectListIndex(0x40)] // 1? nah it uses something else
         // 0x2 is smaller scrub that surrounds link in the cutscene
-        // & 3 are separate params, but wont spawn? weird
+        // params 0x3C nad 0x3 are main params
+        //  0x3 is the object it uses
+        //  one is the regular leaves pkmn, one is the old hint one from OOT reused for yellow flower, one is the tall one
         // 0x6 is big one in nightmare cutscene that link waves to
+
         [GroundVariants(0x2, 0x6)]
         [VariantsWithRoomMax(max: 1, variant: 0x6, 0x2)]
         // crash on transition to witches area in swamp and secretary room in mayor's residence
@@ -2786,7 +2799,10 @@ namespace MMR.Randomizer.GameObjects
         // flying ice platforms leading to lens cave
         [FileID(339)]
         [ObjectListIndex(0x187)]
-        [CheckRestricted(Item.MaskGoron, Item.ChestHotSpringGrottoRedRupee, Item.UpgradeRazorSword, Item.UpgradeRazorSword)]
+        [CheckRestricted(Item.MaskGoron,
+            Item.CollectableMountainVillageWinterSmallSnowball3, Item.CollectableMountainVillageWinterSmallSnowball4,
+            Item.ChestHotSpringGrottoRedRupee,
+            Item.UpgradeRazorSword, Item.UpgradeRazorSword)]
         // parameters unknown, they are not even and not time (time of spawn is a different parameter)
         [WaterTopVariants(0x1FFE, 0x1FFD, 0x1000, 0x1004)]
         // TODO should we consider putting them on water top?
@@ -2931,7 +2947,9 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(354)]
         [ObjectListIndex(0x18F)]
-        [CheckRestricted(Item.ShopItemWitchBluePotion, Item.ShopItemWitchGreenPotion, Item.ShopItemWitchRedPotion, Item.ItemBottleWitch, Item.MundaneItemKotakeMushroomSaleRedRupee)]
+        [CheckRestricted(Item.ShopItemWitchBluePotion, Item.ShopItemWitchGreenPotion, Item.ShopItemWitchRedPotion,
+            Item.ItemBottleWitch,
+            Item.MundaneItemKotakeMushroomSaleRedRupee)]
         [GroundVariants(0)]
         [VariantsWithRoomMax(0, 0)] // no collider no interaction
         [UnkillableAllVariants]
@@ -3222,14 +3240,17 @@ namespace MMR.Randomizer.GameObjects
             Scene.StoneTower, Scene.DekuPlayground)] // dyna crash possible
         ClocktowerGearsAndOrgan = 0x1B6, // Bg_Ctower_Gear
 
-        // [ActorizerEnabled] // disabled since talking is softlock, need to figure that out
+        [ActorizerEnabled] 
         [FileID(403)]
         [ObjectListIndex(0x18F)]
+        [CheckRestricted(Item.ItemBottleWitch)]
         // nothing in the other params other than path, the starting animation and stuff are all hardcoded to entrance
         [PathingVariants(0x2400, 0x2000)]
         [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
+        // disabled since talking is softlock, need to figure that out
+        [VariantsWithRoomMax(max:0, variant: 0x2400, 0x2000)]
         [UnkillableAllVariants]
-        [EnemizerScenesExcluded(Scene.WoodsOfMystery, Scene.SouthernSwamp)]
+        //[EnemizerScenesExcluded(Scene.WoodsOfMystery, Scene.SouthernSwamp)]
         KotakeOnBroom = 0x1B7, // En_Trt2
 
         [FileID(404)]
@@ -3241,6 +3262,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1A5)]
         // params is == 0 and else
         [WaterTopVariants(0,1)]
+        [CheckRestricted(Item.HeartPieceBoatArchery)]
         [UnkillableAllVariants]
         // this could work but is a headache, we need to make sure all checks that are reachable by deku and nut are included...
         //[CheckRestricted(Scene.DekuPalace, -1, Item.MaskScents)]
@@ -4610,8 +4632,12 @@ namespace MMR.Randomizer.GameObjects
 
         // likely wont spawn without the flag
         // TODO make a version that will spawn without the flag
+        [ActorizerEnabled]
         [FileID(551)]
         [ObjectListIndex(0x22A)]
+        [CheckRestricted(Item.MaskGibdo)]
+        [GroundVariants(0xFF00)] // vanilla params even tho we dont have vanilla params for him
+        [VariantsWithRoomMax(max:0, variant:0xFF00)]
         PamelasFatherCured = 0x250, // En_Hg
         
         [FileID(552)]
