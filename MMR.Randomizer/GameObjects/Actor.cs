@@ -104,7 +104,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(46)]
         [ActorInitVarOffset(0x2A60)]
         [ObjectListIndex(0x5)]
-        [WaterTopVariants(0xFF00)]
+        [CheckRestricted(Scene.SouthernSwampClear, -1, Item.HeartPieceBoatArchery)]
+        [WaterTopVariants(0xFF00)] // all vanilla types are the same, however param 0xFF00 and 0xFF are parameters of unkown type
         //[WaterBottomVariants(0xFF01)] // not safe check the params for safe params first
         [EnemizerScenesExcluded(Scene.IkanaCanyon, Scene.GreatBayTemple)]
         Octarok = 0x8, // En_Okuta
@@ -146,7 +147,7 @@ namespace MMR.Randomizer.GameObjects
         // params type: 0 is fire, 2 is normal, 3 is perched, 4 is ice
         // 0x8000 is invisible
         [FlyingVariants(0x0, 0x2, 0x04, 0x8000, 0x8002, 0x8004)] // which ones are fire and ice?
-        [WallVariants(0x8003, 0x3)]
+        [WallVariants(0x8003, 0x3)] // will take off and attack within 120 units distance (xz)
         [FlyingToGroundHeightAdjustment(150)]
         Keese = 0xC, // En_Firefly
 
@@ -2084,14 +2085,16 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x2243)]
         Garo = 0x113, // En_Jso
 
-        // not that interesting, but usual zelda calapsing bridge
+        // not that interesting, cutscene calapsing bridge
         [ActorizerEnabled]
         [FileID(249)]
         [ObjectListIndex(0xED)]
+        [BlockingVariantsAll]
         [FlyingVariants(0)]
         [UnkillableAllVariants]
         [OnlyOneActorPerRoom]
-        FallingBlocks = 0x114, // Obj_Chikuwa
+        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.StoneTower)] // dyna crash
+        UnusedFallingBlocks = 0x114, // Obj_Chikuwa
 
         // TODO would not spawn because I mistyped the ID try again
         //[EnemizerEnabled] // wont spawn, just spawns green tatl points but no actual knight
@@ -3683,6 +3686,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(449)]
         [ObjectListIndex(0x1C6)]
         [GroundVariants(0, 0x0101)]
+        [EnemizerScenesPlacementBlock(Scene.TownShootingGallery)]
         Hiploop = 0x1E9, // Charging beetle in Woodfall
 
         [FileID(450)]
@@ -3827,6 +3831,7 @@ namespace MMR.Randomizer.GameObjects
             Item.ItemPowderKeg)]
         [OnlyOneActorPerRoom] // dyna crash hazard
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // dyna crash
         DarmaniGrave = 0x1FB, // Obj_Ghaka
 
         [ActorizerEnabled]
@@ -4630,19 +4635,19 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x229)]
         TurtleWave = 0x24F, // Eff_Kamejima_Wave
 
-        // likely wont spawn without the flag
-        // TODO make a version that will spawn without the flag
-        [ActorizerEnabled]
+        // shared object with below
         [FileID(551)]
+        [ObjectListIndex(0x22A)]
+        PamelasFatherCursed = 0x250, // En_Hg
+
+        // cannot place without mmra
+        [ActorizerEnabled]
+        [FileID(552)]
         [ObjectListIndex(0x22A)]
         [CheckRestricted(Item.MaskGibdo)]
         [GroundVariants(0xFF00)] // vanilla params even tho we dont have vanilla params for him
-        [VariantsWithRoomMax(max:0, variant:0xFF00)]
-        PamelasFatherCured = 0x250, // En_Hg
-        
-        [FileID(552)]
-        [ObjectListIndex(0x22A)]
-        PamelasFatherCursed = 0x251, // En_Hgo
+        [VariantsWithRoomMax(max: 0, variant: 0xFF00)] // don't place it wont spawn, need replacement mmra for placement
+        PamelasFatherCured = 0x251, // En_Hgo
 
         [ActorizerEnabled]
         [FileID(553)]
