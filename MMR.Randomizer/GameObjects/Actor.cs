@@ -704,7 +704,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.DekuShrine, Scene.GoronRacetrack, Scene.WaterfallRapids, Scene.GormanTrack, Scene.GoronRacetrack,
             Scene.RoadToIkana, Scene.IkanaCastle, Scene.BeneathGraveyard, Scene.DampesHouse,
             Scene.SwampSpiderHouse, Scene.OceanSpiderHouse,
-            Scene.StockPotInn, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall,
+            Scene.StockPotInn, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall, Scene.TradingPost,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
             Scene.SouthernSwamp, // dyna crash, remove if we get dyna overload detection working
             Scene.BeneathTheWell, Scene.IkanaGraveyard, Scene.StoneTower)]
@@ -1168,6 +1168,8 @@ namespace MMR.Randomizer.GameObjects
             check: Item.HeartPieceTerminaGossipStones, Item.HeartPieceZoraGrotto, Item.CollectableGrottosOceanHeartPieceGrottoBeehive1)]
         [CheckRestricted(Scene.Grottos, variant: -1,
             check: Item.ChestHotSpringGrottoRedRupee)]
+        [CheckRestricted(Scene.SwampSpiderHouse, variant: -1,
+            check: Item.CollectibleSwampSpiderToken13)]
         // 0x0114-8 are the bombable rocks in hotspring water
         // params: 0x100 is the big bombable one only, no goron punch
         // 0x8000 creates a Good Job jingle when you break it
@@ -1570,9 +1572,10 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesPlacementBlock(Scene.DekuPalace,
             Scene.Grottos, Scene.AstralObservatory, Scene.ZoraHallRooms, Scene.DampesHouse, Scene.PiratesFortressRooms,
             Scene.GoronRacetrack, Scene.WaterfallRapids, Scene.GormanTrack, Scene.RoadToIkana, Scene.IkanaCastle, Scene.BeneathGraveyard,
-            Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall,
+            Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall, 
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
-            Scene.StockPotInn, Scene.BeneathTheWell, Scene.IkanaGraveyard, Scene.StoneTower)]
+            Scene.StockPotInn, Scene.TradingPost,
+            Scene.BeneathTheWell, Scene.IkanaGraveyard, Scene.StoneTower)]
         [SwitchFlagsPlacement(mask: 0xFF, shift: 0)]
         UnusedStoneTowerPlatform = 0xC7, // Bg_F40_Swlift
 
@@ -2093,8 +2096,9 @@ namespace MMR.Randomizer.GameObjects
         [FlyingVariants(0)]
         [UnkillableAllVariants]
         [OnlyOneActorPerRoom]
-        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.StoneTower)] // dyna crash
-        UnusedFallingBlocks = 0x114, // Obj_Chikuwa
+        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.StoneTower, // dyna crash
+            Scene.TradingPost)]  // might block door?
+        UnusedFallingBridge = 0x114, // Obj_Chikuwa
 
         // TODO would not spawn because I mistyped the ID try again
         //[EnemizerEnabled] // wont spawn, just spawns green tatl points but no actual knight
@@ -3311,7 +3315,8 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(411)]
         [ObjectListIndex(0x1A8)]
-        [CheckRestricted(Item.ItemLens, Item.ChestLensCaveRedRupee, Item.ChestLensCavePurpleRupee)]
+        [CheckRestricted(Scene.GoronVillage, variant: -1, Item.ItemLens, Item.ChestLensCaveRedRupee, Item.ChestLensCavePurpleRupee)]
+        [CheckRestricted(Scene.PathToSnowhead, variant: -1, Item.HeartPieceToSnowhead)]
         [FlyingVariants(0x0)]
         [VariantsWithRoomMax(max:0, variant:0x0)] // invisible, not even seen just looks empty, unless I can move actors to sit ontop of them or something
         [UnkillableAllVariants]
@@ -5035,6 +5040,7 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableAstralObservatorySewerPot1, Item.CollectableAstralObservatorySewerPot2
         )]
         [GroundVariants(0x0B11, 0x0B22, 0x50F, 0x0513, 0x0910)]
+        [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         BombersYouChase = 0x27F, // En_Bomjimb
 
@@ -5062,6 +5068,7 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableAstralObservatorySewerPot1, Item.CollectableAstralObservatorySewerPot2
             )]
         [GroundVariants(0x0)]
+        [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         BomberHideoutGuard = 0x281, // En_Bombers2
