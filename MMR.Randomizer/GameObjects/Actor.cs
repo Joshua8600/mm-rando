@@ -1619,7 +1619,7 @@ namespace MMR.Randomizer.GameObjects
         // if you try to teach him a song with more than one it can lock
         //[EnemizerScenesPlacementBlock(Scene.TradingPost, Scene.TerminaField)]
         [EnemizerScenesExcluded(Scene.TradingPost, Scene.SnowheadTemple, Scene.StoneTower,
-            Scene.PathToSnowhead)]//, Scene.AstralObservatory)] // re-disable this if playing Entrando
+            Scene.PathToSnowhead, Scene.AstralObservatory)] // re-disable this if playing Entrando
         Scarecrow = 0xCA, // En_Kakasi
 
         // think these control the push blocks in the sewer zora push puzzle
