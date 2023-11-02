@@ -2126,7 +2126,7 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.SkulltulaDummy, GameObjects.Actor.OwlStatue)) continue;
+                if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BombersYouChase)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.IkanaGravestone)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.BoatCruiseTarget)) continue;
@@ -3132,11 +3132,11 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
-            if (scene.SceneEnum == GameObjects.Scene.DekuShrine) // force specific actor/variant for debugging
+            if (scene.SceneEnum == GameObjects.Scene.Grottos) // force specific actor/variant for debugging
             {
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
                 //thisSceneData.Scene.Maps[0].Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
-                thisSceneData.Scene.Maps[0xA].Actors[25].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
+                thisSceneData.Scene.Maps[1].Actors[1].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
             }
             /////////////////////////////
             /////////////////////////////
