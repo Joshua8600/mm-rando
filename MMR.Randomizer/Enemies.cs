@@ -2110,7 +2110,6 @@ namespace MMR.Randomizer
                 //////////////////////////////////////////////////////
                 ///////// debugging: force an object (enemy) /////////
                 //////////////////////////////////////////////////////
-                #if //DEBUG
 
                 bool TestHardSetObject(GameObjects.Scene targetScene, GameObjects.Actor target, GameObjects.Actor replacement)
                 {
@@ -2142,7 +2141,6 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
 
                 //TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.FlyingPot);
-                #endif
                 #endregion
 
                 var reducedCandidateList = thisSceneData.CandidatesPerObject[objectIndex].ToList();
@@ -3131,7 +3129,6 @@ namespace MMR.Randomizer
             WriteOutput(" Loops used for match candidate: " + loopsCount);
 
             #region Debugging: Actor Forcing
-            #if //DEBUG
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
@@ -3139,10 +3136,9 @@ namespace MMR.Randomizer
             {
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
                 //thisSceneData.Scene.Maps[0].Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
-                thisSceneData.Scene.Maps[0A].Actors[25].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
+                thisSceneData.Scene.Maps[0xA].Actors[25].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
             }
             /////////////////////////////
-            #endif
             /////////////////////////////
             #endregion
 
