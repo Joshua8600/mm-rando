@@ -3136,7 +3136,7 @@ namespace MMR.Randomizer
             {
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
                 //thisSceneData.Scene.Maps[0].Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
-                thisSceneData.Scene.Maps[1].Actors[1].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
+                thisSceneData.Scene.Maps[1].Actors[0].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
             }
             /////////////////////////////
             /////////////////////////////
