@@ -4214,6 +4214,7 @@ namespace MMR.Randomizer.GameObjects
         // F is WCT, is also found in woodfall, cleared swamp?
         [GroundVariants(0, 1, 3, 2, 6, 5, 7, 8, 9, 0xF)]
         [WaterBottomVariants(0, 1, 3, 2, 6, 5, 7, 8, 9, 0xF)] // already have vanilla replacement blocked
+        [WallVariants(0xF)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
