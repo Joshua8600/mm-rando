@@ -66,6 +66,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(44)]
         [ObjectListIndex(0xC)]
+        [CheckRestricted(Scene.RoadToIkana, variant:0x5080, Item.ChestToIkanaRedRupee)]
         // these three are from inverted stone tower, however when placed in TF, 2/3 were invisible chests
         // type: 0x7 seems to be enemy clear, also type 1, 0x5 is woodentype, 0xC is switch activated
         // 0xF000 is type, 0x001F are chest flags, 0x0FE0 would be the item then
@@ -73,6 +74,7 @@ namespace MMR.Randomizer.GameObjects
         // dont use CM as reference, rando changes how the chests work for item rando to work
         [GroundVariants(0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579,
             0x561E, 0x5C79, 0x5991, 0x5B58, //0x5A1E,
+            0x5080, // road to ikana
             0xBAEE, // Invisible with switch activation, this one should be rare (0x10--(large gold) + 0x--11(spawn on switch clear))
             0x0AFB, 0x099C)] // two free, the rest are gold invisible
                              //[GroundVariants(0x001F)] // testing
@@ -83,6 +85,9 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579,
             0x561E, 0x5C79, 0x5991, 0x5B58, 0x5A1E,
             0x0AFB, 0x099C)] // brown, harder to see in perpheral vision, not invisible
+        [VariantsWithRoomMax(max:0,
+            0x5080 // road to ikana
+            )]
         //[VariantsWithRoomMax(max: 1, variant: )] // vanilla we do not want to re-place in the world
         [UnkillableAllVariants]
         //[AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1,
@@ -287,11 +292,13 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [ActorInitVarOffset(0x5C8)]
         [FileID(62)]
-        [ObjectListIndex(0xE)]
-        [FlyingVariants(0)] // 0 works, but OOT used FFFF
-        [GroundVariants(0)] // 0 works, but OOT used FFFF
-        [WaterVariants(0)]  // 0 works, but OOT used FFFF
-        Shabom = 0x1D,// the flying bubbles from Jabu Jabu, exist only in giants cutscenes
+        [ObjectListIndex(0xE)] // object re-used in giants chamber DemoKankyo
+        // There are no params, and this actor is unused in vanilla placement
+        // This actor is modified by custom MMRA, type 0 is now random count, -1 is single
+        [FlyingVariants(0xFFFF)] // 0 works, but OOT used FFFF
+        [GroundVariants(0xFFFF)] // 0 works, but OOT used FFFF
+        [WaterTopVariants(0xFFFF)]  // 0 works, but OOT used FFFF
+        Shabom = 0x1D, // En_Bubble, the flying bubbles from Jabu Jabu, exist only in giants cutscenes
 
         [FileID(63)]
         [ObjectListIndex(0x1)] // FAKE, multi-object
@@ -816,6 +823,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [AlignedCompanionActor(Obj_Dowsing, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x110)] // rumble
+        [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
         [EnemizerScenesExcluded(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead)]
         GrottoHole = 0x55, // Door_Ana
 
@@ -1024,11 +1032,22 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.TerminaField)] // it would always get placed in termina field, bad
         Item_Etcetera = 0x80, // Item_Etcetera
 
-        //todo
-        //[ActorizerEnabledFreeOnly] // not sure this works with object 1, will test later
+        [ActorizerEnabled] // not sure this works with object 1, will test later
         [FileID(125)]
-        [ObjectListIndex(1)]
-        SmallCrate = 0x81, // Obj_Kibako
+        [ObjectListIndex(0x16F)] // multi-object, could be dangeon keep instead
+        [CheckRestricted(Scene.RomaniRanch, variant: -1, Item.MaskRomani)] // this might be required for objUm weirdly...
+        [CheckRestricted(Scene.EastClockTown, variant: -1, Item.CollectableEastClockTownWoodenCrateSmall1)] //wasnt there a second one
+        [CheckRestricted(Scene.LaundryPool, variant: -1, Item.CollectableLaundryPoolWoodenCrateSmall1)]
+        [CheckRestricted(Scene.GreatBayTemple, variant: -1, Item.ItemIceArrow)] // in case we really want these for the fight
+        [GroundVariants(0x000B, 0x001E, 0x001F, 0x000F, 0x0015,  // stone tower
+            0x060B, 0x200B, // inverted stone tower
+            0xFF1F, // romani ranch
+            0xA002, // laundry pool
+            0x8181, 0x828A)] // east clock town
+        //[VariantsWithRoomMax(max: 5, variant: -1)] // might be dyna
+        //[VariantsWithRoomMax(max: 0, variant: 0xA002, 0x8181, 0x828A)] // items
+        [UnkillableAllVariants]
+        SmallWoodenBox = 0x81, // Obj_Kibako
 
         // MULTIPLE OBJECT ACTOR
         [ActorizerEnabled]
@@ -1169,7 +1188,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.Grottos, variant: -1,
             check: Item.ChestHotSpringGrottoRedRupee)]
         [CheckRestricted(Scene.SwampSpiderHouse, variant: -1,
-            check: Item.CollectibleSwampSpiderToken13)]
+            check: Item.CollectibleSwampSpiderToken13, Item.CollectableSwampSpiderHouseSoftSoil2)]
         // 0x0114-8 are the bombable rocks in hotspring water
         // params: 0x100 is the big bombable one only, no goron punch
         // 0x8000 creates a Good Job jingle when you break it
@@ -1318,7 +1337,9 @@ namespace MMR.Randomizer.GameObjects
         // TODO add all of the tiny rupees from secret shrine to this
         [CheckRestricted(Item.ItemMagicBean,
             Item.ChestTerminaStumpRedRupee,
-            Item.ChestInvertedStoneTowerBean, Item.ChestInvertedStoneTowerBombchu10, Item.ChestInvertedStoneTowerSilverRupee)]
+            Item.ChestInvertedStoneTowerBean, Item.ChestInvertedStoneTowerBombchu10, Item.ChestInvertedStoneTowerSilverRupee,
+            Item.MaskDeku,
+            Item.CollectibleSwampSpiderToken13)]
         [GroundVariants(0)]
         [UnkillableAllVariants]
         //[EnemizerScenesExcluded(Scene.Grottos)]
@@ -1395,9 +1416,17 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesExcluded(Scene.MarineLab)]
         Scientist = 0xAE, // En_Mk
 
+        [ActorizerEnabled]
         [FileID(157)]
         [ObjectListIndex(0xFD)]
+        [CheckRestricted(Scene.GoronVillage, variant:-1, Item.ItemLens, Item.ChestLensCaveRedRupee, Item.ChestLensCavePurpleRupee)]
+        // // never going to put him anywhere I dont think, so just mark his spawn as flying
+        [FlyingVariants(0xF18B, // southern swamp // and clear swamp??? he was there??
+            0x2102, 0x1102, 0x0102)] // three different days of goron village
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
+        // pathing I think, but pathing flying types do not currently exist in this rando
+        [VariantsWithRoomMax(max:0, variant: 0xF18B, 0x2102, 0x1102, 0x0102)]
+        [UnkillableAllVariants]
         En_Owl = 0xAF, // En_Owl
 
         // MULTIPLE OBJECT ACTOR
@@ -4079,10 +4108,10 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         BoatArcheryKoume = 0x214, // En_Tru_Mt
 
-        // todo 
+        // multi-object actor with annoying crashing characteristics, leave alone
         [FileID(492)]
         [ObjectListIndex(0x1FC)]
-        CremiaMilk = 0x215, // Obj_Um
+        CreamiaCariage = 0x215, // Obj_Um
 
         [EnemizerEnabled]
         [ActorInitVarOffset(0x1C50)]
@@ -4187,13 +4216,15 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(503)]
         [ObjectListIndex(0xA7)]
-        [CheckRestricted(Scene.TerminaField, variant:0x40FF, Item.MaskRomani)]
+        [CheckRestricted(Scene.TerminaField, variant: 0x40FF, Item.MaskRomani)]
+        [CheckRestricted(Scene.RomaniRanch, variant: -1, Item.MaskRomani)]
         [GroundVariants(0, // standing around day 1 is type 0
             0x40FF, // wedding
+            0x30FF, // standing in front of ranch, final night walking?
             0x00FF)] // bottom 0xFF is unknown, not used in code?
-        [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
-        [VariantsWithRoomMax(max:0, 0, 0x40FF, 0x00FF)]
+        [VariantsWithRoomMax(max:0, 0, 0x40FF, 0x00FF, 0x30FF)]
+        [OnlyOneActorPerRoom]
         Cremia = 0x220, // En_Ma_Yto
 
         [FileID(504)]

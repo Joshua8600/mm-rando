@@ -464,8 +464,7 @@ namespace MMR.Randomizer
 
         public static void EnemizerLateFixes()
         {
-            // changes after randomization, actors objects already written
-            // not currently needed, turns out all the old content here could be moved
+            /// changes after randomization, actors objects already written, at this point we can detect IF an actor was randomized
 
             // to avoid randomizing medigoron's object
             //var goronVillageWinter = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.GoronVillage);
@@ -551,9 +550,13 @@ namespace MMR.Randomizer
                 piratesExteriorScene.Maps[0].Actors[13].ChangeActor(GameObjects.Actor.Empty, modifyOld: true); // dangeon object so no grotto, empty for now
                 // todo: 14/16 are also torches, we dont really need both here
 
-                // this torch is too close to spider, constantly actors get stuck, just move the damn torch
+                // this torch is too close to spider, constantly actors get stuck, move slightly out of the way
                 var swampSpiderHouseScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SwampSpiderHouse.FileID());
                 swampSpiderHouseScene.Maps[3].Actors[3].Position.x = -480;
+
+                // one of the torches in swamp spider needs to be rotated to not face the wall
+                var spiderTorch2 = swampSpiderHouseScene.Maps[3].Actors[2];
+                spiderTorch2.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 135, flags: spiderTorch2.Rotation.y);
 
                 var dekuPalace = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DekuPalace.FileID());
                 // the torches are really close to the hole, we can spread them wider a bit
@@ -1260,7 +1263,28 @@ namespace MMR.Randomizer
             }
 
             // if we randomize the bombiwa in the swamp spiderhouse, replacements with colliders can block bugs
+            // for now, decided to just un-randomize
 
+            // if we randomize cremia in the branch, the uma cart can crash, we need to change its type from ranch to termina field
+            var romaniRanchScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.RomaniRanch.FileID());
+            var cremia = romaniRanchScene.Maps[0].Actors[2];
+            if (cremia.ActorEnum != GameObjects.Actor.Cremia)
+            {
+                var cariageHorse = romaniRanchScene.Maps[0].Actors[34];
+                //cariageHorse.Variants[0] = 0x0; // same as termina field, which doesnt have cremia on it
+                //cariageHorse.ChangeActor(GameObjects.Actor.Dog, vars: 0x3FF); // this DOES NOTHING its too late the actor has already been written idiot
+                var ranchRoom0Data = RomData.MMFileList[GameObjects.Scene.RomaniRanch.FileID() + 1].Data; // 1327
+                //have to erase this actor directly
+                ranchRoom0Data[0x2A4] = 0xFF; // this works, although would be cool if we could just change type
+                ranchRoom0Data[0x2A5] = 0xFF;
+                //ranchRoom0Data[0x2B2] = 0x0; // attempted change of variant type to zero, this does not work, best to remove the whole actor for now
+                //ranchRoom0Data[0x2B3] = 0x0;
+
+                // now that the cariage is gone we should try to remove the objects to make space for other things in the scene
+                ReadWriteUtils.Arr_WriteU16(ranchRoom0Data, 0x74, SMALLEST_OBJ); // carriage
+                ReadWriteUtils.Arr_WriteU16(ranchRoom0Data, 0x72, SMALLEST_OBJ); // object_ha is the donkey the cart uses
+
+            }
         }
 
         public static void FixKafeiPlacements()
@@ -2128,6 +2152,7 @@ namespace MMR.Randomizer
 
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BombersYouChase)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.IkanaGravestone)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.BoatCruiseTarget)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.BeneathGraveyard, GameObjects.Actor.BadBat, GameObjects.Actor.Takkuri)) continue;
@@ -2724,14 +2749,16 @@ namespace MMR.Randomizer
             }
         }
 
-        public static void MoveAlignedCompanionActors(List<Actor> changedEnemies, Random rng, StringBuilder log)
+        // thisSceneData.Actors, thisSceneData.RNG, thisSceneData.Log
+        //public static void MoveAlignedCompanionActors(List<Actor> changedEnemies, Random rng, StringBuilder log)
+        public static void MoveAlignedCompanionActors(SceneEnemizerData thisSceneData)
         {
             /// Companion actors can sometimes be alligned to their host, to increase immersion
             /// e.g: putting hidden grottos inside of a stone circle
             /// e.g 2: putting butterflies over bushes
 
-            var actorsWithCompanions = changedEnemies.FindAll(act => ((GameObjects.Actor) act.ActorId).HasOptionalCompanions())
-                                                     .OrderBy(act => rng.Next()) // randomize list
+            var actorsWithCompanions = thisSceneData.Actors.FindAll(act => ((GameObjects.Actor) act.ActorId).HasOptionalCompanions())
+                                                     .OrderBy(act => thisSceneData.RNG.Next()) // randomize list
                                                      .ToList();
 
             if (actorsWithCompanions.Count <= 2) return;
@@ -2743,24 +2770,31 @@ namespace MMR.Randomizer
                 var companions = mainActorEnum.GetAttributes<AlignedCompanionActorAttribute>().ToList();
                 foreach (var companion in companions)
                 {
-                    var actorEnum = companion.Companion;
+                    var companionEnum = companion.Companion;
                     // todo detection of ourVars too
                     // scan for companions that can be moved
                     // for now, assume all previously used companions must be left untouched, no shuffling
-                    var eligibleCompanions = changedEnemies.FindAll(act => act.ActorId == (int) actorEnum     // correct actor
-                                                            && act.previouslyMovedCompanion == false          // not already used
-                                                            && companion.Variants.Contains(act.Variants[0])); // correct variant
+                    var eligibleCompanions = thisSceneData.Actors.FindAll(act =>
+                                                               act.ActorId == (int) companionEnum               // correct actor
+                                                            && act.previouslyMovedCompanion == false            // not already used
+                                                            && companion.Variants.Contains(act.Variants[0]));   // correct variant
+
+                    if (mainActor.Blockable == false)
+                    {
+                        eligibleCompanions.RemoveAll(comp => comp.ActorEnum.IsBlockingActor(variant:comp.Variants[0])); // blocking actor sensitive spots
+                    }
 
                     if (eligibleCompanions != null && eligibleCompanions.Count > 0)
                     {
-                        var randomCompanion = eligibleCompanions[rng.Next(eligibleCompanions.Count)];
+                        var randomCompanion = eligibleCompanions[thisSceneData.RNG.Next(eligibleCompanions.Count)];
                         // first move on top, then adjust
                         randomCompanion.Position.x = mainActor.Position.x;
                         randomCompanion.Position.y = (short)(actorsWithCompanions[i].Position.y + companion.RelativePosition.y);
                         randomCompanion.Position.z = mainActor.Position.z;
 
                         // todo: use x and z, with actor rotation, to figure out where to move the actors to
-                        log.AppendLine(" Moved companion: [" + randomCompanion.ActorEnum.ToString()
+                        thisSceneData.Log.AppendLine(
+                                      " Moved companion: [" + randomCompanion.ActorEnum.ToString()
                                     + "][" + randomCompanion.Variants[0].ToString("X2")
                                     + "] to actor: [" + mainActor.ActorEnum.ToString()
                                     + "][" + randomCompanion.Variants[0].ToString("X2")
@@ -3181,7 +3215,7 @@ namespace MMR.Randomizer
             WriteOutput("####################################################### ");
 
             // realign all scene companion actors
-            MoveAlignedCompanionActors(thisSceneData.Actors, thisSceneData.RNG, thisSceneData.Log);
+            MoveAlignedCompanionActors(thisSceneData);
 
             SetSceneEnemyObjects(scene, thisSceneData.ChosenReplacementObjectsPerMap);
             SceneUtils.UpdateScene(scene); // writes scene actors back to binary
@@ -3800,7 +3834,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 53.5\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 54.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
