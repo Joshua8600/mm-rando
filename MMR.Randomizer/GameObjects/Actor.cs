@@ -1659,7 +1659,7 @@ namespace MMR.Randomizer.GameObjects
         // if you try to teach him a song with more than one it can lock
         //[EnemizerScenesPlacementBlock(Scene.TradingPost, Scene.TerminaField)]
         [EnemizerScenesExcluded(Scene.TradingPost, Scene.SnowheadTemple, Scene.StoneTower,
-            Scene.PathToSnowhead)]//, Scene.AstralObservatory)] // re-disable this if playing Entrando
+            Scene.PathToSnowhead, Scene.AstralObservatory)] // re-disable this if playing Entrando
         Scarecrow = 0xCA, // En_Kakasi
 
         // think these control the push blocks in the sewer zora push puzzle
@@ -2257,7 +2257,7 @@ namespace MMR.Randomizer.GameObjects
 
         // wont spawn if you place him outside of his observatory, needs modification
         // the astral observatory viewer
-        [ActorizerEnabled]
+        // [ActorizerEnabled]
         [FileID(264)]
         [ObjectListIndex(0xDE)]
         [CheckRestricted(Item.TradeItemMoonTear, Item.HeartPieceTerminaBusinessScrub, Item.CollectableTerminaFieldTelescopeGuay1)]
@@ -3542,7 +3542,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(
             0x191E)] // below well
         [VariantsWithRoomMax(max: 8, variant: 0x1932, 0x3FFF)]
-        [EnemizerScenesExcluded(Scene.StoneTowerTemple)]
+        [EnemizerScenesExcluded(Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple)]
         [EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.GoronRacetrack)]
         Dexihand = 0x1D1, // En_WdHand : ???'s water logged brother
 
@@ -4253,6 +4253,7 @@ namespace MMR.Randomizer.GameObjects
         // F is WCT, is also found in woodfall, cleared swamp?
         [GroundVariants(0, 1, 3, 2, 6, 5, 7, 8, 9, 0xF)]
         [WaterBottomVariants(0, 1, 3, 2, 6, 5, 7, 8, 9, 0xF)] // already have vanilla replacement blocked
+        [WallVariants(0xF)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
