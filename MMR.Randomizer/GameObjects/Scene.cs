@@ -102,7 +102,10 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x14)]
         // TODO come up with a way to make sure that one spot isn't blocking without hardcoding
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PatrollingPirate,
-            Actor.Obj_Iceblock)] // can block the stairs
+            Actor.Obj_Iceblock,// can block the stairs
+            Actor.Torch, Actor.LargeCrate, Actor.SmallWoodenBox, Actor.Bombiwa, Actor.ClocktowerGearsAndOrgan, // boring
+            Actor.CuccoChick, Actor.En_Ani, Actor.CutsceneZelda, Actor.OOTPotionShopMan, Actor.WoodenBarrel, Actor.IkanaGravestone // boring
+            )] 
         PiratesFortress = 0x11,
 
         [FileID(1173)]
@@ -216,8 +219,13 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)]
         MilkRoad = 0x1F,
 
+        // this is both the sewer and all of the smaller rooms up top
         [FileID(1258)]
         [SceneInternalId(0x23)]
+        // room 9/10 is the virtical water column elevator in the sewers
+        // room 10/11 is the side channel hallway with the mine traps (between rooms)
+        // room 11/12 is the timed cage prison room
+        // room 12/13 is the first sewer underwater maze
         [ClearEnemyPuzzleRooms(0, 1, 2)] // three pirate minibosses
         // TODO need to re-test this
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SpikedMine,
@@ -668,6 +676,8 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
             Actor.LikeLike)] // If you start with one heart this can be a softlock
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Sakon,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can hide the grass weirdly
         NorthClockTown = 0x6B,
 
         [FileID(1516)]
@@ -687,6 +697,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1518)]
         [SceneInternalId(0x70)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SmallWoodenBox,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block guruguru and maybe more
         LaundryPool = 0x6D,
     }
 
