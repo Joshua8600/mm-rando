@@ -2573,7 +2573,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.BoatCruiseTarget)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.BeneathGraveyard, GameObjects.Actor.BadBat, GameObjects.Actor.Takkuri)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.RomaniYts)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.SwampSpiderHouse, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
+                if (TestHardSetObject(GameObjects.Scene.SwampSpiderHouse, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
+                if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBaba, GameObjects.Actor.BombersYouChase)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBaba, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.SpikedMine, GameObjects.Actor.Postbox)) continue;
@@ -4274,7 +4275,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 56.0a\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 56.0b\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

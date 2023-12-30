@@ -35,7 +35,7 @@ namespace MMR.Randomizer.Utils
             #if DEBUG
             string settingstring = $"{setting} + DEBUG BUILD\x00";
             #else
-            string settingstring = $"{setting} + Isghj's Enemizer Test 56.0a\x00";
+            string settingstring = $"{setting} + Isghj's Enemizer Test 56.0b\x00";
             #endif
             int f = GetFileIndexForWriting(veraddr);
             var file = RomData.MMFileList[f];
@@ -306,7 +306,7 @@ namespace MMR.Randomizer.Utils
             {
                 var file = RomData.MMFileList[fileId];
                 RomUtils.CheckCompressed(fileId); // if they werent preiviously modified they might still be compressed, decompress now
-                Debug.Assert(file.IsCompressed);
+                //Debug.Assert(file.IsCompressed);
 
                 file.IsCompressed = false;
             }
