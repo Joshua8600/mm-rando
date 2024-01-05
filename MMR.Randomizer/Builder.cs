@@ -6323,7 +6323,7 @@ namespace MMR.Randomizer
 
                 if (outputSettings.GenerateROM)
                 {
-                    byte[] ROM = RomUtils.BuildROM();
+                    byte[] ROM = RomUtils.BuildROM(outputSettings);
                     if (ROM.Length > 0x4000000) // over 64mb
                     {
                         throw new ROMOverflowException("64 MB", "hardware (Everdrive)");
@@ -6352,7 +6352,7 @@ namespace MMR.Randomizer
                             );
                     }
 
-                    byte[] ROM = RomUtils.BuildROM();
+                    byte[] ROM = RomUtils.BuildROM(outputSettings);
                     if (ROM.Length > 0x2600000) // over 39MB (owl is not a cat says this is closer to the limit, actual hard limit unknown)
                     {
                         throw new ROMOverflowException("39 MB", "WiiVC");
