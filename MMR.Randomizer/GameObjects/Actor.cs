@@ -2657,7 +2657,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(313)]
         [ObjectListIndex(0x172)]
         [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT, Item.CollectableIkanaGraveyardDay2Bats1)]
-        [FlyingVariants(0xFF34,
+        [FlyingVariants(0xFF34, // big cluster
             0xFF02, 0xFF03, 0x0102, 0x0103, // graveyard
             0xFF01)]
         // using irrelevant switch flags to distinquish the fake perching types
@@ -3983,7 +3983,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(473)]
         [ObjectListIndex(0x1DF)]
-        [CheckRestricted(Scene.GoronShrine, variant: 0x3FF1, Item.SongLullaby)]
+        [CheckRestricted(Scene.GoronShrine, variant: 0x3FF1, Item.SongLullaby, Item.MaskDonGero)]
         [CheckRestricted(Scene.GoronRacetrack, variant: 0x3FF1, Item.ItemBottleGoronRace)]
         //[CheckRestricted(Scene.TwinIslandsSpring, variant: 0x3FF1, Item.ItemBottleGoronRace)] // not sure this is required
         // all other versions are 0x13** or 0x1402
@@ -3993,8 +3993,8 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         // in 1.16 this was rescinded, we can now place it in the world again
-        // holy shit this is annoying nvm
         [VariantsWithRoomMax(max: 0, variant: 0x3FF1)] // softlock if you enter the song teach cutscene, which in rando is proximity
+        //VariantsWithRoomMax(max: 0, variant: 0x1400)] // holy shit this is annoying nvm
         //[EnemizerScenesExcluded(Scene.GoronShrine, Scene.GoronRacetrack, Scene.TwinIslandsSpring)]
         [SwitchFlagsPlacement(mask: 0x3F, shift: 8)]
         GoronKid = 0x201, // En_Gk, baby goron, child goron
@@ -4628,6 +4628,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)]
+        [VariantsWithRoomMax(max:0, variant:0)] // silly
         GoronShrineChandelier = 0x240, // Obj_Chan
 
         [ActorizerEnabled]

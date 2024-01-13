@@ -29,7 +29,7 @@ namespace MMR.Randomizer.Utils
                     ItemUtils.IsRequired(u.ItemObject.Item, u.LocationForImportance, randomized),
                     ItemUtils.IsImportant(u.ItemObject.Item, u.LocationForImportance, randomized),
                     ItemUtils.IsLocationJunk(u.LocationForImportance, randomized.Settings),
-                    randomized.ImportantSongLocations?.Contains(u.LocationForImportance) == true,
+                    randomized.RequiredSongLocations?.Contains(u.LocationForImportance) == true,
                     settings.ProgressiveUpgrades,
                     randomized.ItemList
                 ));
@@ -73,7 +73,7 @@ namespace MMR.Randomizer.Utils
             var plainTextRegex = new Regex("[^a-zA-Z0-9' .\\-]+");
             Spoiler spoiler = new Spoiler()
             {
-                Version = Randomizer.AssemblyVersion + " + Isghj's Enemizer Test 56.0b",
+                Version = Randomizer.AssemblyVersion + " + Isghj's Enemizer Test 56.0c",
                 SettingsString = settingsString,
                 Seed = randomized.Seed,
                 DungeonEntrances = dungeonEntrances,

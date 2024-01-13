@@ -117,6 +117,9 @@ namespace MMR.Randomizer
             ReadWriteUtils.WriteCodeUInt32(0x801DB9B4, 0x6000);
             ReadWriteUtils.WriteCodeUInt32(0x801DB9B8, 0x6000);
 
+            // write bigger music buffer for SEQ_PLAYER_BGM_SUB
+            ReadWriteUtils.WriteCodeUInt32(0x801DB9A8, 0x2800);
+
             RemoveFanfaresFromShootingGaleryActors();
         }
 
@@ -279,86 +282,6 @@ namespace MMR.Randomizer
             }
         }
 
-        private void WriteTunicColor()
-        {
-            if (_cosmeticSettings.UseTunicColors[TransformationForm.Human])
-            {
-                Color t = _cosmeticSettings.TunicColors[TransformationForm.Human];
-                byte[] color = { t.R, t.G, t.B };
-
-                var playerModel = DeterminePlayerModel();
-                var characterIndex = (int)playerModel;
-                if (playerModel == Character.Kafei)
-                {
-                    var objectData = ObjUtils.GetObjectData(0x11);
-                    TunicUtils.UpdateKafeiTunic(ref objectData, t);
-                    ObjUtils.InsertObj(objectData, 0x11);
-                }
-                else
-                {
-                    var locations = ResourceUtils.GetIndexedAddresses(characterIndex, Resources.addresses.tunic_0, Resources.addresses.tunic_1, Resources.addresses.tunic_2, Resources.addresses.tunic_3);
-                    var objectData = ObjUtils.GetObjectData(0x11);
-                    for (int j = 0; j < locations.Count; j++)
-                    {
-                        ReadWriteUtils.WriteFileAddr(locations[j], color, objectData);
-                    }
-                    ObjUtils.InsertObj(objectData, 0x11);
-                };
-            }
-
-            var tunicForms = new List<TransformationForm>
-            {
-                TransformationForm.Deku,
-                TransformationForm.Goron,
-                TransformationForm.Zora,
-                TransformationForm.Zora,
-                TransformationForm.FierceDeity,
-            };
-
-            var otherTunics = ResourceUtils.GetAddresses(Resources.addresses.tunic_forms);
-
-            for (var i = 0; i < tunicForms.Count; i++)
-            {
-                if (_cosmeticSettings.UseTunicColors[tunicForms[i]])
-                {
-                    var t = _cosmeticSettings.TunicColors[tunicForms[i]];
-                    TunicUtils.UpdateFormTunics(i, otherTunics, t);
-                }
-            }
-        }
-
-        private void MakeItRain()
-        {
-            int terminaFieldRoom0FID = GameObjects.Scene.TerminaField.FileID() + 1; // tested working
-            int roadtosouthernswampRoom0FID = GameObjects.Scene.RoadToSouthernSwamp.FileID() + 1;
-            int milkroadRoom0FID = GameObjects.Scene.MilkRoad.FileID() + 1;
-            int gormantrackRoom0FD = GameObjects.Scene.GormanTrack.FileID() + 1;
-            int greatbaycoastRoom0FID = GameObjects.Scene.GreatBayCoast.FileID() + 1;
-            int pinnacleRockRoom0FID = GameObjects.Scene.PinnacleRock.FileID() + 1; 
-            int piratesExteriorRoom0FID = GameObjects.Scene.PiratesFortressExterior.FileID() + 1;
-            int piratesInteriorRoom0FID = GameObjects.Scene.PiratesFortress.FileID() + 1;
-            int zoracapeRoom0FID = GameObjects.Scene.ZoraCape.FileID() + 1;
-            int waterfallRapidsRoom0FID = GameObjects.Scene.WaterfallRapids.FileID() + 1;
-            // not sure if woodfall should be added, its in the swamp, but maybe the mountain is supposed to be really tall and above the clouds
-
-            int[] roomFDs = new int[] { terminaFieldRoom0FID, roadtosouthernswampRoom0FID, milkroadRoom0FID, gormantrackRoom0FD,
-                greatbaycoastRoom0FID, pinnacleRockRoom0FID, piratesExteriorRoom0FID, piratesInteriorRoom0FID,
-                zoracapeRoom0FID,  waterfallRapidsRoom0FID};
-            
-            foreach (var fid in roomFDs)
-            {
-                RomUtils.CheckCompressed(fid);
-                for (int Byte = 0; Byte < 0x10 * 70; Byte += 8)
-                {
-                    if (RomData.MMFileList[fid].Data[Byte] == 0x08) // header command starts with 0x08
-                    {
-                        RomData.MMFileList[fid].Data[Byte + 0x6] |= 0x10; // weirdly this seems to be the only noticable effect of this byte
-                        break;
-                    }
-                }
-            }
-        }
-
         private void WriteInstruments(Random random)
         {
             var codeFileAddress = 0xB3C000;
@@ -476,7 +399,7 @@ namespace MMR.Randomizer
             WriteCrashDebuggerShow();
 
             // Dolphin/WiiVC audiothread shutdown workaround
-            ReadWriteUtils.WriteU16ToROM(0xB3C000 + 0x0CD320, 0x1000);
+            ReadWriteUtils.WriteU32ToROM(0xB3C000 + 0x0CD384, 0x00000000);
 
         }
 
@@ -1579,7 +1502,7 @@ namespace MMR.Randomizer
         {
             if (_randomized.Settings.RandomizeEnemies)
             {
-                Enemies.ShuffleEnemies(outputSettings, _randomized, _randomized.Seed);
+                Enemies.ShuffleEnemies(outputSettings, _cosmeticSettings, _randomized, _randomized.Seed);
             }
         }
 
@@ -1607,7 +1530,10 @@ namespace MMR.Randomizer
                 itemList.AddRange(_randomized.Settings.CustomStartingItemList);
             }
 
-            itemList.AddRange(_randomized.BlitzExtraItems);
+            if (_randomized.BlitzExtraItems != null)
+            {
+                itemList.AddRange(_randomized.BlitzExtraItems);
+            }
 
             itemList = itemList.Distinct().ToList();
 
@@ -1755,6 +1681,7 @@ namespace MMR.Randomizer
                 hacks.Add(Resources.mods.safer_glitches_index_warp);
                 hacks.Add(Resources.mods.safer_glitches_fix_4thday_mayor);
                 hacks.Add(Resources.mods.safer_glitches_fix_4thday_gossip);
+                hacks.Add(Resources.mods.safer_glitches_fix_4thday_deku_playground);
             }
 
             if (_randomized.Settings.BombchuDrops)
@@ -2777,27 +2704,6 @@ namespace MMR.Randomizer
                                 .Text(" to anyone who isn't a").Red(" Goron").Text(". ").PlaySoundEffect(0x391C).Text("Sorry.")
                                 ;
                             })
-                            .EndFinalTextBox();
-                        })
-                        .Build()
-                    );
-
-                    newMessages.Add(new MessageEntryBuilder()
-                        .Id(0xDEE)
-                        .Message(it =>
-                        {
-                            it.RuntimeWrap(() =>
-                            {
-                                it.Text("There's a Goron in this village who sells ")
-                                .RuntimeArticle(kegChallengeItem.DisplayItem, kegChallengeItem.NewLocation.Value)
-                                .Red(() =>
-                                {
-                                    it.RuntimeItemName(kegChallengeItem.AlternateName(), kegChallengeItem.NewLocation.Value);
-                                })
-                                .Text(".")
-                                ;
-                            })
-                            .DisableTextSkip2()
                             .EndFinalTextBox();
                         })
                         .Build()
@@ -5607,6 +5513,32 @@ namespace MMR.Randomizer
                         .Build()
                     );
                 }
+
+                // Update Keg Challenge
+                var kegChallengeItem = _randomized.ItemList.First(io => io.NewLocation == Item.ItemPowderKeg);
+                if (kegChallengeItem.Item != Item.ItemPowderKeg)
+                {
+                    newMessages.Add(new MessageEntryBuilder()
+                        .Id(0xDEE)
+                        .Message(it =>
+                        {
+                            it.RuntimeWrap(() =>
+                            {
+                                it.Text("There's a Goron in this village who sells ")
+                                .RuntimeArticle(kegChallengeItem.DisplayItem, kegChallengeItem.NewLocation.Value)
+                                .Red(() =>
+                                {
+                                    it.RuntimeItemName(kegChallengeItem.AlternateName(), kegChallengeItem.NewLocation.Value);
+                                })
+                                .Text(".")
+                                ;
+                            })
+                            .DisableTextSkip2()
+                            .EndFinalTextBox();
+                        })
+                        .Build()
+                    );
+                }
             }
 
             var dungeonItemMessageIds = new byte[] {
@@ -6132,7 +6064,7 @@ namespace MMR.Randomizer
             foreach (var item in _randomized.Traps)
             {
                 var newLocation = item.NewLocation.Value;
-                if (newLocation.IsVisible() && (item.Item != Item.Rupoor || newLocation.IsPurchaseable()) && (item.Item != Item.Nothing))
+                if (newLocation.IsModelVisible(_randomized.Settings) && (item.Item != Item.Rupoor || newLocation.IsShopModelVisible()) && (item.Item != Item.Nothing))
                 {
                     var giIndex = item.NewLocation.Value.GetItemIndex().Value;
                     var graphic = item.Mimic.ResolveGraphic();
