@@ -2580,6 +2580,7 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Skulltula)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Snowhead, GameObjects.Actor.Bo, GameObjects.Actor.BadBat)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BombersYouChase)) continue;
@@ -2588,7 +2589,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.ZoraRaceRing)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.IkanaGravestone)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.BoatCruiseTarget)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.BeneathGraveyard, GameObjects.Actor.BadBat, GameObjects.Actor.Takkuri)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.MilkRoad, GameObjects.Actor.Carpenter, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.RomaniYts)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SwampSpiderHouse, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
@@ -2598,7 +2599,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.MayorsResidence, GameObjects.Actor.Gorman, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
 
-                //TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.FlyingPot);
+                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Monkey)) continue;
+#endif
                 #endregion
 
                 var reducedCandidateList = thisSceneData.CandidatesPerObject[objectIndex].ToList();
@@ -3787,6 +3789,28 @@ namespace MMR.Randomizer
             return newInjectedActor;
         }
 
+        public static List<string> GenerateMMRAFileList(string directory)
+        {
+            var directories = new List<string> { };
+
+            directories.AddRange(Directory.GetDirectories(directory).ToList()); // depth 1
+            foreach (string d in directories.ToList()) // another layer deep to be safe
+            {
+                List<String> deeperDirectories = Directory.GetDirectories(d).ToList();
+                directories.AddRange(deeperDirectories); // depth 2
+            }
+            directories.Add(directory); // added after to avoid contamination
+
+            var files = new List<string> { };
+
+            foreach (var dir in directories)
+            {
+                files.AddRange(Directory.GetFiles(dir, "*.mmra"));
+            }
+
+            return files;
+        }
+
         public static void ScanForMMRA(string directory)
         {
             // decomp lets us more easily modify actors now
@@ -3800,12 +3824,16 @@ namespace MMR.Randomizer
 
             uint END_VANILLA_OBJ_SEGMENT = 0x01E5E600;
 
-            InjectedActors.Clear();
+            InjectedActors.Clear(); // from last gen
             var codeFile = RomData.MMFileList[31].Data;
-            var objectTableOffset = 0x11CC80;
+            var objectTableOffset = 0x11CC80;      
 
-            foreach (string filePath in Directory.GetFiles(directory, "*.mmra"))
+            foreach (string filePath in GenerateMMRAFileList(directory))
             {
+                if (filePath.Contains("SafeBoat.mmra"))
+                    //throw new Exception("SafeBoat.mmra no longer works in actorizer 1.16, \n remove the file from MMR/actors and start a new seed.");
+                    continue;
+
                 try
                 {
                     using (ZipArchive zip = ZipFile.OpenRead(filePath))
@@ -4288,7 +4316,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 56.0c\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 56.0d\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

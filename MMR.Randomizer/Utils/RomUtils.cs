@@ -35,7 +35,7 @@ namespace MMR.Randomizer.Utils
             #if DEBUG
             string settingstring = $"{setting} + DEBUG BUILD\x00";
             #else
-            string settingstring = $"{setting} + Isghj's Enemizer Test 56.0c\x00";
+            string settingstring = $"{setting} + Isghj's Enemizer Test 56.0d\x00";
             #endif
             int f = GetFileIndexForWriting(veraddr);
             var file = RomData.MMFileList[f];
@@ -286,9 +286,11 @@ namespace MMR.Randomizer.Utils
                 GameObjects.Scene.Grottos.FileID(),
                 GameObjects.Scene.Grottos.FileID() + 4, // room 4 : regular chest grotto
 
-                // actor overlays
+                // THESE TWO are the highest priority, huge imporovement 
                 38, // player overlay
                 37, // pause menu
+
+                // actor overlays
                 GameObjects.Actor.Fairy.FileListIndex(),
                 GameObjects.Actor.Arrow.FileListIndex(),
                 GameObjects.Actor.BombAndKeg.FileListIndex(),

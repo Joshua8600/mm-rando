@@ -842,6 +842,8 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [AlignedCompanionActor(Obj_Dowsing, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x110)] // rumble
+        [AlignedCompanionActor(Butterfly, CompanionAlignment.Above, ourVariant: -1,
+            variant: 0, 1, 2)]
         [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
         [EnemizerScenesExcluded(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead)]
         GrottoHole = 0x55, // Door_Ana
@@ -1641,7 +1643,8 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         [FlyingToGroundHeightAdjustment(200)]
-        [EnemizerScenesPlacementBlock(Scene.DekuPalace,
+        // TODO go through all of these and recheck now that we can modify the height correctly
+        [EnemizerScenesPlacementBlock(//Scene.DekuPalace,
             Scene.Grottos, Scene.AstralObservatory, Scene.ZoraHallRooms, Scene.DampesHouse, Scene.PiratesFortressRooms,
             Scene.GoronRacetrack, Scene.WaterfallRapids, Scene.GormanTrack, Scene.RoadToIkana, Scene.IkanaCastle, Scene.BeneathGraveyard,
             Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall,
@@ -2151,7 +2154,8 @@ namespace MMR.Randomizer.GameObjects
 
         // unused actor, now used by a new injected actor
         [FileID(246)]
-        [EnemizerScenesPlacementBlock(Scene.StoneTower, Scene.SouthernSwamp, Scene.SouthernSwampClear)] // dyna crash possible
+        [EnemizerScenesPlacementBlock(Scene.PinnacleRock, // super annoying warping the player all the way back
+            Scene.StoneTower, Scene.SouthernSwamp, Scene.SouthernSwampClear)] // dyna crash possible
         Mimi = 0x111, // En_Bu
 
         //[EnemizerEnabled] //crash
@@ -3127,10 +3131,9 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1BE)]
         SkullKidsOcarina = 0x194, // Dm_Char02
 
-        // ??
         [FileID(365)]
         [ObjectListIndex(0x1A3)]
-        Dm_Char03 = 0x195, // Dm_Char03
+        DekuMaskCutsceneFalling = 0x195, // Dm_Char03
 
         //[ActorizerEnabled]
         [FileID(366)]
@@ -3142,19 +3145,28 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         Dm_Char04 = 0x196, // Dm_Char04
 
-        // these should all be cutscene actors, but which one we do not know
         [FileID(367)]
         [ObjectListIndex(0x213)]
-        Dm_Char05 = 0x197, // Dm_Char05
+        CreditsMaskObjects = 0x197, // Dm_Char05
+
         [FileID(368)]
         [ObjectListIndex(0x1E6)]
-        Dm_Char06 = 0x198, // Dm_Char06
+        SnowheadMountainsSpringTransitionEffects = 0x198, // Dm_Char06
+
+
         [FileID(369)]
         [ObjectListIndex(0x212)]
-        Dm_Char07 = 0x199, // Dm_Char07
+        MilkBarCutsceneObjects  = 0x199, // Dm_Char07
+
+        // cannot put places without modification because he actionFunc=null crashes, hardcoded to the two scenes
+        //[ActorizerEnabled]
         [FileID(370)]
         [ObjectListIndex(0x229)]
-        Dm_Char08 = 0x19A, // Dm_Char08
+        [GroundVariants(0)]
+        [WaterBottomVariants(0)]
+        [VariantsWithRoomMax(max:1, variant:0)]
+        [UnkillableAllVariants]
+        LargeGreatBayTurtle = 0x19A, // Dm_Char08
 
         // todo reattempt: could not spawn
         [FileID(371)]
@@ -3171,8 +3183,16 @@ namespace MMR.Randomizer.GameObjects
 
         Empty19D = 0x19D,
 
+
+        // the only one we can put down is the credits version that basically tposes, make this a modified actor instead
+        //[ActorizerEnabled]
         [FileID(373)]
         [ObjectListIndex(0x195)]
+        // params
+        // type (0x780) >> 7 // holy shit why
+        [GroundVariants(0xFD7F//, // credits monk
+            )]
+        [UnkillableAllVariants]
         // missing switch flags
         Monkey = 0x19E, // En_Mnk
 
@@ -3332,6 +3352,13 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0x2)]
         [UnkillableAllVariants]
         [OnlyOneActorPerRoom]
+        // todo add fairies and butterflies and bees
+        [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
+            variant: 2, 9)]
+        [AlignedCompanionActor(Butterfly, CompanionAlignment.Above, ourVariant: -1,
+            variant: 0, 1, 2)]
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.Above, ourVariant: 0x2,
+            variant: 0, 1, 2, 3, 4, 5)]
         [EnemizerScenesPlacementBlock(Scene.TerminaField)] // TF has object size issues, this is the largest object, this is here just to speed up
         HappyMaskSalesman = 0x1B5, // En_Osn
 
@@ -3588,7 +3615,6 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x1)]
         Mir_Ray2 = 0x1D0, // Mir_Ray2
 
-        // TODO lookup parametsr
         [EnemizerEnabled]
         [ActorInitVarOffset(0x1FD0)]
         [FileID(426)]
@@ -4162,8 +4188,14 @@ namespace MMR.Randomizer.GameObjects
         [TreasureFlagsPlacement(mask: 0x7F, shift: 2)]
         SkullKidPainting = 0x210, // Bg_Kin2_Picture
 
+        [ActorizerEnabledFreeOnly] // big object, boring actor
         [FileID(488)]
         [ObjectListIndex(0x1F5)]
+        [GroundVariants(0x1, // big shelf
+            0x0)] // little shelf
+        [VariantsWithRoomMax(max:2, variant: 0, 1)] // dyna I think, have to limit for now
+        [EnemizerScenesExcluded(Scene.OceanSpiderHouse)] // object is shared with multiple actors in this scene, breaks whole area to remove
+        [UnkillableAllVariants]
         OceanSpiderhouseMovableShelf = 0x211, // Bg_Kin2_Shelf
 
         // kinda want to try randomizing, but I need to check against ALL checks in the graveyard, kinda hard to do
@@ -5485,12 +5517,13 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         SoliderMoonLeaveCutscene = 0x2AA, // En_Ending_Hero4
 
-        //[ActorizerEnabled]
+        [ActorizerEnabled]
         [FileID(642)]
         [ObjectListIndex(0xF1)]
-        //[GroundVariants()]
+        [GroundVariants(0x0, 0x1, 0x2, 0x3, 0x4)]
         [UnkillableAllVariants]
-        CarpentersMoonLeaveCutscene = 0x2AB, // En_Ending_Hero5
+        // placable?
+        CarpentersFromCutscene = 0x2AB, // En_Ending_Hero5
 
         // ???
         [FileID(643)]
