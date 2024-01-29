@@ -358,12 +358,15 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(66)]
         [ObjectListIndex(0xBC)]
-        [CheckRestricted(Scene.SouthernSwamp, variant: 3, Item.HeartPieceChoir, Item.FrogSwamp)]
-        [CheckRestricted(Scene.SouthernSwampClear, variant: 3, Item.HeartPieceChoir, Item.FrogSwamp)]
-        [CheckRestricted(Scene.LaundryPool, variant: 4, Item.HeartPieceChoir, Item.FrogLaundryPool)]
-        [CheckRestricted(Scene.MountainVillageSpring, variant: 4, Item.HeartPieceChoir)]
-        [GroundVariants(1, 2, 3, 4, 0xF)] // 3 is southern swamp, 4 is laundry pool, the versions in teh mountaion have the F flag, think the rest are numbered
+        [CheckRestricted(Scene.SouthernSwamp, variant: 0x3, Item.HeartPieceChoir, Item.FrogSwamp)]
+        [CheckRestricted(Scene.SouthernSwampClear, variant: 0x3, Item.HeartPieceChoir, Item.FrogSwamp)]
+        [CheckRestricted(Scene.LaundryPool, variant: 0x4, Item.HeartPieceChoir, Item.FrogLaundryPool)]
+        [CheckRestricted(Scene.MountainVillageSpring, variant: -1, Item.HeartPieceChoir)]
+        [GroundVariants(1, 2, 3, 4,
+            0xF,
+            0xF0, 0xF1, 0xF2, 0xF3, 0xF4)] // 3 is southern swamp, 4 is laundry pool, the versions in teh mountaion have the F flag, think the rest are numbered
         [VariantsWithRoomMax(max: 1, variant: 1, 2, 3, 4, 0xF)]
+        [VariantsWithRoomMax(max: 0, variant: 0xF0, 0xF1, 0xF2, 0xF3, 0xF4)] // spring only
         [UnkillableAllVariants]
         //[EnemizerScenesExcluded(Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.LaundryPool)]
         RegularFrogs = 0x22, // En_Minifrog
@@ -4567,8 +4570,9 @@ namespace MMR.Randomizer.GameObjects
         // both of his vars are paths, sooo I'm guessing his behavior is hard coded
         [ObjectListIndex(0xE3)]
         [FileID(526)]
-        [CheckRestricted(Scene.NorthClockTown, variant: 0x83FF, Item.MaskBlast, Item.MaskAllNight, Item.NotebookMeetOldLady, Item.NotebookSaveOldLady)]
-        [CheckRestricted(Scene.IkanaCanyon, variant: 0x85FF, Item.MaskCouple)]
+        [CheckRestricted(Scene.NorthClockTown, variant: 0x83FF, Item.MaskBlast, Item.MaskAllNight, Item.NotebookMeetOldLady, Item.NotebookSaveOldLady,
+            Item.MaskCouple, Item.NotebookEscapeFromSakonSHideout)]
+        [CheckRestricted(Scene.IkanaCanyon, variant: 0x85FF, Item.MaskCouple, Item.NotebookEscapeFromSakonSHideout)]
         // cannot remove because he shares objects with the bank
         //[CheckRestricted(Scene.WestClockTown, variant: 0x83FF, Item.MaskBlast, Item.MaskAllNight)]
         // can't replace the one in west clocktown without killing bank

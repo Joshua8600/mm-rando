@@ -846,6 +846,53 @@ namespace MMR.Randomizer
             }
         }
 
+
+        private static void EnableAllFormItems()
+        {
+            /// let deku nut
+
+            const int FORM_FD    = 0; // let me use enum as int without a cast and I'll use it
+            const int FORM_GORON = 1;
+            const int FORM_ZORA  = 2;
+            const int FORM_DEKU  = 3;
+            const int FORM_CHILD = 4;
+
+
+            var codeFile = RomData.MMFileList[31].Data;
+            var startLoc = 0x11C950; // offset to gPlayerFormItemRestrictions
+            var endLoc = 0x11CB90; // this is wrong, includes some padding
+            var formDataWidth = 0x72; // item bytes per form (yes each restriction is a byte not a bit, what a waste...)
+
+            // start by enable everything
+            var i = startLoc;
+            while (i < endLoc)
+            {
+                // gPlayerFormItemRestrictions[GET_PLAYER_FORM][GET_CUR_FORM_BTN_ITEM(i)] // /* 11C950 801C2410 */
+                // item enum: ItemId
+                codeFile[i] = 0xFF; // this is overkill, it can be any value over 1, but this helps with visiblity
+                i++;
+            }
+
+            // however there are some that are broken/bugged and should never be used
+            // hookshot should not be allowed in any forms
+            for (int form = 0; form < 4; form++) // dont overwrite regular link which is form 5
+            {
+                // hookshot item is 0xF ( _can_ crash, cause unknown)
+                codeFile[startLoc + (form * formDataWidth) + 0xF] &= 0x00;
+                // bow item is 0x0 (buggy behavior that isn't useful)
+                codeFile[startLoc + (form * formDataWidth) + 0x1] &= 0x00;
+            }
+
+            // disable goron stick (he just punches which is counter int)
+            codeFile[startLoc + (FORM_GORON * formDataWidth) + 0x8] &= 0x00;
+
+            // FD cannot use bow or stick
+            codeFile[startLoc + (FORM_FD * formDataWidth) + 0x1] &= 0x00;
+            codeFile[startLoc + (FORM_FD * formDataWidth) + 0x8] &= 0x00;
+
+        }
+
+
         private static void Shinanigans()
         {
             // the peahat grass drops NOTHING, this has bothered me for ages, here I change it
@@ -919,19 +966,8 @@ namespace MMR.Randomizer
                     twinislandsSceneData[0xD7] = 0x50; // 50 is behind the waterfall 
                 }
 
+                EnableAllFormItems();
 
-                // for now, remove all form restrictions to see what works and what does not work anymore
-                //*
-                var codeFile = RomData.MMFileList[31].Data;
-                var startLoc = 0x11C950; 
-                var endLoc = 0x11CB8C;
-                var i = startLoc;
-                while (i < endLoc)
-                {
-                    // gPlayerFormItemRestrictions[GET_PLAYER_FORM][GET_CUR_FORM_BTN_ITEM(i)]
-                    codeFile[i] = 0xFF;
-                    i++;
-                }
                 // */
                 // RecreateFishing();
 
@@ -972,6 +1008,7 @@ namespace MMR.Randomizer
             //  if (this->currentMask == PLAYER_MASK_BUNNY) {speedTarget *= 1.5f;
             // the closest I can think of is & 0xF which gets most but not all of them, which does shuffle some code around tho
             // 0x1D59C ofset == 0xCC5490 hard romaddr
+            /*
             ReadWriteUtils.Arr_WriteU32(playerCodeFile, Dest: 0x1D59C, val: 0xC7A4002C);
             ReadWriteUtils.Arr_WriteU32(playerCodeFile, Dest: 0x1D5A0, val: 0x3C013FC0);
             ReadWriteUtils.Arr_WriteU32(playerCodeFile, Dest: 0x1D5A4, val: 0x3319000F);
@@ -981,6 +1018,7 @@ namespace MMR.Randomizer
             ReadWriteUtils.Arr_WriteU16(playerCodeFile, Dest: 0x1D5C0, val: 0x8D08);
             ReadWriteUtils.Arr_WriteU16(playerCodeFile, Dest: 0x1D5CC, val: 0x8509);
             ReadWriteUtils.Arr_WriteU16(playerCodeFile, Dest: 0x1D5D8, val: 0x4489);
+            */
 
             // can we remove an object from ikana to increase object budget to have more stuff?
             var ikanaScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaCanyon.FileID());
@@ -3411,19 +3449,19 @@ namespace MMR.Randomizer
 
             if (scene.SceneEnum == GameObjects.Scene.TerminaField || scene.SceneEnum == GameObjects.Scene.IkanaCanyon)
                 Thread.CurrentThread.Priority = ThreadPriority.AboveNormal; // more time than the other small scenes
+            WriteOutput($" starting timestamp : [{DateTime.Now.ToString("hh:mm:ss.fff tt")}]");
             #endregion
 
-            WriteOutput($" starting timestamp : [{DateTime.Now.ToString("hh:mm:ss.fff tt")}]");
             thisSceneData.Actors = GetSceneEnemyActors(scene);
             if (thisSceneData.Actors.Count == 0)
             {
                 return; // if no enemies, no point in continuing
             }
-            WriteOutput("time to get scene enemies: " + GET_TIME(thisSceneData.StartTime) + "ms");
+            WriteOutput("time to read scene enemies: " + GET_TIME(thisSceneData.StartTime) + "ms");
 
             thisSceneData.Objects = GetSceneEnemyObjects(thisSceneData);
             //var sceneObjectLimit = SceneUtils.GetSceneObjectBankSize(scene.SceneEnum); // er, this isnt used here anymore, why did intelesense not tell me?
-            WriteOutput(" time to get scene objects: " + GET_TIME(thisSceneData.StartTime) + "ms");
+            WriteOutput(" time to read scene objects: " + GET_TIME(thisSceneData.StartTime) + "ms");
 
             WriteOutput("=========================================================================");
             WriteOutput("For Scene: [" + scene.ToString() + "] with fid: " + scene.File + ", with sid: 0x" + scene.Number.ToString("X2"));
@@ -3542,6 +3580,8 @@ namespace MMR.Randomizer
 
                 // check if objects fits now, because the rest can take awhile and at least for termina field we can check this waaaaay earlier
                 thisSceneData.ActorCollection.SetNewActors(scene, thisSceneData.ChosenReplacementObjects);
+                WriteOutput($" set new actors: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
+
                 var objectOverflowCheck = thisSceneData.ActorCollection.isObjectSizeAcceptable();
                 if (objectOverflowCheck > 0){
                     WriteOutput($"---- bogo REJECTED: obj pre-check failed (size:{objectOverflowCheck}): [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
@@ -3589,7 +3629,7 @@ namespace MMR.Randomizer
                 //}
 
                 // set objects and actors for isSizeAcceptable to use, and our debugging output
-                thisSceneData.ActorCollection.SetNewActors(scene, thisSceneData.ChosenReplacementObjects);
+                thisSceneData.ActorCollection.SetNewActors(scene, thisSceneData.ChosenReplacementObjects); // 30~70ms for this? hmm
 
                 WriteOutput($" set for size check: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
@@ -3638,8 +3678,7 @@ namespace MMR.Randomizer
             for (int a = 0; a < thisSceneData.Actors.Count; a++)
             {
                 var actor = thisSceneData.Actors[a];
-                WriteOutput($"  Old Enemy actor:[{actor.OldName}] " +
-                    $"map [{actor.Room.ToString("D2")}] " +
+                WriteOutput($"  Old Enemy actor:[{actor.Room.ToString("D2")}] [{actor.OldName}] " +
                     $"was replaced by new enemy: [{actor.Variants[0].ToString("X4")}]" +
                     $"[{actor.Name}]");
             }
@@ -4316,7 +4355,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 57.0\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 57.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
