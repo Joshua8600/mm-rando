@@ -1012,7 +1012,7 @@ namespace MMR.Randomizer
             //  if (this->currentMask == PLAYER_MASK_BUNNY) {speedTarget *= 1.5f;
             // the closest I can think of is & 0xF which gets most but not all of them, which does shuffle some code around tho
             // 0x1D59C ofset == 0xCC5490 hard romaddr
-            /*
+            // /*
             ReadWriteUtils.Arr_WriteU32(playerCodeFile, Dest: 0x1D59C, val: 0xC7A4002C);
             ReadWriteUtils.Arr_WriteU32(playerCodeFile, Dest: 0x1D5A0, val: 0x3C013FC0);
             ReadWriteUtils.Arr_WriteU32(playerCodeFile, Dest: 0x1D5A4, val: 0x3319000F);
@@ -1022,7 +1022,7 @@ namespace MMR.Randomizer
             ReadWriteUtils.Arr_WriteU16(playerCodeFile, Dest: 0x1D5C0, val: 0x8D08);
             ReadWriteUtils.Arr_WriteU16(playerCodeFile, Dest: 0x1D5CC, val: 0x8509);
             ReadWriteUtils.Arr_WriteU16(playerCodeFile, Dest: 0x1D5D8, val: 0x4489);
-            */
+            // */
 
             // can we remove an object from ikana to increase object budget to have more stuff?
             var ikanaScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaCanyon.FileID());
@@ -2668,7 +2668,6 @@ namespace MMR.Randomizer
                 //////////////////////////////////////////////////////
                 ///////// debugging: force an object (enemy) /////////
                 //////////////////////////////////////////////////////
-                #if DEBUG
 
                 bool TestHardSetObject(GameObjects.Scene targetScene, GameObjects.Actor target, GameObjects.Actor replacement)
                 {
@@ -2685,21 +2684,30 @@ namespace MMR.Randomizer
                     return false;
                 }
 
+                if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Armos)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Skulltula)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Snowhead, GameObjects.Actor.Bo, GameObjects.Actor.BadBat)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BombersYouChase)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Shabom)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BigPoe)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.ZoraRaceRing)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.IkanaGravestone)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.BoatCruiseTarget)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.MilkRoad, GameObjects.Actor.Carpenter, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
-                if (TestHardSetObject(GameObjects.Scene.WoodfallTemple, GameObjects.Actor.DekuBaba, GameObjects.Actor.DragonFly)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.WoodfallTemple, GameObjects.Actor.DekuBaba, GameObjects.Actor.DragonFly)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.RomaniYts)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SwampSpiderHouse, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBaba, GameObjects.Actor.BombersYouChase)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBaba, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.SpikedMine, GameObjects.Actor.Postbox)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.MayorsResidence, GameObjects.Actor.Gorman, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Monkey)) continue;
-#endif
+
                 #endregion
 
                 var reducedCandidateList = thisSceneData.CandidatesPerObject[objectIndex].ToList();
@@ -3710,17 +3718,16 @@ namespace MMR.Randomizer
             WriteOutput(" Loops used for match candidate: " + loopsCount);
 
             #region Debugging: Actor Forcing
-            #if DEBUG
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
-            if (scene.SceneEnum == GameObjects.Scene.DekuShrine) // force specific actor/variant for debugging
+            if (scene.SceneEnum == GameObjects.Scene.Grottos) // force specific actor/variant for debugging
             {
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
-                thisSceneData.Scene.Maps[0].Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
+                //thisSceneData.Scene.Maps[0].Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
+                thisSceneData.Scene.Maps[1].Actors[0].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
             }
             /////////////////////////////
-            #endif
             /////////////////////////////
             #endregion
 
