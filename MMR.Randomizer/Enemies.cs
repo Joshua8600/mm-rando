@@ -180,7 +180,7 @@ namespace MMR.Randomizer
             //var snowheadFairyReward = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.FairyDoubleMagic).Item;
             //if (ItemUtils.IsJunk(snowheadFairyReward))
             //{
-                var snowheadStrayFairyImportantSearch = allSphereItems.Any(u => u.Item1 == "Snowfall Stray Fairy");
+                var snowheadStrayFairyImportantSearch = allSphereItems.Any(u => u.Item1 == "Snowhead Stray Fairy");
                 if (!snowheadStrayFairyImportantSearch)
                 {
                     var snowheadFairies = allFaries.FindAll(token => token.Name().Contains("Snowhead")).ToList();
@@ -660,6 +660,7 @@ namespace MMR.Randomizer
             ModifyFireflyKeeseForPerching();
             SplitPirateSewerMines();
             BlockBabyGoronIfNoSFXRando();
+            FixArmosSpawnPos();
 
             Shinanigans();
             ObjectIsItemBlocked();
@@ -874,13 +875,16 @@ namespace MMR.Randomizer
             }
 
             // however there are some that are broken/bugged and should never be used
-            // hookshot should not be allowed in any forms
             for (int form = 0; form < 4; form++) // dont overwrite regular link which is form 5
             {
-                // hookshot item is 0xF ( _can_ crash, cause unknown)
+                // hookshot item is 0xF ( _can_ crash, cause unknown, pj64 doesnt crash so I cant even debug it)
                 codeFile[startLoc + (form * formDataWidth) + 0xF] &= 0x00;
                 // bow item is 0x0 (buggy behavior that isn't useful)
                 codeFile[startLoc + (form * formDataWidth) + 0x1] &= 0x00;
+                // elemental arrows are different items
+                codeFile[startLoc + (form * formDataWidth) + 0x2] &= 0x00;
+                codeFile[startLoc + (form * formDataWidth) + 0x3] &= 0x00;
+                codeFile[startLoc + (form * formDataWidth) + 0x4] &= 0x00;
             }
 
             // disable goron stick (he just punches which is counter int)
@@ -2167,6 +2171,38 @@ namespace MMR.Randomizer
             }
         }
 
+        public static void FixArmosSpawnPos()
+        {
+            /// for some reason armos changes its home and world position based on y rotation in init
+            //
+            // this->actor.home.pos.x -= 9.0f * Math_SinS(this->actor.shape.rot.y);
+            // this->actor.home.pos.z -= 9.0f * Math_CosS(this->actor.shape.rot.y);
+            // this->actor.world.pos.x = this->actor.home.pos.x;
+            // this->actor.world.pos.z = this->actor.home.pos.z;
+            // and it makes no sense, removing
+
+            var armosData = RomData.MMFileList[GameObjects.Actor.Armos.FileListIndex()].Data;
+
+            // the four writes (home.x home.z world.x, world.z)
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x0E0, val: 0x0000000); // reminder: all zero instruction is NOP
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x104, val: 0x0000000);
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x0FC, val: 0x0000000);
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x110, val: 0x0000000);
+
+            // for good measure, lets nop some of these expensive floating instructions leading to the save too
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x0D4, val: 0x0000000); // mul.s
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x0D8, val: 0x0000000); // sub.s
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x0F4, val: 0x0000000); // mul.s
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x100, val: 0x0000000); // sub.s
+
+            // god this compiler sucks, it LOADS the value it just stored to re-save it to a new location,
+            // instead of reusing the already populated register
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x0CC, val: 0x0000000); // lwc
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x0EC, val: 0x0000000); // lwc
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x0F0, val: 0x0000000); // lwc
+            ReadWriteUtils.Arr_WriteU32(armosData, Dest: 0x108, val: 0x0000000); // lwc
+        }
+
 
         #endregion
 
@@ -2373,6 +2409,26 @@ namespace MMR.Randomizer
             }
         }
 
+
+        public static Actor FindStrayFairy(SceneEnemizerData thisSceneData, int x, int z)
+        {
+            var scene = thisSceneData.Scene;
+            for (int m = 0; m < scene.Maps.Count; m++)
+            {
+                var actors = scene.Maps[m].Actors;
+                for (int a = 0; a < actors.Count; a++)
+                {
+                    var actor = actors[a];
+                    if (actor.ActorEnum == GameObjects.Actor.StrayFairy && actor.Position.x == x && actor.Position.z == z)
+                    {
+                        return actor;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public static void FixGroundToFlyingActorHeights(SceneEnemizerData thisSceneData, StringBuilder log)
         {
             /// For variety, I wanted to be able to put flying enemies where ground enemies used to be.
@@ -2407,6 +2463,17 @@ namespace MMR.Randomizer
 
                         log.AppendLine($" + adjusted height of actor [{testActor.Name}] by [{attr.Height}]");
                     }
+
+                    // if this actor was on top of a fairy, the fairy has to match the same height or it wont spawn after the enemy death
+                    if (thisSceneData.Scene.SceneEnum.IsFairyDroppingEnemy(roomNum: testActor.Room, actorNum: testActor.RoomActorIndex))
+                    {
+                        var testStrayFairy = FindStrayFairy(thisSceneData, testActor.Position.x, testActor.Position.z);
+                        if (testStrayFairy != null)
+                        {
+                            testStrayFairy.Position.y = testActor.Position.y;
+                        }
+                    }
+
                 }
             }
             thisSceneData.Log.AppendLine(" ---------- ");
@@ -2618,6 +2685,7 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Armos)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Skulltula)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Snowhead, GameObjects.Actor.Bo, GameObjects.Actor.BadBat)) continue;
@@ -2628,6 +2696,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.IkanaGravestone)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.BoatCruiseTarget)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.MilkRoad, GameObjects.Actor.Carpenter, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.WoodfallTemple, GameObjects.Actor.DekuBaba, GameObjects.Actor.DragonFly)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.RomaniYts)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SwampSpiderHouse, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
@@ -2795,7 +2864,8 @@ namespace MMR.Randomizer
             {
                 MustBeKillable = true; // we dont want respawning or unkillable enemies here
                 /// special case: armos does not drop stray fairies, and I dont know why. TODO attempt to fix instead of this code
-                ReplacementListRemove(reducedCandidateList, GameObjects.Actor.Armos);
+                //ReplacementListRemove(reducedCandidateList, GameObjects.Actor.Armos);
+                //ReplacementListRemove(reducedCandidateList, GameObjects.Actor.DragonFly);
             }
 
             // this could be per-enemy, but right now its only used where enemies and objects match,
@@ -4355,7 +4425,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 57.1\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 57.2\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

@@ -728,7 +728,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0)] // too much Bg is crash
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        [FlyingToGroundHeightAdjustment(200)]
+        [FlyingToGroundHeightAdjustment(250)]
         [EnemizerScenesPlacementBlock(
             Scene.Grottos, Scene.AstralObservatory, Scene.ZoraHallRooms, Scene.PiratesFortressRooms, Scene.DekuPalace,
             Scene.DekuShrine, Scene.GoronRacetrack, Scene.WaterfallRapids, Scene.GormanTrack, Scene.GoronRacetrack,
@@ -1645,7 +1645,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0)] // too much Bg is crash
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        [FlyingToGroundHeightAdjustment(200)]
+        [FlyingToGroundHeightAdjustment(250)]
         // TODO go through all of these and recheck now that we can modify the height correctly
         [EnemizerScenesPlacementBlock(//Scene.DekuPalace,
             Scene.Grottos, Scene.AstralObservatory, Scene.ZoraHallRooms, Scene.DampesHouse, Scene.PiratesFortressRooms,
@@ -4226,6 +4226,7 @@ namespace MMR.Randomizer.GameObjects
         //[ActorizerEnabled]
         [FileID(491)]
         [ObjectListIndex(0x18E)]
+        [CheckRestricted(scene: Scene.SouthernSwampClear, variant: -1, Item.HeartPieceBoatArchery)]
         [UnkillableAllVariants]
         BoatArcheryKoume = 0x214, // En_Tru_Mt
 
@@ -4925,7 +4926,8 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(567)]
         [ObjectListIndex(0xD0)]
-        [WaterTopVariants(0,1)]
+        //[WaterTopVariants(0,1)] // these are not actually at the water surface, but 10ft below
+        [WaterVariants(0,1)]
         [UnkillableAllVariants]
         SwimmingZora = 0x260, // En_Zow
 
