@@ -49,10 +49,15 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.Octarok,
             Actor.Wolfos, // can attack you off the boat
             Actor.LikeLike)] // can grab you on the boat ride
+        [EnemizerSceneEnemyReplacementBlock(Actor.Lilypad,
+            Actor.Desbreko)] // heavy lag
         SouthernSwampClear = 0x06,
 
         [FileID(1151)]
         [SceneInternalId(0x0D)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy:Actor.Sakon,
+        //    Actor.SleepingScrub, // Can block the text interaction
+        //    Actor.En_Ani)]
         CuriosityShop = 0x07,
 
         //[FileID(1520)]

@@ -878,21 +878,21 @@ namespace MMR.Randomizer
             for (int form = 0; form < 4; form++) // dont overwrite regular link which is form 5
             {
                 // hookshot item is 0xF ( _can_ crash, cause unknown, pj64 doesnt crash so I cant even debug it)
-                codeFile[startLoc + (form * formDataWidth) + 0xF] &= 0x00;
+                codeFile[startLoc + (form * formDataWidth) + 0xF] = 0x00;
                 // bow item is 0x0 (buggy behavior that isn't useful)
-                codeFile[startLoc + (form * formDataWidth) + 0x1] &= 0x00;
+                codeFile[startLoc + (form * formDataWidth) + 0x1] = 0x00;
                 // elemental arrows are different items
-                codeFile[startLoc + (form * formDataWidth) + 0x2] &= 0x00;
-                codeFile[startLoc + (form * formDataWidth) + 0x3] &= 0x00;
-                codeFile[startLoc + (form * formDataWidth) + 0x4] &= 0x00;
+                codeFile[startLoc + (form * formDataWidth) + 0x4A] = 0x00; // 2 3 and 4 arent valid here for some reason
+                codeFile[startLoc + (form * formDataWidth) + 0x4B] = 0x00;
+                codeFile[startLoc + (form * formDataWidth) + 0x4C] = 0x00;
             }
 
             // disable goron stick (he just punches which is counter int)
-            codeFile[startLoc + (FORM_GORON * formDataWidth) + 0x8] &= 0x00;
+            codeFile[startLoc + (FORM_GORON * formDataWidth) + 0x8] = 0x00;
 
             // FD cannot use bow or stick
-            codeFile[startLoc + (FORM_FD * formDataWidth) + 0x1] &= 0x00;
-            codeFile[startLoc + (FORM_FD * formDataWidth) + 0x8] &= 0x00;
+            codeFile[startLoc + (FORM_FD * formDataWidth) + 0x1] = 0x00;
+            codeFile[startLoc + (FORM_FD * formDataWidth) + 0x8] = 0x00;
 
         }
 
@@ -2685,6 +2685,7 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.FriendlyCucco)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Armos)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Skulltula)) continue;
@@ -3939,7 +3940,8 @@ namespace MMR.Randomizer
 
             foreach (string filePath in GenerateMMRAFileList(directory))
             {
-                if (filePath.Contains("SafeBoat.mmra"))
+                if (filePath.Contains("SafeBoat.mmra") ||
+                    filePath.Contains("FollowingDinofos.mmra"))
                     //throw new Exception("SafeBoat.mmra no longer works in actorizer 1.16, \n remove the file from MMR/actors and start a new seed.");
                     continue;
 
