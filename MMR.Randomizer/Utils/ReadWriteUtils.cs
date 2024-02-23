@@ -83,6 +83,7 @@ namespace MMR.Randomizer.Utils
             val.CopyTo(memory.Slice(dest));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Arr_Insert(byte[] src, int start, int len, byte[] dest, int addr)
         {
             for (int i = 0; i < len; i++)
@@ -91,36 +92,43 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint Byteswap32(uint val)
         {
             return ((val & 0xFF) << 24) | ((val & 0xFF00) << 8) | ((val & 0xFF0000) >> 8) | ((val & 0xFF000000) >> 24);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ushort Byteswap16(ushort val)
         {
             return (ushort)(((val & 0xFF) << 8) | ((val & 0xFF00) >> 8));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static uint Arr_ReadU32(byte[] Arr, int Src)
         {
             return (uint)((Arr[Src] << 24) | (Arr[Src + 1] << 16) | (Arr[Src + 2] << 8) | Arr[Src + 3]);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int Arr_ReadS32(byte[] Arr, int Src)
         {
             return (Arr[Src] << 24) | (Arr[Src + 1] << 16) | (Arr[Src + 2] << 8) | Arr[Src + 3];
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ushort Arr_ReadU16(byte[] Arr, int Src)
         {
             return (ushort)((Arr[Src] << 8) | (Arr[Src + 1]));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static short Arr_ReadS16(byte[] Arr, int Src)
         {
             return (short)((Arr[Src] << 8) | (Arr[Src + 1]));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Arr_WriteU32(byte[] Arr, int Dest, uint val)
         {
             Arr[Dest] = (byte)((val & 0xFF000000) >> 24);
@@ -129,6 +137,7 @@ namespace MMR.Randomizer.Utils
             Arr[Dest + 3] = (byte)(val & 0xFF);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Arr_WriteU16(byte[] Arr, int Dest, ushort val)
         {
             Arr[Dest] = (byte)((val & 0xFF00) >> 8);
