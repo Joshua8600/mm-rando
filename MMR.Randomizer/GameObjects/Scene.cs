@@ -253,7 +253,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1276)]
         [SceneInternalId(0x25)]
-        [EnemizerSceneBlockSensitive(Actor.PointedSign, -1)]
+        // to randomize the signs, I added another object and changed the signs to bombiwa, the code expects bombiwa
+        [EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)]
         PinnacleRock = 0x22,
 
         [FileID(1278)]
@@ -413,8 +414,9 @@ namespace MMR.Randomizer.GameObjects
         // respawning bo can show up here, but I dont want to mark the whole room to not place respawning enemies
         // mirror blocks climbing
         [EnemizerSceneEnemyReplacementBlock(Actor.BadBat,
-            Actor.Bo, Actor.StoneTowerMirror, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.SpiderWeb)]
-        [EnemizerSceneBlockSensitive(Actor.BadBat, -1)]
+            Actor.Bo, Actor.StoneTowerMirror,
+            Actor.SpiderWeb)] // TODO would be cool if we could allow this if the item was junk, or logic require fire arrows
+        [EnemizerSceneBlockSensitive(Actor.BadBat, -1)] // giant ice block, unused stone stuff at least
         RoadToSouthernSwamp = 0x3D,
 
         [FileID(1349)]

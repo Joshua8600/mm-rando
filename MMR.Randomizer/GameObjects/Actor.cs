@@ -536,15 +536,21 @@ namespace MMR.Randomizer.GameObjects
         [FileID(79)]
         // 0x1180 below graveyard
         // 0x289 gold pirate torches
-        // 0x287F east clocktown
+        // 0x287F east/south clocktown
         [GroundVariants(0x1180, 0x289, 0x287F, 0x207F)]
+        [CheckRestricted(Scene.SouthClockTown, variant:0x287F,
+            check: Item.CollectableSouthClockTownHitTag1, Item.CollectableSouthClockTownHitTag2, Item.CollectableSouthClockTownHitTag3)]
         [CompanionActor(MothSwarm, ourVariant: -1, variant: 1, 2, 3, 4, 7)] // todo select specific variants that are lit
-        [UnkillableAllVariants]
+        [CompanionActor(Keese, ourVariant: -1, variant: 0x0, 0x2, 0x8002, 0x8004)] // todo select specific variants that are lit
+        [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
         [AlignedCompanionActor(MothSwarm, CompanionAlignment.Above, ourVariant: -1,
            variant: 1, 2, 3, 4, 7)] // they're free, and they are moths, makes sense
-        [EnemizerScenesExcluded(Scene.WoodfallTemple, Scene.SouthernSwamp, Scene.SouthClockTown, Scene.DekuShrine, Scene.WestClockTown, Scene.SouthernSwampClear,
+        [AlignedCompanionActor(Keese, CompanionAlignment.Above, ourVariant: -1,
+            variant: 0x0, 0x2, 0x8002, 0x8004)] // todo select specific variants that are lit
+        //Scene.SouthClockTown
+        [EnemizerScenesExcluded(Scene.WoodfallTemple, Scene.SouthernSwamp, Scene.DekuShrine, Scene.WestClockTown, Scene.SouthernSwampClear,
             Scene.SnowheadTemple, Scene.BeneathGraveyard, Scene.GreatBayCoast, Scene.GreatBayTemple, Scene.OceanSpiderHouse, Scene.BeneathTheWell, Scene.PiratesFortressRooms, Scene.PoeHut)]
-        [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
+        [UnkillableAllVariants]
         Torch = 0x39, // Obj_Syokudai
 
         [FileID(80)]
@@ -728,7 +734,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0)] // too much Bg is crash
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        [FlyingToGroundHeightAdjustment(250)]
+        [FlyingToGroundHeightAdjustment(275)]
         [EnemizerScenesPlacementBlock(
             Scene.Grottos, Scene.AstralObservatory, Scene.ZoraHallRooms, Scene.PiratesFortressRooms, Scene.DekuPalace,
             Scene.DekuShrine, Scene.GoronRacetrack, Scene.WaterfallRapids, Scene.GormanTrack, Scene.GoronRacetrack,
@@ -737,7 +743,8 @@ namespace MMR.Randomizer.GameObjects
             Scene.StockPotInn, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall, Scene.TradingPost, Scene.MayorsResidence,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
             Scene.SouthernSwamp, // dyna crash, remove if we get dyna overload detection working
-            Scene.BeneathTheWell, Scene.IkanaGraveyard, Scene.StoneTower)]
+            Scene.BeneathTheWell,
+            Scene.IkanaGraveyard, Scene.StoneTower)] // dyna crash
         //*/
         //[EnemizerScenesPlacementBlock(Scene.DekuPalace, Scene.BeneathTheWell, Scene.BeneathGraveyard, Scene.RoadToIkana, Scene.StoneTower)]
         UnusedStoneTowerStoneElevator = 0x4D, // Bg_F40_Flift
@@ -1645,7 +1652,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0)] // too much Bg is crash
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        [FlyingToGroundHeightAdjustment(250)]
+        [FlyingToGroundHeightAdjustment(275)]
         // TODO go through all of these and recheck now that we can modify the height correctly
         [EnemizerScenesPlacementBlock(//Scene.DekuPalace,
             Scene.Grottos, Scene.AstralObservatory, Scene.ZoraHallRooms, Scene.DampesHouse, Scene.PiratesFortressRooms,
@@ -1653,7 +1660,8 @@ namespace MMR.Randomizer.GameObjects
             Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.GoronShrine, Scene.DekuShrine, Scene.ZoraHall,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
             Scene.StockPotInn, Scene.TradingPost, Scene.MayorsResidence,
-            Scene.BeneathTheWell, Scene.IkanaGraveyard, Scene.StoneTower)]
+            Scene.BeneathTheWell,
+            Scene.IkanaGraveyard, Scene.StoneTower)] // dyna crash
         //[SwitchFlagsPlacement(mask: 0xFF, shift: 0)]
         UnusedStoneTowerPlatform = 0xC7, // Bg_F40_Swlift
 
@@ -2909,10 +2917,13 @@ namespace MMR.Randomizer.GameObjects
             Item.ChestHotSpringGrottoRedRupee,
             Item.UpgradeRazorSword, Item.UpgradeRazorSword)]
         // parameters unknown, they are not even and not time (time of spawn is a different parameter)
-        [WaterTopVariants(0x1FFE, 0x1FFD, 0x1000, 0x1004)]
+        [WaterTopVariants(0x1FFE, 0x1FFD, 0x1000, 0x1004)] // for replacement
+        //[PathingVariants(0x1FFD, 0x1FFE)] // 0x7F >> 2, 0x1FC
+        //[PathingTypeVarsPlacement(mask:0x7F, shift:2)]
         // TODO should we consider putting them on water top?
         // don't put too many in the world might run into BG issues
-        [VariantsWithRoomMax(max: 1, variant: 0x1FFE, 0x1FFD, 0x1000, 0x1004)]
+        [VariantsWithRoomMax(max: 2, variant: 0x1000, 0x1004)]
+        [VariantsWithRoomMax(max: 0, variant: 0x1FFE, 0x1FFD)] // pathing type, and we dont want them to path
         [UnkillableAllVariants]
         IceWaterPlatforms = 0x179, // Obj_Driftice
 
@@ -3912,7 +3923,8 @@ namespace MMR.Randomizer.GameObjects
         [WaterBottomVariants(0x00FF)]
         [CompanionActor(Flame, ourVariant: -1, 0x7FE)] // blue flames
         // uhhh what else
-        //[CheckRestricted(Scene.InvertedStoneTowerTemple, variant:-1,  Item.MundaneItemCuriosityShopBlueRupee)]
+        //[CheckRestricted(Scene.InvertedStoneTowerTemple, variant:-1,
+        //    Item.MundaneItemCuriosityShopBlueRupee, Item.)] // this is not easy to check if the poe scoop, could be princess leads to butler race
         [EnemizerScenesExcluded(Scene.InvertedStoneTowerTemple)]
         Poe = 0x1F3, // En_Poh
 
@@ -4580,7 +4592,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(526)]
         [CheckRestricted(Scene.NorthClockTown, variant: 0x83FF, Item.MaskBlast, Item.MaskAllNight, Item.NotebookMeetOldLady, Item.NotebookSaveOldLady,
             Item.MaskCouple, Item.NotebookEscapeFromSakonSHideout)]
-        [CheckRestricted(Scene.IkanaCanyon, variant: 0x85FF, Item.MaskCouple, Item.NotebookEscapeFromSakonSHideout)]
+        [CheckRestricted(Scene.IkanaCanyon, variant: 0x85FF, Item.MaskCouple, Item.NotebookEscapeFromSakonSHideout, Item.NotebookUniteAnjuAndKafei)]
         [CheckRestricted(Scene.CuriosityShop, variant: 0x83FF, Item.MaskBlast, Item.UpgradeBigBombBag,
             Item.MundaneItemCuriosityShopBlueRupee, Item.MundaneItemCuriosityShopRedRupee, Item.MundaneItemCuriosityShopPurpleRupee, Item.MundaneItemCuriosityShopGoldRupee)]
         // cannot remove because he shares objects with the bank
