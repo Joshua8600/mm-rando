@@ -1687,7 +1687,7 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableGoronRacetrackPot24, Item.CollectableGoronRacetrackPot25, Item.CollectableGoronRacetrackPot26,
             Item.CollectableGoronRacetrackPot27, Item.CollectableGoronRacetrackPot28, Item.CollectableGoronRacetrackPot29, Item.CollectableGoronRacetrackPot30
             )]
-        [CheckRestricted(Scene.TwinIslands, variant: -1, Item.ItemBottleGoronRace,
+        [CheckRestricted(Scene.TwinIslands, variant: -1, Item.ItemBottleGoronRace, Item.ChestToGoronRaceGrotto,
             Item.CollectableGoronRacetrackPot1, Item.CollectableGoronRacetrackPot2, Item.CollectableGoronRacetrackPot3,
             Item.CollectableGoronRacetrackPot4, Item.CollectableGoronRacetrackPot5, Item.CollectableGoronRacetrackPot6,
             Item.CollectableGoronRacetrackPot7, Item.CollectableGoronRacetrackPot8, Item.CollectableGoronRacetrackPot9, Item.CollectableGoronRacetrackPot10,
@@ -2915,7 +2915,8 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted( scene:Scene.MountainVillage, variant:-1, check: Item.MaskGoron,
             Item.CollectableMountainVillageWinterSmallSnowball3, Item.CollectableMountainVillageWinterSmallSnowball4,
             Item.ChestHotSpringGrottoRedRupee,
-            Item.UpgradeRazorSword, Item.UpgradeRazorSword)]
+            Item.UpgradeRazorSword, Item.UpgradeRazorSword,
+            Item.ItemWellCowMilk)]
         // parameters unknown, they are not even and not time (time of spawn is a different parameter)
         [WaterTopVariants(0x1FFE, 0x1FFD, 0x1000, 0x1004)] // for replacement
         //[PathingVariants(0x1FFD, 0x1FFE)] // 0x7F >> 2, 0x1FC
@@ -4031,7 +4032,8 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(473)]
         [ObjectListIndex(0x1DF)]
-        [CheckRestricted(Scene.GoronShrine, variant: 0x3FF1, Item.SongLullaby, Item.MaskDonGero)]
+        [CheckRestricted(Scene.GoronShrine, variant: 0x3FF1, Item.SongLullaby, Item.MaskDonGero,
+            Item.SongLullabyIntro)] // have to talk to kid to get intro from leader
         [CheckRestricted(Scene.GoronRacetrack, variant: 0x3FF1, Item.ItemBottleGoronRace)]
         //[CheckRestricted(Scene.TwinIslandsSpring, variant: 0x3FF1, Item.ItemBottleGoronRace)] // not sure this is required
         // all other versions are 0x13** or 0x1402

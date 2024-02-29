@@ -78,7 +78,7 @@ namespace MMR.Randomizer
         // outer list is item.category, inner list is items
         private static List<List<GameObjects.Item>> ActorizerKnownJunkItems { get; set; }
         private static Mutex EnemizerLogMutex = new Mutex();
-        private static bool ACTORSENABLED = true;
+        private static bool ACTORSENABLED = false;
         private static Random seedrng;
         private static Models.RandomizedResult _randomized;
         private static OutputSettings _outputSettings;
@@ -852,9 +852,9 @@ namespace MMR.Randomizer
 
             const int FORM_FD    = 0; // let me use enum as int without a cast and I'll use it
             const int FORM_GORON = 1;
-            const int FORM_ZORA  = 2;
-            const int FORM_DEKU  = 3;
-            const int FORM_CHILD = 4;
+            //const int FORM_ZORA  = 2;
+            //const int FORM_DEKU  = 3;
+            //const int FORM_CHILD = 4;
 
 
             var codeFile = RomData.MMFileList[31].Data;
@@ -1045,6 +1045,10 @@ namespace MMR.Randomizer
             var pohData = RomData.MMFileList[GameObjects.Actor.Poe.FileListIndex()].Data;
             pohData[0x3003] = 0x2;
 
+            // to pointerize milk bar we have to change the obj_sound actor in themilkbar
+            //SequenceUtils.ConvertSequenceSlotToPointer(seqSlotIndex: 0x56, substituteSlotIndex:0x1F, "mm-milk-bar-pointer"); // house
+            var milkbarScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkBar.FileID());
+            milkbarScene.Maps[0].Actors[17].Variants[0] = 0x13C; // from 0x156, the pointer, to 3C the actual milkbar song
 
             //LightShinanigans();
 
@@ -2683,6 +2687,7 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.FriendlyCucco)) continue;
@@ -4428,7 +4433,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 59.0\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 59.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
