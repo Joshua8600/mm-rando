@@ -95,6 +95,11 @@ namespace MMR.Randomizer.Extensions
             {
                 variants.AddRange(attrWall.Variants);
             }
+            var attrCeil = actor.GetAttribute<CeilingVariantsAttribute>();
+            if (attrCeil != null)
+            {
+                variants.AddRange(attrCeil.Variants);
+            }
             var attrPatrol = actor.GetAttribute<PathingVariantsAttribute>();
             if (attrPatrol != null)
             {
@@ -122,7 +127,7 @@ namespace MMR.Randomizer.Extensions
 
         public static List<Scene> ScenesRandomizationExcluded(this Actor actor)
         {
-            return actor.GetAttribute<EnemizerScenesExcludedAttribute>()?.ScenesExcluded ?? new List<Scene>();
+            return actor.GetAttribute<ForbidFromSceneAttribute>()?.ScenesExcluded ?? new List<Scene>();
         }
 
         public static List<int> GetUnPlacableVariants(this Actor actor)

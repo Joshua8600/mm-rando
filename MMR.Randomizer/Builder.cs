@@ -69,7 +69,7 @@ namespace MMR.Randomizer
             RomData.TargetSequences = RomData.TargetSequences.OrderBy(x => random.Next()).ToList(); // random ordered slots
 
             // if we have lots of music, let's randomize skulltula house and ikana well to have something unique that isn't cave music
-            if (RomData.SequenceList.Count > 80 && RomData.SequenceList.FindAll(u => u.Type.Contains(2)).Count >= 8 + 2){ // tested by asking for all targetseq that have a category of 2, counted (8)
+            if (RomData.SequenceList.Count > 80 && RomData.SequenceList.FindAll(u => u.Categories.Contains(2)).Count >= 8 + 2){ // tested by asking for all targetseq that have a category of 2, counted (8)
                 SequenceUtils.ReassignSongSlots(log, random);
             }
             SequenceUtils.ResetBudget();
@@ -97,7 +97,7 @@ namespace MMR.Randomizer
 
                 if (foundValidReplacement == false) // no available songs fit in this slot category
                 {
-                    WriteOutput($"No song fits in [{targetSlot.Name}] slot, with categories: " + String.Join(", ", targetSlot.Type.Select(x => "0x" + x.ToString("X2"))));
+                    WriteOutput($"No song fits in [{targetSlot.Name}] slot, with categories: " + String.Join(", ", targetSlot.Categories.Select(x => "0x" + x.ToString("X2"))));
                     // loosen song restrictions and re-attempt
                     SequenceUtils.TryBackupSongPlacement(targetSlot, log, unassigned, settings);
                 }
@@ -153,7 +153,7 @@ namespace MMR.Randomizer
             SequenceUtils.ResetFreeBankIndex();
             if (_cosmeticSettings.Music == Music.Random)
             {
-                SequenceUtils.PointerizeSequenceSlots();
+                SequenceUtils.PointerizeSequenceSlots(settings, _randomized.Settings.RandomizeEnemies);
                 BGMShuffle(random, settings);
                 ResourceUtils.ApplyHack(Resources.mods.remove_morning_music);
             }
@@ -1501,7 +1501,7 @@ namespace MMR.Randomizer
         {
             if (_randomized.Settings.RandomizeEnemies)
             {
-                Enemies.ShuffleEnemies(outputSettings, _cosmeticSettings, _randomized, _randomized.Seed);
+                Enemies.ShuffleEnemies(outputSettings, _cosmeticSettings, _randomized);
             }
         }
 
@@ -1681,6 +1681,7 @@ namespace MMR.Randomizer
                 hacks.Add(Resources.mods.safer_glitches_fix_4thday_mayor);
                 hacks.Add(Resources.mods.safer_glitches_fix_4thday_gossip);
                 hacks.Add(Resources.mods.safer_glitches_fix_4thday_deku_playground);
+                hacks.Add(Resources.mods.safer_glitches_fix_0thday_4thday_town_shooting);
             }
 
             if (_randomized.Settings.BombchuDrops)
@@ -1699,6 +1700,41 @@ namespace MMR.Randomizer
             {
                 ReadWriteUtils.WriteCodeNOP(0x800DF44C);
                 ReadWriteUtils.WriteCodeNOP(0x800DF450);
+            }
+
+            if (_randomized.Settings.TakeDamageWhileShielding)
+            {
+                hacks.Add(Resources.mods.take_damage_while_shielding);
+            }
+
+            if (_randomized.Settings.TakeDamageFromVoid)
+            {
+                hacks.Add(Resources.mods.take_damage_from_void);
+            }
+
+            if (_randomized.Settings.TakeDamageFromDog)
+            {
+                hacks.Add(Resources.mods.take_damage_from_dog);
+            }
+
+            if (_randomized.Settings.TakeDamageFromGorons)
+            {
+                hacks.Add(Resources.mods.take_damage_from_goron);
+            }
+
+            if (_randomized.Settings.TakeDamageGettingCaught)
+            {
+                hacks.Add(Resources.mods.take_damage_from_caught);
+
+                if (_randomized.Settings.LogicMode != LogicMode.Vanilla)
+                {
+                    hacks.Add(Resources.mods.sonata_check_gentle_throw);
+                }
+            }
+
+            if (_randomized.Settings.TakeDamageFromGibdosFaster)
+            {
+                hacks.Add(Resources.mods.take_damage_from_gibdo_immediately);
             }
 
             foreach (var hack in hacks)

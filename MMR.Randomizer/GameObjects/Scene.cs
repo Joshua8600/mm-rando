@@ -109,10 +109,16 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x14)]
         // TODO come up with a way to make sure that one spot isn't blocking without hardcoding
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PatrollingPirate,
-            Actor.Obj_Iceblock,// can block the stairs
-            Actor.Torch, Actor.LargeCrate, Actor.SmallWoodenBox, Actor.Bombiwa, Actor.ClocktowerGearsAndOrgan, // boring
-            Actor.CuccoChick, Actor.En_Ani, Actor.CutsceneZelda, Actor.OOTPotionShopMan, Actor.WoodenBarrel, Actor.IkanaGravestone // boring
-            )] 
+            //Actor.RegularIceBlock // should be covered by block sensitive now
+            // Actor.LargeCrate, .SmalActorlWoodenBox, Actor.WoodenBarrel,  // these should only be free actors lets let them show up again
+            //Actor.ClocktowerGearsAndOrgan, // blocking
+            Actor.Bombiwa, Actor.Torch,  // boring
+            Actor.CuccoChick, Actor.En_Ani, Actor.IkanaGravestone // boring
+            )]
+        [EnemizerSceneBlockSensitive(Actor.PatrollingPirate,
+            0x14EA, // bottom of ladder
+            0x18EA, // bridge to chest room
+            0xEA)] // top of ladder -> bridge
         PiratesFortress = 0x11,
 
         [FileID(1173)]
@@ -160,7 +166,8 @@ namespace MMR.Randomizer.GameObjects
         [FairyDroppingEnemies(roomNumber: 3, actorNumber: 3)] // west wing, skulltula:3
         [FairyDroppingEnemies(roomNumber: 5, actorNumber: 22)] // east wing, beehive:22
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Dinofos, // weak enemies are kinda lame here
-            Actor.Leever, Actor.ChuChu, Actor.DekuBabaWithered)]
+            Actor.Leever, Actor.ChuChu, Actor.DekuBabaWithered,
+            Actor.Hiploop)] // dies instantly in the water
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula, 
             Actor.BigPoe)] // I think this was an issue? other than being annoying I mean
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bo,
@@ -206,8 +213,9 @@ namespace MMR.Randomizer.GameObjects
         //    Actor.WarpDoor, Actor.WarpToTrialEntrance, Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.IkanaGravestone, Actor.Tijo)]
         [EnemizerSceneBlockSensitive(Actor.Wolfos, -1)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RedBubble, // spawns in hot lava, keep wood enemies out
-            Actor.Peahat, Actor.MadShrub, Actor.Postbox, Actor.DekuBaba, Actor.DekuBabaWithered, Actor.Freezard, Actor.Eeno, Actor.Wolfos, Actor.Dinofos, Actor.Snapper)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bo, // spawns in hot lava, keep wood enemies out
+            Actor.Peahat, Actor.MadShrub, Actor.Postbox, Actor.DekuBaba, Actor.DekuBabaWithered,
+            Actor.Freezard, Actor.RegularIceBlock, Actor.Eeno, Actor.Wolfos, Actor.Dinofos, Actor.Snapper)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bo,
             Actor.Bombiwa /* Actor.RegularIceBlock, Actor.IkanaCanyonHookshotStump, */ )] // could block the fairy bubble
         [EnemizerSceneBlockSensitive(Actor.Bo, -1)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Freezard,
@@ -216,7 +224,9 @@ namespace MMR.Randomizer.GameObjects
             Actor.DragonFly, // if you kill it at long range or such that its dying body falls to first floor it wont count
             Actor.WarpDoor, // Cannot walk through them to get to the chest under
             Actor.Wolfos)] // wolfos: ice wolfos can push the regular actual dog backwards through the wall
-        [EnemizerSceneBlockSensitive(Actor.Freezard, 5)] // can block access to the elevator
+        [EnemizerSceneBlockSensitive(Actor.Freezard,
+            2, // can block the chest
+            5)] // can block access to the elevator
         [FairyDroppingEnemies(roomNumber: 11, actorNumber: 2, 3)] // dinofos 
         SnowheadTemple = 0x1E,
 
@@ -254,7 +264,10 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1276)]
         [SceneInternalId(0x25)]
         // to randomize the signs, I added another object and changed the signs to bombiwa, the code expects bombiwa
-        [EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)]
+        //[EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.Bombiwa, // blocking a few skulltulla
+            Actor.RegularIceBlock, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
+            Actor.Bumper, Actor.ClocktowerGearsAndOrgan)]
         PinnacleRock = 0x22,
 
         [FileID(1278)]
@@ -298,7 +311,9 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // can block the stairs
             //Actor.RegularIceBlock,  // the big one can be too big
             Actor.Dexihand)] // if it grabs you as you fall into a grotto hole it can hardlock
+        [EnemizerSceneEnemyReplacementBlock(Actor.Bombiwa, Actor.ClocktowerGearsAndOrgan)] // likely dynacrash if other actors have them too
         [EnemizerSceneBlockSensitive(Actor.Torch, -1)]
+        [EnemizerSceneBlockSensitive(Actor.Monkey, -1)] // giant ice block, unused stone stuff at least
         DekuPalace = 0x28,
 
         [FileID(1308)]
@@ -311,6 +326,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ClayPot,
             Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DekuBaba,
+            Actor.RegularIceBlock, // I dont want to block on all of them, but the big one is a problem for peahat grotto
             Actor.LikeLike)] // can grab you on grotto exit and softlock with only one heart, TODO make special code instead moving them?
         // these actors are only seen in the credits, we should block all large object actors from these spots to save generation time
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ViscenMoonLeaveCutscene,
@@ -355,6 +371,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1324)]
         [SceneInternalId(0x34)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Treee,
+                        Actor.Hiploop)] // water explosion
         TradingPost = 0x31,
 
         [FileID(1326)]
@@ -415,6 +433,7 @@ namespace MMR.Randomizer.GameObjects
         // mirror blocks climbing
         [EnemizerSceneEnemyReplacementBlock(Actor.BadBat,
             Actor.Bo, Actor.StoneTowerMirror,
+            Actor.MothSwarm, // can block
             Actor.SpiderWeb)] // TODO would be cool if we could allow this if the item was junk, or logic require fire arrows
         [EnemizerSceneBlockSensitive(Actor.BadBat, -1)] // giant ice block, unused stone stuff at least
         RoadToSouthernSwamp = 0x3D,
@@ -477,6 +496,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.BigPoe)] // for some reason big poe in the first room can cause camera to lock, unknown reason
         [EnemizerSceneEnemyReplacementBlock(Actor.Dexihand,
             Actor.Bumper)] // can block the water channel
+        [EnemizerSceneEnemyReplacementBlock(Actor.SkullFish,
+            Actor.Desbreko)] // lag
         [FairyDroppingEnemies(roomNumber: 8, actorNumber: 7)] // skulltula in first room
         [EnemizerSceneBlockSensitive(Actor.Dexihand, -1)]
         GreatBayTemple = 0x46,
@@ -551,6 +572,9 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1444)]
         [SceneInternalId(0x59)]
         [EnemizerSceneBlockSensitive(Actor.BlueBubble, -1)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Poe,
+            Actor.Bo)] // can block the whole assension
+
         InvertedStoneTower = 0x56,
 
         [FileID(1446)]
@@ -666,6 +690,8 @@ namespace MMR.Randomizer.GameObjects
         //Actor.RegularIceBlock)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
             Actor.LikeLike)] // If you start with one heart this can be a softlock
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Postbox,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // Flying can block the roof leading to the chest
         [EnemizerSceneBlockSensitive(Actor.BombersYouChase, -1)] // chicken holder leads to a chest
         EastClockTown = 0x69,
 
