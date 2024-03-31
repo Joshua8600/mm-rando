@@ -317,7 +317,6 @@ namespace MMR.Randomizer.GameObjects
         // This actor is modified by custom MMRA, type 0 is now random count, -1 is single
         [FlyingVariants(0xFFFF)] // 0 works, but OOT used FFFF
         [GroundVariants(0xFFFF)] // 0 works, but OOT used FFFF
-        [WaterTopVariants(0xFFFF)]  // 0 works, but OOT used FFFF
         [DifficultVariants(0x2)]
         Shabom = 0x1D, // En_Bubble, the flying bubbles from Jabu Jabu, exist only in giants cutscenes
 
@@ -745,7 +744,6 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(mask: 0x7E, shift: 9)]
         //[GroundVariants(0)] // params are ignored, uses params as a variable for setting
         [FlyingVariants(0)]
-        [WaterTopVariants(0)]
         [VariantsWithRoomMax(max: 1, variant: 0)] // too much Bg is crash
         [UnkillableAllVariants]
         [BlockingVariantsAll]
@@ -1299,6 +1297,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0xED)]
         Obj_Lift = 0x95, // Obj_Lift
 
+        // wait is this not rainbow? what is this? TODO
         [FileID(140)]
         [ObjectListIndex(0xEC)]
         HookshotBlock = 0x96, // Obj_Hsblock
@@ -1667,7 +1666,6 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x5C)]
         //[GroundVariants(0)]
         [FlyingVariants(0)]
-        [WaterTopVariants(0)]
         [VariantsWithRoomMax(max: 1, variant: 0)] // too much Bg is crash
         [UnkillableAllVariants]
         [BlockingVariantsAll]
@@ -2305,9 +2303,13 @@ namespace MMR.Randomizer.GameObjects
                         0x003F, // goron trial
                         0x1000, 0x0B00, 0x0C00, 0x600, 0x002B)] // snowheattemple
         [CeilingVariants(0xFF01, 0xFF00, 0xFF02 )]
+        [EnemizerScenesPlacementBlock(Scene.GormanTrack, // dyna crash on trees
+            Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.StoneTower)] // assumed same as above
+        [VariantsWithRoomMax(max:1, variant: 0x1000, 0x0B00, 0x0C00, 0x600, 0x002B, 0x003F, 0x700, 0xD00, 0xA00)]
         [UnkillableAllVariants]
         IceCavernStelagtite = 0x11F, // Bg_Icicle // also stalagmite
 
+        // what
         [FileID(260)]
         [ObjectListIndex(0x6)]
         En_Syateki_Crow = 0x120, // En_Syateki_Crow
@@ -3425,7 +3427,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [OnlyOneActorPerRoom]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 9)] // 0xFE00
-        [ForbidFromScene(Scene.Woodfall, Scene.Snowhead, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple)]
+        [ForbidFromScene(Scene.Woodfall, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple)]
         ElfBubble = 0x1B1, // En_Elfbub
 
         Empty1B2 = 0x1B2,
@@ -3631,9 +3633,11 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [ObjectListIndex(0x1AD)]
         [FileID(418)]
-        [CheckRestricted(Item.CollectableSnowheadTempleIceBlockRoomItem1,
+        [CheckRestricted(Item.ItemSnowheadKey2,
+                         Item.CollectableSnowheadTempleIceBlockRoomItem1,
                          Item.CollectableSnowheadTempleIceBlockRoomItem2,
-                         Item.CollectableSnowheadTempleIceBlockRoomItem3)] // should be just for the sht scene but thats the only place it shows up
+                         Item.CollectableSnowheadTempleIceBlockRoomItem3 // should be just for the sht scene but thats the only place it shows up
+            )] 
         // FF01 is the ice blocking the path north
         // 0x5AXX seems to be the blocking path ice walls from snowhead temple
         //[CeilingVariants(0x5A00)] // we dont want t remove, and placing them on the floor 
@@ -3643,7 +3647,7 @@ namespace MMR.Randomizer.GameObjects
         [BlockingVariantsAll]
         [VariantsWithRoomMax(max:0, variant:0x5A00)]
         [ForbidFromScene(Scene.TerminaField)]
-        NorthTFIceBlock = 0x1C8, // Obj_BigIcicle
+        LargeBreakableIceDrop = 0x1C8, // Obj_BigIcicle
 
         [ActorizerEnabled]
         [FileID(419)]
@@ -4592,7 +4596,6 @@ namespace MMR.Randomizer.GameObjects
         [FlyingToGroundHeightAdjustment(15)]
         [FlyingVariants(0x0)]
         [GroundVariants(0x0)]
-        [WaterTopVariants(0x0)]
         [VariantsWithRoomMax(variant: 0, max: 1)]
         [EnemizerScenesPlacementBlock(Scene.StoneTower, Scene.IkanaGraveyard, // too much dyna
             Scene.SouthernSwamp, Scene.SouthernSwampClear,
@@ -5051,7 +5054,8 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)]
         [VariantsWithRoomMax(max:1, variant:0)]
         [UnkillableAllVariants]
-        [EnemizerScenesPlacementBlock(Scene.TerminaField, Scene.GreatBayCoast)]
+        [EnemizerScenesPlacementBlock(Scene.TerminaField, Scene.GreatBayCoast,
+            Scene.SouthernSwamp)] // dyna crash suspect, even if not in the second room
         [ForbidFromScene(Scene.IkanaCanyon, Scene.RoadToIkana)] // do not remove original
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
         IkanaCanyonHookshotStump = 0x25E, // Obj_HsStump
@@ -5141,7 +5145,6 @@ namespace MMR.Randomizer.GameObjects
         // params is number of gulls
         // exception: 0x100 is following player
         [FlyingVariants(7, 5)]
-        [WaterTopVariants(4,6)] // non-vanilla
         [UnkillableAllVariants]
         [FlyingToGroundHeightAdjustment(500)]
         [VariantsWithRoomMax(max: 2, variant: 7, 5)] // > severe lag over 10
