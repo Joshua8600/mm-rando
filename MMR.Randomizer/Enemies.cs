@@ -43,6 +43,7 @@ namespace MMR.Randomizer
         public int ObjectId  = 0;
         public int fileID    = 0;
         public int ObjectFid = 0;
+        public (int poly, int vert) DynaLoad = (-1, -1);
 
         // if all new actor, we meed to know where the old vram start was when we shift VRAM for the actor
         public uint buildVramStart = 0;
@@ -132,90 +133,154 @@ namespace MMR.Randomizer
             FreeOnlyCandidateList = freeOnlyCandidates.Select(act => new Actor(act)).ToList();
         }
 
-        private static void PrepareJunkSpiderTokens(List<GameObjects.Item> addedJunkItems, List<(string, string)> allSphereItems)
+        private static void PrepareJunkSpiderTokens(List<(string, string)> allSphereItems)
         {
             List<GameObjects.Item> allSpiderTokens = _randomized.ItemList.FindAll(item => item.Item.ItemCategory() == GameObjects.ItemCategory.SkulltulaTokens).Select(u => u.Item).ToList();
 
-            // I used to do this but now that we have sphere its faster because the sphere list is smaller datasize
-            // check the token reward itself
-            //var swampSkullReward = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.MaskTruth).Item;
-            // check if the important items has a token (which might tell us all tokens are required to 
-            //if (ItemUtils.IsJunk(swampSkullReward) )
+            if ((_randomized.Settings.VictoryMode & Models.VictoryMode.SkullTokens) > 0)
+                return; // victory mode for fairies is enabled, none are junk: leave early
 
-            var swampTokenImportantSearch = allSphereItems.Any(u => u.Item1 == "Swamp Skulltula Spirit");
-            if (!swampTokenImportantSearch)
+            void AddTokens(string tokenSearch)
             {
-                var swampTokens = allSpiderTokens.FindAll(token => token.Name().Contains("Swamp")).ToList();
-                addedJunkItems.AddRange(swampTokens);
+                var tokensSearched = allSpiderTokens.FindAll(token => token.Name().Contains(tokenSearch)).ToList();
+                ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.SkulltulaTokens].AddRange(tokensSearched);
             }
 
-            var oceanTokenImportantSearch = allSphereItems.Any(u => u.Item1 == "Ocean Skulltula Spirit");
-            if (!oceanTokenImportantSearch)
+            if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic)
             {
-                var oceanTokens = allSpiderTokens.FindAll(token => token.Name().Contains("Ocean")).ToList();
-                addedJunkItems.AddRange(oceanTokens);
+                var swampSkullReward = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.MaskTruth).Item;
+                // check if the reward is important, if not add them 
+                if (junkCategories.Contains(swampSkullReward.ItemCategory() ?? GameObjects.ItemCategory.None))
+                {
+                    AddTokens("Swamp");
+                }
+
+                var oceanSkullReward1 = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.UpgradeGiantWallet).Item;
+                var oceanSkullReward2 = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.MundaneItemOceanSpiderHouseDay2PurpleRupee).Item;
+                var oceanSkullReward3 = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.MundaneItemOceanSpiderHouseDay3RedRupee).Item;
+                // check if the reward is important, if not add them 
+                if (junkCategories.Contains(oceanSkullReward1.ItemCategory() ?? GameObjects.ItemCategory.None)
+                    && junkCategories.Contains(oceanSkullReward2.ItemCategory() ?? GameObjects.ItemCategory.None)
+                    && junkCategories.Contains(oceanSkullReward3.ItemCategory() ?? GameObjects.ItemCategory.None))
+                {
+                    AddTokens("Ocean");
+                }
+
+            }
+            else
+            {
+                // we have logic, just use the logic spheres
+
+                var swampTokenImportantSearch = allSphereItems.Any(u => u.Item1 == "Swamp Skulltula Spirit");
+                if (!swampTokenImportantSearch)
+                {
+                    AddTokens("Swamp");
+                }
+
+                var oceanTokenImportantSearch = allSphereItems.Any(u => u.Item1 == "Ocean Skulltula Spirit");
+                if (!oceanTokenImportantSearch)
+                {
+                    AddTokens("Ocean");
+                }
             }
         }
 
-        private static void PrepareJunkStrayFairies(List<GameObjects.Item> addedJunkItems, List<(string, string)> allSphereItems)
+        private static void PrepareJunkStrayFairies(List<(string, string)> allSphereItems)
         {
-            var allFaries = _randomized.ItemList.FindAll(item => item.Item.ClassicCategory() == GameObjects.ClassicCategory.StrayFairies).Select(u => u.Item).ToList();
+            var allFaires = _randomized.ItemList.FindAll(item => item.Item.ClassicCategory() == GameObjects.ClassicCategory.StrayFairies).Select(u => u.Item).ToList();
 
-            // I used to do this but now that we have sphere its faster because the sphere list is smaller datasize
-            //var woodfallFairyReward = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.FairySpinAttack).Item;
-            //if (ItemUtils.IsJunk(woodfallFairyReward))
-            var woodfallStrayFairyImportantSearch = allSphereItems.Any(u => u.Item1 == "Woodfall Stray Fairy");
-            if (!woodfallStrayFairyImportantSearch)
+            if ((_randomized.Settings.VictoryMode & Models.VictoryMode.Fairies) > 0)
+                return; // victory mode for fairies is enabled, none are junk: leave early
+
+            void AddFairies(string tokenSearch)
             {
-                var woodfallFairies = allFaries.FindAll(token => token.Name().Contains("Woodfall")).ToList();
-                addedJunkItems.AddRange(woodfallFairies);
+                var fairySearched = allFaires.FindAll(token => token.Name().Contains(tokenSearch)).ToList();
+                ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.StrayFairies].AddRange(fairySearched);
             }
 
-            var snowheadStrayFairyImportantSearch = allSphereItems.Any(u => u.Item1 == "Snowhead Stray Fairy");
-            if (!snowheadStrayFairyImportantSearch)
+            if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic)
             {
-                var snowheadFairies = allFaries.FindAll(token => token.Name().Contains("Snowhead")).ToList();
-                addedJunkItems.AddRange(snowheadFairies);
-            }
+                void AddBasedOnResult(GameObjects.Item item, string str)
+                {
+                    var reward = _randomized.ItemList.Find(i => i.NewLocation == item).Item;
+                    // check if reward is junk, if so add all fairies 
+                    if (junkCategories.Contains(reward.ItemCategory() ?? GameObjects.ItemCategory.None))
+                    {
+                        AddFairies(str);
+                    }
+                }
 
-            var greatbayStrayFairyImportantSearch = allSphereItems.Any(u => u.Item1 == "Great Bay Stray Fairy");
-            if (!greatbayStrayFairyImportantSearch)
-            {
-                var greatbayFairies = allFaries.FindAll(token => token.Name().Contains("Great Bay")).ToList();
-                addedJunkItems.AddRange(greatbayFairies);
-            }
+                AddBasedOnResult(GameObjects.Item.FairySpinAttack, "Woodfall");
+                AddBasedOnResult(GameObjects.Item.FairyDoubleMagic, "Snowhead");
+                AddBasedOnResult(GameObjects.Item.FairyDoubleDefense, "Great Bay");
+                AddBasedOnResult(GameObjects.Item.ItemFairySword, "Stone Tower");
 
-            var stonetowerStrayFairyImportantSearch = allSphereItems.Any(u => u.Item1 == "Stone Tower Stray Fairy");
-            if (!stonetowerStrayFairyImportantSearch)
+            }
+            else
             {
-                var stoneTowerFairies = allFaries.FindAll(token => token.Name().Contains("Stone Tower")).ToList();
-                addedJunkItems.AddRange(stoneTowerFairies);
+                // I used to do this but now that we have sphere its faster because the sphere list is smaller datasize
+                //var woodfallFairyReward = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.FairySpinAttack).Item;
+                //if (ItemUtils.IsJunk(woodfallFairyReward))
+
+                void AddBasedOnSphere(string testToken, string searchToken)
+                {
+                    var search = allSphereItems.Any(u => u.Item1 == testToken);
+                    // check if any of the fairies are considered important, if they aren't then they are junk 
+                    if (!search)
+                    {
+                        AddFairies(searchToken);
+                    }
+                }
+
+                AddBasedOnSphere("Woodfall Stray Fairy", "Woodfall");
+                AddBasedOnSphere("Snowhead Stray Fairy", "Snowhead");
+                AddBasedOnSphere("Great Bay Stray Fairy", "Great Bay");
+                AddBasedOnSphere("Stone Tower Stray Fairy", "Stone Tower");
             }
         }
 
-        private static void PrepareJunkNotebookEntries(List<GameObjects.Item> addedJunkItems, List<(string, string)> allSphereItems)
+        private static void PrepareJunkNotebookEntries(List<(string, string)> allSphereItems)
         {
             /// Notebook entries are junk IF the settings do not specify getting all notebook is required to beat the seed
 
-            var notebookEntryImportantSearch = allSphereItems.Any(u => u.Item1.Contains("Notebook:"));
-            if (!notebookEntryImportantSearch)
+            if ((_randomized.Settings.VictoryMode & Models.VictoryMode.Notebook) > 0)
+                return; // victory mode for notebook entries is enabled, none are junk: leave early
+
+            void AddNotebookEntires()
             {
                 var notebookEntries = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.NotebookEntries).Select(itemObj => itemObj.Item).ToList();
-                addedJunkItems.AddRange(notebookEntries);
+                ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.NotebookEntries].AddRange(notebookEntries);
+                ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.MainInventory].Add(GameObjects.Item.ItemNotebook);
             }
-        }
 
-        private static void PrepareKegEntry(List<GameObjects.Item> addedJunkItems, List<(string, string)> allSphereItems)
-        {
-            var kegImportantSearch = allSphereItems.Any(u => u.Item1 == "Powder Keg");
-            if (!kegImportantSearch)
+            if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic)
             {
-                //VanillaEnemyList.Add(GameObjects.Actor.)
+                var reward = _randomized.ItemList.Find(i => i.NewLocation == GameObjects.Item.MaskFierceDeity).Item;
+                // check if reward is junk, if so add all fairies 
+                if (junkCategories.Contains(reward.ItemCategory() ?? GameObjects.ItemCategory.None))
+                    AddNotebookEntires();
+            }
+            else
+            {
+                // check if any notebook entries are in the list of important items
+                var notebookEntryImportantSearch = allSphereItems.Any(u => u.Item1.Contains("Notebook:"));
+                if (!notebookEntryImportantSearch)
+                    AddNotebookEntires();
             }
 
         }
 
-        private static void PrepareJunkScoopList(List<GameObjects.Item> addedJunkItems, List<(string, string)> allSphereItems)
+        private static void PrepareKegEntry(List<(string, string)> allSphereItems)
+        {
+            //var kegImportantSearch = allSphereItems.Any(u => u.Item1 == "Powder Keg");
+            //if (!kegImportantSearch)
+            //{
+                //VanillaEnemyList.Add(GameObjects.Actor.)
+            //}
+
+        }
+
+        private static void PrepareJunkScoopList(List<(string, string)> allSphereItems)
         {
             // if the scoops are vanilla they can never be considered junk
 
@@ -236,52 +301,30 @@ namespace MMR.Randomizer
             var scoopItems = _randomized.ItemList.FindAll(item => item.Item.ItemCategory() == GameObjects.ItemCategory.ScoopedItems);
             var unImportantScoops = scoopItems.FindAll(scoop => importantBottleItems.Count(important => important.Item2 == scoop.Item.Name()) == 0);
 
-            //scoopItems.RemoveAll(importantScoops);
-            List<GameObjects.Item> itemList = unImportantScoops.Select(itemObj => itemObj.Item).ToList();
-            addedJunkItems.AddRange(itemList);
+            List<GameObjects.Item> scoopList = unImportantScoops.Select(itemObj => itemObj.Item).ToList();
+            //addedJunkItems.AddRange(itemList);
+            ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.ScoopedItems].AddRange(scoopList);
         }
 
-
-        private static void PrepareJunkOrganizeLists(List<GameObjects.Item> addedJunkItems)
+        private static void PrepareJunkHeartPieces()
         {
-            /// We need to clone JunkItems and remove items we want to keep,
-            /// add our new junk items, and generate list of item list (per-category)
-
-            var listOfItemsPerCategory = new List<List<GameObjects.Item>>();
-
-            // because I don't trust isJunk, I am going to pull a copy, modify it, then add it to my list
-            var curatedIsJunkList = ItemUtils.JunkItems.ToList();
-            curatedIsJunkList.Remove(GameObjects.Item.UpgradeRoyalWallet);
-            curatedIsJunkList.Remove(GameObjects.Item.IkanaScrubGoldRupee);
-            curatedIsJunkList.Remove(GameObjects.Item.MundaneItemCuriosityShopGoldRupee);
-            curatedIsJunkList.Remove(GameObjects.Item.CollectableIkanaGraveyardDay2Bats1); // Crimson
-            foreach (var silver in curatedIsJunkList.FindAll(item => item.ItemCategory() == GameObjects.ItemCategory.SilverRupees))
+            // if no logic, we want to add these since those crazy people think hearts are junk
+            if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic)
             {
-                curatedIsJunkList.Remove(silver);
+                var heartPieces = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.PiecesOfHeart).Select(itemObj => itemObj.Item).ToList();
+                ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.PiecesOfHeart].AddRange(heartPieces);
+
+                var recoveryHearts = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.RecoveryHearts).Select(itemObj => itemObj.Item).ToList();
+                ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.RecoveryHearts].AddRange(recoveryHearts);
             }
-
-            curatedIsJunkList.Remove(GameObjects.Item.IceTrap); // Requested because the actor being removed can give away traps for now
-            curatedIsJunkList.Remove(GameObjects.Item.BombTrap); // Requested because the actor being removed can give away traps for now
-
-            // for speed of lookup later, we are going to split items per category into buckets to reduce search time
-            // first, generate list of list with curated junk
-            foreach (var category in Enum.GetValues(typeof(GameObjects.ItemCategory)).Cast<GameObjects.ItemCategory>())
-            {
-                var newJunkListByCategory = curatedIsJunkList.FindAll(item => item.ItemCategory() == category);
-                listOfItemsPerCategory.Add(newJunkListByCategory);
-            }
-
-            // second, add our new junk items that we selected
-            foreach (var item in addedJunkItems)
-            {
-                var category = (int)item.ItemCategory();
-
-                listOfItemsPerCategory[category].Add(item);
-            }
-
-            ActorizerKnownJunkItems = listOfItemsPerCategory;
         }
 
+        private static void PrepareJunkRedRupee()
+        {
+            var redRupees = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.RedRupees).Select(itemObj => itemObj.Item).ToList();
+            redRupees.Remove(GameObjects.Item.CollectableIkanaGraveyardDay2Bats1);
+            ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.RedRupees].AddRange(redRupees);
+        }
 
         private static void PrepareJunkItems()
         {
@@ -289,31 +332,34 @@ namespace MMR.Randomizer
             ///  solution: add more items that we check ourselves, and remove some junk items we want to allow
 
             var addedJunkItems = new List<GameObjects.Item>();
-            ActorizerKnownJunkItems = new List<List<GameObjects.Item>>(); // blank in case of no logic
 
-            if (_randomized.Spheres == null) return; // this is no logic and we can't know anything
-
-            List<(string item, string location)> allSphereItems = _randomized.Spheres.SelectMany(u => u).ToList();
-
-            if (_randomized.Settings.LogicMode == Models.LogicMode.Casual
-                || _randomized.Settings.LogicMode == Models.LogicMode.Glitched)
+            // probably a better way to init a list of list to size, but not known
+            ActorizerKnownJunkItems = new List<List<GameObjects.Item>>(); // init
+            foreach (var category in Enum.GetValues(typeof(GameObjects.ItemCategory)))
             {
-                // for casual and glitched logic these items can be detect as non-important
-                // user logic might do something crazy, not sure this code works at all in no-logic
-                PrepareJunkSpiderTokens(addedJunkItems, allSphereItems);
-                PrepareJunkStrayFairies(addedJunkItems, allSphereItems);
-                PrepareJunkNotebookEntries(addedJunkItems, allSphereItems);
-                PrepareJunkScoopList(addedJunkItems, allSphereItems);
-                // all heart pieces <- already not considered junk
-                // all transformation and non-transofrmation mask <- already not considered junk
-                // all boss remains <- already not considered junk
+                ActorizerKnownJunkItems.Add(new List<GameObjects.Item>());
             }
+
+            var allSphereItems = new List<(string item, string location)>();
+            if (_randomized.Settings.LogicMode != Models.LogicMode.NoLogic)
+            {
+                allSphereItems = _randomized.Spheres.SelectMany(u => u).ToList();
+            }
+
+            PrepareJunkSpiderTokens(allSphereItems);
+            PrepareJunkStrayFairies(allSphereItems);
+            PrepareJunkNotebookEntries(allSphereItems);
+            PrepareJunkScoopList(allSphereItems);
+            PrepareJunkHeartPieces(); // no logic only
+            PrepareJunkRedRupee(); // crimson counts, and thats stupid and not fair, removing
+            // all transformation and non-transofrmation mask <- already not considered junk
+            // all boss remains <- already not considered junk
 
             // keg? not handle-able here
             // koume?
 
-            // todo: why not just add to list by category first instead of scanning
-            PrepareJunkOrganizeLists(addedJunkItems);
+            // this should no longer be required now that we build the list of lists first
+            //PrepareJunkOrganizeLists(addedJunkItems); // sets ActorizerKnownJunkItems
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -335,7 +381,7 @@ namespace MMR.Randomizer
 
         #region Read and Write Scene Actors and Objects
 
-        public static List<Actor> GetSceneEnemyActors(Scene scene)
+        public static List<Actor> GetSceneEnemyActors(Scene scene, StringBuilder log)
         {
             /// Gets all actors in a scene, that we want to randomize
             /// this function is separate from object because actors and objects are a different list in the scene/room data
@@ -367,8 +413,15 @@ namespace MMR.Randomizer
                             mapActor.Type = matchingEnemy.GetType(mapActor.OldVariant);
                             mapActor.AllVariants = Actor.BuildVariantList(matchingEnemy);
                             mapActor.Blockable = mapActor.ActorEnum.IsBlockable(scene.SceneEnum, actorNumber);
+
                             sceneEnemyList.Add(mapActor);
                         }
+                        #if DEBUG
+                        else
+                        {
+                            log.Append($" in scene [{scene.SceneEnum}][{mapIndex}] actor was skipped over: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}]\n");
+                        }
+                        #endif
                     }
                 }
             }
@@ -376,15 +429,17 @@ namespace MMR.Randomizer
         }
 
         // if one of these already exists somewhere in the logic I did not find it
-        public static List<GameObjects.ItemCategory> junkCategories = new List<GameObjects.ItemCategory>{
+        public static readonly List<GameObjects.ItemCategory> junkCategories = new List<GameObjects.ItemCategory>{
             GameObjects.ItemCategory.GreenRupees,
             GameObjects.ItemCategory.BlueRupees,
-            GameObjects.ItemCategory.RedRupees, // should be lots of money in other locations this should be junk
+            //GameObjects.ItemCategory.RedRupees, // crimson rup in this list, removed by building into our own list
             GameObjects.ItemCategory.Arrows,
             GameObjects.ItemCategory.Bombs,
             GameObjects.ItemCategory.DekuSticks,
             GameObjects.ItemCategory.DekuNuts,
+            GameObjects.ItemCategory.Fairy,
             GameObjects.ItemCategory.GreenPotions,
+            GameObjects.ItemCategory.None, // think this was mostly used for traps
             GameObjects.ItemCategory.MagicJars
         };
 
@@ -393,8 +448,6 @@ namespace MMR.Randomizer
             /// problem: ItemUtils.IsJunk only cares about never-important items like rups
             ///  and ItemUtils.IsLogicalJunk cares about logic too strongly and can junk cool things like swords
             ///  goal: use IsJunk and add extra conditions that can happen
-
-            if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic) return ItemUtils.IsJunk(itemInCheck);
 
             // we need to build a list of known junk items and check that list here
             var category = itemInCheck.ItemCategory() ?? GameObjects.ItemCategory.None;
@@ -405,9 +458,11 @@ namespace MMR.Randomizer
                 return true;
             }
 
-            return ItemUtils.IsJunk(itemInCheck);
+            //return ItemUtils.IsJunk(itemInCheck);
+            return junkCategories.Contains(category);
         }
 
+        // todo move to actorutils
         private static bool ObjectIsCheckBlocked(Scene scene, GameObjects.Actor testActor)
         {
             /// checks if randomizing the actor would interfere with getting access to a check
@@ -435,7 +490,7 @@ namespace MMR.Randomizer
                         var itemIsNotJunk = ! IsActorizerJunk(itemInCheck);
                         if (itemIsNotJunk)
                         {
-                            return true;
+                            return true; // blocked
                         }
                     }
 
@@ -508,8 +563,21 @@ namespace MMR.Randomizer
             }// */
             if (testActor == GameObjects.Actor.Postbox)
             {
-                GameObjects.Item[] checksPostBoxLeadsTo = { GameObjects.Item.TradeItemMamaLetter, GameObjects.Item.MaskKeaton, GameObjects.Item.HeartPiecePostBox, GameObjects.Item.MaskCouple,
-                    GameObjects.Item.NotebookDepositLetterToKafei};
+                GameObjects.Item[] checksPostBoxLeadsTo = {
+                    GameObjects.Item.TradeItemMamaLetter,
+                    GameObjects.Item.NotebookDeliverPendant,
+                    GameObjects.Item.TradeItemPendant,
+                    GameObjects.Item.NotebookPromiseKafei,
+                    GameObjects.Item.MaskKeaton,
+                    GameObjects.Item.HeartPiecePostBox,
+                    GameObjects.Item.MaskCouple,
+                    GameObjects.Item.NotebookDepositLetterToKafei,
+                    GameObjects.Item.NotebookMeetKafei,
+                    GameObjects.Item.NotebookCuriosityShopManSGift,
+                    GameObjects.Item.NotebookMeetCuriosityShopMan,
+                    GameObjects.Item.NotebookPromiseCuriosityShopMan,
+                    GameObjects.Item.NotebookUniteAnjuAndKafei
+                };
                 if (_randomized.ImportantLocations!= null && _randomized.ImportantLocations.Union(checksPostBoxLeadsTo).Count() > 0)
                 {
                     // if we need a mailbox, keep one
@@ -677,9 +745,10 @@ namespace MMR.Randomizer
             BlockBabyGoronIfNoSFXRando();
             FixArmosSpawnPos();
             RandomizeTheSongMonkey();
+            MoveTheISTTTunnelTransitionBack();
+            FixSwordSchoolPotRandomization();
 
             Shinanigans();
-            //ObjectIsItemBlocked();
         }
 
         public static void EnemizerLateFixes()
@@ -724,9 +793,14 @@ namespace MMR.Randomizer
             stonetowertempleScene.Maps[3].Actors[19].Position.x = 1530;
 
             // in WFT, the dinofos spawn is near the roof, lower
-            // TODO: do secret shrine too maybe if we randomize
             var woodfalltempleScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.WoodfallTemple.FileID());
             woodfalltempleScene.Maps[7].Actors[0].Position.y = -1208;
+
+            // same in secret shrine, all three dinofos are in the air
+            var secretShrineScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SecretShrine.FileID());
+            secretShrineScene.Maps[2].Actors[0].Position.y = 0;
+            secretShrineScene.Maps[2].Actors[1].Position.y = 0;
+            secretShrineScene.Maps[2].Actors[2].Position.y = 0;
 
             // one of the snappers is right in front of the chest, if actorizer, that actor could be something that doesnt have to be killable, could block the chest
             woodfalltempleScene.Maps[6].Actors[1].Position.z = -55; // room 7, z was -25, 
@@ -863,6 +937,23 @@ namespace MMR.Randomizer
                 gormanInResidence = mayorsResitenceScene.Maps[2].Actors[1];
                 gormanInResidence.Rotation.y = ActorUtils.MergeRotationAndFlags(180 + 45, gormanInResidence.Rotation.y);
 
+                // bombers hideout torch is facing a funny way
+                var bombersHideoutScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.AstralObservatory.FileID());
+                var blastWallTorch = bombersHideoutScene.Maps[0].Actors[15];
+                blastWallTorch.Rotation.y = ActorUtils.MergeRotationAndFlags(270, blastWallTorch.Rotation.y); // face the bombable wall
+                // and move a bit away from the far wall
+                blastWallTorch.Position.z -= 40;
+
+                // the gibdos in ikana canyon, two of them are basically on top of each other can lead to weird shinanigans
+                var ikanaCanyonScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaCanyon.FileID());
+                var doubledGibdo = ikanaCanyonScene.Maps[0].Actors[64];
+                doubledGibdo.Position = new vec16(-602, 400, 972);
+
+                // in spring there are two torches on top of each other, which is weird, move the other one to face the first one
+                //var mountainVillageSpring = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillageSpring.FileID());
+                //var secondTorch = mountainVillageSpring.Maps[0].Actors[13];
+                //secondTorch.Rotation.y = ActorUtils.MergeRotationAndFlags(180, secondTorch.Rotation.y);
+                //secondTorch.Position.z -= 50;
             }
         }
 
@@ -1707,11 +1798,12 @@ namespace MMR.Randomizer
             // we want both ground or water types, so we are going to use multiple actors
             var randomActorCandidates = new List<(GameObjects.Actor actor, short vars)>
             {
-                (GameObjects.Actor.LikeLike, 0x2), // water bottom type
+                (GameObjects.Actor.LikeLike, 0x2),  // water bottom type
+                (GameObjects.Actor.Mikau, 0xC0F),   // water surface type
                 (GameObjects.Actor.GoGoron, 0x7FC1) // ground type (race track goron, stretching)
             };
-            int coinFlip = rng.Next(2);
-            var coinTossResultActor = randomActorCandidates[coinFlip];
+            int randomValue = rng.Next(randomActorCandidates.Count);
+            var coinTossResultActor = randomActorCandidates[randomValue];
 
             var grottosScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
             var hotspringDekuBaba = grottosScene.Maps[14].Actors.FindAll(a => a.ActorEnum == GameObjects.Actor.DekuBabaWithered);
@@ -1730,6 +1822,12 @@ namespace MMR.Randomizer
             farEntry.Position   = new vec16(6936, -22, 824);
             leftEntry.Position  = new vec16(6935, -24, 1072);
             rightEntry.Position = new vec16(7160, -24, 916);
+            if (farEntry.ActorEnum == GameObjects.Actor.Mikau) // surface type, move up to water top
+            {
+                farEntry.Position.y = 0;
+                leftEntry.Position.y = 0;
+                rightEntry.Position.y = 0;
+            }
 
             // baba have no face, so they don't get a rotation normally, they would all face the same direction,
             // turn them to face the center of the pool and each other
@@ -2320,6 +2418,35 @@ namespace MMR.Randomizer
             dekuPalaceScene.Maps[0].Actors[11].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180-40, flags: dekuPalaceScene.Maps[0].Actors[11].Rotation.y);
         }
 
+        public static void MoveTheISTTTunnelTransitionBack()
+        {
+            /// the room tranition for the scene is very close to the edge of the dexihand
+            /// this presents a problem for enemizer if playing no hit rules
+
+            var isttSceneData = RomData.MMFileList[GameObjects.Scene.InvertedStoneTowerTemple.FileID()].Data;
+            isttSceneData[0xD7] = 0xBC; // 294 -> 2BC, from pos.x = 660 to 700
+            var sceneClass = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.InvertedStoneTowerTemple.FileID());
+            // move the switch a little up the hallway
+            sceneClass.Maps[3].Actors[28].Position.x = 800;
+        }
+
+        private static void FixSwordSchoolPotRandomization()
+        {
+            /// we cannot randomize the pots in swordschool because its dungeon keep object pots,
+            ///   that means those pots require dungeon keep which we cannot swap out, and actorizer quits early when it cannot find the object for these
+            /// however the pots just need a regular pot object, its a small scene with space for one, and the object list has 7 objects
+            ///   which means we can expand the list and add another pot object
+
+            if (!ReplacementListContains(GameObjects.Actor.ClayPot)) return;
+
+            var swordSchoolScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SwordsmansSchool.FileID());
+            swordSchoolScene.Maps[0].Objects.Add(GameObjects.Actor.ClayPot.ObjectIndex()); // add clay pot object
+
+            // room file header 0xB describes object list offset in the file, but also describes size to load into memory, need to increase to 8
+            var swordSchoolRoom0 = RomData.MMFileList[GameObjects.Scene.SwordsmansSchool.FileID() + 1].Data; // 1434
+            swordSchoolRoom0[0x29] = 8; // increase object list to 8
+        }
+
 
         #endregion
 
@@ -2621,6 +2748,15 @@ namespace MMR.Randomizer
                     UpdateStrayFairyHeight(testActor);
                 }
 
+                var wallVariants = testActor.OldActorEnum.GetAttribute<WallVariantsAttribute>();
+                // for now I want this manually just for dexihand: rotate forward a touch because its on a wall
+                if (testActor.ActorEnum == GameObjects.Actor.Dexihand && testActor.OldActorEnum != GameObjects.Actor.Dexihand
+                    && wallVariants != null && wallVariants.Variants.Contains(testActor.OldVariant))
+                {
+                    // pitch down a bit
+                    testActor.Rotation.x = ActorUtils.MergeRotationAndFlags(45, flags: testActor.Rotation.x);
+                }
+
             }
             thisSceneData.Log.AppendLine(" ---------- ");
         }
@@ -2831,6 +2967,9 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Guay)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.RomaniRanch, GameObjects.Actor.Treee, GameObjects.Actor.BadBat)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.BioDekuBaba, GameObjects.Actor.Lilypad)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Dinofos)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
@@ -2847,11 +2986,19 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.IkanaGravestone)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.BoatCruiseTarget)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.Wolfos, GameObjects.Actor.Gomess)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.WoodfallTemple, GameObjects.Actor.DekuBaba, GameObjects.Actor.DragonFly)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.Keese, GameObjects.Actor.UnusedStoneTowerPlatform)) continue; 
+                //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.ReDead, GameObjects.Actor.OceanSpiderhouseBombableWall)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.PinnacleRock, GameObjects.Actor.Bombiwa, GameObjects.Actor.Japas)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.RomaniYts)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SwampSpiderHouse, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Woodfall, GameObjects.Actor.Lilypad, GameObjects.Actor.IceBlockWaterPlatforms)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoGoron, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.Dexihand)) continue;
+
+                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.LikeLike, GameObjects.Actor.MagicSlab)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Leever, GameObjects.Actor.ButlersSon)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.SwimmingZora, GameObjects.Actor.LabFish)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.Monkey, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoGoron, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBaba, GameObjects.Actor.BombersYouChase)) continue;
@@ -3050,7 +3197,7 @@ namespace MMR.Randomizer
 
                         // if the actor is in a kill all enemy room, reduce the chances of boring enemies from showing up here
                         if ((oldActor.MustNotRespawn 
-                            && !(thisSceneData.Scene.SceneEnum == GameObjects.Scene.WoodfallTemple && oldActor.Room == 9)
+                            && !(thisSceneData.Scene.SceneEnum == GameObjects.Scene.WoodfallTemple && oldActor.Room == 9) // dark room exception
                             && !containsFairyDroppingEnemy) && seedrng.Next(100) < 25)
                         {
                             newEnemy.RemoveEasyEmemies();
@@ -3735,7 +3882,7 @@ namespace MMR.Randomizer
             WriteOutput($" starting timestamp : [{DateTime.Now.ToString("hh:mm:ss.fff tt")}]");
             #endregion
 
-            thisSceneData.Actors = GetSceneEnemyActors(scene);
+            thisSceneData.Actors = GetSceneEnemyActors(scene, thisSceneData.Log);
             if (thisSceneData.Actors.Count == 0)
             {
                 return; // if no enemies, no point in continuing
@@ -3979,6 +4126,7 @@ namespace MMR.Randomizer
 
             SetSceneEnemyObjects(scene, thisSceneData.ChosenReplacementObjectsPerMap);
             SceneUtils.UpdateScene(scene); // writes scene actors back to binary
+
             WriteOutput($" time to complete randomizing [{scene.SceneEnum}]: " + GET_TIME(thisSceneData.StartTime) + "ms");
             WriteOutput($" ending timestamp : [{DateTime.Now.ToString("hh:mm:ss.fff tt")}]");
             FlushLog();
@@ -4065,13 +4213,23 @@ namespace MMR.Randomizer
                     newInjectedActor.limitedVariants.Add(new VariantsWithRoomMax(max, variant));
                     continue;
                 }
+                if (command == "dyna_load")
+                {
+                    var newDynaValuePair = valueStr.Split(",").ToList();
+                    var intBase = newDynaValuePair[0].Contains("0x") ? 16 : 10;
+                    newInjectedActor.DynaLoad.poly = Convert.ToInt32(newDynaValuePair[0].Trim(), intBase);
+                    intBase = newDynaValuePair[0].Contains("0x") ? 16 : 10;
+                    newInjectedActor.DynaLoad.vert = Convert.ToInt32(newDynaValuePair[1].Trim(), intBase);
+                    continue;
+                }
+
 
                 var value = Convert.ToInt32(valueStr, fromBase: 16);
                 if (command == "actor_id")
                 {
                     newInjectedActor.ActorId = value;
                 }
-                if (command == "obj_id")
+                else if (command == "obj_id")
                 {
                     newInjectedActor.ObjectId = value;
                 }
@@ -4639,7 +4797,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 62.2\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 64.2\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
@@ -4666,12 +4824,16 @@ namespace MMR.Randomizer
         // sum of object size
         public List<int> ObjectList;
         public int ObjectRamSize;
+        public int DynaPolySize;
+        public int DynaVertSize;
         public int[] objectSizes; //debug
         // list of enemies that were used to make this
         public List<Actor> oldActorList = null;
 
         public BaseEnemiesCollection(List<Actor> actorList, List<int> objList, Scene s)
         {
+            /// values per day/night
+
             oldActorList = actorList;
             //var distinctActors = actorList.Select(act => act).DistinctBy(act => act);
             var distinctActors = actorList.DistinctBy(act => act);
@@ -4683,6 +4845,16 @@ namespace MMR.Randomizer
             this.ObjectRamSize = objectSizes.Sum();
 
             this.CalculateDefaultObjectUse(s);
+
+            this.DynaPolySize = 0;
+            this.DynaVertSize = 0;
+            for (int act = 0; act < actorList.Count; act++)
+            {
+                var actor = actorList[act];
+                this.DynaPolySize += actor.DynaLoad.poly;
+                this.DynaVertSize += actor.DynaLoad.vert;
+            }
+
         }
 
         public void CalculateDefaultObjectUse(Scene s)
@@ -4756,6 +4928,7 @@ namespace MMR.Randomizer
         }
 
         // init for new replacements
+        // this doesnt set actors anywhere tho, just objects, misnomer?
         public void SetNewActors(Scene scene, List<ValueSwap> newObjChanges)
         {
             // this is the slowest part of our bogo sort, we need to try speeding it up
@@ -4802,6 +4975,13 @@ namespace MMR.Randomizer
                 return false;
             }
 
+            var dynatest = isDynaSizeAcceptable();
+            if (dynatest != "acceptable")
+            {
+                log.AppendLine($" ---- bogo REJECTED: dyna are too big (by {dynatest})");
+                return false;
+            }
+
             for (int map = 0; map < oldMapList.Count; ++map) // per map
             {
                 // pos diff is smaller
@@ -4816,6 +4996,8 @@ namespace MMR.Randomizer
                     log.AppendLine($" ---- bogo REJECTED: map {map} does not meed RAM requirements for NIGHT");
                     return false;
                 }
+
+                // compare dyna requirements
 
             }
             return true; // all of them passed size test
@@ -4881,6 +5063,44 @@ namespace MMR.Randomizer
             return 0;
         }
 
+        public string isDynaSizeAcceptable()
+        {
+            for (int map = 0; map < oldMapList.Count; ++map)
+            {
+                // pull dynaheadroom for the scene, if there isnt one continue
+                var dynaHeadroomAttr = SceneUtils.GetSceneDynaAttributes(this.Scene.SceneEnum, map);
+                if (dynaHeadroomAttr == null) continue; // this room has none
+
+                // compare headroom to actual
+                var dayPolyDiff = this.newMapList[map].day.DynaPolySize - this.oldMapList[map].day.DynaPolySize;
+                if (dayPolyDiff >  dynaHeadroomAttr.Polygon)
+                {
+                    return $"map [{map}] day poly: [{dayPolyDiff}]";
+                }
+
+                var dayVertDiff = this.newMapList[map].day.DynaVertSize - this.oldMapList[map].day.DynaVertSize;
+                if (dayVertDiff > dynaHeadroomAttr.Polygon)
+                {
+                    return $"map [{map}] day vert: [{dayVertDiff}]";
+                }
+
+                var nightPolyDiff = this.newMapList[map].night.DynaPolySize - this.oldMapList[map].night.DynaPolySize;
+                if (nightPolyDiff > dynaHeadroomAttr.Polygon)
+                {
+                    return $"map [{map}] day poly: [{nightPolyDiff}]";
+                }
+
+                var nightVertDiff = this.newMapList[map].night.DynaVertSize - this.oldMapList[map].night.DynaVertSize;
+                if (nightVertDiff > dynaHeadroomAttr.Polygon)
+                {
+                    return $"map [{map}] day vert: [{nightVertDiff}]";
+                }
+            }
+
+            return "acceptable";
+        }
+
+
         // print to log function
         public void PrintAllMapRamObjectOutput(StringBuilder log)
         {
@@ -4888,6 +5108,13 @@ namespace MMR.Randomizer
                 log.AppendLine(text + " ratio: [" + ((float) newv / (float) oldv).ToString("F4")
                     + "] newsize: [" + newv.ToString("X6") + "] oldsize: [" + oldv.ToString("X6") + "]");
             }
+            void PrintCombineDeltaNewOld(string text, int newv, int oldv)
+            {
+                log.AppendLine(text + " delta: [" + (newv - oldv).ToString()
+                    + "] newsize: [" + newv.ToString("X6") + "] oldsize: [" + oldv.ToString("X6") + "]");
+            }
+
+
 
             if (newMapList == null)
             {
@@ -4910,12 +5137,16 @@ namespace MMR.Randomizer
                 PrintCombineRatioNewOld("  day:    overlay ", newMapList[map].day.OverlayRamSize,   oldMapList[map].day.OverlayRamSize);
                 PrintCombineRatioNewOld("  day:    struct  ", newMapList[map].day.ActorInstanceSum, oldMapList[map].day.ActorInstanceSum);
                 PrintCombineRatioNewOld("  day:    total  =", newDTotal, oldDTotal);
-                PrintCombineRatioNewOld("  day:    object  ", newMapList[map].day.ObjectRamSize, oldMapList[map].day.ObjectRamSize);
 
                 PrintCombineRatioNewOld("  night:  overlay ", newMapList[map].night.OverlayRamSize,   oldMapList[map].night.OverlayRamSize);
                 PrintCombineRatioNewOld("  night:  struct  ", newMapList[map].night.ActorInstanceSum, oldMapList[map].night.ActorInstanceSum);
                 PrintCombineRatioNewOld("  night:  total  =", newNTotal, oldNTotal);
+
+                log.AppendLine($"  ------------------------------------------------------ ");
+
+                PrintCombineRatioNewOld("  day:    object  ", newMapList[map].day.ObjectRamSize, oldMapList[map].day.ObjectRamSize);
                 PrintCombineRatioNewOld("  night:  object  ", newMapList[map].night.ObjectRamSize, oldMapList[map].night.ObjectRamSize);
+
 
                 // print map objects size
                 var hexString = "";
@@ -4925,10 +5156,16 @@ namespace MMR.Randomizer
                 }
                 var size = newMapList[map].day.objectSizes.Sum().ToString("X");
                 var allSize = newMapList[map].day.ObjectRamSize.ToString("X");
-                log.AppendLine($" object sizes: [ {hexString}]");
+                log.AppendLine($"   object sizes: [ {hexString}]");
                 log.AppendLine($"    sum: [0x{size}] allsize: [0x{allSize}]");
-                log.AppendLine($" ------------------------------------------------- ");
+                log.AppendLine($"  ------------------------------------------------------ ");
 
+                PrintCombineDeltaNewOld("  day:    dyna poly  ", newMapList[map].day.DynaPolySize, oldMapList[map].day.DynaPolySize);
+                PrintCombineDeltaNewOld("  day:    dyna vert  ", newMapList[map].day.DynaVertSize, oldMapList[map].day.DynaVertSize);
+                PrintCombineDeltaNewOld("  night:  dyna poly  ", newMapList[map].night.DynaPolySize, oldMapList[map].night.DynaPolySize);
+                PrintCombineDeltaNewOld("  night:  dyna vert  ", newMapList[map].night.DynaVertSize, oldMapList[map].night.DynaVertSize);
+
+                log.AppendLine($" ------------------------------------------------- ");
             }
         } // end PrintAllMapRamObjectOutput
     } // end actorsCollection

@@ -11,6 +11,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1160)]
         [SceneInternalId(0x12)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(Actor.Toto,
             Actor.Dexihand, Actor.LikeLike)] // hand can stop you talking to mother
         [EnemizerSceneEnemyReplacementBlock(Actor.Secretary,
@@ -46,6 +47,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1137)]
         [SceneInternalId(0x00)]
+        [DynaHeadroom(12, 9)] // unknown, I know two organs is crash, two in different rooms so one budget per room is too much
         [EnemizerSceneEnemyReplacementBlock(Actor.Octarok,
             Actor.Wolfos, // can attack you off the boat
             Actor.LikeLike)] // can grab you on the boat ride
@@ -78,14 +80,18 @@ namespace MMR.Randomizer.GameObjects
             Actor.RegularIceBlock)] // blocking actors
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DekuBabaWithered, // grottos are common, this can get silly
             Actor.Peahat, Actor.Beamos, Actor.LikeLike, Actor.Freezard, //, Actor.BomberHideoutGuard // annoying
+            Actor.Seagulls, // with new height adjust its basically invisible
             Actor.Hiploop// water causes instant death
             //Actor.Bumper, Actor.UnusedStoneTowerStoneElevator, Actor.UnusedStoneTowerPlatform, Actor.RegularIceBlock,
             /*Actor.ClocktowerGearsAndOrgan /*, Actor.PatrollingPirate */ )]
-        [EnemizerSceneBlockSensitive(Actor.DekuBabaWithered, -1)]
+        [EnemizerSceneBlockSensitive(Actor.DekuBabaWithered, -1)] // can block the chest
         [EnemizerSceneBlockSensitive(Actor.DekuBaba, -1)] // this this is required to keep it off of withered as well
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BioDekuBaba,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // they can extend so far they can block the door leading out
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoldSkulltula,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can get the player locked behind them near the grotto stones
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HoneyComb,
+            Actor.Seagulls, // weird
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can get the player locked behind them near the grotto stones
         Grottos = 0x0A,
 
@@ -147,6 +153,7 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x18)]
         [FairyDroppingEnemies(roomNumber: 1, actorNumber: 3)] // eygore 
         [FairyDroppingEnemies(roomNumber: 1, actorNumber: 1)] // wizrobe
+        [ClearEnemyPuzzleRooms(4)] // wizrobe room is a clear all room
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DeathArmos,
             Actor.PatrollingPirate)] // casual, causes a need for stone mask to procede through the temple
         InvertedStoneTowerTemple = 0x15,
@@ -161,12 +168,15 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1208)]
         [SceneInternalId(0x1B)]
+        [DynaHeadroom(32,32)]  // low default to start
         [ClearEnemyPuzzleRooms(4, 6, 7, 8, 9)] // 4: mapchest, 6: snapper room, 7: bow room, 8: BK, 9:dark
         [FairyDroppingEnemies(roomNumber: 1, actorNumber: 4, 34)] // wooden flower room, deku baba and stray fairy in bubble
         [FairyDroppingEnemies(roomNumber: 3, actorNumber: 3)] // west wing, skulltula:3
         [FairyDroppingEnemies(roomNumber: 5, actorNumber: 22)] // east wing, beehive:22
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Dinofos, // weak enemies are kinda lame here
             Actor.Leever, Actor.ChuChu, Actor.DekuBabaWithered,
+            Actor.Hiploop)] // dies instantly in the water
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper,
             Actor.Hiploop)] // dies instantly in the water
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula, 
             Actor.BigPoe)] // I think this was an issue? other than being annoying I mean
@@ -177,6 +187,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DragonFly,
             Actor.GiantBeee)] // issue being that the one that spins around and doesnt agro hard requires a ranged weapon because the spawn is so high
         [EnemizerSceneBlockSensitive(Actor.Bo, -1)]
+        [EnemizerSceneBlockSensitive(Actor.SwampSpiderHouseCutableIvy, -1)]
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper,
         //    Actor.WarpDoor, Actor.ClocktowerGearsAndOrgan)] // Snapper spawns just on top of its chest, its possible a non-killable actor is placed int he wya
         [EnemizerSceneBlockSensitive(Actor.Snapper, -1)]
@@ -188,6 +199,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1224)]
         [SceneInternalId(0x1D)]
+        [ClearEnemyPuzzleRooms(5)] // wizrobe room
         IkanaCastle = 0x1A,
 
         [FileID(1235)]
@@ -263,6 +275,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1276)]
         [SceneInternalId(0x25)]
+        [DynaHeadroom(64, 64)]  // low default to start
         // to randomize the signs, I added another object and changed the signs to bombiwa, the code expects bombiwa
         //[EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Bombiwa, // blocking a few skulltulla
@@ -276,6 +289,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1284)]
         [SceneInternalId(0x27)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // blocking a few skulltulla
             Actor.Bombiwa //Actor.StockpotBell, Actor.IkanaGravestone,  Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
             /*Actor.Bumper, Actor.ClocktowerGearsAndOrgan*/)]
@@ -284,17 +298,20 @@ namespace MMR.Randomizer.GameObjects
             /*Actor.Bumper, Actor.ClocktowerGearsAndOrgan*/)]
         [EnemizerSceneBlockSensitive(Actor.Torch, -1)]
         [EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)]
+        [EnemizerSceneBlockSensitive(Actor.SwampSpiderHouseCutableIvy, -1)]
         // old, should no longer be needed: Actor.En_Ani, Actor.GoronElder, Actor.Cow, Actor.Tijo , Actor.Postbox,
         SwampSpiderHouse = 0x24,
 
         [FileID(1291)]
         [SceneInternalId(0x28)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(Actor.SkulltulaDummy,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // Can block the ability to reach rafters to get a skulltoken
         OceanSpiderHouse = 0x25,
 
         [FileID(1298)]
         [SceneInternalId(0x29)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(Actor.Scarecrow,
             Actor.ClocktowerGearsAndOrgan)] // can block the stairs
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch,
@@ -308,6 +325,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1304)]
         [SceneInternalId(0x2B)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // can block the stairs
             //Actor.RegularIceBlock,  // the big one can be too big
             Actor.Dexihand)] // if it grabs you as you fall into a grotto hole it can hardlock
@@ -322,6 +340,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1310)]
         [SceneInternalId(0x2D)]
+        //[DynaHeadroom(0, 0)] // unknown but it seems higher than most 0x64/0x3D is safe
+        [DynaHeadroom(0x64,0x3D)] // tested safe
         // this actor is mostly ignored, player might not even notice, dont waste lots of object budget on this thing
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ClayPot,
             Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
@@ -342,7 +362,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CarpentersFromCutscene,
                         Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
         //*/
-        TerminaField = 0x2A,
+        TerminaField = 0x2A, // keikoku, c800 dyna size
 
         [FileID(1312)]
         [SceneInternalId(0x2E)]
@@ -362,11 +382,13 @@ namespace MMR.Randomizer.GameObjects
         // inside of the goron village main building, with the goron shop and merrygoround
         [FileID(1319)]
         [SceneInternalId(0x32)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneBlockSensitive(Actor.GoGoron, -1)] // ice block can block shop
         GoronShrine = 0x2F,
 
         [FileID(1322)]
         [SceneInternalId(0x33)]
+        [DynaHeadroom(64, 64)]  // low default to start
         ZoraHall = 0x30,
 
         [FileID(1324)]
@@ -375,9 +397,12 @@ namespace MMR.Randomizer.GameObjects
                         Actor.Hiploop)] // water explosion
         TradingPost = 0x31,
 
+        // the only "small" dyna poly scene... but why
         [FileID(1326)]
         [SceneInternalId(0x35)]
-        RomaniRanch = 0x32,
+        // we know nothing here, TODO recheck
+        [DynaHeadroom(12,9, room: 0)] 
+        RomaniRanch = 0x32, // F01, 0xF000 dyna size
 
         [FileID(1328)]
         [SceneInternalId(0x36)]
@@ -385,12 +410,15 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1330)]
         [SceneInternalId(0x37)]
+        [DynaHeadroom(64, 64)]  // low default to start
+        //[DynaHeadroom(16,12, room:0)] // we know 16/12 is safe, that might be too conservative
         [EnemizerSceneEnemyReplacementBlock(Actor.Seagulls,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can stop ting from falling
         GreatBayCoast = 0x34,
 
         [FileID(1332)]
         [SceneInternalId(0x38)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(Actor.LikeLike,
                     Actor.Japas, Actor.Bombiwa, Actor.BronzeBoulder, Actor.Mimi, Actor.TreasureChest)] // small blocking
          //    Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.Tijo,
@@ -407,6 +435,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1336)]
         [SceneInternalId(0x3B)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch,
             Actor.ClocktowerGearsAndOrgan, Actor.RegularIceBlock)]
         PiratesFortressExterior = 0x38,
@@ -429,6 +458,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1347)]
         [SceneInternalId(0x40)]
+        [DynaHeadroom(64, 64)]  // low default to start
         // respawning bo can show up here, but I dont want to mark the whole room to not place respawning enemies
         // mirror blocks climbing
         [EnemizerSceneEnemyReplacementBlock(Actor.BadBat,
@@ -449,6 +479,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1353)]
         [SceneInternalId(0x43)]
+        [DynaHeadroom(0,0)] // seems very low, for now disable
         [EnemizerSceneEnemyReplacementBlock(Actor.Dampe,
             Actor.Treee)]// for some reason big poe in the first room can cause camera to lock, unknown reason
         [EnemizerSceneBlockSensitive(Actor.Dampe, -1)]
@@ -460,6 +491,11 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1358)]
         [SceneInternalId(0x45)]
+        // has to be smaller than 24, 16 as one ikana stump in room zero was an issue
+        //... but one 28,16 swlift was working fine???
+        // one lily(12, 8) plus one darmani grave (10, 8) and one ice platform(22,13) was too much tho (43,29)
+        [DynaHeadroom(28, 16, room: 0)]
+        [DynaHeadroom(28, 16, room: 2)]
         //[EnemizerSceneEnemyReplacementBlock(Actor.DekuBabaWithered, // bit annoying 
         //    Actor.Peahat, Actor.LikeLike, Actor.Freezard)]
         //[EnemizerSceneEnemyReplacementBlock(Actor.DragonFly, // blocks deku flying 
@@ -472,6 +508,11 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1362)]
         [SceneInternalId(0x46)]
+        // 16 lilypads: 192,128,
+        // replaced by 12 platforms and one elevator
+        // (12x28,16) + (12,8) = 348, and that is 20 over the limit
+        // 348 - 192 - 22 = 134 max poly
+        [DynaHeadroom(130,116, room:2)]  // 116 is estimate
         //  we want the hiploop to be non-blocking actors, making them killable with this flag does the job
         [FairyDroppingEnemies(roomNumber: 24, actorNumber: 25, 26)] // hiploops
         [EnemizerSceneEnemyReplacementBlock(Actor.Hiploop, // respawning bo can show up here, but I dont want to mark the whole room to not place respawning enemies
@@ -490,6 +531,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1369)]
         [SceneInternalId(0x49)]
+        // 8 biobabas in the ceiling caused crash in room 8, at 10x8 and we went over by 7, so 72 should be safe
+        [DynaHeadroom(68,68)]
         //3: clear the biobabas, 5 is gekko, 8 is wart
         [ClearEnemyPuzzleRooms(3, 5, 7)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Skulltula,
@@ -547,8 +590,10 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1433)]
         [SceneInternalId(0x54)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Clock,
             Actor.BadBat, Actor.GoldSkulltula, Actor.RealBombchu)] // z-targetable can be annoying in the sword test
+        [EnemizerSceneBlockSensitive(Actor.KendoSensei, -1)]
         SwordsmansSchool = 0x51,
 
         [FileID(1434)]
@@ -565,6 +610,10 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1442)]
         [SceneInternalId(0x58)]
+        // one swlift, 0x1C/0x10: works
+        // one swlift, 3 cuttable ivy, 0x22/0x1C, works
+        // two swlift was fine?? how did I even get crashes previously??
+        [DynaHeadroom(38, 32)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Beamos,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block the whole assension
         StoneTower = 0x55,
@@ -572,13 +621,16 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1444)]
         [SceneInternalId(0x59)]
         [EnemizerSceneBlockSensitive(Actor.BlueBubble, -1)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Poe,
-            Actor.Bo)] // can block the whole assension
-        [ClearEnemyPuzzleRooms(4)] // wizrobe room is a clear all room
+        // the fuck is this? even if I meant for this to be in the temple it still makes no sense
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Poe,
+        //    Actor.Bo)] // can block the whole assension
         InvertedStoneTower = 0x56,
 
         [FileID(1446)]
         [SceneInternalId(0x5A)]
+        [DynaHeadroom(64, 64)]  // low default to start
+        [EnemizerSceneEnemyReplacementBlock(Actor.HoneyComb,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // until I change the combs to be wall or flying only this is weird
         MountainVillageSpring = 0x57,
 
         [FileID(1449)]
@@ -587,19 +639,22 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1451)]
         [SceneInternalId(0x5C)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneBlockSensitive(originalEnemy: Actor.Flagpole, -1)] // ice block can stop access to the whole dungeon
         [EnemizerSceneEnemyReplacementBlock(Actor.Bo,
-            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block the twisted path into snowhead
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block the twisted path into snowhead temple
         Snowhead = 0x59,
 
         [FileID(1453)]
         [SceneInternalId(0x5D)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Wolfos,
-            /* Actor.UnusedStoneTowerPlatform,*/ Actor.UnusedStoneTowerStoneElevator)] // can be so wide they block the hot spring grotto
+        [DynaHeadroom(64, 64)]  // low default to start
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Wolfos,
+        //    /* Actor.UnusedStoneTowerPlatform,*/ Actor.UnusedStoneTowerStoneElevator)] // can be so wide they block the hot spring grotto
         TwinIslands = 0x5A,
 
         [FileID(1455)]
         [SceneInternalId(0x5E)]
+        [DynaHeadroom(64, 64)]  // low default to start
         TwinIslandsSpring = 0x5B,
 
         [FileID(1457)]
@@ -608,7 +663,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1459)]
         [SceneInternalId(0x60)]
-        [ClearEnemyPuzzleRooms(2,3,4,5)]
+        [ClearEnemyPuzzleRooms(2,3,4,5)] // the miniboss rooms
         SecretShrine = 0x5D,
 
         [FileID(1466)]
@@ -661,6 +716,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1506)]
         [SceneInternalId(0x6A)]
+        // TODO explore this one
+        [DynaHeadroom(28, 16)] // actual limit is unknown, but assume kinda small given the tree count
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Treee,
             Actor.PoeBalloon, Actor.BigPoe, // Actor.FloorMaster,
             //Actor.SleepingScrub, // too much dyna, spawns too many flowers and flower companions
@@ -672,31 +729,39 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1508)]
         [SceneInternalId(0x6B)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneBlockSensitive(Actor.BombFlower, -1)]
         [EnemizerSceneBlockSensitive(Actor.UglyTree, -1)]
         GoronRacetrack = 0x68,
 
         [FileID(1510)]
         [SceneInternalId(0x6C)]
+        [DynaHeadroom(64, 64)]  // low default to start
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Gorman,
         //    Actor.ClocktowerGearsAndOrgan, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // organ is huge, covers the mayor's door
         [EnemizerSceneBlockSensitive(Actor.Gorman, -1)] // was moved next to mayors door, large bodies can actually block this
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
+            Actor.LikeLike,
             Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BomberHideoutGuard,
-                Actor.Peahat, Actor.Tijo, Actor.ArmosStatue, Actor.ClocktowerGearsAndOrgan, Actor.CircleOfFire, Actor.GibdoWell, Actor.RegularIceBlock, // worried about big blocking actors
-                Actor.Wolfos)]
-        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BombersYouChase,
-        //Actor.RegularIceBlock)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
-            Actor.LikeLike)] // If you start with one heart this can be a softlock
+                Actor.Peahat, Actor.Tijo
+                //Actor.ArmosStatue, // blocking
+                //Actor.ClocktowerGearsAndOrgan, 
+                //Actor.CircleOfFire, Actor.GibdoWell, Actor.RegularIceBlock, // worried about big blocking actors
+                /*Actor.Wolfos*/)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Jugglers,
+                                                           Actor.UnusedStoneTowerPlatform)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Anju,
+            Actor.GaroMaster)] // if spawning in sct partial, can fall through the floor and dissapear but leave their annoying music
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Postbox,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // Flying can block the roof leading to the chest
         [EnemizerSceneBlockSensitive(Actor.BombersYouChase, -1)] // chicken holder leads to a chest
-        EastClockTown = 0x69,
+        [EnemizerSceneBlockSensitive(Actor.BomberHideoutGuard, -1)] // leads to a whole area with like 4 things
+        EastClockTown = 0x69, // ect
 
         [FileID(1512)]
         [SceneInternalId(0x6D)]
+        [DynaHeadroom(64, 64)]  // low default to start
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
         //    Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
@@ -704,10 +769,11 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BombersYouChase,
             Actor.UnusedStoneTowerStoneElevator)]//, Actor.UnusedStoneTowerPlatform)]
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
-        WestClockTown = 0x6A,
+        WestClockTown = 0x6A, // wct
 
         [FileID(1514)]
         [SceneInternalId(0x6E)]
+        [DynaHeadroom(64, 64)]  // low default to start
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
         //    Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
@@ -719,6 +785,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1516)]
         [SceneInternalId(0x6F)]
+        [DynaHeadroom(64, 64)]  // low default to start
         /*[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Carpenter,
             Actor.RegularIceBlock, Actor.Bumper, Actor.CircleOfFire, Actor.GoronElder, Actor.LightBlock, // can block day 3 chest, TODO move it so we can re-enable
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, // chest can raise to match height,putting it out of reach
@@ -734,6 +801,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1518)]
         [SceneInternalId(0x70)]
+        [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SmallWoodenBox,
             /*Actor.UnusedStoneTowerPlatform,*/ Actor.UnusedStoneTowerStoneElevator)] // can block guruguru and maybe more
         LaundryPool = 0x6D,
