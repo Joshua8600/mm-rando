@@ -133,7 +133,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1175)]
         [SceneInternalId(0x16)]
-        [ClearEnemyPuzzleRooms(4, 7)]// basement lava
+        [ClearEnemyPuzzleRooms(4, 7, // basement lava
+            10)] // garo master
         [FairyDroppingEnemies(roomNumber: 1, actorNumber: 2)] // eygore
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RealBombchu,
         //    Actor.WarpDoor)]
@@ -200,6 +201,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1224)]
         [SceneInternalId(0x1D)]
         [ClearEnemyPuzzleRooms(5)] // wizrobe room
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
+            Actor.Bombiwa)] // can block jumping
         IkanaCastle = 0x1A,
 
         [FileID(1235)]
@@ -495,8 +498,9 @@ namespace MMR.Randomizer.GameObjects
         // has to be smaller than 24, 16 as one ikana stump in room zero was an issue
         //... but one 28,16 swlift was working fine???
         // one lily(12, 8) plus one darmani grave (10, 8) and one ice platform(22,13) was too much tho (43,29)
-        [DynaHeadroom(28, 16, room: 0)]
-        [DynaHeadroom(28, 16, room: 2)]
+        //[DynaHeadroom(28, 16, room: 0)]
+        //[DynaHeadroom(28, 16, room: 2)]
+        [DynaHeadroom(10,8)] // hotfix: lower to avoid dyna collider while I wait for better data as to issue
         //[EnemizerSceneEnemyReplacementBlock(Actor.DekuBabaWithered, // bit annoying 
         //    Actor.Peahat, Actor.LikeLike, Actor.Freezard)]
         //[EnemizerSceneEnemyReplacementBlock(Actor.DragonFly, // blocks deku flying 
@@ -665,6 +669,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1459)]
         [SceneInternalId(0x60)]
         [ClearEnemyPuzzleRooms(2,3,4,5)] // the miniboss rooms
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CeilingSpawner,
+            Actor.Shabom)] // report of them not spawning or falling out of bounds and softlock
         SecretShrine = 0x5D,
 
         [FileID(1466)]

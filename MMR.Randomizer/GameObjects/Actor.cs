@@ -550,12 +550,14 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [ObjectListIndex(0x80)]
         [FileID(79)]
+        [CheckRestricted(Scene.SouthClockTown, variant: 0x287F,
+            check: Item.CollectableSouthClockTownHitTag1, Item.CollectableSouthClockTownHitTag2, Item.CollectableSouthClockTownHitTag3)]
+        //[CheckRestricted(Scene.DekuShrine, variant: -1,
+        //    check: )]
         // 0x1180 below graveyard
         // 0x289 gold pirate torches
         // 0x287F east/south clocktown
         [GroundVariants(0x1180, 0x289, 0x287F, 0x207F)]
-        [CheckRestricted(Scene.SouthClockTown, variant:0x287F,
-            check: Item.CollectableSouthClockTownHitTag1, Item.CollectableSouthClockTownHitTag2, Item.CollectableSouthClockTownHitTag3)]
         [CompanionActor(MothSwarm, ourVariant: -1, variant: 1, 2, 3, 4, 7)] // todo select specific variants that are lit
         [CompanionActor(Keese, ourVariant: -1, variant: 0x0, 0x2, 0x8002, 0x8004)] // todo select specific variants that are lit
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
@@ -565,7 +567,7 @@ namespace MMR.Randomizer.GameObjects
             variant: 0x0, 0x2, 0x8002, 0x8004)] // todo select specific variants that are lit
         //Scene.SouthClockTown
         [ForbidFromScene(Scene.WoodfallTemple, Scene.SouthernSwamp,
-            //Scene.DekuShrine,
+            Scene.DekuShrine, // TODO re-enable if we get all of the check list fleshed out, but people use this for weirdshot
             Scene.WestClockTown, //Scene.SouthernSwampClear,
             Scene.SnowheadTemple, Scene.BeneathGraveyard, Scene.GreatBayCoast,
             Scene.GreatBayTemple, Scene.OceanSpiderHouse,
@@ -1163,6 +1165,7 @@ namespace MMR.Randomizer.GameObjects
         [DifficultAllVariants]
         [VariantsWithRoomMax(max: 2, 0xFF03, 0xFF02, 0xFF01)]
         [VariantsWithRoomMax(max: 1, 0x0103, 0x0102, 0x0101)]
+        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // can crash the scheduler, no I dont know why
         IronKnuckle = 0x84, // En_Ik
 
         Empty85 = 0x85,
@@ -1433,8 +1436,9 @@ namespace MMR.Randomizer.GameObjects
         // 3 exists in granny's room in the inn, for title sequence.. so you can hear him walking toward the door???
         // 3 is also present in east clock town
         [CheckRestricted(Item.NotebookMeetGorman, Item.MaskCircusLeader, Item.NotebookMovingGorman)]
-        [PathingVariants(3,  0)]
         [GroundVariants(0xFF)]
+        [PathingVariants(3, 0)]
+        [PathingTypeVarsPlacement(mask: 0xFF, shift: 0)]
         // behavior too complicated, disable placement anywhere
         [VariantsWithRoomMax(max: 0, variant: 0, 3, 0xFF)]
         [UnkillableAllVariants]
@@ -2444,8 +2448,8 @@ namespace MMR.Randomizer.GameObjects
         // enhy nonsense, it has to load its inner-actor thing first, so its set to gameplay keep
         [ObjectListIndex(0xDF)] // 1
         // params: 0x007E is path range, 0x7E is max
-        [PathingTypeVarsPlacement(mask: 0x7E00, shift: 9)]
         [PathingVariants(0x0)]
+        [PathingTypeVarsPlacement(mask: 0x7E00, shift: 9)]
         [GroundVariants(0x7E00)] // todo check if 0x7F is a thing
         // Pathing Variants todo
         [VariantsWithRoomMax(max: 7, variant: 0x7E00)] // lag, probably from the realtime shadow generation
@@ -2543,8 +2547,10 @@ namespace MMR.Randomizer.GameObjects
         //[ActorizerEnabled] // even cutscene version doesn't spawn, might be a rando thing, modification untested assumed difficult
         [FileID(274)]
         [ObjectListIndex(0x8)]
+        //[CheckRestricted(Scene.Great)]
         // doesn't have real BG right?
-        [GroundVariants(0xFE0F)] // cutscene version that is supposed to be teaching link defense
+        //[GroundVariants(0xFE0F)] // cutscene version that is supposed to be teaching link defense
+        [GroundVariants(0x201, 0x402, 0x602, 804)]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 9)]
         [UnkillableAllVariants]
         GreatFairy = 0x130, // Bg_Dy_Yoseizo
@@ -3225,9 +3231,8 @@ namespace MMR.Randomizer.GameObjects
             0x7FFF, // standing next to the king
             0x8000  // credits: in front of his son
         )]
-        [PathingVariants(
-            0x0001 // inside of the race shrine
-        )]
+        [PathingVariants(0x0001)] // inside of the race shrine
+        [PathingTypeVarsPlacement(mask:0x7F, shift:0)]
         // good candidate for aligned front companions, to his son
         [VariantsWithRoomMax(max:0, variant: 0x8000,0x7FFF, 0x0001)] // none of the vanila variants spawn out of location or out of event
         [UnkillableAllVariants]
@@ -3275,8 +3280,8 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x18D)]
         // params: 7x >> 6 is switch, 0x3F is unk
         [PathingVariants(0x700, 0x940)]
-        [DifficultAllVariants]
         [PathingTypeVarsPlacement(mask: 0x3F, shift: 0)]
+        [DifficultAllVariants]
         [OnlyOneActorPerRoom]
         [BlockingVariantsAll] // until we can fix his pathing, he will just sit there as a statue most of the time
         [ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
@@ -3294,11 +3299,11 @@ namespace MMR.Randomizer.GameObjects
             )] // loads more, think there are flags here
         [PerchingVariants(0x1012)] // non-vanilla link speed 12, attempting to perch
         [PathingVariants(0x0000)] // pathing type? requires us to introduce paths which might confuse our rando tho
+        [PathingTypeVarsPlacement(mask:0xFF, shift:0)]
         // if I had a hanging from cieling thing like spiders this would work fine
         //[WallVariants(0x100D,  0x110E, 0x1011, 0x1014, 0x1016, 0x1017, 0x1019)]
         [UnkillableAllVariants] // actorcat PROP, not detected as enemy
         [FlyingToGroundHeightAdjustment(300)]
-        [PathingTypeVarsPlacement(mask:0xFF, shift:0)]
         [VariantsWithRoomMax(max:0, 0x101E, 0x100D, 0x1011, 0x1019, 0x1014)] // until I can get cieling detection modification, this is weird
         //[ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
         SpikedMine = 0x185, // Obj_Mine
@@ -3980,6 +3985,7 @@ namespace MMR.Randomizer.GameObjects
         // this could be pathing, but the paths are part of the schedule
         [GroundVariants(0x1, // inn, milkbar
             0x0)] // patroling around the world
+        [PathingTypeVarsPlacement(mask: 0xFF, shift: 0)]
         //[VariantsWithRoomMax()]
         [UnkillableAllVariants]
         [VariantsWithRoomMax(max:0, variant:0, 1)] // do not place: hardcoded up the wazzo
@@ -4695,12 +4701,12 @@ namespace MMR.Randomizer.GameObjects
             0x284B, 0x144B, // hookshotroom
 
             0x28EB, 0x30EB, 0x34EB, 0x38EB, 0x3CEB, 0x4C24)]
+        [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
         //[GroundVariants(0xFC20, 0xFC40 /*, 0xFCE0 */)]
         [VariantsWithRoomMax(max: 0, variant: 0x4C24, 0xFC00, 0xFC01, 0x81F, 0xC1F)] // only type 7 (0xE0) should be bonkable
         [VariantsWithRoomMax(max: 1, variant: 0xFC00)]
         [VariantsWithRoomMax(max: 1, variant: 0x1F, 0xEA, 0x04EA, 0x8EA, 0xCEA, 0x101F, 0x104B, 0x10EA,
                 0x144B, 0x14EA, 0x18EA, 0x284B, 0x28EB, 0x30EB, 0x34EB, 0x38EB, 0x3CEB, 0x4C24)]
-        [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
         // if kickout is 1F it does nothing? interesting
         [PathingKickoutAddrVarsPlacement(mask: 0x1F, shift: 0x0)]
         [RespawningAllVariants] // think they count as enemy, but they dont die they get back up, so can't put places
@@ -4816,9 +4822,9 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0xFC06, 0xFC08, 0xFC0C, 0xFC0D, 0xFC0E, 0xFC0F, 0xFC10, 0xFC13, 0xFC14, 0xFC15)]
         // TODO finish making these both underwater and above water where possible
         [PathingVariants(0x140A, 0xFC05, 0x2, 0x3, 0x4)]
+        [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
         [VariantsWithRoomMax(max: 1, variant: 0x140A, 0xFC05, 0x2, 0x3, 0x4)]
         [VariantsWithRoomMax(max: 1, variant: 0xFC08, 0xFC07, 0xFC06, 0xFC13, 0xFC14, 0xFC15, 0xFC00)]
-        [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
         [ForbidFromScene(Scene.ZoraCape)]//, Scene.ZoraHall)]
         [UnkillableAllVariants]
         RegularZora = 0x228, // En_Zot
@@ -5183,9 +5189,14 @@ namespace MMR.Randomizer.GameObjects
         [FileID(546)]
         [ObjectListIndex(0x1)]
         SongOfSoaringEffects = 0x24B, // Oceff_Wipe6
-        
+
+        [ActorizerEnabled] // enabled so we can get the object space back and so we can see weird shit in the telescope
         [FileID(547)]
         [ObjectListIndex(0x1E5)]
+        [CheckRestricted(Item.HeartPieceTerminaBusinessScrub)]
+        [FlyingVariants(0x1F)] // might be pathing but I dont really care until we have flying path types
+        [VariantsWithRoomMax(max:0, variant: 0x1F)] // assume pathing or whatever wack shit
+        [UnkillableAllVariants]
         FlyingFieldScrub = 0x24C, // En_Scopenuts
 
         [ActorizerEnabled]
@@ -5200,8 +5211,8 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableTerminaFieldGuay17, Item.CollectableTerminaFieldGuay18, Item.CollectableTerminaFieldGuay19, Item.CollectableTerminaFieldGuay20,
             Item.CollectableTerminaFieldGuay21, Item.CollectableTerminaFieldGuay22, Item.CollectableTerminaFieldGuay23
             )]
-        [FlyingVariants(0x5A2)]
-        [VariantsWithRoomMax(max: 0, variant: 0x5A2)] // flying pathing
+        [FlyingVariants(0x5A2, 0x0922)]
+        [VariantsWithRoomMax(max: 0, variant: 0x5A2, 0x0922)] // flying pathing
         [UnkillableAllVariants]
         TelescopeGuay = 0x24D, // En_Scopecrow
         
@@ -5423,9 +5434,9 @@ namespace MMR.Randomizer.GameObjects
         // params: 0x7F is switch flags
         // params: 0x8000 is day 3 version
         // params: 0x1f80 is path
-        [PathingTypeVarsPlacement(mask: 0x1F80, shift: 7)]
         // while this guy stands around and you dont think of him as a pathing actor, bombs make him "flee", path is used
-        [PathingVariants(0x201, 0x9FFF)] 
+        [PathingVariants(0x201, 0x9FFF)]
+        [PathingTypeVarsPlacement(mask: 0x1F80, shift: 7)]
         // restrict if not
         [UnkillableAllVariants]
         MilkroadCarpenter = 0x26A, // En_Daiku2
@@ -5512,18 +5523,42 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(587)]
         [ObjectListIndex(0x1E5)]
-        //[CheckRestricted(Scene.SouthernSwamp, variant: 0xFC05, Item.ShopItemBusinessScrubMagicBean, Item.HeartPieceSwampScrub)]
-        //[CheckRestricted(Scene.SouthernSwamp, variant: 0xFC05, Item.ShopItemBusinessScrubMagicBean, Item.HeartPieceSwampScrub)]
+        [CheckRestricted(Scene.SouthClockTown, variant: 0xFC05,
+            Item.ShopItemBusinessScrubMagicBean, Item.TradeItemLandDeed, Item.ChestSouthClockTownPurpleRupee)]
+        [CheckRestricted(Scene.SouthernSwamp, variant: -1,
+            Item.ShopItemBusinessScrubMagicBean, Item.TradeItemSwampDeed, Item.HeartPieceSwampScrub, Item.UpgradeBiggestBombBag)]
+        // do we care?
+        //[CheckRestricted(Scene.SouthernSwampClear, variant: -1, Item.ShopItemBusinessScrubMagicBean, Item.HeartPieceSwampScrub, Item.UpgradeBiggestBombBag)]
+        [CheckRestricted(Scene.GoronVillage, variant: -1,
+            Item.UpgradeBiggestBombBag, Item.TradeItemMountainDeed, Item.ShopItemBusinessScrubGreenPotion, Item.HeartPieceGoronVillageScrub)]
+        [CheckRestricted(Scene.ZoraHallRooms, variant: -1,
+            Item.ShopItemBusinessScrubGreenPotion, Item.TradeItemOceanDeed, Item.HeartPieceZoraHallScrub, Item.ShopItemBusinessScrubBluePotion)]
+        [CheckRestricted(Scene.IkanaCanyon, variant: -1,
+            Item.ShopItemBusinessScrubBluePotion, Item.IkanaScrubGoldRupee, Item.HeartPieceIkana, Item.CollectableIkanaCanyonSakonSHideoutAreaGossipFairy1)]
         // 0xFC08, 0x1000 are clear swamp
         //0x4 is a flag, meaning the actor has a path, checks if 0xFC00 is a path or not and self terminates
         //[GroundVariants(0xFC08, 0x1000, 0xFC04, 0xFC07, 0x1001, 0x0402, 0xFC06, 0x0001, 0x1800, 0x1003)]
-        [PathingVariants(0xFC08, 0x1000, 0xFC04, 0xFC07, 0x1001, 0x0402, 0xFC06, 0x0001, 0x1800, 0x1003)]
+        [PathingVariants(0xFC08,  0xFC04, 0x1001, 0x1003,
+            0x1800, 0x7F, // southern swamp
+            0x1000, 0xFC05, // clear southern swamp
+            0xFC06, 0x0001, // goron village winter
+            0xFC07, 0x0402 // zora halls
+            )]
         [PathingTypeVarsPlacement(mask:0x3F, shift:10)]
         [OnlyOneActorPerRoom]
-        //[VariantsWithRoomMax(max: 1, variant: )]
+        [VariantsWithRoomMax(max: 0, variant: 0xFC08, 0xFC04, 0x1001, 0x1003,
+            0x1800, 0x7F, // southern swamp
+            0x1000, 0xFC05, // clear southern swamp
+            0xFC06, 0x0001, // goron village winter
+            0xFC07, 0x0402)] // this actors placemnet is a pain, needs investigation
         [UnkillableAllVariants]
         [AlignedCompanionActor(DekuFlower, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x017F)] // treasure chest shop music
-        [ForbidFromScene(Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.SouthClockTown, Scene.GoronVillage, Scene.GoronVillageSpring, Scene.ZoraHallRooms, Scene.IkanaCanyon)]
+        //[ForbidFromScene( //Scene.SouthernSwamp, Scene.SouthernSwampClear,
+            //Scene.SouthClockTown,
+            //Scene.GoronVillage,
+            //Scene.GoronVillageSpring,
+            //Scene.ZoraHallRooms,
+            //Scene.IkanaCanyon)]
         BuisnessScrub = 0x274, // En_AkinDonuts
 
         [FileID(588)]

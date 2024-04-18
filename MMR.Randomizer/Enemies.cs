@@ -326,6 +326,34 @@ namespace MMR.Randomizer
             ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.RedRupees].AddRange(redRupees);
         }
 
+        private static void PrepareJunkMapAndCompass()
+        {
+            // this does not work, without me knowing when they are junk or not
+            /// if the player does not get hints from these, they should count as junk
+
+            if (_randomized.Settings.LogicMode == Models.LogicMode.Vanilla
+                || _randomized.Settings.LogicMode == Models.LogicMode.Casual)
+            {
+                return;
+            }
+
+            if (_randomized.Settings.RandomizeBossRooms == false)
+            {
+                var compass = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.Navigation
+                                                                    && itemObj.Item.ToString().Contains("Compass"))
+                                                  .Select(itemObj => itemObj.Item).ToList();
+                ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.Navigation].AddRange(compass);
+            }
+
+            if (_randomized.Settings.RandomizeDungeonEntrances == false)
+            {
+                var maps = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.Navigation
+                                                                    && itemObj.Item.ToString().Contains("Map"))
+                                                  .Select(itemObj => itemObj.Item).ToList();
+                ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.Navigation].AddRange(maps);
+            }
+        }
+
         private static void PrepareJunkItems()
         {
             /// Problem: IsJunk and ItemUtils.JunkItems aren't a good fit for actorizer replacing actors
@@ -433,6 +461,7 @@ namespace MMR.Randomizer
             GameObjects.ItemCategory.GreenRupees,
             GameObjects.ItemCategory.BlueRupees,
             //GameObjects.ItemCategory.RedRupees, // crimson rup in this list, removed by building into our own list
+            GameObjects.ItemCategory.PurpleRupees,
             GameObjects.ItemCategory.Arrows,
             GameObjects.ItemCategory.Bombs,
             GameObjects.ItemCategory.DekuSticks,
@@ -950,13 +979,18 @@ namespace MMR.Randomizer
                 var doubledGibdo = ikanaCanyonScene.Maps[0].Actors[64];
                 doubledGibdo.Position = new vec16(-602, 400, 972);
 
-                // in spring there are two torches on top of each other, which is weird, move the other one to face the first one
-                //var mountainVillageSpring = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillageSpring.FileID());
-                //var secondTorch = mountainVillageSpring.Maps[0].Actors[13];
-                //secondTorch.Rotation.y = ActorUtils.MergeRotationAndFlags(180, secondTorch.Rotation.y);
-                //secondTorch.Position.z -= 50;
+                // trying to fix clock, nothing
+                //var curiosityShopClock = curiosityShop.Maps[0].Actors[5];
+                //curiosityShopClock.Position.x = -130;
+
+
+                    // in spring there are two torches on top of each other, which is weird, move the other one to face the first one
+                    //var mountainVillageSpring = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillageSpring.FileID());
+                    //var secondTorch = mountainVillageSpring.Maps[0].Actors[13];
+                    //secondTorch.Rotation.y = ActorUtils.MergeRotationAndFlags(180, secondTorch.Rotation.y);
+                    //secondTorch.Position.z -= 50;
+                }
             }
-        }
 
 
         private static void EnableAllFormItems()
@@ -1293,6 +1327,41 @@ namespace MMR.Randomizer
             }
         }
 
+        private static void MoveShopScurbsIfRandomized()
+        {
+            /// if we randomize the shop scrubs, then we have two of them sitting on top of each other, which is weird
+            var southernSwamp = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwamp.FileID());
+            var swampScrub = southernSwamp.Maps[0].Actors[1]; // first is zero
+            if (swampScrub.Name != GameObjects.Actor.BuisnessScrub.ToString())
+            {
+                var stationaryScrub = southernSwamp.Maps[0].Actors[0]; // needs to be rotated, naturally faces left down the swamp
+                stationaryScrub.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: stationaryScrub.Rotation.y);
+
+                swampScrub.Position = new vec16(115, 170, 26);
+            }
+            // TODO cleared swamp
+
+            var goronvillage = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GoronVillage.FileID());
+            var gvScrub = goronvillage.Maps[0].Actors[4]; // first is 3
+            if (gvScrub.ActorEnum != GameObjects.Actor.BuisnessScrub)
+            {
+                gvScrub.Position = new vec16(168, -200, 427);
+                gvScrub.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: gvScrub.Rotation.y); // turn back around to face the other guy
+            }
+
+            var zoraHallrooms = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraHallRooms.FileID());
+            var zorahallScrub = zoraHallrooms.Maps[2].Actors[1]; // first is zero
+            if (zorahallScrub.ActorEnum != GameObjects.Actor.BuisnessScrub)
+            {
+                var stationaryScrub = southernSwamp.Maps[0].Actors[0]; // needs to be rotated, naturally faces the door
+                stationaryScrub.Rotation.y = ActorUtils.MergeRotationAndFlags(90, flags: stationaryScrub.Rotation.y);
+
+                zorahallScrub.Position = new vec16(-2113, 49, -71);
+                // rotation?
+            }
+
+        }
+
         public static void MoveActorsIfRandomized()
         {
             /// if ossan in trading post was randomized we want to move one of them, as there are two of the, assumed for late night
@@ -1325,6 +1394,23 @@ namespace MMR.Randomizer
                 ReadWriteUtils.Arr_WriteU16(ranchRoom0Data, 0x74, SMALLEST_OBJ); // carriage
                 ReadWriteUtils.Arr_WriteU16(ranchRoom0Data, 0x72, SMALLEST_OBJ); // object_ha is the donkey the cart uses
             }
+
+            var curiosityShop = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.CuriosityShop.FileID());
+            var curiosityShopClock = curiosityShop.Maps[0].Actors[5];
+            if (curiosityShopClock.ActorEnum != GameObjects.Actor.Clock)
+            {
+                //curiosityShopClock.Position.x = -129;
+            }
+
+            var terminaField = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TerminaField.FileID());
+            var terminaFieldScopeNuts = terminaField.Maps[0].Actors[210];
+            if (terminaFieldScopeNuts.ActorEnum != GameObjects.Actor.FlyingBuisinessScrub)
+            {
+                terminaFieldScopeNuts.Position = new vec16(780, 760, 615); // move closer to the edge of ect so the player can see it
+            }
+
+
+            MoveShopScurbsIfRandomized();
         }
 
         public static void DisableAllLocationRestrictions()
@@ -2984,6 +3070,11 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BuisnessScrub)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.GoronVillage, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ZoraHallRooms, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.BioDekuBaba, GameObjects.Actor.Lilypad)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GreatFairy)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.WoodfallTemple, GameObjects.Actor.DekuBaba, GameObjects.Actor.Hiploop)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Guay)) continue;
@@ -3005,7 +3096,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.IkanaGravestone)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.Clock, GameObjects.Actor.BoatCruiseTarget)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.GreatFairy)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.Keese, GameObjects.Actor.UnusedStoneTowerPlatform)) continue; 
+                //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.DekuPatrolGuard, GameObjects.Actor.BuisnessScrub)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.ReDead, GameObjects.Actor.OceanSpiderhouseBombableWall)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.PinnacleRock, GameObjects.Actor.Bombiwa, GameObjects.Actor.Japas)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.RomaniYts)) continue;
@@ -4827,7 +4918,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 65.0\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 66.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

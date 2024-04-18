@@ -1698,8 +1698,7 @@ namespace MMR.Randomizer
 
             if (_randomized.Settings.ImprovedCamera)
             {
-                ReadWriteUtils.WriteCodeNOP(0x800DF44C);
-                ReadWriteUtils.WriteCodeNOP(0x800DF450);
+                hacks.Add(Resources.mods.improved_camera);
             }
 
             if (_randomized.Settings.TakeDamageWhileShielding)
@@ -3867,8 +3866,6 @@ namespace MMR.Randomizer
                         .ShouldTransfer()
                         .Build()
                     );
-
-                    ResourceUtils.ApplyHack(Resources.mods.skulltula_token_npc_hint);
                 }
 
                 var remains = ItemUtils.BossRemains().Where(r => _randomized.ItemList[r].Item == r);
@@ -6335,7 +6332,7 @@ namespace MMR.Randomizer
             WriteInstruments(new Random(BitConverter.ToInt32(hash, 0)));
 
             progressReporter.ReportProgress(73, "Writing music...");
-            SequenceUtils.MoveAudioBankTableToFile();
+            SequenceUtils.MoveAudioBankTable();
             WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
             WriteMuteMusic();
             WriteEnemyCombatMusicMute();
