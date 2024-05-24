@@ -35,7 +35,7 @@ namespace MMR.Randomizer.Utils
             #if DEBUG
             string settingstring = $"{setting} + DEBUG BUILD\x00";
             #else
-            string settingstring = $"{setting} + Isghj's Enemizer Test 67.0\x00";
+            string settingstring = $"{setting} + Isghj's Enemizer Test 69.1\x00";
             #endif
             int f = GetFileIndexForWriting(veraddr);
             var file = RomData.MMFileList[f];
@@ -294,7 +294,7 @@ namespace MMR.Randomizer.Utils
                 GameObjects.Actor.Fairy.FileListIndex(),
                 GameObjects.Actor.Arrow.FileListIndex(),
                 GameObjects.Actor.BombAndKeg.FileListIndex(),
-                GameObjects.Actor.GrassBush.FileListIndex(),
+                //GameObjects.Actor.TallGrass.FileListIndex(),
                 GameObjects.Actor.En_Clear_Tag.FileListIndex(), // bomb effects and such
                 GameObjects.Actor.Arms_Hook.FileListIndex(), // hookshot tip
                 GameObjects.Actor.ZoraFinBoomerang.FileListIndex(),

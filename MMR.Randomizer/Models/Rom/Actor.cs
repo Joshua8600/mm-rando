@@ -7,7 +7,7 @@ using MMR.Randomizer.Utils;
 using MMR.Randomizer.Models.Vectors;
 using System.Collections.Generic;
 using System;
-
+using System.Runtime.CompilerServices;
 
 namespace MMR.Randomizer.Models.Rom
 {
@@ -42,8 +42,8 @@ namespace MMR.Randomizer.Models.Rom
         public int ActorSize; // todo
         public int ObjectSize; // read by enemizer at scene actor reading
         public (int poly, int vert) DynaLoad =  (0, 0);  // dyna load per actor, can be overwritten by injected actor
-        public int Room;           // this specific actor, which map/room was it in
-        public int RoomActorIndex; // the index of this actor in its room's actor list
+        public int Room;           // the room the actor is in in the scene
+        public int RoomActorIndex; // the actor index of the room the actor is in
         //public int Stationary; // Deathbasket used to use this, I dont see the point except around water
         public vec16 Position = new vec16();
         public vec16 Rotation = new vec16();
@@ -65,12 +65,14 @@ namespace MMR.Randomizer.Models.Rom
 
         public Actor() { } // default, used when building from scene/room read
 
-        public Actor(GameObjects.Actor actor)
+        // TODO we should consolidate all of this actor constructor/update code
+
+        public Actor(GameObjects.Actor actor, InjectedActor injectedData = null)
         {
             // converted from enum, used for building replacement candidate actors
 
             this.Name = this.OldName = actor.ToString();
-            this.ActorId =  (int)actor;
+            this.ActorId =  (int) actor;
             this.ActorEnum = this.OldActorEnum = actor;
             this.ObjectId = this.OldObjectId = actor.ObjectIndex();
             this.ObjectSize = ObjUtils.GetObjSize(actor.ObjectIndex());
@@ -91,6 +93,10 @@ namespace MMR.Randomizer.Models.Rom
                 this.DynaLoad.poly = dynaProperties.Polygons;
                 this.DynaLoad.vert = dynaProperties.Verticies;
             }
+
+            // missing injected actor stuff
+            if (injectedData != null)
+                this.UpdateActor(injectedData);
         }
 
         public Actor(InjectedActor injected, string name)
@@ -126,7 +132,6 @@ namespace MMR.Randomizer.Models.Rom
             this.UnplaceableVariants = this.ActorEnum.GetUnPlacableVariants();
             this.OnlyOnePerRoom = injected.onlyOnePerRoom;
             this.InjectedActor = injected;
-
             
             var dynaProperties = this.ActorEnum.GetAttribute<DynaAttributes>();
             if (dynaProperties != null)
@@ -215,7 +220,7 @@ namespace MMR.Randomizer.Models.Rom
 
             newActor.Variants = newActor.AllVariants.SelectMany(u => u).ToList(); // might as well start with all
             newActor.OnlyOnePerRoom = this.OnlyOnePerRoom;
-            newActor.VariantsWithRoomMax = this.VariantsWithRoomMax;
+            newActor.VariantsWithRoomMax = this.VariantsWithRoomMax.ToList();
 
             if (this.RespawningVariants != null)
             {
@@ -290,6 +295,11 @@ namespace MMR.Randomizer.Models.Rom
                 this.DynaLoad.poly = dynaProperties.Polygons;
                 this.DynaLoad.vert = dynaProperties.Verticies;
             }
+            else
+            {
+                this.DynaLoad.poly = 0; // none, values are to be reset
+                this.DynaLoad.vert = 0;
+            }
         }
 
         public void ChangeActor(Actor otherActor, int vars = -1)
@@ -310,7 +320,10 @@ namespace MMR.Randomizer.Models.Rom
 
             this.DynaLoad = otherActor.DynaLoad;
 
-            this.InjectedActor = otherActor.InjectedActor;
+            if (otherActor.InjectedActor != null)
+                this.UpdateActor(otherActor.InjectedActor);
+
+            this.VariantsWithRoomMax = otherActor.VariantsWithRoomMax.ToList();
         }
 
         public void UpdateActor(InjectedActor injectedActor)
@@ -360,6 +373,7 @@ namespace MMR.Randomizer.Models.Rom
             AddToSpecificSubtype(ActorType.WaterBottom, injectedActor.waterBottomVariants);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ChangeVariant(int variant)
         {
             /// deep change: changes old variant as well
@@ -542,7 +556,7 @@ namespace MMR.Randomizer.Models.Rom
             return killableVariants;
         }
 
-        public int VariantMaxCountPerRoom(int queryVariant)
+        public int VariantMaxCountPerRoom(int queryVariant = 0x0000)
         {
             if (this.OnlyOnePerRoom != null)
             {
@@ -594,11 +608,13 @@ namespace MMR.Randomizer.Models.Rom
             return true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasVariantsWithRoomLimits()
         {
             return VariantsWithRoomMax != null || OnlyOnePerRoom != null;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int GetTimeFlags()
         {
             // 10 time flags, day and night for days 0 through 4, split in the flags section of the rotation shorts
