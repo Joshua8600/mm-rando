@@ -412,6 +412,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1316)]
         [SceneInternalId(0x30)]
+        [EnemizerSceneBlockSensitive(Actor.BigPoe, -1)]
+            [EnemizerSceneBlockSensitive( Actor.Dampe, -1)] // not sure which one it is, but if its a big thing they cant get past the entrance
         // [ClearEnemyPuzzleRooms(   )] // is big poe reward a clear room reward?
         DampesHouse = 0x2D,
 
@@ -595,6 +597,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.Grog // still blocks the bridges
             /* Actor.Wolfos */ )] // wolfos:iceblock
         [EnemizerSceneBlockSensitive(Actor.Hiploop, -1)]
+        [EnemizerSceneBlockSensitive(Actor.ClayPot, -1)]
         Woodfall = 0x43,
 
         [FileID(1364)]
