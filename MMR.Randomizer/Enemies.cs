@@ -2234,6 +2234,25 @@ namespace MMR.Randomizer
             }
         }
 
+        public static void FixSnowballActorSpawns(SceneEnemizerData thisSceneData)
+        {
+            /// The large snowballs can sometimes spawn an actor when you break them,
+            /// but they are too stupid to handle the possibility of the actor object missing, crash
+            /// but we cannot block them from spawning based on params because params is not used to specify
+            /// instead, the parameter that controls snowball type is rotation.y, so we nullify it here per-scene where we add them
+
+            var largeSnowballs = thisSceneData.Actors.FindAll(actor => actor.ActorEnum == GameObjects.Actor.LargeSnowball);
+            if (largeSnowballs.Count > 0)
+            {
+                for(int i = 0; i < largeSnowballs.Count; i++)
+                {
+                    var snowball = largeSnowballs[i];
+                    // where zero rotation (type 0) just drops an item, no actor
+                    snowball.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 0, flags: snowball.Rotation.y);
+                }
+            }
+        }
+
         public static void FixWoodfallTempleGekkoMiniboss()
         {
             /// we cannot randomize the snapper in woodfall temple without breaking the gekko miniboss
@@ -3550,6 +3569,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.WoodfallTemple, GameObjects.Actor.Snapper, GameObjects.Actor.Mimi)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.GormanRaceTrack, GameObjects.Actor.Flagpole, GameObjects.Actor.HookshotWallSpot)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.IkanaGraveyard, GameObjects.Actor.BadBat, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.ClayPot, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.ReDead, GameObjects.Actor.HookshotWallSpot)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.ClayPot, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.SwimmingZora, GameObjects.Actor.LabFish)) continue;
@@ -3562,7 +3583,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Monkey)) continue;
-// #endif
+//                #endif
                 #endregion
 
                 var reducedCandidateList = thisSceneData.CandidatesPerObject[objectIndex].ToList();
@@ -4716,6 +4737,7 @@ namespace MMR.Randomizer
             FixRedeadSpawnScew(thisSceneData); // redeads don't like x/z rotation
             FixBrokenActorSpawnCutscenes(thisSceneData); // some actors dont like having bad cutscenes
             FixWaterPostboxes(thisSceneData);
+            FixSnowballActorSpawns(thisSceneData);
             // the following modify Variant which can confuse typing system
             FixPathingVars(thisSceneData); // any patrolling types need their vars fixed
             FixKickoutEnemyVars(thisSceneData); // and same with the two actors that have kickout addresses
@@ -5450,7 +5472,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 69.3\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 69.4\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
@@ -5682,17 +5704,16 @@ namespace MMR.Randomizer
 
         private bool testDynaSize()
         {
-            //what the fuck how did I forget about this
 
             for(int m = 0; m < oldMapList.Count; ++m)
             {
-                if (isDynaOverLoaded(this.newMapList[m].day, this.newMapList[m].day, m))
+                if (isDynaOverLoaded(this.newMapList[m].day, this.oldMapList[m].day, m))
                     return false;
-                if (isDynaOverLoaded(this.newMapList[m].night, this.newMapList[m].night, m))
+                if (isDynaOverLoaded(this.newMapList[m].night, this.oldMapList[m].night, m))
                     return false;
             }
 
-            return true; // 
+            return true;
         }
 
         

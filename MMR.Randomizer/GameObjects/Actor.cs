@@ -4728,6 +4728,10 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableMountainVillageWinterLargeSnowball3, Item.CollectableMountainVillageWinterLargeSnowball4,
             Item.SongLullabyIntro
         )]
+        [CheckRestricted(Scene.MountainVillageSpring, variant: -1,
+            Item.CollectableMountainVillageSpringSmallSnowball1, Item.CollectableMountainVillageSpringSmallSnowball2, // small
+            Item.CollectableMountainVillageSpringSmallSnowball3, Item.CollectableMountainVillageSpringSmallSnowball4
+        )]
         [CheckRestricted(Scene.PathToSnowhead, variant: -1,
             Item.CollectablePathToSnowheadSmallSnowball1, Item.CollectablePathToSnowheadSmallSnowball2, // small
             Item.CollectablePathToSnowheadSmallSnowball3, Item.CollectablePathToSnowheadSmallSnowball4,
@@ -5546,7 +5550,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x0)]
         [WaterBottomVariants(0x1)]
         [OnlyOneActorPerRoom]
-        //[EnemizerScenesPlacementBlock(Scene.GoronShrine)] // if rock sirloin falls onto him its aparently broken // but we dont want to block here we want to be able to deliver it to him in the next room
+        [EnemizerScenesPlacementBlock(Scene.MilkRoad)] // he can detect keg and try to talk to you about it, also small bombs I bet
         [UnkillableAllVariants]
         GoronWithGeroMask = 0x23A, // En_Geg : HungryGoron, sirloin goron, "Hugo"
 
@@ -6376,7 +6380,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x129)]
         [GroundVariants(5)]
         [UnkillableAllVariants]
-        [PlacementWeight(75)]
+        [PlacementWeight(60)]
         Secretary = 0x290, // En_Recepgirl, Receptionist
 
         [EnemizerEnabled]
@@ -6390,8 +6394,8 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [FlyingToGroundHeightAdjustment(100)]
         //[ForbidFromScene(Scene.TerminaField)] // do not remove original, esp with rupeeland coming soon
-        [PlacementWeight(86)]
-        Takkuri = 0x291, // En_Theifbird
+        [PlacementWeight(75)]
+        Takkuri = 0x291, // En_Thiefbird
 
         //todo
         [FileID(617)]
