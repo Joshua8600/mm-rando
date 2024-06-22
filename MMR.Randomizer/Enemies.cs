@@ -822,6 +822,7 @@ namespace MMR.Randomizer
             RandomizePinnacleRockSigns();
             RandomizeDekuPalaceBombiwaSigns();
             ChangeHotwaterGrottoDekuBabaIntoSomethingElse(rng);
+            RandomizeGrottoGossipStonesPerGrotto();
             SwapGreatFairies(rng);
             ModifyFireflyKeeseForPerching();
             SplitPirateSewerMines();
@@ -873,9 +874,9 @@ namespace MMR.Randomizer
             // the south field dekubaba to the east is facing south, because in vanilla its direction does not matter
             // rotate to face out of the field
             var southDekubaba = terminafieldScene.Maps[0].Actors[45];
-            southDekubaba.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: southDekubaba.Rotation.y); // fixes the leever spawn is too low (bombchu explode)
+            southDekubaba.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: southDekubaba.Rotation.y);
             southDekubaba = terminafieldScene.Maps[0].Actors[44];
-            southDekubaba.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: southDekubaba.Rotation.y); // fixes the leever spawn is too low (bombchu explode)
+            southDekubaba.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: southDekubaba.Rotation.y);
 
             // in STT, move the bombchu in the first room 
             //   backward several feet from the chest, so replacement cannot block the chest
@@ -1053,6 +1054,11 @@ namespace MMR.Randomizer
 
                 var milkbarScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkBar.FileID());
                 milkbarScene.Maps[0].Objects[10] = GameObjects.Actor.ArcheryMiniGameMan.ObjectIndex();
+
+                // the ceiling water drip effect actor was placed too close to the door, can softlock if it knocks the player away (skulltula)
+                var underGraveyardScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.BeneathGraveyard.FileID());
+                underGraveyardScene.Maps[0].Actors[1].Position.x = 20; // facing door from hole, move back toward door
+                underGraveyardScene.Maps[0].Actors[1].Position.z = 251; // facing door from hole, move left toward day 2
 
                 // trying to fix clock, nothing
                 //var curiosityShopClock = curiosityShop.Maps[0].Actors[5];
@@ -1544,8 +1550,15 @@ namespace MMR.Randomizer
             if (terminaFieldScopeNuts.ActorEnum != GameObjects.Actor.FlyingBuisinessScrub)
             {
                 terminaFieldScopeNuts.Position = new vec16(780, 760, 615); // move closer to the edge of ect so the player can see it
-                SceneUtils.UpdateScene(terminaField);
             }
+
+            var terminaFieldWestGossipBombiwa = terminaField.Maps[0].Actors[198];
+            if (terminaFieldWestGossipBombiwa.ActorEnum != GameObjects.Actor.Bombiwa) // assumption: currently both have to be randomized at the same time
+            {
+                terminaFieldWestGossipBombiwa.Position.z = -1727; // move back from sitting right on top of the grotto
+                terminaField.Maps[0].Actors[199].Position.z = -642; // move back from sitting right on top of the grotto
+            }
+            SceneUtils.UpdateScene(terminaField);
 
             MoveShopScurbsIfRandomized();
             MovePostmanIfRandomized(terminaField);
@@ -2066,6 +2079,68 @@ namespace MMR.Randomizer
             grottosScene.Maps[14].Objects[2] = (coinTossResultActor.actor).ObjectIndex();
         }
 
+        private static void RandomizeGrottoGossipStonesPerGrotto()
+        {
+            /// each gossip stone grotto has enough object space to add or switch an object
+            /// and then randomize three of the gossip stones to something new and random
+            /// should be doable without breaking the gossip stone quest
+
+            if (!ReplacementListContains(GameObjects.Actor.GossipStone)) return;
+
+            var grottosScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
+
+            void ChangeStones(Map map, int[] actorSlots, GameObjects.Actor actorType, int actorParam, string name)
+            {
+                for(int i = 0; i < actorSlots.Length; i++)
+                {
+                    var actor = map.Actors[actorSlots[i]];
+                    actor.ChangeActor(actorType, actorParam, modifyOld: true);
+                    actor.OldName = name;
+                }
+            }
+
+
+            // west butterfly/comb grotto (middle right stone)
+            var westGrotto = grottosScene.Maps[0];
+            westGrotto.Objects[3] = GameObjects.Actor.Leever.ObjectIndex(); // unused deku baba object here, we can override
+            int[] westStoneSlots = { 9, 10, 12 };
+            ChangeStones(westGrotto, westStoneSlots, GameObjects.Actor.Leever, actorParam: 0xFF, "GossipStoneWest");
+
+            // south spider grotto (far left stone)
+            var southGrotto = grottosScene.Maps[1];
+            southGrotto.Objects.Add(GameObjects.Actor.Armos.ObjectIndex()); // three objects in this scene, because of padding there is a fourth free spot without scene expansion
+            var southGrottoRoomFile = RomData.MMFileList[GameObjects.Scene.Grottos.FileID() + 2].Data; // room file
+            southGrottoRoomFile[0x29] = 4; // update object list to load all four objects in-game
+            int[] southGrottoStones = { 4, 5, 6 };
+            ChangeStones(southGrotto, southGrottoStones, GameObjects.Actor.Armos, actorParam: 0x7F, "GossipStoneSouth");
+
+            // east sandy grotto (far right stone)
+            var eastGrotto = grottosScene.Maps[2];
+            eastGrotto.Objects[1] = GameObjects.Actor.Wolfos.ObjectIndex(); // unused deku baba slot can be reused
+            int[] eastStoneSlots = { 5, 6, 7 };
+            ChangeStones(eastGrotto, eastStoneSlots, GameObjects.Actor.Wolfos, actorParam: 0xFF80, "GossipStoneEast");
+
+            // north flooded grotto (middle left stone)
+            var northGrotto = grottosScene.Maps[3];
+            northGrotto.Objects[1] = GameObjects.Actor.Snapper.ObjectIndex(); // unused deku baba slot can be reused
+            int[] northGrottoSlots = { 1, 3, 4 };
+            ChangeStones(northGrotto, northGrottoSlots, GameObjects.Actor.Snapper, actorParam: 0, "GossipStoneNorth");
+
+            void ChangeGossipHintType(Actor stone, int newHint)
+            {
+                stone.Variants[0] &= 0xFFF0; // remove previous bottom (text offset)
+                stone.Variants[0] |= newHint;
+            }
+
+            /// the hint given by the big gossip stone is always the same hint, we have to change the hint variable
+            /// where, the hint offset is +4 from the type 2 (regular hints) to use the same hint IDs with big type
+            /// so hints 0, 1, 2 become 4, 5, 6
+            //ChangeGossipHintType(southGrotto.Actors[3], 0x2); // already far left, leave alone
+            ChangeGossipHintType(northGrotto.Actors[2], 4); // middel left
+            ChangeGossipHintType(westGrotto.Actors[11], 5); // middle right
+            ChangeGossipHintType(eastGrotto.Actors[8], 6); // far right
+
+        }
 
         private static void SwapGreatFairies(Random rng)
         {
@@ -3044,74 +3119,102 @@ namespace MMR.Randomizer
             }
         }
 
-        private static bool TrimDynaActors(SceneEnemizerData thisSceneData, List<List<Actor>> shrinkableActorsList)
+        private static bool TrimDynaActors(SceneEnemizerData thisSceneData, StringBuilder dynaLog)
         {
-            /// shrinkableActorsList is a list of lists, where each list is all actors of the same type in the same room/day/night combo
+            /// too much dyna crashes the game, so we want to trim some of our dyna actors, removing them or turning them into something benign
 
             /// TODO move this to a better spot in the code
 
-            while (shrinkableActorsList.Count > 0)
+            void TrimSmaller(List<List<Actor>> shrinkTargets, List<List<Actor>> markForFinished)
             {
-                var markForFinished = new List<List<Actor>>();
+                // we want to randomize the list so that its not always the same order we remove actors by category, in case we have repeats
+                //shrinkTargets = shrinkTargets.OrderBy(x => thisSceneData.RNG.Next()).ToList();
+                // until such a time as we can detect (actor A exists in both lists and was removed earlier) this is a bit pre-mature, we always remove one from all lists for now
 
-                // per list of lists, remove one actor,
-                for (int l = 0; l < shrinkableActorsList.Count; l++)
+                // remove one from all of the list of lists
+                for (int l = 0; l < shrinkTargets.Count; l++)
                 {
-                    var list = shrinkableActorsList[l];
+                    //target actor list PerRoomTypeAndTime
+                    var list = shrinkTargets[l];
                     if (list.Count <= 1) // in a previous loop we shrank this one too mininum already, ignore
-                        continue;
+                        continue; // this is probably no longer needed 
 
-                    // remove one from all of the list of lists? 
                     var randomlyChosenActor = list[thisSceneData.RNG.Next() % list.Count];
                     var currentRoom = randomlyChosenActor.Room;
 
-                    thisSceneData.Log.AppendLine($" -- dyna overload trimmed actor [{randomlyChosenActor.Name}] on previous [{randomlyChosenActor.OldName}]" +
+                    dynaLog.AppendLine($" -- dyna overload trimmed actor [{randomlyChosenActor.Name}] on previous [{randomlyChosenActor.OldName}]" +
                                                 $" in map [{currentRoom}] index [{randomlyChosenActor.RoomActorIndex}]");
 
                     var roomActors = thisSceneData.Actors.FindAll(a => a.Room == randomlyChosenActor.Room);
 
                     // there is a lot of shlock here that I didn't realize, hopefully doesn't slow us down too much
-                    var blockedActors = thisSceneData.Scene.SceneEnum.GetBlockedReplacementActors(roomActors[0].OldActorEnum);
+                    var blockedActors = thisSceneData.Scene.SceneEnum.GetBlockedReplacementActors(randomlyChosenActor.OldActorEnum);
                     var roomFreeActors = GetRoomFreeActors(thisSceneData, randomlyChosenActor.Room);
                     // this is a hack, just assume if they have limits we shouldn't use them for this last second replacement
                     roomFreeActors.RemoveAll(actor => actor.DynaLoad.poly > 0
-                                                   || (actor.Variants.Count() > 0 && actor.VariantMaxCountPerRoom(actor.Variants[0]) > 1));
+                                                    || (actor.Variants.Count() > 0 && actor.VariantMaxCountPerRoom(actor.Variants[0]) > 1));
                     List<Actor> acceptableReplacementFreeActors = roomFreeActors.FindAll(a => !blockedActors.Contains(a.ActorEnum)).ToList();
+                    //var acceptableReplacementFreeActors = roomFreeActors.Except(blockedActors).ToList(); // damned default comparator
                     EmptyOrFreeActor(thisSceneData, randomlyChosenActor, roomActors, acceptableReplacementFreeActors,
-                        roomIsClearPuzzleRoom: true); // for now marking this true just because I dont want to re-calculate this since its in the wrong spot, dont both doing this for last second dyna removal
-                                                      // we may have fucked up putting this in the wrong layer
-                                                      //randomlyChosenActor.ChangeActor(GameObjects.Actor.Empty, 0x0); // temp
+                        roomIsClearPuzzleRoom: true); // for now marking this true just because I dont want to re-calculate this since its in the wrong spot,
+                                                      // dont bother doing this for last second dyna removal
+                                                        // we may have fucked up putting this in the wrong layer
 
-                    thisSceneData.Log.AppendLine($" --  replaced with  [{randomlyChosenActor.Name}]");
-
+                    dynaLog.AppendLine($" --  replaced with  [{randomlyChosenActor.Name}] ");
 
                     list.Remove(randomlyChosenActor);
 
-                    if (list.Count <= 1) // too small to contiue to remove, leave alone
+                    if (list.Count <= 1) // too small to continue to remove, leave alone
                     {
                         markForFinished.Add(list);
                     }
 
                     // test if dyna is still an issue, if not remove list
                     var act = thisSceneData.ActorCollection;
+                    act.SetNewActors(thisSceneData.Scene, thisSceneData.ChosenReplacementObjects); // have to update dyna values for the later functions to work
+
+                    //act.newMapList[currentRoom].day.DynaPolySize
                     var dayOverloaded = act.isDynaOverLoaded(act.newMapList[currentRoom].day, act.oldMapList[currentRoom].day, currentRoom);
                     var nightOverloaded = act.isDynaOverLoaded(act.newMapList[currentRoom].night, act.oldMapList[currentRoom].night, currentRoom);
                     if (!dayOverloaded && !nightOverloaded)
                     {
-                        markForFinished.Add(list);
+                        markForFinished.Add(list); // this room should be done, so this list should be removed, it might still cull from the other actors in this room tho
                     }
-                    list.Remove(randomlyChosenActor);
-                }
+                } // end for each list of lists
+            } // end trim smaller
 
-                for (int l = 0; l < markForFinished.Count; l++)
+            void TrimPass(List<List<Actor>> shrinkTargets)
+            {
+                while (shrinkTargets.Count > 0)
                 {
-                    shrinkableActorsList.Remove(markForFinished[l]);
+                    var markForFinished = new List<List<Actor>>();
+
+                    TrimSmaller(shrinkTargets, markForFinished);
+
+                    for (int l = 0; l < markForFinished.Count; l++)
+                    {
+                        shrinkTargets.Remove(markForFinished[l]);
+                    }
+
+                    // alt: we test once per pass instead of per actor removal
                 }
-
-
             }
 
-            return true;
+            // first pass: scan through large lists of large actors first, they are the biggest offenders
+            /// shrinkableActorsList is a list of lists, where each list is all actors of the same type in the same room/day/night combo
+            var shrinkableActorsList = thisSceneData.ActorCollection.GenerateShrinkableDynaList();
+            shrinkableActorsList.RemoveAll(list => list.Count <= 13);
+            TrimPass(shrinkableActorsList);
+
+            shrinkableActorsList = thisSceneData.ActorCollection.GenerateShrinkableDynaList();
+            shrinkableActorsList.RemoveAll(list => list.Count <= 5);
+            TrimPass(shrinkableActorsList);
+
+            // second pass: no, all of the large lists werent the issue, we still need to trim the small lists
+            shrinkableActorsList = thisSceneData.ActorCollection.GenerateShrinkableDynaList();
+            TrimPass(shrinkableActorsList);
+
+            return false;
         }
 
         public static void FinalActorLimitTrim(SceneEnemizerData thisSceneData)
@@ -3306,6 +3409,7 @@ namespace MMR.Randomizer
                 {
                     testActor.Rotation.x = ActorUtils.MergeRotationAndFlags(45, flags: testActor.Rotation.x); // pitch rotation down a bit
                 }
+                // special case: monkey spawns with an extra height offset from the floor, not at the location of the visible model
                 if (testActor.ActorEnum == GameObjects.Actor.Monkey && testActor.Variants[0] == 0x02FF
                     && wallVariants != null && wallVariants.Variants.Contains(testActor.OldVariant))
                 {
@@ -3524,11 +3628,12 @@ namespace MMR.Randomizer
 
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronKid)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.MilkbarChairs)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.DekuPalaceChamberGuard)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.BadBat, GameObjects.Actor.MilkbarChairs)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.En_Boj_04)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.CuriosityShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.En_Boj_04)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CutscenePirate)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Dog, GameObjects.Actor.Evan)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.WestClockTown, GameObjects.Actor.RosaSisters, GameObjects.Actor.GaboraBlacksmith)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BuisnessScrub)) continue;
@@ -3569,6 +3674,12 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.WoodfallTemple, GameObjects.Actor.Snapper, GameObjects.Actor.Mimi)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.GormanRaceTrack, GameObjects.Actor.Flagpole, GameObjects.Actor.HookshotWallSpot)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.UglyTree, GameObjects.Actor.MilkbarChairs)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TwinIslands, GameObjects.Actor.LargeSnowball, GameObjects.Actor.MilkbarChairs)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Leever, GameObjects.Actor.DarmaniGrave)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ZoraCape, GameObjects.Actor.Leever, GameObjects.Actor.MilkbarChairs)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBaba, GameObjects.Actor.SkullKidPainting)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.IkanaGraveyard, GameObjects.Actor.BadBat, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.ClayPot, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.ReDead, GameObjects.Actor.HookshotWallSpot)) continue;
@@ -4275,6 +4386,16 @@ namespace MMR.Randomizer
             thisSceneData.AcceptableCandidates = ReplacementCandidateList.FindAll(act => !act.ActorEnum.BlockedScenes().Contains(thisSceneData.Scene.SceneEnum))
                                                                          .FindAll(act => !act.NoPlacableVariants());
 
+            // if the dyna limits for this scene are low, we might as well trim all actors that cannot ever be put here,
+            // no point running code on them later
+            var dynaLimitsAttributes = thisSceneData.Scene.SceneEnum.GetAttribute<DynaAttributes>();
+            if (dynaLimitsAttributes != null)
+            {
+                var largeDynaActors = thisSceneData.AcceptableCandidates.FindAll(act => act.DynaLoad.poly > dynaLimitsAttributes.Polygons
+                                                                                     || act.DynaLoad.vert > dynaLimitsAttributes.Verticies);
+                thisSceneData.AcceptableCandidates = thisSceneData.AcceptableCandidates.Except(largeDynaActors).ToList();
+            }
+
             thisSceneData.Log.AppendLine($" ---------------------------");
 
             // trim weights
@@ -4296,8 +4417,7 @@ namespace MMR.Randomizer
                 // random coin toss, remove one
                 var targetActorEnum = (thisSceneData.RNG.Next() % 2 == 1) ? (GameObjects.Actor.GaboraBlacksmith) : (GameObjects.Actor.Zubora);
                 thisSceneData.AcceptableCandidates.RemoveAll(a => a.ActorEnum == targetActorEnum);
-            }
-
+             }
         }
 
         private static void SplitSceneLikeLikesIntoTwoActorObjects(SceneEnemizerData thisSceneData)
@@ -4679,17 +4799,14 @@ namespace MMR.Randomizer
                 WriteOutput($" set for size check: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
                 // dyna overflow is a common crash concern, here we need to check if we overflow and shrink the dyna actor count
+                var dynaLog = new StringBuilder();
                 var dynatest = thisSceneData.ActorCollection.isDynaSizeAcceptable();
                 if (dynatest != "acceptable")
                 {
                     // we failed the first test, try removing some dyna actors to compensate
                     // now we need to try trimming the dyna to smaller size by reducing each dyna by one until it fits or doesnt
-                    var shrinkableActorList = thisSceneData.ActorCollection.GenerateShrinkableDynaList();
 
-                    while (shrinkableActorList.Count > 0) // shrinkable is curated within trimdynaactors, if its shrinks to empty we are done
-                    {
-                        TrimDynaActors(thisSceneData, shrinkableActorList);
-                    }
+                    var dynaTrimSuccess = TrimDynaActors(thisSceneData, dynaLog);
                 }
 
                 WriteOutput($" set for dyna trim: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
@@ -4705,9 +4822,10 @@ namespace MMR.Randomizer
 
                 if (thisSceneData.ActorCollection.isSizeAcceptable(bogoLog)) // SUCCESS
                 {
-                    WriteOutput($" after issizeacceptable: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
+                    WriteOutput($" after isSizeAcceptable: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
                     //thisSceneData.Log.Append(objectReplacementLog);
+                    thisSceneData.Log.Append(dynaLog);
                     break; // done, break loop
                 }
                 // else: not small enough; reset loop and try again
@@ -4749,14 +4867,16 @@ namespace MMR.Randomizer
             for (int a = 0; a < thisSceneData.Actors.Count; a++)
             {
                 var actor = thisSceneData.Actors[a];
+                string dsize = actor.DynaLoad.poly > 0 ? $" dyn: [{actor.DynaLoad.poly}]" : "";
                 #if DEBUG
-                var actorNameData = $"  Old actor:[{thisSceneData.Scene.SceneEnum}][{actor.Room.ToString("D2")}][{actor.OldName}] ";
+                var actorNameData = $"  Old actor:[{thisSceneData.Scene.SceneEnum}][{actor.Room.ToString("D2")}][{actor.OldName}]";
                 #else
                 var actorNameData = $"  Old actor:[{actor.Room.ToString("D2")}][{actor.OldName}] ";
                 #endif
                 WriteOutput(actorNameData +
-                    $"was replaced by new actor: [{actor.Variants[0].ToString("X4")}]" +
-                    $"[{actor.Name}]");
+                    $" replaced by new actor: [{actor.Variants[0].ToString("X4")}]" +
+                    $"[{actor.Name}]"
+                    + dsize);
             }
 
             WriteOutput("---------------------------------------------------------");
@@ -5472,7 +5592,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 69.4\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 70.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
@@ -5578,8 +5698,14 @@ namespace MMR.Randomizer
             // split enemies into day and night, init two types
             int dayFlagMask = 0x2AA; // nigth is just shifted to the right by one
 
-            day = new BaseEnemiesCollection(actorList.FindAll(act => (act.GetTimeFlags() & dayFlagMask) > 0), objList, scene);
-            night = new BaseEnemiesCollection(actorList.FindAll(act => (act.GetTimeFlags() & (dayFlagMask >> 1)) > 0), objList, scene);
+            var dayActors = actorList.FindAll(act => (act.GetTimeFlags() & dayFlagMask) > 0);
+            this.day = new BaseEnemiesCollection(dayActors, objList, scene);
+            var nightActors = actorList.FindAll(act => (act.GetTimeFlags() & (dayFlagMask >> 1)) > 0);
+            this.night = new BaseEnemiesCollection(nightActors, objList, scene);
+#if DEBUG
+            //var missingElements = actorList.Except(dayActors).Except(nightActors).ToList();
+            //Debug.Assert(missingElements.Count == 0);
+#endif
         }
     }
 
