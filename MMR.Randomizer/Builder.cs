@@ -58,7 +58,6 @@ namespace MMR.Randomizer
                 Debug.WriteLine(str);
                 log.AppendLine(str);
             }
-            
 
             // we randomize both slots and songs because if we're low on variety, and we don't sort slots
             //   then all the variety can be dried up for the later slots
@@ -68,9 +67,14 @@ namespace MMR.Randomizer
             List<SequenceInfo> unassigned = RomData.SequenceList.FindAll(u => u.Replaces == -1);
             unassigned = unassigned.OrderBy(x => random.Next()).ToList();                           // random ordered songs
             RomData.TargetSequences = RomData.TargetSequences.OrderBy(x => random.Next()).ToList(); // random ordered slots
-            WriteOutput(" Randomizing " + RomData.TargetSequences.Count + " song slots, with " + unassigned.Count + " available songs:");
 
+            // if we have lots of music, let's randomize skulltula house and ikana well to have something unique that isn't cave music
+            if (RomData.SequenceList.Count > 80 && RomData.SequenceList.FindAll(u => u.Categories.Contains(2)).Count >= 8 + 2){ // tested by asking for all targetseq that have a category of 2, counted (8)
+                SequenceUtils.ReassignSongSlots(log, random);
+            }
             SequenceUtils.ResetBudget();
+            WriteOutput(" Randomizing " + RomData.TargetSequences.Count + " song slots, with " + unassigned.Count + " available songs:");
+            WriteOutput("=====================================================");
 
             // songtest filename token allows music makers and users to force a song into a MMR seed for recording/testing
             SequenceUtils.CheckSongTest(unassigned, log);
@@ -85,7 +89,7 @@ namespace MMR.Randomizer
 
             // songforce filename token places music in a higher priority, check for songs with songforce here
             SequenceUtils.CheckSongForce(unassigned, log, random);
-
+                
             foreach (var targetSlot in RomData.TargetSequences)
             {
                 // scan all songs for a replacement that fits in this slot
@@ -111,9 +115,32 @@ namespace MMR.Randomizer
             // write bigger music buffer
             ReadWriteUtils.WriteCodeUInt32(0x801DB9B4, 0x6000);
             ReadWriteUtils.WriteCodeUInt32(0x801DB9B8, 0x6000);
+
+            // write bigger music buffer for SEQ_PLAYER_BGM_SUB
+            ReadWriteUtils.WriteCodeUInt32(0x801DB9A8, 0x2800);
+
+            RemoveFanfaresFromShootingGaleryActors();
         }
 
-        private void WriteAudioSeq(Random random, OutputSettings _settings)
+        void RemoveFanfaresFromShootingGaleryActors()
+        {
+            /// If you hit wolfos or the distant scrubs they play a fanfare when you kill them instead of just regular sfx
+            /// this is annoying for BGM shuffle, you probably want to hear the minigame music, not the fanfare, some of which are really long
+
+            var wolfosFid = GameObjects.Actor.ShootingGalleryDekuWolfos.FileListIndex();
+            RomUtils.CheckCompressed(wolfosFid);
+            var wolfosData = RomData.MMFileList[wolfosFid].Data;
+            ReadWriteUtils.Arr_WriteU32(wolfosData, 0xD30, 0x0C067C32); // Jal AudioPlayFanfare -> jal play_sound
+            ReadWriteUtils.Arr_WriteU32(wolfosData, 0xD34, 0x24044807); // load 0x4807 into a0, the same sfx used in the rest of the game
+
+            var dekuNutsFid = GameObjects.Actor.ShootingGalleryDekuScrub.FileListIndex();
+            RomUtils.CheckCompressed(dekuNutsFid);
+            var dekuNutsData = RomData.MMFileList[dekuNutsFid].Data;
+            ReadWriteUtils.Arr_WriteU32(dekuNutsData, 0xC14, 0x0C067C32); // Jal AudioPlayFanfare -> jal play_sound
+            ReadWriteUtils.Arr_WriteU32(dekuNutsData, 0xC18, 0x24044807); // load 0x4807 into a0, the same sfx used in the rest of the game
+        }
+
+        private void WriteAudioSeq(Random random, OutputSettings settings)
         {
             if (_cosmeticSettings.Music == Music.None)
             {
@@ -126,8 +153,8 @@ namespace MMR.Randomizer
             SequenceUtils.ResetFreeBankIndex();
             if (_cosmeticSettings.Music == Music.Random)
             {
-                SequenceUtils.PointerizeSequenceSlots();
-                BGMShuffle(random, _settings);
+                SequenceUtils.PointerizeSequenceSlots(settings, _randomized, _cosmeticSettings);
+                BGMShuffle(random, settings);
                 ResourceUtils.ApplyHack(Resources.mods.remove_morning_music);
             }
 
@@ -135,7 +162,7 @@ namespace MMR.Randomizer
             SequenceUtils.RebuildAudioSeq(RomData.SequenceList,
                 _cosmeticSettings.AsmOptions.MusicConfig.SequenceMaskFileIndex,
                 _cosmeticSettings.AsmOptions.MusicConfig.SequenceNamesFileIndex);
-            SequenceUtils.WriteNewSoundSamples(RomData.InstrumentSetList);
+            SequenceUtils.WriteNewSoundSamples(RomData.InstrumentSetList, settings);
             SequenceUtils.RebuildAudioBank(RomData.InstrumentSetList);
         }
 
@@ -793,66 +820,14 @@ namespace MMR.Randomizer
             }
         }
 
-        private void WriteNutsAndSticks()
+        private void WriteNutsAndSticksDrops()
         {
-            /// adds deku sticks and deku nuts as additional drops to the drop tables, very useful in enemizer
-            /// when an actor drops an item, they roll a 16 side die, sometimes hardcode overrides in special cases (fairy)
-            ///   all of the slots replaced here with sticks and nuts were empty in vanilla
-            /// image guide from mzxrules of the drop tables in vanilla
-            /// https://pbs.twimg.com/media/Dct7fa6X4AEeYpv?format=jpg&name=large 
+            DropTableUtils.WriteNutsAndSticksDrops(_randomized);
+        }
 
-            if (_randomized.Settings.NutandStickDrops == NutAndStickDrops.Default)
-            {
-                return;
-            }
-
-            const byte DEKUNUT   = 0x0C;
-            const byte DEKUSTICK = 0x0D;
-            int  bushCount = (int)_randomized.Settings.NutandStickDrops;
-            byte nutCount = _randomized.Settings.NutandStickDrops == NutAndStickDrops.Light ? (byte) 0x1 : (byte)bushCount;
-            byte stickCount = (byte)Math.Max((int)_randomized.Settings.NutandStickDrops - 2, 1);
-            int  droptableFileID = RomUtils.GetFileIndexForWriting(0xC444B8);
-            RomUtils.CheckCompressed(droptableFileID);
-
-            void AddDropToDropTable(byte dropType, int replacementSlot = 0xC444B8, byte amount = 0)
-            {                
-                // each replacementSlot is a single 1/16 slot for random item drop
-                int offset = replacementSlot - RomData.MMFileList[droptableFileID].Addr;
-                RomData.MMFileList[droptableFileID].Data[offset] = dropType;
-                // how many items are dropped is the table that follows, aligns exactly with 0x110
-                RomData.MMFileList[droptableFileID].Data[offset + 0x110] = amount;
-            }
-
-            // termina field bushes 1/16 drop table entry
-            AddDropToDropTable(DEKUNUT, 0xC444B7, nutCount);
-            AddDropToDropTable(DEKUSTICK, 0xC444BF, stickCount);
-            if (bushCount >= 2) // medium and higher
-            {
-                // another slot in the TF grass drop table
-                AddDropToDropTable(DEKUNUT, 0xC444B8, nutCount);
-                AddDropToDropTable(DEKUSTICK, 0xC444C0, stickCount);
-            }
-            if (bushCount >= 3) // extra and higher
-            {
-                // another slot in the TF grass drop table
-                AddDropToDropTable(DEKUNUT, 0xC444BC, nutCount);
-                AddDropToDropTable(DEKUSTICK, 0xC444C1, stickCount);
-                // if extra and higher, add some to non termina field droplists
-                AddDropToDropTable(DEKUNUT, 0xC444CB, nutCount);   // stalchild and south swamp
-                AddDropToDropTable(DEKUSTICK, 0xC444CC, stickCount);
-                AddDropToDropTable(DEKUNUT, 0xC44574, nutCount);   // lens of truth grass
-                AddDropToDropTable(DEKUSTICK, 0xC44575, stickCount);
-            }
-            if (bushCount >= 4) // mayhem
-            {
-                // nuts and sticks in weird drop tables too for mayhem
-                AddDropToDropTable(DEKUNUT, 0xC444F8, nutCount);   // graveyard rocks
-                AddDropToDropTable(DEKUSTICK, 0xC444F9, stickCount);
-                AddDropToDropTable(DEKUNUT, 0xC444D6, nutCount);   // snow trees and snow rocks
-                AddDropToDropTable(DEKUSTICK, 0xC444D7, stickCount);
-                AddDropToDropTable(DEKUNUT, 0xC445BA, nutCount);   // field mice
-                AddDropToDropTable(DEKUSTICK, 0xC445BB, stickCount);
-            }
+        public void WriteBombchuDrops()
+        {
+            DropTableUtils.WriteNutsAndSticksDrops(_randomized);
         }
 
         private void WriteQuickText()
@@ -1241,6 +1216,7 @@ namespace MMR.Randomizer
                     })
                     .Build()
                 );
+
             }
 
             if (_randomized.Settings.SpeedupBabyCuccos)
@@ -1298,6 +1274,11 @@ namespace MMR.Randomizer
             if (_randomized.Settings.AllowFierceDeityAnywhere)
             {
                 ResourceUtils.ApplyHack(Resources.mods.fierce_deity_anywhere);
+
+                // Enable FD Spinattack, by removing the check to make sure link is human form
+                RomUtils.CheckCompressed(38); // ovl_player_actor
+                var playerFile = RomData.MMFileList[38].Data;
+                ReadWriteUtils.Arr_WriteU32(playerFile, 0x5880, 0x00000000); // branch on player->transoformation != Human -> NOP
             }
 
             if (_randomized.Settings.AllowFierceDeityAnywhere || _randomized.Settings.SaferGlitches)
@@ -1516,11 +1497,11 @@ namespace MMR.Randomizer
             }
         }
 
-        private void WriteEnemies()
+        private void WriteEnemies(OutputSettings outputSettings)
         {
             if (_randomized.Settings.RandomizeEnemies)
             {
-                Enemies.ShuffleEnemies(new Random(_randomized.Seed));
+                Enemies.ShuffleEnemies(outputSettings, _cosmeticSettings, _randomized);
             }
         }
 
@@ -6016,7 +5997,7 @@ namespace MMR.Randomizer
             // change the table labels so "Name", the unused field of filenames, is removed and tiny "cn" is replaced with Num
             // also "No." changed to A.ID, as "No." could be confused for count, but its actorId
             byte[] newTableLabelString = Encoding.ASCII.GetBytes("A.Id RAMStart -   RAMEnd Num."); // replaces "No. RamStart- RamEnd cn  Name\n"
-            var newTableSubString = Encoding.ASCII.GetBytes("%4d %08X - %08X %4d "); // replaces "%3d %08x-%08x %3d %s\n"
+            var newTableSubString = Encoding.ASCII.GetBytes("%4X %08X - %08X %4d "); // replaces "%3d %08x-%08x %3d %s\n"
             ReadWriteUtils.Arr_Insert(newTableLabelString, 0, newTableLabelString.Length, codeFileData, 0x137104);
             ReadWriteUtils.Arr_Insert(newTableSubString,   0, newTableSubString.Length,   codeFileData, 0x137124);
 
@@ -6304,10 +6285,11 @@ namespace MMR.Randomizer
                 WriteSpeedUps(messageTable);
 
                 progressReporter.ReportProgress(65, "Writing enemies...");
-                WriteEnemies();
+                WriteEnemies(outputSettings);
 
                 progressReporter.ReportProgress(66, "Writing items...");
                 WriteItems(messageTable);
+
                 WriteMiscHacks();
 
                 progressReporter.ReportProgress(67, "Writing cutscenes...");
@@ -6336,8 +6318,9 @@ namespace MMR.Randomizer
                 progressReporter.ReportProgress(71, "Writing ASM patch...");
                 WriteAsmPatch(asm);
 
-                WriteNutsAndSticks();
-                
+                DropTableUtils.WriteNutsAndSticksDrops(_randomized);
+                DropTableUtils.WriteBombchuDrops(_randomized);
+
                 progressReporter.ReportProgress(72, outputSettings.GeneratePatch ? "Generating patch..." : "Computing hash...");
                 hash = outputSettings.GeneratePatch switch
                 {
@@ -6361,6 +6344,7 @@ namespace MMR.Randomizer
             progressReporter.ReportProgress(72, "Writing cosmetics...");
             WriteTatlColour(new Random(BitConverter.ToInt32(hash, 0)));
             //WriteTunicColor();
+            //MakeItRain();
             WriteInstruments(new Random(BitConverter.ToInt32(hash, 0)));
 
             progressReporter.ReportProgress(73, "Writing music...");
@@ -6379,13 +6363,15 @@ namespace MMR.Randomizer
             {
                 progressReporter.ReportProgress(75, "Building ROM...");
 
+                Enemies.UpdateActorOverlayTable(); // last second before rom generation
+
                 if (outputSettings.GenerateROM)
                 {
-                    byte[] ROM = RomUtils.BuildROM();
+                    byte[] ROM = RomUtils.BuildROM(outputSettings);
                     if (ROM.Length > 0x4000000) // over 64mb
                     {
                         throw new ROMOverflowException("64 MB", "hardware (Everdrive)");
-                    }
+                    }// */
                     progressReporter.ReportProgress(85, "Writing ROM...");
                     RomUtils.WriteROM(outputSettings.OutputROMFilename, ROM);
                 }
@@ -6410,7 +6396,7 @@ namespace MMR.Randomizer
                             );
                     }
 
-                    byte[] ROM = RomUtils.BuildROM();
+                    byte[] ROM = RomUtils.BuildROM(outputSettings);
                     if (ROM.Length > 0x2800000) // Over 40MB. The upper limit is likely 48MB, but let's stick with 40 for now.
                     {
                         throw new ROMOverflowException("40 MB", "WiiVC");

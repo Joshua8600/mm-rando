@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using System.Media;
 using MMR.Randomizer.Models;
 using MMR.Randomizer.Utils;
 using MMR.Randomizer.Asm;
@@ -68,8 +69,30 @@ namespace MMR.UI.Forms
             About = new AboutForm();
             HudConfig = new HudConfigForm();
 
+            this.AllowDrop = true;
+            this.DragEnter += new DragEventHandler(Main_ItemDragEnter);
+            this.DragDrop += new DragEventHandler(Main_ItemDragDrop);
 
-            Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion}";
+            this.KeyPreview = true;
+            this.KeyDown += MainForm_KeyDown_CtrlS;
+            #if DEBUG
+            Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + DEBUG ON";
+            #else
+            Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + Isghj's Enemizer Test 70.1";
+            #endif
+
+            var args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                var openWithArg = args[1];
+                if (Path.GetExtension(openWithArg) == ".mmr")
+                {
+                    ttOutput.SelectedIndex = 1;
+                    TogglePatchSettings(false);
+                    _configuration.OutputSettings.InputPatchFilename = openWithArg;
+                    tPatch.Text = _configuration.OutputSettings.InputPatchFilename;
+                }
+            }
         }
 
         private void InitializeSimpleControls()
@@ -1019,6 +1042,46 @@ namespace MMR.UI.Forms
             _configuration.CosmeticSettings.Instruments[form] = value;
         }
 
+        protected void Main_ItemDragEnter(object sender, DragEventArgs e)
+        {
+            // required for drag and drop to work
+            if (e.Data.GetDataPresent(DataFormats.FileDrop) ||
+                e.Data.GetDataPresent(DataFormats.UnicodeText) || e.Data.GetDataPresent(DataFormats.Text))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        protected void Main_ItemDragDrop(object sender, DragEventArgs e)
+        {
+            /// If the player DragAndDrops patch files, settings files, or seed values into the GUI I want them to auto load
+
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop); // can drop multiple files, for now just one
+            if (files != null && files.Length == 1)
+            {
+                var filename = files[0];
+                if (filename.Substring(filename.Length - 4) == ".mmr")
+                {
+                    this.ttOutput.SelectedTab = this.tpPatchSettings;
+
+                    this.tPatch.Text = filename;
+                }
+
+                else if (filename.Substring(filename.Length - 5) == ".json")
+                {
+                    LoadSettings(filename); // error handling should already be contained within, right?
+                }
+
+            }
+
+            string seedText = (string)e.Data.GetData(DataFormats.Text);
+            int intTest;
+            if (seedText != null && int.TryParse(seedText, out intTest))
+            {
+                this.tSeed.Text = seedText;
+            }
+        }
+
         #region Forms Code
 
         private void mmrMain_Load(object sender, EventArgs e)
@@ -1074,8 +1137,18 @@ namespace MMR.UI.Forms
 
         private void bgWorker_WorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            pProgress.Value = 0;
-            lStatus.Text = "Ready...";
+            if ((_configuration.OutputSettings.GenerateSpoilerLog || _configuration.OutputSettings.GenerateHTMLLog) && !_configuration.OutputSettings.GeneratePatch && !_configuration.OutputSettings.GenerateROM)
+            {
+                lStatus.Text = "Log generated! Ready for another seed...";
+            }
+            else if (pProgress.Value < pProgress.Maximum)
+            {
+                lStatus.Text = "Build failed! Ready for another seed...";
+            }
+            else
+            {
+                lStatus.Text = "Build finished! Ready for another seed...";
+            }
             EnableAllControls(true);
             ToggleCheckBoxes();
             TogglePatchSettings(ttOutput.SelectedTab.TabIndex == 0);
@@ -1212,30 +1285,42 @@ namespace MMR.UI.Forms
             UpdateSettingLogicMarkers();
         }
 
-        private void Randomize()
+        private void Randomize(bool filePromptBypass = false)
         {
-            string validationResult;
-            if (!string.IsNullOrWhiteSpace(_configuration.OutputSettings.InputPatchFilename))
-            {
-                validationResult = _configuration.OutputSettings.Validate();
-                saveROM.FileName = Path.ChangeExtension(Path.GetFileName(_configuration.OutputSettings.InputPatchFilename), "z64");
-            }
-            else
-            {
-                validationResult = _configuration.GameplaySettings.Validate() ?? _configuration.OutputSettings.Validate();
-                var defaultOutputROMFilename = FileUtils.MakeFilenameValid($"MMR-{typeof(Randomizer).Assembly.GetName().Version}-{DateTime.UtcNow:o}");
-                saveROM.FileName = defaultOutputROMFilename;
-            }
-
+                        var validationResult = _configuration.GameplaySettings.Validate() ?? _configuration.OutputSettings.Validate();
             if (validationResult != null)
             {
                 MessageBox.Show(validationResult, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            if (saveROM.ShowDialog() != DialogResult.OK)
+            var defaultOutputROMFilename = FileUtils.MakeFilenameValid($"MMR-{typeof(Randomizer).Assembly.GetName().Version}-{DateTime.UtcNow:o}");
+
+            saveROM.FileName = !string.IsNullOrWhiteSpace(_configuration.OutputSettings.InputPatchFilename)
+                             ? Path.ChangeExtension(Path.GetFileName(_configuration.OutputSettings.InputPatchFilename), "z64")
+                             : defaultOutputROMFilename;
+
+            if (!filePromptBypass)
             {
-                return;
+                if (saveROM.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                var directory = "output";
+                if (_configuration.OutputSettings.OutputROMFilename != null && _configuration.OutputSettings.OutputROMFilename.Length > 0)
+                {
+                    directory = Path.GetDirectoryName(_configuration.OutputSettings.OutputROMFilename);
+                }
+                else if (! Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                saveROM.FileName = saveROM.FileName + "." + saveROM.DefaultExt;
+                saveROM.FileName = Path.Combine(directory, saveROM.FileName);
             }
 
             _configuration.OutputSettings.OutputROMFilename = saveROM.FileName;
@@ -1244,9 +1329,20 @@ namespace MMR.UI.Forms
             bgWorker.RunWorkerAsync();
         }
 
-        private void bRandomise_Click(object sender, EventArgs e)
+        private void bRandomise_MouseDown(object sender, MouseEventArgs e)
         {
-            Randomize();
+            // if right click, generate quickly without file select
+            Randomize(e.Button == MouseButtons.Right);
+        }
+
+        private void bReroll_MouseDown(object sender, MouseEventArgs e)
+        {
+            tSeed.Text = (new Random()).Next(2147483647).ToString();
+
+            if (e.Button == MouseButtons.Right)  // reroll seed and instant re-generate
+            {
+                Randomize(true);
+            }
         }
 
         private void bApplyPatch_Click(object sender, EventArgs e)
@@ -2005,6 +2101,7 @@ namespace MMR.UI.Forms
             cDrawHash.Enabled = v;
 
             bRandomise.Enabled = v;
+            bReroll.Enabled = v;
             tSeed.Enabled = v;
             tSettings.Enabled = v;
             bLoadPatch.Enabled = v;
@@ -2026,9 +2123,9 @@ namespace MMR.UI.Forms
             }
         }
 
-        #endregion
+#endregion
 
-        #region Settings
+#region Settings
 
         public void InitializeSettings()
         {
@@ -2049,9 +2146,9 @@ namespace MMR.UI.Forms
         }
 
 
-        #endregion
+#endregion
 
-        #region Randomization
+#region Randomization
 
         /// <summary>
         /// Try to perform randomization and make rom
@@ -2068,7 +2165,10 @@ namespace MMR.UI.Forms
 
             _configuration.OutputSettings.InputPatchFilename = null;
 
-            MessageBox.Show("Generation complete!", "Success", MessageBoxButtons.OK, MessageBoxIcon.None);
+            if (File.Exists("SeedDone.wav"))
+                new SoundPlayer("SeedDone.wav").Play();  // specific sfx file
+            else
+                SystemSounds.Asterisk.Play();             // System sound
         }
 
         private bool CheckLogicFileExists()
@@ -2083,7 +2183,7 @@ namespace MMR.UI.Forms
             return true;
         }
 
-        #endregion
+#endregion
 
         private void BLoadPatch_Click(object sender, EventArgs e)
         {
@@ -2292,6 +2392,17 @@ namespace MMR.UI.Forms
                 {
                     SaveSettings(saveSettings.FileName);
                 }
+            }
+        }
+
+        private void MainForm_KeyDown_CtrlS(object sender, KeyEventArgs e)
+        {
+            if (e.Modifiers == Keys.Control && e.KeyCode == Keys.S)
+            {
+                SaveSettings();
+                //this.Text = AssemblyVersion + "    --    Settings Saved: " + DateTime.Now.ToString("hh:mm:ss tt  \"GMT\"zzz"); // with GMT
+                this.Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion}" + "--    Settings Saved: " + DateTime.Now.ToString("hh:mm:ss tt"); // title bar
+                e.Handled = true;
             }
         }
 

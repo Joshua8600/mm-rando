@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using MMR.Randomizer.Extensions;
+using System.Diagnostics;
+using System;
+using MMR.Randomizer.Attributes.Actor;
+using MMR.Randomizer.Attributes.Entrance;
+using MMR.Common.Extensions;
 
 namespace MMR.Randomizer.Utils
 {
@@ -60,7 +65,8 @@ namespace MMR.Randomizer.Utils
                 if (saddr != 0)
                 {
                     s.File = RomUtils.AddrToFile((int)saddr);
-                    s.Number = (byte)(i >> 4);
+                    s.Number = i >> 4;
+                    s.SceneEnum = ((GameObjects.Scene[])Enum.GetValues(typeof(GameObjects.Scene))).ToList().Find(u => u.Id() == s.Number);
                     RomData.SceneList.Add(s);
                 }
                 i += 16;
@@ -88,7 +94,10 @@ namespace MMR.Randomizer.Utils
                             scene.Maps.Add(m);
                             mapsaddr += 8;
                         }
-                        break;
+                    }
+                    if (cmd == 0x07)
+                    {
+                        scene.SpecialObject = (Scene.SceneSpecialObject) RomData.MMFileList[f].Data[j + 7];
                     }
                     if (cmd == 0x14)
                     {
@@ -100,6 +109,33 @@ namespace MMR.Randomizer.Utils
                 if (scene.Number == 108) // avoid modifying unused setup in East Clock Town. doesn't seem to actually affect anything in-game, but best not to touch it.
                 {
                     scene.Setups.RemoveAt(2);
+                }
+            }
+        }
+
+        public static void GetSceneHeaders()
+        {
+            for (int i = 0; i < RomData.SceneList.Count; i++)
+            {
+                RomUtils.CheckCompressed(RomData.SceneList[i].File); // should be done by this point?
+                var sceneFile = RomData.MMFileList[RomData.SceneList[i].File].Data;
+                int ptr = 0;
+                while (true)
+                {
+                    byte cmd = sceneFile[ptr];
+                    if (cmd == 0x0E)
+                    {
+                        byte DoorCount = sceneFile[ptr + 1];
+                        int DoorAddr = (int)ReadWriteUtils.Arr_ReadU32(sceneFile, ptr + 4) & 0xFFFFFF;
+                        //RomData.SceneList[i].Maps[j].ActorAddr = ActorAddr;
+                        RomData.SceneList[i].Doors = ReadSceneDoors(sceneFile, DoorAddr, DoorCount, i);
+                    }
+                    else if (cmd == 0x14) // final header command, no more headers
+                    {
+                        break;
+                    }
+
+                    ptr += 8;
                 }
             }
         }
@@ -161,26 +197,87 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-        private static List<Actor> ReadMapActors(byte[] Map, int Addr, int Count)
+        private static List<Actor> ReadMapActors(byte[] Map, int Addr, int Count, int sceneID, int mapID)
         {
             List<Actor> Actors = new List<Actor>();
             for (int i = 0; i < Count; i++)
             {
+                // actor list format https://wiki.cloudmodding.com/mm/Scenes_and_Rooms#Actors_List
+
                 Actor a = new Actor();
                 ushort an = ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16));
-                a.m = an & 0xF000;
-                a.n = an & 0x0FFF;
-                a.p.x = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 2);
-                a.p.y = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 4);
-                a.p.z = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 6);
-                a.r.x = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 8);
-                a.r.y = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 10);
-                a.r.z = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 12);
-                a.v = ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 14);
+                a.ActorIdFlags = an & 0xF000; // unused
+                a.ActorId = an & 0x0FFF;
+                a.ActorEnum = (GameObjects.Actor)a.ActorId;
+                a.OldActorEnum = a.ActorEnum;
+                a.OldName = a.ActorEnum.ToString();
+                a.ObjectId = a.ActorEnum.ObjectIndex();
+                a.OldObjectId = a.ObjectId;
+                //a.ObjectSize = ObjUtils.GetObjSize(a.ObjectIndex());
+                a.Position.x = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 2);
+                a.Position.y = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 4);
+                a.Position.z = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 6);
+                a.Rotation.x = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 8);
+                a.Rotation.y = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 10);
+                a.Rotation.z = (short)ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 12);
+                a.Variants[0] = ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16) + 14);
+                a.OldVariant = a.Variants[0];
+                //a.sceneID = RomData.SceneList[sceneID].Number;
+                a.Room = mapID;
+                a.RoomActorIndex = i;
+
+                var dynaProperties = a.ActorEnum.GetAttribute<DynaAttributes>();
+                if (dynaProperties != null)
+                {
+                    a.DynaLoad.poly = dynaProperties.Polygons;
+                    a.DynaLoad.vert = dynaProperties.Verticies;
+                }
+
                 Actors.Add(a);
             }
+            Debug.WriteLine("\n");
+
             return Actors;
         }
+
+        private static List<Actor> ReadSceneDoors(byte[] Scene, int DoorActorListOffset, int Count, int sceneID)
+        {
+            List<Actor> doors = new List<Actor>();
+            for (ushort i = 0; i < Count; i++)
+            {
+                // transition list format https://wiki.cloudmodding.com/mm/Scenes_and_Rooms#Transition_Actors
+
+                var doorOffset = DoorActorListOffset + (i * 16); // location of specific door entry in list as address
+                Actor a = new Actor();
+                ushort an = ReadWriteUtils.Arr_ReadU16(Scene, doorOffset + 4);
+                a.ActorId = an & 0x0FFF;
+                a.OldActorEnum = a.ActorEnum = (GameObjects.Actor) a.ActorId;
+                a.OldName = a.Name = a.ActorEnum.ToString();
+                a.OldObjectId = a.ObjectId = a.ActorEnum.ObjectIndex();
+
+                a.Position.x = (short)ReadWriteUtils.Arr_ReadU16(Scene, doorOffset + 6);
+                a.Position.y = (short)ReadWriteUtils.Arr_ReadU16(Scene, doorOffset + 8);
+                a.Position.z = (short)ReadWriteUtils.Arr_ReadU16(Scene, doorOffset + 10);
+                a.Rotation.x = 0; // doors can't be x/z rotated I guess, they need the data space for other things
+                a.Rotation.y = (short)ReadWriteUtils.Arr_ReadU16(Scene, doorOffset + 12);
+                a.Rotation.z = 0;
+                a.Variants[0] = ReadWriteUtils.Arr_ReadU16(Scene, doorOffset + 14);
+                a.OldVariant = a.Variants[0];
+
+                // doors do not have a room, they are in the scene and therefor in every room
+                // but does do have a room they point towards, the next room that loads when you touch them
+                // for now, reusing this value for this other purpose
+                a.RoomActorIndex = ReadWriteUtils.Arr_ReadU16(Scene, doorOffset + 0);
+                // from the back
+                //a.RoomActorIndex = ReadWriteUtils.Arr_ReadU16(Scene, doorOffset + 2);
+
+                doors.Add(a);
+            }
+            Debug.WriteLine("\n");
+
+            return doors;
+        }
+
 
         private static List<int> ReadMapObjects(byte[] Map, int Addr, int Count)
         {
@@ -192,18 +289,49 @@ namespace MMR.Randomizer.Utils
             return Objects;
         }
 
+        public static int GetSceneObjectBankSize(GameObjects.Scene scene)
+        {
+            // in MM scenes have static object allocation on the heap, hard coded
+            // these values are ripped from mm decomp:
+            // https://github.com/zeldaret/mm/blob/master/include/z64object.h#L4-L7
+            // https://github.com/zeldaret/mm/blob/master/src/code/z_scene.c#L32-L41
+
+            const int OBJECT_SPACE_SIZE_DEFAULT         = 1413120; // 0x159000
+            const int OBJECT_SPACE_SIZE_CLOCK_TOWN      = 1566720; // 0x17E800
+            const int OBJECT_SPACE_SIZE_MILK_BAR        = 1617920; // 0x18B000
+            const int OBJECT_SPACE_SIZE_TERMINA_FIELD   = 1505280; // 0x16F800
+
+            if (scene == GameObjects.Scene.SouthClockTown || scene == GameObjects.Scene.EastClockTown ||
+                scene == GameObjects.Scene.NorthClockTown || scene == GameObjects.Scene.WestClockTown)
+            {
+                return OBJECT_SPACE_SIZE_CLOCK_TOWN;
+            }
+            else if (scene == GameObjects.Scene.MilkBar)
+            {
+                return OBJECT_SPACE_SIZE_MILK_BAR;
+            }
+            else if (scene == GameObjects.Scene.TerminaField)
+            {
+                return OBJECT_SPACE_SIZE_TERMINA_FIELD;
+            }
+            else
+            {
+                return OBJECT_SPACE_SIZE_DEFAULT;
+            }
+        }
+
         private static void WriteMapActors(byte[] Map, int Addr, List<Actor> Actors)
         {
             for (int i = 0; i < Actors.Count; i++)
             {
-                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16), (ushort)(Actors[i].m | Actors[i].n));
-                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 2, (ushort)Actors[i].p.x);
-                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 4, (ushort)Actors[i].p.y);
-                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 6, (ushort)Actors[i].p.z);
-                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 8, (ushort)Actors[i].r.x);
-                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 10, (ushort)Actors[i].r.y);
-                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 12, (ushort)Actors[i].r.z);
-                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 14, (ushort)Actors[i].v);
+                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16), (ushort)(Actors[i].ActorIdFlags | Actors[i].ActorId));
+                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 2, (ushort)Actors[i].Position.x);
+                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 4, (ushort)Actors[i].Position.y);
+                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 6, (ushort)Actors[i].Position.z);
+                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 8, (ushort)Actors[i].Rotation.x);
+                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 10, (ushort)Actors[i].Rotation.y);
+                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 12, (ushort)Actors[i].Rotation.z);
+                ReadWriteUtils.Arr_WriteU16(Map, Addr + (i * 16) + 14, (ushort)Actors[i].Variants[0]);
             }
         }
 
@@ -215,10 +343,10 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-        private static void UpdateMap(Map M)
+        private static void UpdateMap(Map map)
         {
-            WriteMapActors(RomData.MMFileList[M.File].Data, M.ActorAddr, M.Actors);
-            WriteMapObjects(RomData.MMFileList[M.File].Data, M.ObjAddr, M.Objects);
+            WriteMapActors(RomData.MMFileList[map.File].Data, map.ActorAddr, map.Actors);
+            WriteMapObjects(RomData.MMFileList[map.File].Data, map.ObjAddr, map.Objects);
         }
 
         public static void UpdateScene(Scene scene)
@@ -228,6 +356,9 @@ namespace MMR.Randomizer.Utils
                 UpdateMap(scene.Maps[i]);
             }
         }
+
+        //public static void ParseSceneHeaders
+
 
         public static void GetActors()
         {
@@ -246,7 +377,7 @@ namespace MMR.Randomizer.Utils
                             byte ActorCount = RomData.MMFileList[f].Data[k + 1];
                             int ActorAddr = (int)ReadWriteUtils.Arr_ReadU32(RomData.MMFileList[f].Data, k + 4) & 0xFFFFFF;
                             RomData.SceneList[i].Maps[j].ActorAddr = ActorAddr;
-                            RomData.SceneList[i].Maps[j].Actors = ReadMapActors(RomData.MMFileList[f].Data, ActorAddr, ActorCount);
+                            RomData.SceneList[i].Maps[j].Actors = ReadMapActors(RomData.MMFileList[f].Data, ActorAddr, ActorCount, i, j);
                         }
                         if (cmd == 0x0B)
                         {
@@ -333,6 +464,35 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        public static DynaHeadroom GetSceneDynaAttributes(GameObjects.Scene scene, int roomNumber)
+        {
+            var attributes = scene.GetAttributes<DynaHeadroom>().ToList();
+            if (attributes != null)
+            {
+                for (int i = 0; i < attributes.Count; i++)
+                {
+                    var attr = attributes[i];
+                    if (attr.Room == roomNumber
+                        || attr.Room == -1) // room doesn't need to match because this scene probably only has one
+                    {
+                        return attr;
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        public static (int, int) GetSceneRoomDynaLimits(GameObjects.Scene scene, int roomNumber)
+        {
+
+
+
+            return (0, 0); // default
+        }
+
+        #region Night Music
+
         public static void ReenableNightBGMSingle(int SceneFileID, byte NewMusicByte = 0x13)
         {
             // search for the bgm music header in the scene headers and replace the night sfx with a value that plays day BGM
@@ -413,6 +573,8 @@ namespace MMR.Randomizer.Utils
             // null function call to Audio_QueueSeqCmd -> NOP
             ReadWriteUtils.Arr_WriteU32(sakonData, 0x3A0C, 0x00000000);
         }
+
+        #endregion
 
         public static void InsertLargeChestCutscene()
         {

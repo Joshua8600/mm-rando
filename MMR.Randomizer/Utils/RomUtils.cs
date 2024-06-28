@@ -11,7 +11,11 @@ using System.IO.Compression;
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Threading;
+using MMR.Common.Extensions;
+using MMR.Randomizer.Extensions;
+using MMR.Randomizer.Attributes;
 using System.Numerics;
+using MMR.Randomizer.Models.Settings;
 
 namespace MMR.Randomizer.Utils
 {
@@ -27,8 +31,12 @@ namespace MMR.Randomizer.Utils
             int veraddr = 0xC44E30;
             int settingaddr = 0xC44E70;
             string verstring = $"MM Rando {ver}\x00";
-            string settingstring = $"{setting}\x00";
 
+            #if DEBUG
+            string settingstring = $"{setting} + DEBUG BUILD\x00";
+            #else
+            string settingstring = $"{setting} + Isghj's Enemizer Test 70.1\x00";
+            #endif
             int f = GetFileIndexForWriting(veraddr);
             var file = RomData.MMFileList[f];
 
@@ -53,6 +61,52 @@ namespace MMR.Randomizer.Utils
                 file => RAddr >= file.Addr && RAddr < file.End);
         }
 
+        public static int GetFIDFromVROM(int actorStartVROM, int startID = 3, int endID = 1550)
+        {
+            /// search for File ID from VROM address in DMA table
+            /// WARNING: this assumes you are searching vanilla files only, which are default sorted by VROM
+
+            var dmaFID = 2;
+            var dmaData = RomData.MMFileList[dmaFID].Data;
+
+            int Linear(int start)
+            {
+                for (int i = start; i < 1550; ++i)
+                {
+                    // xxxxxxxx yyyyyyyy aaaaaaaa bbbbbbbb <- DMA table entry
+                    // x and y should be start and end VROM addresses of each file
+                    var dmaStartingAddr = ReadWriteUtils.Arr_ReadU32(dmaData, 16 * i);
+                    if (dmaStartingAddr == actorStartVROM)
+                    {
+                        return i;
+                    }
+                }
+
+                throw new Exception($"GetFIDFromVROM: could not find the file at VROM start addr:\n" +
+                                    $"    [0x{actorStartVROM.ToString("X")}]");
+                //return -1;
+            }
+
+            var size = endID - startID;
+            if (size < 15) // if dma range < 15 (12.1 at 8 layers deep): search the rest of the way with linear
+            {
+                return Linear(startID);
+            }
+            else // else: recursive down to smaller size
+            {
+                int middle = (int)(size / 2.0) + startID;
+                var middleAddr = ReadWriteUtils.Arr_ReadU32(dmaData, 16 * middle);
+                if (actorStartVROM >= middleAddr)
+                {
+                    return GetFIDFromVROM(actorStartVROM, middle, endID);
+                }
+                else
+                {
+                    return GetFIDFromVROM(actorStartVROM, startID, middle - 1);
+                }
+            }
+        }
+
         public static void CheckCompressed(int fileIndex, List<MMFile> mmFileList = null)
         {
             if (mmFileList == null)
@@ -60,6 +114,10 @@ namespace MMR.Randomizer.Utils
                 mmFileList = RomData.MMFileList;
             }
             var file = mmFileList[fileIndex];
+            if (file.Data == null || file.Data.Length == 0)
+            {
+                return;
+            }
             if (file.IsCompressed && !file.WasEdited)
             {
                 file.Data = Yaz.Decode(file.Data);
@@ -137,15 +195,20 @@ namespace MMR.Randomizer.Utils
             return -1;
         }
 
-        private static void UpdateFileTable(byte[] ROM)
+        private static void UpdateDMAFileTable(byte[] ROM)
         {
+            /// the DMA filetable stores the decompressed and compressed file start/end for every file
+            /// AAAAAAAA BBBBBBBB CCCCCCCC DDDDDDDD size = 0x10
+            /// where A and B are the start of VROM, where the files are located in decompressed space in-game and decompressed rom
+            /// C and D are start/end of where the compressed version of the file exists in the compressed rom
+
             for (int i = 0; i < RomData.MMFileList.Count; i++)
             {
                 int offset = FILE_TABLE + (i * 16);
-                ReadWriteUtils.Arr_WriteU32(ROM, offset, (uint)RomData.MMFileList[i].Addr);
-                ReadWriteUtils.Arr_WriteU32(ROM, offset + 4, (uint)RomData.MMFileList[i].End);
-                ReadWriteUtils.Arr_WriteU32(ROM, offset + 8, (uint)RomData.MMFileList[i].Cmp_Addr);
-                ReadWriteUtils.Arr_WriteU32(ROM, offset + 12, (uint)RomData.MMFileList[i].Cmp_End);
+                ReadWriteUtils.Arr_WriteU32(ROM, offset + 0x0, (uint)RomData.MMFileList[i].Addr);
+                ReadWriteUtils.Arr_WriteU32(ROM, offset + 0x4, (uint)RomData.MMFileList[i].End);
+                ReadWriteUtils.Arr_WriteU32(ROM, offset + 0x8, (uint)RomData.MMFileList[i].Cmp_Addr);
+                ReadWriteUtils.Arr_WriteU32(ROM, offset + 0xC, (uint)RomData.MMFileList[i].Cmp_End);
             }
         }
 
@@ -164,7 +227,9 @@ namespace MMR.Randomizer.Utils
 
             var startTime = DateTime.Now;
 
-            // sorting the list with .Where().ToList() => OrderByDescending().ToList only takes (~ 0.400 miliseconds) on Isghj's computer
+            // sorting the list with .Where() => OrderByDescending().ToList only takes (~ 0.400 miliseconds) on Isghj's computer
+            //  but the time required to compress mostly scales with size:
+            //  by sorting biggest files first, we are less likely to be stuck waiting for one big file at the end
             var sortedCompressibleFiles = RomData.MMFileList
                 .Where(file => file.IsCompressed && file.WasEdited)
                 .OrderByDescending(file => file.Data.Length)
@@ -186,27 +251,99 @@ namespace MMR.Randomizer.Utils
             // this thread is borrowed, we don't want it to always be the lowest priority, return to previous state
             Thread.CurrentThread.Priority = previousThreadPriority;
 
+            // uncompressed files need to have their compressed rom end address zero'd, this tells the game its not compressed
+            foreach(var uncompressedFile in RomData.MMFileList.Where(file => !file.IsCompressed))
+            {
+                uncompressedFile.Cmp_End = 0x0;
+            }
+
             Debug.WriteLine($" compress all files time : [{(DateTime.Now).Subtract(startTime).TotalMilliseconds} (ms)]");
         }
 
-        public static byte[] BuildROM()
+        private static void SetFilesToRemainDecompressed(OutputSettings settings)
         {
+            /// Now that files can remain uncompressed and be expected to work, lets leave some commonly accessed files de-compressed so they don't cost as much to load
+
+            if (settings.OutputVC)
+            {
+                return; // this does not work with wiivc right now
+            }
+
+
+            var listOfFiles = new List<int>()
+            {
+                //scenes
+                //GameObjects.Scene.TerminaField.FileID(),
+                //GameObjects.Scene.TerminaField.FileID() + 1, // room 0
+                //GameObjects.Scene.SouthClockTown.FileID(),
+                //GameObjects.Scene.SouthClockTown.FileID() + 1, // room 0
+                //GameObjects.Scene.WestClockTown.FileID(),
+                //GameObjects.Scene.WestClockTown.FileID() + 1, // room 0
+                //GameObjects.Scene.EastClockTown.FileID(),
+                //GameObjects.Scene.EastClockTown.FileID() + 1, // room 0
+                //GameObjects.Scene.NorthClockTown.FileID(),
+                //GameObjects.Scene.NorthClockTown.FileID() + 1, // room 0
+                //GameObjects.Scene.Grottos.FileID(),
+                //GameObjects.Scene.Grottos.FileID() + 4, // room 4 : regular chest grotto
+
+                // THESE TWO are the highest priority, huge imporovement 
+                38, // player overlay
+                37, // pause menu
+
+                // actor overlays
+                GameObjects.Actor.Fairy.FileListIndex(),
+                GameObjects.Actor.Arrow.FileListIndex(),
+                GameObjects.Actor.BombAndKeg.FileListIndex(),
+                //GameObjects.Actor.TallGrass.FileListIndex(),
+                GameObjects.Actor.En_Clear_Tag.FileListIndex(), // bomb effects and such
+                GameObjects.Actor.Arms_Hook.FileListIndex(), // hookshot tip
+                GameObjects.Actor.ZoraFinBoomerang.FileListIndex(),
+
+                // objects
+                649, // gameplay_keep
+                650, // field_keep
+                651, // dangeon_keep
+                654, // object_child_link (regular link)
+                655, // goron 
+                656, // zora
+                657, // nuts
+
+            };
+
+            foreach (var fileId in listOfFiles)
+            {
+                var file = RomData.MMFileList[fileId];
+                RomUtils.CheckCompressed(fileId); // if they werent preiviously modified they might still be compressed, decompress now
+                //Debug.Assert(file.IsCompressed);
+
+                file.IsCompressed = false;
+            }
+        }
+
+        public static byte[] BuildROM(OutputSettings settings)
+        {
+            SetFilesToRemainDecompressed(settings);
+
             CompressMMFiles();
 
             byte[] ROM = new byte[0x2000000];
+
             int ROMAddr = 0;
             // write all files to rom
             for (int i = 0; i < RomData.MMFileList.Count; i++)
             {
-                if (RomData.MMFileList[i].Cmp_Addr == -1)
+                if (RomData.MMFileList[i].Cmp_Addr == -1) // empty file slot, ignore
                 {
                     continue;
                 }
-                RomData.MMFileList[i].Cmp_Addr = ROMAddr;
-                int fileLength = RomData.MMFileList[i].Data.Length;
-                if (RomData.MMFileList[i].IsCompressed)
+                var file = RomData.MMFileList[i];
+
+                file.Cmp_Addr = ROMAddr;
+
+                int fileLength = file.Data.Length;
+                if (file.IsCompressed)
                 {
-                    RomData.MMFileList[i].Cmp_End = ROMAddr + fileLength;
+                    file.Cmp_End = ROMAddr + fileLength;
                 }
                 if (ROMAddr + fileLength > ROM.Length) // rom too small
                 {
@@ -223,10 +360,12 @@ namespace MMR.Randomizer.Utils
 
                 ReadWriteUtils.Arr_Insert(RomData.MMFileList[i].Data, 0, fileLength, ROM, ROMAddr);
                 ROMAddr += fileLength;
-
             }
+
+            // should this be moved up now that I split up the file updated values?
             SequenceUtils.UpdateBankInstrumentPointers(ROM);
-            UpdateFileTable(ROM);
+
+            UpdateDMAFileTable(ROM);
             SignROM(ROM);
             FixCRC(ROM);
 
