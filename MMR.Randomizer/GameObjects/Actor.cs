@@ -3252,6 +3252,7 @@ namespace MMR.Randomizer.GameObjects
         KoumeInKiosk = 0x168, // En_Dnh
 
         // TODO figure out why the hell its crashing
+        //   working theory: the objects being shuffled when moving from one room to another breaks object code
         // code suggests even more params might exist than are used in vanilla
         [ActorizerEnabled]
         [FileID(326)]
@@ -3268,6 +3269,7 @@ namespace MMR.Randomizer.GameObjects
         // seems to be room transition related, for now ban from any place where rooms change over
         [EnemizerScenesPlacementBlock(Scene.SouthernSwampClear, Scene.SouthernSwamp, Scene.MayorsResidence, Scene.StockPotInn,
             Scene.OceanSpiderHouse, Scene.DekuPalace, Scene.SwampSpiderHouse, Scene.DekuShrine, Scene.IkanaCanyon, Scene.BeneathTheWell,
+            Scene.PiratesFortressRooms,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.OceanSpiderHouse, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple)]
         [UnkillableAllVariants]
         [PlacementWeight(80)]
@@ -3567,7 +3569,7 @@ namespace MMR.Randomizer.GameObjects
         [DifficultAllVariants]
         [OnlyOneActorPerRoom]
         [VariantsWithRoomMax(max:0, variant:0)] // cutscene variant is hardcoded
-        [PlacementWeight(80)]
+        [PlacementWeight(75)]
         //[ForbidFromScene(Scene.StoneTowerTemple)]
         GaroMaster = 0x182, // En_Jso2
 
@@ -4864,6 +4866,7 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(mask: 0xFE, shift: 9)]
         [PathingKickoutAddrVarsPlacement(mask:0x1F, shift:0)] // why oh why did this stupid actor need a selectable exit kickout
         [OnlyOneActorPerRoom]
+        [EnemizerScenesPlacementBlock(Scene.MilkBar)] // can interupt balad of the windfish performance
         [UnkillableAllVariants]
         [PlacementWeight(80)]
         GaboraBlacksmith = 0x1FF, // En_Kgy
@@ -5485,7 +5488,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(523)]
         [ObjectListIndex(0x23A)]
-        [CheckRestricted(Scene.MilkBar, variant:0x3FFF, Item.MaskCircusLeader, Item.NotebookMeetToto)]
+        [CheckRestricted(Scene.MilkBar, variant:-1, Item.MaskCircusLeader, Item.NotebookMeetToto, Item.NotebookMovingGorman)]
         [CheckRestricted(Scene.MayorsResidence, variant:-1, Item.NotebookMeetToto)]
         [GroundVariants(0x050B, 0x3FFF)] // sitting in mayors office // TODO which one
         [PerchingVariants(0x050B, 0x3FFF)] // sitting in mayors office
@@ -5644,6 +5647,7 @@ namespace MMR.Randomizer.GameObjects
             0xF)] // also, do not put regular variant as water our typing system is dumb, doesnt know which is which
         [VariantsWithRoomMax(max:1, variant: 0xFE0F/*, 0xFE0F*/)]
         [UnkillableAllVariants]
+        [PlacementWeight(30)]
         Evan = 0x241, // En_Zos
 
         [ActorizerEnabled]
@@ -5744,7 +5748,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(545)]
         [ObjectListIndex(0x1B6)]
-        [CheckRestricted(Item.NotebookMeetShiro, Item.NotebookSaveInvisibleSoldier)]
+        [CheckRestricted(Item.NotebookMeetShiro, Item.NotebookSaveInvisibleSoldier, Item.MaskStone)]
         [GroundVariants(0)]
         [VariantsWithRoomMax(max: 1, variant:0)]
         [UnkillableAllVariants]

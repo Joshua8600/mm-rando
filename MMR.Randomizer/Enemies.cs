@@ -909,7 +909,7 @@ namespace MMR.Randomizer
             // but most people dont notice where their original spawn even is so move them
             var greatbaytempleScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GreatBayTemple.FileID());
             // the bombchu along the green pipe in the double seesaw room needs to be moved in case its an unmovable enemy
-            greatbaytempleScene.Maps[10].Actors[3].Position = new vec16(3525, -180, 630);
+            greatbaytempleScene.Maps[10].Actors[3].Position.z = 344; // new vec16(3525, -180, 630); // this was hard to open if chest
             // the bombchu along the red pipe in the pre-wart room needs the same kind of moving
             greatbaytempleScene.Maps[6].Actors[7].Position = new vec16(-1840, -570, -870);
 
@@ -1060,10 +1060,24 @@ namespace MMR.Randomizer
                 underGraveyardScene.Maps[0].Actors[1].Position.x = 20; // facing door from hole, move back toward door
                 underGraveyardScene.Maps[0].Actors[1].Position.z = 251; // facing door from hole, move left toward day 2
 
+                // in blacksmith building, there are two pots that need to be rotated
+                var mountainSmithyScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainSmithy.FileID());
+                var leftSmithyPot = mountainSmithyScene.Maps[0].Actors[4];
+                leftSmithyPot.Rotation.y = ActorUtils.MergeRotationAndFlags(180, leftSmithyPot.Rotation.y); ;
+                var rightSmithyPot = mountainSmithyScene.Maps[0].Actors[8];
+                rightSmithyPot.Rotation.y = ActorUtils.MergeRotationAndFlags(180, rightSmithyPot.Rotation.y);
+                rightSmithyPot.Position.x = -70;
+                rightSmithyPot.Position.z = 288;
+
+                var mountainVillageScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillage.FileID());
+                var leftMountainVillagePot = mountainVillageScene.Maps[0].Actors[35];
+                leftMountainVillagePot.Rotation.y = ActorUtils.MergeRotationAndFlags(270, leftSmithyPot.Rotation.y); ;
+                var rightMountainPot = mountainVillageScene.Maps[0].Actors[36];
+                rightMountainPot.Rotation.y = ActorUtils.MergeRotationAndFlags(270, rightMountainPot.Rotation.y);
+
                 // trying to fix clock, nothing
                 //var curiosityShopClock = curiosityShop.Maps[0].Actors[5];
                 //curiosityShopClock.Position.x = -130;
-
 
                 // in spring there are two torches on top of each other, which is weird, move the other one to face the first one
                 //var mountainVillageSpring = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillageSpring.FileID());
@@ -1408,7 +1422,7 @@ namespace MMR.Randomizer
             }
         }
 
-        private static void MoveShopScurbsIfRandomized()
+        private static void MoveShopScrubsIfRandomized()
         {
             /// if we randomize the shop scrubs, then we have two of them sitting on top of each other, which is weird
             var southernSwamp = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwamp.FileID());
@@ -1546,8 +1560,8 @@ namespace MMR.Randomizer
             }
 
             var terminaField = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TerminaField.FileID());
-            var terminaFieldScopeNuts = terminaField.Maps[0].Actors[210];
-            if (terminaFieldScopeNuts.ActorEnum != GameObjects.Actor.FlyingBuisinessScrub)
+            var terminaFieldScopeNuts = terminaField.Maps[0].Actors[210]; // buisness scrub
+            if (terminaFieldScopeNuts.ActorEnum != GameObjects.Actor.FlyingFieldScrub)
             {
                 terminaFieldScopeNuts.Position = new vec16(780, 760, 615); // move closer to the edge of ect so the player can see it
             }
@@ -1560,7 +1574,7 @@ namespace MMR.Randomizer
             }
             SceneUtils.UpdateScene(terminaField);
 
-            MoveShopScurbsIfRandomized();
+            MoveShopScrubsIfRandomized();
             MovePostmanIfRandomized(terminaField);
         }
 
@@ -3401,13 +3415,19 @@ namespace MMR.Randomizer
                     log.AppendLine($" - lowered height of actor [{testActor.Name}] by [{randomHeight}] from ceiling to fly");
                     UpdateStrayFairyHeight(testActor);
                 }
+                // special case: chain mine trap is too low from ceiling
+                if(oldCeilingVariants != null && testActor.ActorEnum == GameObjects.Actor.SpikedMine)
+                {
+                    // chain is too long, this is annoying, raise the actor to be a tad higher so more of its chain is in the ceiling
+                    testActor.Position.y += 100;
+                }
 
                 var wallVariants = testActor.OldActorEnum.GetAttribute<WallVariantsAttribute>();
                 // for now I want this manually just for dexihand: rotate forward a touch because its on a wall
                 if (testActor.ActorEnum == GameObjects.Actor.Dexihand && testActor.OldActorEnum != GameObjects.Actor.Dexihand
                     && wallVariants != null && wallVariants.Variants.Contains(testActor.OldVariant))
                 {
-                    testActor.Rotation.x = ActorUtils.MergeRotationAndFlags(45, flags: testActor.Rotation.x); // pitch rotation down a bit
+                    testActor.Rotation.x = ActorUtils.MergeRotationAndFlags(60, flags: testActor.Rotation.x); // pitch rotation down a bit
                 }
                 // special case: monkey spawns with an extra height offset from the floor, not at the location of the visible model
                 if (testActor.ActorEnum == GameObjects.Actor.Monkey && testActor.Variants[0] == 0x02FF
@@ -3633,6 +3653,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.BadBat, GameObjects.Actor.MilkbarChairs)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.En_Boj_04)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.CuriosityShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.MountainVillage, GameObjects.Actor.PottedPlant, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CutscenePirate)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Dog, GameObjects.Actor.Evan)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.WestClockTown, GameObjects.Actor.RosaSisters, GameObjects.Actor.GaboraBlacksmith)) continue; 
@@ -3665,6 +3686,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.ClayPot, GameObjects.Actor.BeanSeller)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.StoneTower, GameObjects.Actor.ReDead, GameObjects.Actor.OceanSpiderhouseBombableWall)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.PinnacleRock, GameObjects.Actor.Bombiwa, GameObjects.Actor.Japas)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.BioDekuBaba, GameObjects.Actor.LabFish)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Carpenter, GameObjects.Actor.RomaniYts)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SwampSpiderHouse, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
@@ -4842,6 +4864,7 @@ namespace MMR.Randomizer
             if (scene.SceneEnum == GameObjects.Scene.Grottos) // force specific actor/variant for debugging
             {
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
+                //thisSceneData.Scene.Maps[11].Actors[4].ChangeActor(GameObjects.Actor.Fish, vars: 0); // was not commented out on isghj branch
                 //thisSceneData.Scene.Maps[0].Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
                 thisSceneData.Scene.Maps[1].Actors[0].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
             }
@@ -5592,7 +5615,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Enemizer Test 70.1\n");
+                    sw.Write("Enemizer version: Isghj's Enemizer Test 71.2\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
