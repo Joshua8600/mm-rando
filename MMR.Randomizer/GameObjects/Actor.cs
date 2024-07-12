@@ -427,8 +427,9 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)]
         [ActorInstanceSize(0x1A8)]
         // 0xFF00 is text ID space
-        [GroundVariants(0x400A, 0x420A, 0x2C09, 0x2D0A, 0x2409, 0x2909, // great bay
+        [GroundVariants(0x400A,  0x2C09, 0x2D0A, 0x2409, 0x2909, // great bay
             0x350A, 0x370A, 0x390A,
+            0x400A, 0x420A,// milkroad
             0x3B0A, 0x080A, 0x0D0A, 0x360A)]
         [UnkillableAllVariants]
         PointedSign = 0x26, // En_A_Obj
@@ -553,7 +554,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         [ForbidFromScene(Scene.DekuTrial, Scene.GoronTrial, Scene.LinkTrial, Scene.ZoraTrial)]
-        [PlacementWeight(20)]
+        [PlacementWeight(15)]
         WarpDoor = 0x38, // Door_Warp1
 
         [ActorizerEnabled]
@@ -799,6 +800,12 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [FileID(95)]
         [ObjectListIndex(0x1)] // gameplay_keep obj 1
+        [CheckRestricted(Scene.TerminaField, -1, Item.CollectableTerminaFieldButterflyFairy1)]
+        // TODO separate them
+        [CheckRestricted(Scene.Grottos, -1, Item.CollectableGrottosOceanGossipStonesButterflyFairy1, Item.CollectableGrottosMagicBeanSellerSGrottoButterflyFairy1,
+            Item.CollectableGrottosCowGrottoButterflyFairy1, Item.CollectableGrottosCowGrottoButterflyFairy2)]
+        [CheckRestricted(Scene.MountainVillageSpring, -1, Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy1, Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy2)]
+        [CheckRestricted(Scene.GreatBayCoast, -1, Item.CollectableGreatBayCoastButterflyFairy1)]
         [GroundVariants(0x3323, 0x2324, 0x4324)] // beatles on the floor
         //[FlyingVariants(0x2324, 0x4324)] // butterlies in the air
         [WaterVariants(0x6322)] // fish swimming in the water
@@ -870,6 +877,40 @@ namespace MMR.Randomizer.GameObjects
         [ActorInstanceSize(0x194)]
         [ObjectListIndex(2)] // field_keep, obj 2
         [FileID(99)]
+        //[CheckRestricted(Scene.NorthClockTown, -1,
+        //    item:Item.)] //TODO finish this
+        [ForbidFromScene(Scene.TerminaField, // too many here, and we want the hints
+            Scene.NorthClockTown, // so many checks
+            Scene.LaundryPool, Scene.MountainVillage)] // old joke
+        //[CheckRestricted(Scene.TerminaField, variant: -1,
+        //    check: Item.)]
+        [CheckRestricted(Scene.RoadToSouthernSwamp, variant: -1,
+            check: Item.ChestToSwampGrotto)]
+        [CheckRestricted(Scene.SouthernSwamp, variant: -1,
+            check: Item.ChestSwampGrotto)]
+        [CheckRestricted(Scene.WoodsOfMystery, variant: -1,
+            check: Item.ChestWoodsGrotto)]
+        [CheckRestricted(Scene.DekuPalace, variant: -1,
+            check: Item.ItemMagicBean, Item.CollectableGrottosMagicBeanSellerSGrottoButterflyFairy1,Item.CollectableBeanGrottoSoftSoil1, Item.ChestBeanGrottoRedRupee)]
+        [CheckRestricted(Scene.PathToSnowhead, variant: -1,
+            check: Item.ChestToSnowheadGrotto)]
+        [CheckRestricted(Scene.TwinIslands, variant: -1,
+            check: Item.HeartPieceTwinIslandsChest, Item.ChestHotSpringGrottoRedRupee, Item.BottleCatchHotSpringWater)]
+        [CheckRestricted(Scene.TwinIslandsSpring, variant: -1,
+            check: Item.HeartPieceTwinIslandsChest)]
+        [CheckRestricted(Scene.MountainVillageSpring, variant: -1,
+            check: Item.ChestMountainVillageGrottoRedRupee)]
+        [CheckRestricted(Scene.GreatBayCoast, variant: -1,
+            check: Item.ChestGreatBayCoastGrotto,
+                   Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.CollectableGrottosCowGrottoButterflyFairy2)]
+        [CheckRestricted(Scene.ZoraCape, variant: -1,
+            check: Item.ChestGreatBayCapeGrotto)]
+        [CheckRestricted(Scene.RoadToIkana, variant: -1,
+            check: Item.ChestToIkanaGrotto)]
+        [CheckRestricted(Scene.IkanaGraveyard, variant: -1,
+            check: Item.ChestGraveyardGrotto)]
+        [CheckRestricted(Scene.IkanaCanyon, variant: -1,
+            check: Item.ChestIkanaSecretShrineGrotto)]
         // FF/299 is HSG, 233 is path to snowhead, 3B is mountain village spring grot 3D is swamp grotto, , 5C is mystery woods
         // 96 is goron rock grotto, 218/2B8? is graveyard grotto, 3E is road to swamp
         // 301 is ranch grotto? 214 is log cow grotto
@@ -905,7 +946,8 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(Butterfly, CompanionAlignment.Above, ourVariant: -1,
             variant: 0, 1, 2)]
         [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
-        [ForbidFromScene(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead)]
+        //[ForbidFromScene(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead,
+        //    Scene.TerminaField)]
         GrottoHole = 0x55, // Door_Ana
 
         Empty56 = 0x56,
@@ -1141,7 +1183,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         SmallWoodenBox = 0x81, // Obj_Kibako
 
-        // MULTIPLE OBJECT ACTOR, can use pot object, dungeon keep, and green pot object
+        // MULTIPLE OBJECT ACTOR, can use object_tsubo object, dungeon keep, and green pot object
         [ActorizerEnabled]
         [FileID(126)]
         //[ObjectListIndex(0x1)] // this is a lie, the pot DETECTS multiple objects but does NOT exist in gameplay keep
@@ -1309,6 +1351,15 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(133)]
         [ObjectListIndex(1)]
+        [ForbidFromScene(Scene.MountainSmithy, Scene.SnowheadTemple, Scene.TerminaField)] // TODO figure out if I want to split these or not
+        [CheckRestricted(Scene.TwinIslands, -1,
+            check: Item.HeartPieceTwinIslandsChest, Item.ChestHotSpringGrottoRedRupee, Item.BottleCatchHotSpringWater)]
+        [CheckRestricted(Scene.GoronVillage, -1,
+            check: Item.ItemPowderKeg)]
+        //[CheckRestricted(Scene.MountainSmithy, -1,
+        //    check: )]
+        [CheckRestricted(Scene.GreatBayTemple, -1,
+            check: Item.ItemGreatBayBossKey, Item.FrogGreatBayTemple)]
         //params 0xFF is size
         // 0xFF00 is switch flag, for things like
         // if 0xFFXX then dont check flags
@@ -1320,7 +1371,7 @@ namespace MMR.Randomizer.GameObjects
         // all restricted because they add colliders which limits our BGcheck options for other things
         [VariantsWithRoomMax(max: 1, variant: 0xFF10, 0xFF20, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         //[VariantsWithRoomMax(max: 1, variant: 0xFFC8, 0xFF96, 0xFF78)]
-        [PlacementWeight(70)]
+        [PlacementWeight(60)]
         RegularIceBlock = 0x8E, // Obj_Ice_Poly
 
         [EnemizerEnabled]
@@ -1336,11 +1387,10 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [ActorInstanceSize(0x19C)]
         [FileID(135)]
-        //[ObjectListIndex(0x1)] // gameplay_keep obj 1, for regular single bush of grass
-        [ObjectListIndex(0xF8)] //
+        [ObjectListIndex(0xF8)] // type 0 (0x3) is FIELD_KEEP, handled in code because we dont have working code for multi-object
         [CheckRestricted(Scene.SouthernSwampClear, variant: -1, Item.CollectableSouthernSwampClearCentralSwampGrass1, Item.CollectableSouthernSwampClearCentralSwampGrass2)]
         [CheckRestricted(Scene.MilkRoad, variant: -1, Item.CollectableMilkRoadGrass1, Item.CollectableMilkRoadGrass2, Item.CollectableMilkRoadGrass3)]
-        // 0 uses gameplay keep to draw regular grass, like ObjGrassUnit
+        // 0 uses field keep to draw regular grass, like ObjGrassUnit
         // 1 creates a grass circle in termina field, 0 is grotto grass single
         // 642B is a smaller cuttable grass from the ground in secret 
         //[GroundVariants(0, 1)]
@@ -1364,7 +1414,7 @@ namespace MMR.Randomizer.GameObjects
         // for now, until I can identify which ones have drops we need to be careful of, going to block all randimization
         [ForbidFromScene(Scene.SouthernSwamp, Scene.OdolwasLair,
             Scene.IkanaCastle, Scene.StoneTowerTemple, Scene.Woodfall, Scene.GreatBayCoast,
-            Scene.SecretShrine, Scene.MountainVillageSpring, Scene.WoodsOfMystery,
+            Scene.SecretShrine, Scene.MountainVillageSpring, //Scene.WoodsOfMystery,
             Scene.LaundryPool, Scene.SnowheadTemple, Scene.RoadToSouthernSwamp,
             //Scene.MilkRoad,
             Scene.IkanaCanyon, Scene.Grottos, Scene.BeneathTheWell, Scene.WoodfallTemple)]
@@ -1555,6 +1605,7 @@ namespace MMR.Randomizer.GameObjects
         [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)]
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0090)]
         [UnkillableAllVariants]
+        [PlacementWeight(50)] // boring
         Carpenter = 0x9C, // En_Daiku
 
         // tag: lemons
@@ -1773,6 +1824,18 @@ namespace MMR.Randomizer.GameObjects
         [FileID(158)]
         [ActorInstanceSize(0x198)]
         [ObjectListIndex(0x2)] // pick up rock version
+        [ForbidFromScene(Scene.InvertedStoneTower, Scene.SwampSpiderHouse)] // we want the bugs, I think its too much to ask players to leave to get bugs
+        [CheckRestricted(Scene.TerminaField, variant:-1,
+            Item.CollectableTerminaFieldRock1, Item.CollectableTerminaFieldRock4, Item.CollectableTerminaFieldRock3,
+            Item.CollectableTerminaFieldRock4, Item.CollectableTerminaFieldRock5, Item.CollectableTerminaFieldRock6,
+            Item.CollectableTerminaFieldRock7, Item.CollectableTerminaFieldRock8, Item.CollectableTerminaFieldRock9)]
+        [CheckRestricted(Scene.MountainVillageSpring, variant: -1,
+            Item.CollectableMountainVillageWinterMountainVillageSpringItem1)]
+        [CheckRestricted(Scene.GreatBayCoast, variant: 0x32,
+            Item.CollectableGreatBayCoastSoftSoil1)]
+        [CheckRestricted(Scene.IkanaGraveyard, variant: -1,
+            Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock1, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock2, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock3,
+            Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock4, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock5)]
         //[ObjectListIndex(0x1F6)] // NEVER USED IN MM, damn thing lied to me, even the boulders are object 2
         // it actually uses one of two objects: gameplay_field or object_ishi, which is only in SSHouse
         //6a does not load
@@ -1827,6 +1890,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)] // gamplaykeep obj 1
         // 801, opening scene grass, 0x1FXX are ranch and TF
         // 0402 is ikana graveyard rock circle
+        //[CheckRestricted()]
         [GroundVariants(0x801, 0x1F02, 0x1F00, 0x0402)]
         [WaterBottomVariants(0x0402)]
         [AlignedCompanionActor(Shiro, CompanionAlignment.OnTop, ourVariant: -1,
@@ -3576,11 +3640,16 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled] // free enemy, placed in places where enemies are normally
         [FileID(349)]
         [ObjectListIndex(0x1)] // obj 1: gameplay keep, but can't set that
+        //[CheckRestricted]
         //[ObjectListIndex(0xF3)] // TESTING
         [DynaAttributes(12,12)] // both gold and pink flowers have the same count
         [GroundVariants(0x7F, 0x17F)] // 7F is regular, 17F is big yellow
         [UnkillableAllVariants]
-        [ForbidFromScene(Scene.Woodfall, Scene.DekuPalace, Scene.WoodfallTemple, Scene.OdolwasLair,
+        [ForbidFromScene(Scene.SouthernSwamp, Scene.Woodfall, Scene.DekuPalace, Scene.WoodfallTemple, Scene.OdolwasLair,
+            Scene.ZoraHallRooms, Scene.GoronVillage, Scene.IkanaCanyon, 
+            Scene.DekuPlayground, Scene.SwampSpiderHouse, Scene.DekuTrial,
+            Scene.InvertedStoneTowerTemple,
+            Scene.StoneTowerTemple, Scene.GoronVillageSpring, Scene.GoronVillage,
             Scene.EastClockTown, Scene.NorthClockTown, Scene.IkanaCastle, Scene.SnowheadTemple)]
         DekuFlower = 0x183, // Obj_Etcetera
 
@@ -4643,7 +4712,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x2F70)]
         [FileID(459)]
         [ObjectListIndex(0x1C3)]
-        [CheckRestricted(Item.BottleCatchPoe)]
+        [CheckRestricted(Item.BottleCatchPoe)] // only one in the istt
         [FlyingVariants(0x00FF)]
         // FF is in the game, in OOT 02 was a composer brother, but in MM 0-6 are the same as FF
         [GroundVariants(0x01FF)] // non-vanilla, params doesnt seem to matter for this actor
@@ -5961,6 +6030,39 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(572)]
         [ObjectListIndex(0x1)]
+        [ForbidFromScene(Scene.TerminaField)]
+        //[CheckRestricted(Scene.TerminaField)] // TODO
+        // TODO decouple the specific actors per object based on variant
+        [CheckRestricted(Scene.SouthClockTown, -1,
+            Item.CollectableSouthClockTownHitTag1, Item.CollectableSouthClockTownHitTag2, Item.CollectableSouthClockTownHitTag3)]
+        [CheckRestricted(Scene.EastClockTown, -1,
+            Item.CollectableEastClockTownHitTag1, Item.CollectableEastClockTownHitTag2, Item.CollectableEastClockTownHitTag3,
+            Item.CollectableEastClockTownHitTag4, Item.CollectableEastClockTownHitTag5, Item.CollectableEastClockTownHitTag6,
+            Item.CollectableEastClockTownHitTag7, Item.CollectableEastClockTownHitTag8, Item.CollectableEastClockTownHitTag9)]
+        [CheckRestricted(Scene.StockPotInn, -1,
+            Item.CollectableStockPotInnHitTag1, Item.CollectableStockPotInnHitTag2, Item.CollectableStockPotInnHitTag3)]
+        [CheckRestricted(Scene.SwampSpiderHouse, -1,
+            Item.CollectableSwampSpiderHouseHitTag1, Item.CollectableSwampSpiderHouseHitTag2, Item.CollectableSwampSpiderHouseHitTag3,
+            Item.CollectableSwampSpiderHouseHitTag4, Item.CollectableSwampSpiderHouseHitTag5, Item.CollectableSwampSpiderHouseHitTag6,
+            Item.CollectableSwampSpiderHouseHitTag7, Item.CollectableSwampSpiderHouseHitTag8, Item.CollectableSwampSpiderHouseHitTag9,
+            Item.CollectableSwampSpiderHouseHitTag10, Item.CollectableSwampSpiderHouseHitTag11, Item.CollectableSwampSpiderHouseHitTag12)]
+        [CheckRestricted(Scene.CuccoShack, -1,
+            Item.CollectableCuccoShackHitTag1, Item.CollectableCuccoShackHitTag2, Item.CollectableCuccoShackHitTag3,
+            Item.CollectableCuccoShackHitTag4, Item.CollectableCuccoShackHitTag5, Item.CollectableCuccoShackHitTag6)]
+        [CheckRestricted(Scene.OceanSpiderHouse, -1,
+            Item.CollectableOceansideSpiderHouseHitTag1, Item.CollectableOceansideSpiderHouseHitTag2, Item.CollectableOceansideSpiderHouseHitTag3,
+            Item.CollectableOceansideSpiderHouseHitTag4, Item.CollectableOceansideSpiderHouseHitTag5, Item.CollectableOceansideSpiderHouseHitTag6,
+            Item.CollectableOceansideSpiderHouseHitTag7, Item.CollectableOceansideSpiderHouseHitTag8, Item.CollectableOceansideSpiderHouseHitTag9)]
+        [CheckRestricted(Scene.PiratesFortressRooms, -1,
+            Item.CollectablePiratesFortressInteriorHookshotRoomHitTag1, Item.CollectablePiratesFortressInteriorHookshotRoomHitTag2, Item.CollectablePiratesFortressInteriorHookshotRoomHitTag3)]
+        [CheckRestricted(Scene.PiratesFortress, -1,
+            Item.CollectablePiratesFortressHitTag1, Item.CollectablePiratesFortressHitTag2, Item.CollectablePiratesFortressHitTag3,
+        Item.CollectablePiratesFortressHitTag4, Item.CollectablePiratesFortressHitTag5, Item.CollectablePiratesFortressHitTag6)]
+        [CheckRestricted(Scene.IkanaGraveyard, -1,
+            Item.CollectableIkanaGraveyardHitTag1, Item.CollectableIkanaGraveyardHitTag2, Item.CollectableIkanaGraveyardHitTag3,
+            Item.CollectableIkanaGraveyardHitTag4, Item.CollectableIkanaGraveyardHitTag5, Item.CollectableIkanaGraveyardHitTag6,
+            Item.CollectableIkanaGraveyardHitTag7, Item.CollectableIkanaGraveyardHitTag8, Item.CollectableIkanaGraveyardHitTag9,
+            Item.CollectableIkanaGraveyardHitTag10, Item.CollectableIkanaGraveyardHitTag11, Item.CollectableIkanaGraveyardHitTag12)]
         [WallVariants(0xFE00)]
         [CeilingVariants(0xFC00)]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 9)]
@@ -6018,6 +6120,7 @@ namespace MMR.Randomizer.GameObjects
         [PathingTypeVarsPlacement(mask: 0x1F80, shift: 7)]
         // restrict if not
         [UnkillableAllVariants]
+        [PlacementWeight(40)]
         MilkroadCarpenter = 0x26A, // En_Daiku2
 
         [ActorizerEnabled]
@@ -6108,8 +6211,7 @@ namespace MMR.Randomizer.GameObjects
             Item.ShopItemBusinessScrubMagicBean, Item.TradeItemLandDeed, Item.ChestSouthClockTownPurpleRupee)]
         [CheckRestricted(Scene.SouthernSwamp, variant: -1,
             Item.ShopItemBusinessScrubMagicBean, Item.TradeItemSwampDeed, Item.HeartPieceSwampScrub, Item.UpgradeBiggestBombBag)]
-        // do we care?
-        //[CheckRestricted(Scene.SouthernSwampClear, variant: -1, Item.ShopItemBusinessScrubMagicBean, Item.HeartPieceSwampScrub, Item.UpgradeBiggestBombBag)]
+        [CheckRestricted(Scene.SouthernSwampClear, variant: -1, Item.ShopItemBusinessScrubMagicBean, Item.HeartPieceSwampScrub, Item.UpgradeBiggestBombBag)]
         [CheckRestricted(Scene.GoronVillage, variant: -1,
             Item.UpgradeBiggestBombBag, Item.TradeItemMountainDeed, Item.ShopItemBusinessScrubGreenPotion, Item.HeartPieceGoronVillageScrub)]
         [CheckRestricted(Scene.ZoraHallRooms, variant: -1,
@@ -6584,7 +6686,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max:0, variant:0)]
         [UnkillableAllVariants]
         [PlacementWeight(80)]
-        SoliderMoonLeaveCutscene = 0x2AA, // En_Ending_Hero4
+        SoldierMoonLeaveCutscene = 0x2AA, // En_Ending_Hero4
 
         [ActorizerEnabled]
         [FileID(642)]
@@ -6592,6 +6694,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x0, 0x1, 0x2, 0x3, 0x4)]
         [VariantsWithRoomMax(max: 0, variant: 0x0, 0x1, 0x2, 0x3, 0x4)] // often fail to spawn
         [UnkillableAllVariants]
+        [PlacementWeight(30)]
         // placable?
         CarpentersFromCutscene = 0x2AB, // En_Ending_Hero5
 
