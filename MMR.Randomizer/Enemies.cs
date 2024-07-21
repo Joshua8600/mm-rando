@@ -656,13 +656,13 @@ namespace MMR.Randomizer
             var checkRestrictedAttr = testActor.GetAttributes<CheckRestrictedAttribute>();
             if (checkRestrictedAttr != null && checkRestrictedAttr.Count() > 0) // actor has check restrictions
             {
-                var reducedList = checkRestrictedAttr.ToList().FindAll(attr => attr.Scene == scene.SceneEnum);
+                var reducedList = checkRestrictedAttr.ToList().FindAll(attr => attr.Scene == scene.SceneEnum || (int) attr.Scene == -1);
 
                 foreach (var restriction in reducedList) // can have multiple rules
                 {
                     if (restriction.Scene != ANYSCENE && restriction.Scene != scene.SceneEnum) continue;
 
-                    if (restriction.Variant != -1 && restriction.Variant != variant)
+                    if (restriction.Variant != GameObjects.ActorConst.ANY_VARIANT && restriction.Variant != variant)
                         continue; // we dont care about this variant being restricted
 
                     var restrictedChecks = restriction.Checks;
@@ -808,7 +808,7 @@ namespace MMR.Randomizer
                        && !matchingEnum.ScenesRandomizationExcluded().Contains(scene.SceneEnum)) // not excluded from being extracted from this scene
                     {
 
-                        if (ObjectIsCheckBlocked(scene, matchingEnum))
+                        if (ObjectIsCheckBlocked(scene, matchingEnum, matchingEnemy.OldVariant))
                         {
                             thisSceneData.Actors.RemoveAll(act => act.ObjectId == obj);
                         }
@@ -1133,6 +1133,17 @@ namespace MMR.Randomizer
                 leftMountainVillagePot.Rotation.y = ActorUtils.MergeRotationAndFlags(270, leftSmithyPot.Rotation.y); ;
                 var rightMountainPot = mountainVillageScene.Maps[0].Actors[36];
                 rightMountainPot.Rotation.y = ActorUtils.MergeRotationAndFlags(270, rightMountainPot.Rotation.y);
+
+                // if the clocktown talk points are randomized, we want to rotate them as they dont have set rotation
+                // this shit does nothing because something funky is going on, the rotation is not what it is in vanilla and its being ignored????
+                /* var westClocktownScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.WestClockTown.FileID());
+                var curiosityshopSign = westClocktownScene.Maps[0].Actors[22];
+                curiosityshopSign.Rotation.y = ActorUtils.MergeRotationAndFlags(180 , flags: curiosityshopSign.Rotation.y);
+                var tradingpostSign = westClocktownScene.Maps[0].Actors[9];
+                tradingpostSign.Rotation.y = ActorUtils.MergeRotationAndFlags(0, flags: tradingpostSign.Rotation.y);
+                var bombshopSign = westClocktownScene.Maps[0].Actors[2];
+                bombshopSign.Rotation.y = ActorUtils.MergeRotationAndFlags(0, flags: bombshopSign.Rotation.y);
+                // */
 
                 // trying to fix clock, nothing
                 //var curiosityShopClock = curiosityShop.Maps[0].Actors[5];
@@ -3402,6 +3413,100 @@ namespace MMR.Randomizer
             return null;
         }
 
+        public static void ActorizerForceDropHeavyGrassMinimum(SceneEnemizerData thisSceneData)
+        {
+            /// people are complaining that in high sanity they need at least one place where they can get drops of some kind
+
+            GameObjects.Scene[] scenesToForce = new GameObjects.Scene[]{
+                GameObjects.Scene.TerminaField,
+                GameObjects.Scene.GreatBayCoast,
+                GameObjects.Scene.IkanaCanyon, // none, TODO
+                GameObjects.Scene.IkanaGraveyard 
+            };
+
+            if (_randomized.Settings.LogicMode != Models.LogicMode.NoLogic // crazy bitches need their juice
+                && scenesToForce.Contains(thisSceneData.Scene.SceneEnum))
+            {
+                #if DEBUG
+                var debuggingActorList = thisSceneData.Actors;
+                #endif
+
+                var firstRestrictions = thisSceneData.Actors.FindAll(act => act.Type == GameObjects.ActorType.Ground || act.Type == GameObjects.ActorType.Pathing);
+                if (thisSceneData.Scene.SceneEnum == GameObjects.Scene.TerminaField || thisSceneData.Scene.SceneEnum == GameObjects.Scene.GreatBayCoast)
+                {
+                    firstRestrictions = firstRestrictions.FindAll(act => act.Room == 0); // these scenes have hidden second rooms that are harder to reach
+                }
+                if (thisSceneData.Scene.SceneEnum == GameObjects.Scene.GreatBayCoast)
+                {
+                    //firstRestrictions.RemoveAll(act => act.ActorEnum == GameObjects.Actor.RainbowHookshotPillar); // out of range
+                    firstRestrictions = firstRestrictions.FindAll(act => act.OldActorEnum == GameObjects.Actor.Leever); // tired of this alg keeps putting it in stupid locations ENOUGH
+                }
+                if (thisSceneData.Scene.SceneEnum == GameObjects.Scene.IkanaCanyon)
+                {
+                    firstRestrictions.RemoveAll(act => act.OldActorEnum == GameObjects.Actor.Guay); // this should be flying not ground type, TODO fix
+                }
+
+
+                // find one actor that is either empty or standalone
+                // and ground variety
+                var replacementCandidates = firstRestrictions.FindAll(act =>   thisSceneData.StandaloneActors.Contains(act)
+                                                                       || act.ActorEnum == GameObjects.Actor.Empty);
+
+                if (replacementCandidates.Count == 0) // did not find empty or standalone ground types we could replace
+                {
+                    /// lets try actors that are special object
+                    replacementCandidates = firstRestrictions.FindAll(act => act.ActorEnum.ObjectIndex() <= 3);
+                }
+
+                if (replacementCandidates.Count == 0) // did not find any cheap object actors
+                {
+                    /// lets try actors that have lots of copies, those can sometimes have too many
+                    //var sortedGroups = firstRestrictions.OrderBy(x => x).GroupBy(x => x.ActorEnum);
+                    //List<List<Actor>> bucketSortedList = sortedGroups.Select(g => g.ToList()).ToList(); // not working and I dont know this system enough to get it working, screw it writing it manually
+                    List<(int type, int count)> bucketList = new List<(int type, int count)>();
+                    foreach (var actor in firstRestrictions)
+                    {
+                        var searchIndex = bucketList.FindIndex(bucket => bucket.type == actor.ActorId);
+                        if (searchIndex == -1) // not in bucketlist yet, add new bucket
+                        {
+                            bucketList.Add((actor.ActorId, 1));
+                        }
+                        else // previously existing bucket
+                        {
+                            var countPtr = bucketList[searchIndex].count; // can't inline increment tuple value, c# weirdness
+                            countPtr++;
+                        }
+                    }
+
+                    var largestIndex = 0;
+                    for(int i = 0; i < bucketList.Count; i++)
+                    {
+                        var newList = bucketList[i];
+                        var oldList = bucketList[largestIndex];
+                        if (newList.count > oldList.count)
+                        {
+                            largestIndex = i;
+                        }
+                    }
+                    replacementCandidates = firstRestrictions.FindAll( act => act.ActorId == bucketList[largestIndex].type);
+                }
+
+                if (replacementCandidates.Count == 0)//Debug.Assert(replacementCandidates.Count > 0);
+                    throw new Exception("Could not place supply bush, please try another seed.");
+
+                // change them to a bush containing things
+                var actorChoice = replacementCandidates[thisSceneData.RNG.Next(replacementCandidates.Count)];
+
+                thisSceneData.Log.AppendLine($" +++ BUSH SUPPLIES at index:[{actorChoice.RoomActorIndex}]"
+                           + $" replacing new choice [{actorChoice.Name}][{actorChoice.Variants[0].ToString("X4")}]"
+                           + $" where old actor was [{actorChoice.OldName}][{actorChoice.OldVariant.ToString("X4")}] ");
+
+                // dont need to modify old as this happens dead last
+                actorChoice.ChangeActor(GameObjects.Actor.NaturalPatchOfGrass, vars:0x0001, modifyOld: false);
+            }
+        }
+
+
         public static void FixGroundToFlyingActorHeights(SceneEnemizerData thisSceneData, StringBuilder log)
         {
             /// For variety, I wanted to be able to put flying enemies where ground enemies used to be.
@@ -3715,6 +3820,7 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.En_Owl)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronKid)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.MilkbarChairs)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.DekuPalaceChamberGuard)) continue;
@@ -3724,6 +3830,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.MountainVillage, GameObjects.Actor.PottedPlant, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CutscenePirate)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Dog, GameObjects.Actor.Evan)) continue; 
+                //if (TestHardSetObject(GameObjects.Scene.PiratesFortress, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.PatrollingPirate)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.WestClockTown, GameObjects.Actor.RosaSisters, GameObjects.Actor.GaboraBlacksmith)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BuisnessScrub)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BeanSeller)) continue;
@@ -5084,9 +5191,12 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
-            if (scene.SceneEnum == GameObjects.Scene.Grottos) // force specific actor/variant for debugging
+            if (scene.SceneEnum == GameObjects.Scene.WestClockTown) // force specific actor/variant for debugging
             {
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
+                //thisSceneData.Scene.Maps[0].Actors[22].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
+                //thisSceneData.Scene.Maps[0].Actors[9].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
+                //thisSceneData.Scene.Maps[0].Actors[2].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
                 //thisSceneData.Scene.Maps[11].Actors[4].ChangeActor(GameObjects.Actor.Fish, vars: 0); // was not commented out on isghj branch
                 //thisSceneData.Scene.Maps[0].Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
                 thisSceneData.Scene.Maps[1].Actors[0].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
@@ -5096,6 +5206,8 @@ namespace MMR.Randomizer
             #endregion
 
             var flagLog = new StringBuilder();
+
+            ActorizerForceDropHeavyGrassMinimum(thisSceneData);
 
             FixGroundToFlyingActorHeights(thisSceneData, flagLog); // putting flying actors on ground spawns can be weird
             FixRedeadSpawnScew(thisSceneData); // redeads don't like x/z rotation
@@ -5838,7 +5950,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Objectless Test Alpha4\n");
+                    sw.Write("Enemizer version: Isghj's Objectless Test Alpha5\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

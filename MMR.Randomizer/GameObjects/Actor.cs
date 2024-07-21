@@ -792,9 +792,11 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.DekuPalace, Scene.BeneathTheWell, Scene.BeneathGraveyard, Scene.RoadToIkana, Scene.StoneTower)]
         UnusedStoneTowerStoneElevator = 0x4D, // Bg_F40_Flift
 
-        // Has no File
+        //[ActorizerEnabled] // TODO
+        // Has no File, burried in [code] file
         [ActorInstanceSize(0)] // unknown, never seen though
-        [ObjectListIndex(0x0)]
+        [ObjectListIndex(0x1)]
+        //[GroundVariants]
         Bg_Heavy_Block = 0x4E, // Bg_Heavy_Block
 
         [EnemizerEnabled]
@@ -811,6 +813,8 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.MountainVillageSpring, -1, Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy1, Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy2)]
         [CheckRestricted(Scene.GreatBayCoast, -1, Item.CollectableGreatBayCoastButterflyFairy1)]
         [GroundVariants(0x3323, 0x2324, 0x4324, 0x5323)] // beatles on the floor
+        // they dont stick to the wall, they climb in the air
+        //[WallVariants(0x3323, 0x2324, 0x4324, 0x5323)] // beatles on the... wall?
         [FlyingVariants(0x2323, 0x4324)] // butterlies in the air
         [WaterVariants(0x6322)] // fish swimming in the water
         [UnkillableAllVariants]
@@ -1224,19 +1228,19 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableGreatBayCoastPot7, Item.CollectableGreatBayCoastPot8, Item.CollectableGreatBayCoastPot9,
             Item.CollectableGreatBayCoastPot10, Item.CollectableGreatBayCoastPot11
         )]
-        /* 
+        ///* 
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x601E, Item.CollectableOceansideSpiderHouseEntrancePot1)] 
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x621E, Item.CollectableOceansideSpiderHouseEntrancePot2)]
-        [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x5C0E, Item.CollectableOceansideSpiderHouseEntrancePot3)]// done
+        [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x5C0E, Item.CollectableOceansideSpiderHouseEntrancePot3)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x018A, Item.CollectableOceansideSpiderHouseMainRoomPot1)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0xB, Item.CollectableOceansideSpiderHouseMainRoomPot2)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x741E, Item.CollectableOceansideSpiderHouseMaskRoomPot1)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x761E, Item.CollectableOceansideSpiderHouseMaskRoomPot2)]         
-         */
-        [CheckRestricted(Scene.OceanSpiderHouse, variant: -1,
+        // */
+        /*[CheckRestricted(Scene.OceanSpiderHouse, variant: -1,
             Item.CollectableOceansideSpiderHouseEntrancePot1, Item.CollectableOceansideSpiderHouseEntrancePot2, Item.CollectableOceansideSpiderHouseEntrancePot3,
             Item.CollectableOceansideSpiderHouseMainRoomPot1, Item.CollectableOceansideSpiderHouseMainRoomPot2,
-            Item.CollectableOceansideSpiderHouseMaskRoomPot1, Item.CollectableOceansideSpiderHouseMaskRoomPot2)]
+            Item.CollectableOceansideSpiderHouseMaskRoomPot1, Item.CollectableOceansideSpiderHouseMaskRoomPot2)] */
         [CheckRestricted(Scene.PinnacleRock, variant: -1,
             Item.CollectablePinnacleRockPot1, Item.CollectablePinnacleRockPot2, Item.CollectablePinnacleRockPot3, Item.CollectablePinnacleRockPot4)]
         [CheckRestricted(Scene.ZoraCape, variant: -1, Item.CollectableZoraCapeJarGame1,
@@ -1840,19 +1844,21 @@ namespace MMR.Randomizer.GameObjects
         [FileID(157)]
         [ObjectListIndex(0xFD)]
         [CheckRestricted(Scene.GoronVillage, variant: -1, Item.ItemLens, Item.ChestLensCaveRedRupee, Item.ChestLensCavePurpleRupee)]
-        // // never going to put him anywhere I dont think, so just mark his spawn as flying
+        // path is 0xF000, if you set to max (F) then its none-pathing and just auto flies away
         [PerchingVariants(0xF18B, // southern swamp // and clear swamp??? he was there??
             0xF000,
+            0xF180,
             0x2102, 0x1102, 0x0102)] // three different days of goron village
-        // variant 0/else
-        [GroundVariants(0xF000)] // just sits there and stares at you, neat
+        // type: 1 is unused monkey text, broken, 3 is soaring hint, 2 is lens cave, 30 is falling feathers I think
+        [GroundVariants(0xF180, // soaring hint version, works without path sweet
+            0xF000)] // just sits there and stares at you, neat
+        //[FlyingVariants()] // if we could make sure flying is never used alone, putting some falling feathers could be cool
         // variant 1
         //[GroundVariants(0xF080)] // instant talks to you with monkey dialgoue but talking doesnt end: softlock
-        // there is also a variant 1000 which cannot be accessed with the 0x1F range, will have to mod to get that working
         [SwitchFlagsPlacement(mask: 0x7F, shift: 0)]
         [ForbidFromScene(Scene.SouthernSwamp)] // since we want the hint
-        // pathing I think, but pathing flying types do not currently exist in this rando
-        [VariantsWithRoomMax(max: 0, variant: 0xF18B, 0x2102, 0x1102, 0x0102)]
+        [VariantsWithRoomMax(max: 1, variant: 0xF180)] // only want to waste one slot on the hint owl
+        [VariantsWithRoomMax(max: 0, variant: 0x2102, 0x1102, 0x0102)] // these are pathing, do not place
         [VariantsWithRoomMax(max: 10, variant: 0xF000)]
         [UnkillableAllVariants]
         En_Owl = 0xAF, // En_Owl
@@ -2631,6 +2637,7 @@ namespace MMR.Randomizer.GameObjects
         // params: 0x1F00 is drop table index, and 0x0001 is shape, 0 is octagon, 1 is loose shuffled
         // all the regular drop tables that can be attached to grass
         [GroundVariants(0x0, 0x1, 0x100, 0x101, 0x600, 0x601, 0x800, 0x801, 0xA00, 0xA01, 0xB00, 0xB01, 0xC00, 0xC01,
+            0x01, 0x21, 0x31, 0x41, 0x11,  // just regular drop table, multiple for higher chance
             0x400, 0x401, // ikana rocks, seems reasonable
             0xF00, 0xF01, // tektite, weirdly this is the nost variable of all the drop tables
             0x901, // chance of lots of money, as this is the drop table for money enemies
@@ -5273,7 +5280,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)] // no params
         //[VariantsWithRoomMax(max:10, variant:0)]
         [UnkillableAllVariants]
-        [PlacementWeight(50)] // new actor, for now lets leave high
+        [PlacementWeight(45)] // new actor, for now lets leave high
         MilkbarChairs = 0x217, // Bg_Mbar_Chair
 
         [FileID(495)]
