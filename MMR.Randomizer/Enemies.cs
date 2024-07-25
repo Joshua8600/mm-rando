@@ -87,12 +87,13 @@ namespace MMR.Randomizer
 
         // these have to be separate from Actor Enum for now beacuse they are for special objects, not regular types
         static int[] clayPotDungeonVariants = {
-            0xB,
-            // beneath the well (todo)
+            0xB, // multiple
+            0x4C02, 0x4E02, 0x5002, 0x5202, // wft
             0x5C0E, 0x601E, 0x621E, 0x4C0E, 0x660E, 0x741E, 0x5A0A, // ospiderhouse
             0x761E, 0x001A, 0x400A, 0x0186, 0x018A, 0x680A, 0x6E0A, 0x700A, 0x720E, // ospiderhouse
             0x5A1E, 0x5C1E, 0x400B, 0x420A, 0x521F, 0x440B, 0x4602, 0x561E,         // pirate bay rooms
             0x5013, 0x581E, 0x480B, 0x4A1E, 0x101F, 0x1203, 0x480B, 0x541E, 0x4E0B, // pirate bay rooms
+            0x4015, 0x4215, 0x4415, 0x4615, 0x4815, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, // botw
             0x0186, 0x0187, 0x018A, 0x018C, 0x018A, 0x440A, 0x460A, 0x480A, 0x440B, 0x018B, 0x000F, 0x4210, 0x0015, 0x001E, // istt
             0x018A, 0x000F, 0x3811, 0x0015, 0x001E, 0x4210, 0x000A, 0x001E, 0x4C02, 0x4E02, 0x5002, 0x5202, // wft
             0xC00B, 0xC21E, 0xC40E, 0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF81E, 0xF60E, 0xF410 // secret shrine
@@ -581,7 +582,10 @@ namespace MMR.Randomizer
 
                             var checkBlocked = ObjectIsCheckBlocked(scene, testActor.ActorEnum, testActor.OldVariant);
                             if (checkBlocked)
+                            {
+                                log.Append($" in scene [{scene.SceneEnum}][{mapIndex}][{mapActor.RoomActorIndex}] actor: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] was blocked by item.\n");
                                 return;
+                            }
 
                             if ( ! testActor.Variants.Contains(mapActor.OldVariant))
                             {
@@ -810,6 +814,7 @@ namespace MMR.Randomizer
 
                         if (ObjectIsCheckBlocked(scene, matchingEnum, matchingEnemy.OldVariant))
                         {
+                            thisSceneData.Log.Append($" in scene [{scene.SceneEnum}] actor type: [{matchingEnemy.ActorEnum}] was blocked by item.\n");
                             thisSceneData.Actors.RemoveAll(act => act.ObjectId == obj);
                         }
                         else
@@ -3319,7 +3324,7 @@ namespace MMR.Randomizer
                 var nightActorList = thisSceneData.Actors.Intersect(map.night.oldActorList).ToList();
                 var nightUniqueList = nightActorList.GroupBy(elem => elem.ActorEnum).Select(group => group.First()).ToList();
                 nightUniqueList.RemoveAll(u => u.ActorEnum == GameObjects.Actor.Empty);
-                TrimAllActors(thisSceneData, nightActorList, nightActorList, allowLimits: false);
+                TrimAllActors(thisSceneData, nightUniqueList, nightActorList, allowLimits: false);
             }
         }
 
@@ -3424,8 +3429,9 @@ namespace MMR.Randomizer
                 GameObjects.Scene.IkanaGraveyard 
             };
 
-            if (_randomized.Settings.LogicMode != Models.LogicMode.NoLogic // crazy bitches need their juice
-                && scenesToForce.Contains(thisSceneData.Scene.SceneEnum))
+            if (ACTORSENABLED == true
+             && _randomized.Settings.LogicMode != Models.LogicMode.NoLogic // crazy bitches need their juice
+             && scenesToForce.Contains(thisSceneData.Scene.SceneEnum))
             {
                 #if DEBUG
                 var debuggingActorList = thisSceneData.Actors;
@@ -5950,7 +5956,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Objectless Test Alpha6\n");
+                    sw.Write("Enemizer version: Isghj's Objectless Test Alpha7\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

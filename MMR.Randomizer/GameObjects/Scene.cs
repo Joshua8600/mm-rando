@@ -90,6 +90,12 @@ namespace MMR.Randomizer.GameObjects
             Actor.Hiploop// water causes instant death
                          //Actor.Bumper, Actor.UnusedStoneTowerStoneElevator, Actor.UnusedStoneTowerPlatform, Actor.RegularIceBlock,
             /*Actor.ClocktowerGearsAndOrgan /*, Actor.PatrollingPirate */ )]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.TallGrass, // grottos are common, this can get silly
+            Actor.RegularIceBlock, // big one can block the door or even block the whole hallway
+            Actor.Beamos, Actor.LikeLike, Actor.Freezard, //, Actor.BomberHideoutGuard // annoying
+            Actor.Seagulls, // with new height adjust its basically invisible
+            Actor.Hiploop// water causes instant death
+        )]
         [EnemizerSceneBlockSensitive(Actor.DekuBabaWithered, -1)] // can block the chest
         [EnemizerSceneBlockSensitive(Actor.DekuBaba, -1)] // this this is required to keep it off of withered as well
         [EnemizerSceneBlockSensitive(Actor.Wolfos, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
@@ -131,6 +137,7 @@ namespace MMR.Randomizer.GameObjects
             //Actor.RegularIceBlock // should be covered by block sensitive now
             // Actor.LargeCrate, .SmalActorlWoodenBox, Actor.WoodenBarrel,  // these should only be free actors lets let them show up again
             //Actor.ClocktowerGearsAndOrgan, // blocking
+            Actor.RegularIceBlock, // temporary, can block the bridge and the bottom code isnt working perfectly
             Actor.Bombiwa, Actor.Torch,  // boring
             Actor.CuccoChick, Actor.En_Ani, Actor.IkanaGravestone // boring
             )]
@@ -573,6 +580,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1349)]
         [SceneInternalId(0x41)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.ClayPot,
+            Actor.RegularIceBlock)] // the big one can reach through the ceiling into the chest, blocking the chest
         DoggyRacetrack = 0x3E,
 
         [FileID(1351)]
@@ -915,6 +924,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.LikeLike)] // If you start with one heart this can be a softlock
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Sakon,
             /*Actor.UnusedStoneTowerPlatform,*/ Actor.UnusedStoneTowerStoneElevator)] // can hide the grass weirdly
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
+            Actor.Beamos)] // can one shot the player as they leave the grotto with 1 heart
         NorthClockTown = 0x6B,
 
         [FileID(1516)]
