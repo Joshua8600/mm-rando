@@ -4256,7 +4256,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         OOTPotionShopMan = 0x1C3, // En_Ds2n
 
-        [ActorizerEnabled]
+        // [ActorizerEnabled]
         [FileID(415)]
         [ObjectListIndex(0x1AB)]
         [CheckRestricted(Scene.CuriosityShop, variant: ActorConst.ANY_VARIANT,
