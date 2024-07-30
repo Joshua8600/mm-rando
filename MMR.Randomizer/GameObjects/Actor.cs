@@ -273,6 +273,9 @@ namespace MMR.Randomizer.GameObjects
 
         [ActorizerEnabled] // this is just one fish, if you want a school summon a differemnt mure actor
         [FileID(120)]
+        [CheckRestricted(Scene.Grottos, ActorConst.ANY_VARIANT,
+            Item.BottleCatchFish
+        )]
         [ObjectListIndex(1)]
         // zero is swimming, one is dropped from a bottle (but also the trading post one, -1 is just a differnt color I think
         // 2 is unk
@@ -652,7 +655,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(86)]
         [ObjectListIndex(0x61)]
         // weirdly this is NOT dynapoly actor
-        [CheckRestricted(Scene.TerminaField, variant: 0x01, Item.CollectableTerminaFieldTreeItem1)]
+        [CheckRestricted(Scene.TerminaField, variant: GameObjects.ActorConst.ANY_VARIANT, Item.CollectableTerminaFieldTreeItem1)]
         // bush: 0xFF0B, small tree: 0xFF02
         // big tree: 0xFF00, big tree with shop man in it: 0x0A1A
         // 17,18 are leaf particles
@@ -804,18 +807,23 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)] // gameplay_keep obj 1
         [CheckRestricted(Scene.TerminaField, ActorConst.ANY_VARIANT, Item.CollectableTerminaFieldButterflyFairy1)] // TODO which is it?
         // TODO finish separating them
-        [CheckRestricted(Scene.Grottos, 0x5323, Item.BottleCatchBug)] // north grotto
+        [CheckRestricted(Scene.Grottos, 0x5323, Item.BottleCatchBug)] // north gossip grotto
+        [CheckRestricted(Scene.Grottos, 0x2323, Item.BottleCatchBug)] // west gossip grotto
         [CheckRestricted(Scene.Grottos, 0x6322, Item.BottleCatchFish)] // regular grotto, TODO do we want to force a fish in a unique place instead?
-        [CheckRestricted(Scene.Grottos, ActorConst.ANY_VARIANT, Item.CollectableGrottosOceanGossipStonesButterflyFairy1, Item.CollectableGrottosMagicBeanSellerSGrottoButterflyFairy1,
-            Item.CollectableGrottosCowGrottoButterflyFairy1, Item.CollectableGrottosCowGrottoButterflyFairy2,
-            Item.BottleCatchFish
+        [CheckRestricted(Scene.Grottos, 0x2324, Item.CollectableGrottosOceanGossipStonesButterflyFairy1)]
+        [CheckRestricted(Scene.Grottos, 0x4324, Item.CollectableGrottosMagicBeanSellerSGrottoButterflyFairy1)]
+        [CheckRestricted(Scene.Grottos, variant: 0x3324,
+            Item.CollectableGrottosCowGrottoButterflyFairy1, Item.CollectableGrottosCowGrottoButterflyFairy2
             )]
-        [CheckRestricted(Scene.MountainVillageSpring, ActorConst.ANY_VARIANT, Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy1, Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy2)]
-        [CheckRestricted(Scene.GreatBayCoast, ActorConst.ANY_VARIANT, Item.CollectableGreatBayCoastButterflyFairy1)]
-        [GroundVariants(0x3323, 0x2324, 0x4324, 0x5323)] // beatles on the floor
+        [CheckRestricted(Scene.MountainVillageSpring, 0x4324,
+            Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy1)]
+        [CheckRestricted(Scene.MountainVillageSpring, 0x5324,
+            Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy2)]
+        [CheckRestricted(Scene.GreatBayCoast, variant: 0x2324, Item.CollectableGreatBayCoastButterflyFairy1)]
+        [GroundVariants(0x3323, 0x4324, 0x5323)] // beatles on the floor
         // they dont stick to the wall, they climb in the air
         //[WallVariants(0x3323, 0x2324, 0x4324, 0x5323)] // beatles on the... wall?
-        [FlyingVariants(0x2323, 0x4324)] // butterlies in the air
+        [FlyingVariants(0x2323, 0x2324, 0x4324)] // butterlies in the air
         [WaterVariants(0x6322)] // fish swimming in the water
         [UnkillableAllVariants]
         [VariantsWithRoomMax(max: 2, 0x3323, 0x2324, 0x4324)]
@@ -953,6 +961,8 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(Obj_Dowsing, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x110)] // rumble
         [AlignedCompanionActor(Butterfly, CompanionAlignment.Above, ourVariant: -1,
             variant: 0, 1, 2)]
+        [AlignedCompanionActor(IshiRock, CompanionAlignment.Above, ourVariant: -1,
+            variant: 0xA1, 0xFE01)] // everyone loves a good hidden grotto under a rock
         [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
         //[ForbidFromScene(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead,
         //    Scene.TerminaField)]
@@ -1298,7 +1308,7 @@ namespace MMR.Randomizer.GameObjects
             0x4D10, 0xFF04, 0x4D10,// mountain village spring
             0xC719, 0xC90E, 0xCB0E, 0xCD19, 0xCF0F, 0xD10F, 0xD30F, 0xD519, 0xC119, 0xC319, 0xC50F, 0xC709, // goron shrine
             0x410E, 0x450A, 0x470A, 0x490A, 0x4B0A, 0x4D0E, 0x530A, 0x550A, 0x570E, 0x590A, 0x5B0E, // pinnacle rock
-            0x471E, 0x590E, 0x531E, 0x4114, 0x4314, 0x4B1E, 0x4D0A, 0x5D0A, 0x5F0A, // beneath the graveyard
+            0x471E, 0x590E, 0x531E, 0x4114, 0x4314, 0x4B1E, 0x4D0A, 0x5D0A, 0x5F0A, 0x5F03, 0x5714, // beneath the graveyard
             0x0B01, 0x0D01, 0x0F1E, 0x110A, 0x1301, 0x151E, 0x1705, 0x191E, 0x1B1E, 0x1D0A, // damps house
             0x7C10, 0x7E0B, 0x800B, 0x820E, 0x840B, 0x9C10, 0x9E0E, 0xA010, 0xB40E, 0x860B, 0x8813, 0x8A0B, 0x8C0B,// ikana castle
             0x430A, 0x450E, 0x4710, 0x4B10, 0x4D14, 0x4F0A, 0x5114, 0x5314, 0x570A, 0x5910, 0x5B14, 0x5D0E, 0x5F1E, 0x610A, 0x630E, // stone tower
@@ -1530,6 +1540,8 @@ namespace MMR.Randomizer.GameObjects
             0x0401, 0x0504, // inverted stone tower
             0x0506, 0x070C, 0x060F // termina field
         )]
+        [AlignedCompanionActor(GoldSkulltula, CompanionAlignment.OnTop, ourVariant: -1,
+            variant: 0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F)]
         //[ForbidFromScene(Scene.SwampSpiderHouse )] // dont want to mess with this by accident until I know it has proper logic
         SoftSoilAndBeans = 0x91, // Obj_Bean
 
@@ -1593,7 +1605,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 8)]
         [ForbidFromScene(Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
-            Scene.BeneathTheWell, Scene.DekuShrine, Scene.IkanaCastle, Scene.PiratesFortressRooms)]
+            Scene.BeneathTheWell, Scene.DekuShrine, Scene.IkanaCastle, Scene.PiratesFortressRooms, Scene.SwampSpiderHouse)]
         ObjSwitch = 0x93, // Obj_Switch
 
         Empty94 = 0x94, // Empty94
@@ -1641,7 +1653,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [ObjectListIndex(0xF1)]
         [FileID(143)]
-        [CheckRestricted(Scene.MayorsResidence, variant: 0, Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
+        [CheckRestricted(Scene.MayorsResidence, variant: ActorConst.ANY_VARIANT, Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
         // 1 scoffing at poster, 2 is shouting at the sky looker
         // 0x03 is a walking type
         [GroundVariants(1, 2,
@@ -1896,7 +1908,6 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4624, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock3)]
         [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4214, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock4)]
         [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4814, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock5)]
-
         //[ObjectListIndex(0x1F6)] // NEVER USED IN MM, damn thing lied to me, even the boulders are object 2
         // it actually uses one of two objects: gameplay_field or object_ishi, which is only in SSHouse
         //6a does not load
@@ -1963,6 +1974,7 @@ namespace MMR.Randomizer.GameObjects
             variant: 0x8200, 0xA200, // secret japanese grottos, hidden
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [AlignedCompanionActor(Shot_Sun, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x41)] // fairies love grass
+        [ForbidFromScene(Scene.RoadToIkana)] // its right on top of shirou which gets confusing if two actors are on top of each other, visually it makes sense to leave this as a land mark
         [UnkillableAllVariants]
         GrassRockCluster = 0xB3, // Obj_Mure2
 
@@ -2664,6 +2676,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [AlignedCompanionActor(Shot_Sun, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x41)] // fairies love grass
         [AlignedCompanionActor(Fairy, CompanionAlignment.OnTop, ourVariant: -1, variant: 2, 7, 9)] // fairies love grass
+        [AlignedCompanionActor(Butterfly, CompanionAlignment.OnTop, ourVariant: -1, variant: 0, 1, 2)] // butterflies love grass
         NaturalPatchOfGrass = 0x10D, // Obj_Grass_Unit
 
         Empty10E = 0x10E, // Empty10E
@@ -2853,7 +2866,7 @@ namespace MMR.Randomizer.GameObjects
 
         // wont spawn if you place him outside of his observatory, needs modification
         // the astral observatory viewer
-        // [ActorizerEnabled]
+        // [ActorizerEnabled] // TODO randomize this only if casual logic too lazy to do that tonight tho
         [FileID(264)]
         [ObjectListIndex(0xDE)]
         [CheckRestricted(Item.TradeItemMoonTear, Item.HeartPieceTerminaBusinessScrub, Item.CollectableTerminaFieldTelescopeGuay1)]
@@ -2963,11 +2976,11 @@ namespace MMR.Randomizer.GameObjects
         //[ActorizerEnabled] // wont spawn because the required item objects are likely missing
         [FileID(276)]
         [ObjectListIndex(0xD0)]
-        [CheckRestricted(Scene.BombShop, variant: 02,
+        [CheckRestricted(Scene.BombShop, variant: ActorConst.ANY_VARIANT, // 02,
             Item.ShopItemBombsBomb10, Item.ShopItemBombsBombchu10, Item.ItemBombBag, Item.UpgradeBigBombBag)]
-        [CheckRestricted(Scene.ZoraHallRooms, variant: 0x3E0,
+        [CheckRestricted(Scene.ZoraHallRooms, variant: ActorConst.ANY_VARIANT, // 0x3E0,
             Item.ShopItemZoraArrow10, Item.ShopItemZoraRedPotion, Item.ShopItemZoraShield)]
-        [CheckRestricted(Scene.GoronShop, variant: 0x3E1,
+        [CheckRestricted(Scene.GoronShop, variant: ActorConst.ANY_VARIANT, // 0x3E1,
             Item.ShopItemGoronArrow10, Item.ShopItemGoronBomb10, Item.ShopItemGoronRedPotion)]
         // 2 is bombshop, 3E0 is zora shopf
         [GroundVariants(0x3E0, // zora shop
@@ -3919,7 +3932,8 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(373)]
         [ObjectListIndex(0x195)]
-        [CheckRestricted(scene:Scene.DekuKingChamber, variant:0x2FF, Item.SongSonata)]
+        [CheckRestricted(scene:Scene.DekuKingChamber, variant: ActorConst.ANY_VARIANT, // 0x2FF,
+            Item.SongSonata)]
         // params
         // type (0x780) >> 7 // holy shit why
         [GroundVariants(0xFD7F, // credits monk, wish it did more than tpose...
@@ -4337,8 +4351,10 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(420)]
         [ObjectListIndex(0x1AF)]
-        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x814, Item.CollectableIkanaGraveyardDay2Bats1)]
-        [CheckRestricted(Scene.DampesHouse, variant: 0x10, Item.ItemBottleDampe)]
+        [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT, // 0x814,
+            Item.CollectableIkanaGraveyardDay2Bats1)]
+        [CheckRestricted(Scene.DampesHouse, variant: ActorConst.ANY_VARIANT, // 0x10,
+            Item.ItemBottleDampe)]
         [GroundVariants(0x1, 0x10, 0xFFF3,  // basement
             0x12, // trembling
             0x814)] // outside
@@ -4648,9 +4664,8 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants] // actually I'm not sure, it has health
         [BlockingVariantsAll]
         [ForbidFromScene(Scene.IkanaGraveyard)]
-        //[EnemizerScenesPlacementBlock(Scene.Woodfall, // blocking enemies
-        //    Scene.SouthernSwamp)] // 75% chance of crash, reason unk
-        [SwitchFlagsPlacement(mask: 0xFF, shift: 8)]
+        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwamp)] // crash cause is unknown, mtx calculation crash
+        //[SwitchFlagsPlacement(mask: 0xFF, shift: 8)] // not actually used by vanilla variants, we can ignore
         IkanaGravestone = 0x1E3, // Obj_Hakaisi
 
         [FileID(445)]
@@ -5024,9 +5039,11 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(473)]
         [ObjectListIndex(0x1DF)]
-        [CheckRestricted(Scene.GoronShrine, variant: 0x3FF1, Item.SongLullaby, Item.MaskDonGero,
+        [CheckRestricted(Scene.GoronShrine, variant: ActorConst.ANY_VARIANT, // 0x3FF1,
+            Item.SongLullaby, Item.MaskDonGero,
             Item.SongLullabyIntro)] // have to talk to kid to get intro from leader
-        [CheckRestricted(Scene.GoronRacetrack, variant: 0x3FF1, Item.ItemBottleGoronRace)]
+        [CheckRestricted(Scene.GoronRacetrack, variant: ActorConst.ANY_VARIANT, // 0x3FF1,
+            Item.ItemBottleGoronRace)]
         //[CheckRestricted(Scene.TwinIslandsSpring, variant: 0x3FF1, Item.ItemBottleGoronRace)] // not sure this is required
         [GroundVariants(
             0x1400, // regular one in the shrine throne room
@@ -5056,9 +5073,9 @@ namespace MMR.Randomizer.GameObjects
             Item.TradeItemRoomKey, Item.TradeItemKafeiLetter, Item.MaskCouple,
             Item.NotebookMeetAnju, Item.NotebookInnReservation, Item.NotebookPromiseAnjuDelivery,
             Item.NotebookPromiseAnjuMeeting, Item.NotebookDeliverPendant, Item.NotebookUniteAnjuAndKafei)]
-        [CheckRestricted(Scene.LaundryPool, variant: 0x8001,
+        [CheckRestricted(Scene.LaundryPool, variant: ActorConst.ANY_VARIANT, //0x8001,
             Item.NotebookMeetAnju)]
-        [CheckRestricted(Scene.RanchBuildings, variant: 0x8001,
+        [CheckRestricted(Scene.RanchBuildings, variant: ActorConst.ANY_VARIANT, // 0x8001,
             Item.NotebookMeetAnju)]
         // 8001 is pathing to laundrypool, also sitting on bed in ranch day 3
         [GroundVariants(2 // inn
@@ -5118,8 +5135,10 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [FileID(479)]
         [ObjectListIndex(0x1F1)]
-        [CheckRestricted(Scene.BeneathTheWell, variant: 0xFF00, Item.BottleCatchBigPoe)]
-        [CheckRestricted(Scene.DampesHouse, variant: 0xFF01, Item.BottleCatchBigPoe, Item.ItemBottleDampe)]
+        [CheckRestricted(Scene.BeneathTheWell, variant: ActorConst.ANY_VARIANT, // 0xFF00,
+            Item.BottleCatchBigPoe)]
+        [CheckRestricted(Scene.DampesHouse, variant: ActorConst.ANY_VARIANT, // 0xFF01,
+            Item.BottleCatchBigPoe, Item.ItemBottleDampe)]
         // params: 0xFF00 is switch flags, if switch flag is exactly 0xFF then switch flags are ignored
         //    0xFF is type, where 0 is well, 1 is suppmoned in dampe house, 2/3/4 are dampe fire subtypes
         // we should be able to use 0xFF00... but rando changes something that makes dampe po spawn instant and well po has a cutscene
@@ -5511,7 +5530,8 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x20D)]
         [DynaAttributes(31,18)] // this is just the top of the tree, the bottom is a soft collider
         // both 0 and 0xFF on oposite sides
-        [CheckRestricted(Scene.NorthClockTown, variant: 0, Item.HeartPieceNorthClockTown)]
+        [CheckRestricted(Scene.NorthClockTown, variant: ActorConst.ANY_VARIANT, // 0x0
+            Item.HeartPieceNorthClockTown)]
         [GroundVariants(0x0, 0xFF, 0x80FF)]
         [VariantsWithRoomMax(max: 1, variant: 0x0, 0xFF, 0x80FF)]
         //[EnemizerScenesPlacementBlock(//Scene.SouthernSwampClear,// known dyna issues
