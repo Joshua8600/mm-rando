@@ -5288,7 +5288,7 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
-            if (scene.SceneEnum == GameObjects.Scene.RoadToIkana) // force specific actor/variant for debugging
+            if (scene.SceneEnum == GameObjects.Scene.Grottos) // force specific actor/variant for debugging
             {
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
                 //thisSceneData.Scene.Maps[0].Actors[5].ChangeActor(GameObjects.Actor.BeanSeller, vars: 0); // was not commented out on isghj branch
