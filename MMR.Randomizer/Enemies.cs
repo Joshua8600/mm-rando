@@ -89,6 +89,7 @@ namespace MMR.Randomizer
         // these have to be separate from Actor Enum for now beacuse they are for special objects, not regular types
         static int[] clayPotDungeonVariants = {
             0xB, // multiple
+            0x1E, 0x5, // swamp spiderhouse spider pots
             0x4C02, 0x4E02, 0x5002, 0x5202, // wft
             0x5C0E, 0x601E, 0x621E, 0x4C0E, 0x660E, 0x741E, 0x5A0A, // ospiderhouse
             0x761E, 0x001A, 0x400A, 0x0186, 0x018A, 0x680A, 0x6E0A, 0x700A, 0x720E, // ospiderhouse
@@ -1707,6 +1708,17 @@ namespace MMR.Randomizer
                 terminaField.Maps[0].Actors[199].Position.z = -642; // move back from sitting right on top of the grotto
             }
             SceneUtils.UpdateScene(terminaField);
+
+            var roadToIkanaCanyonScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.RoadToIkana.FileID());
+
+            var roadToIkanaRedHamishi = roadToIkanaCanyonScene.Maps[0].Actors[5];
+            if (roadToIkanaRedHamishi.ActorEnum != GameObjects.Actor.BronzeBoulder) // assumption: currently both have to be randomized at the same time
+            {
+                roadToIkanaRedHamishi.Position.z = -413; // move back from sitting right on top of the grotto
+                // TODO change rotation?
+            }
+            SceneUtils.UpdateScene(roadToIkanaCanyonScene);
+
 
             MoveShopScrubsIfRandomized();
             MovePostmanIfRandomized(terminaField);
@@ -3864,11 +3876,11 @@ namespace MMR.Randomizer
 
             for (int objectIndex = 0; objectIndex < thisSceneData.Objects.Count; objectIndex++)
             {
-#region Object Forcing Debug
+                #region Object Forcing Debug
                 //////////////////////////////////////////////////////
                 ///////// debugging: force an object (enemy) /////////
                 //////////////////////////////////////////////////////
-// #if DEBUG
+                // #if DEBUG
 
                 bool TestHardSetObject(GameObjects.Scene targetScene, GameObjects.Actor target, GameObjects.Actor replacement)
                 {
@@ -3940,7 +3952,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.UglyTree, GameObjects.Actor.MilkbarChairs)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TwinIslands, GameObjects.Actor.LargeSnowball, GameObjects.Actor.MilkbarChairs)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Leever, GameObjects.Actor.DarmaniGrave)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.RoadToIkana, GameObjects.Actor.RealBombchu, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ZoraCape, GameObjects.Actor.Leever, GameObjects.Actor.MilkbarChairs)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBaba, GameObjects.Actor.SkullKidPainting)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.IkanaGraveyard, GameObjects.Actor.BadBat, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
@@ -4113,9 +4125,9 @@ namespace MMR.Randomizer
                         //var specificCandidateList = GetMatchPool(thisSceneData, thisSceneData.ActorsPerObject[objectIndex], containsFairyDroppingEnemy:false, objectHasBlockingSensitivity);
                         // except we already did this above? should we limit to one?
 
-                        candidatesPerActor.AddRange(actorsForThisObject);
+                        candidatesPerActor.AddRange(actorsForThisObject.ToList());
                     }
-                    candidatesPerActor.AddRange(thisSceneData.SceneFreeActors);
+                    candidatesPerActor.AddRange(thisSceneData.SceneFreeActors.ToList());
 
                     // now we need to go through candidates and reduce to variants we can use
                     var trimmedCandidates = new List<Actor>();
@@ -4301,7 +4313,7 @@ namespace MMR.Randomizer
             return enemyMatchesPool;
         }
 
-#region Trim and Free actors
+        #region Trim and Free actors
 
         public static void TrimAllActors(SceneEnemizerData thisSceneData, List<Actor> previouslyAssignedCandidates, List<Actor> temporaryMatchEnemyList, bool allowLimits = true)
         {
@@ -4488,15 +4500,16 @@ namespace MMR.Randomizer
             return objectsPerMap;
         }
 
-        public static List<Actor> GetSceneFreeActors(Scene scene)
+        public static void GetSceneFreeActors(SceneEnemizerData thisSceneData)
         {
             /// some actors don't require unique objects, they can use objects that are generally loaded, we can use these almost anywhere
             ///  any actor that is object type 1 (gameplay_keep) is free to use anywhere
             ///  scenes can have a special object loaded by themselves, this is either dangeon_keep or field_keep, or none
 
+            var scene = thisSceneData.Scene;
             var sceneIsDungeon = scene.HasDungeonObject();
             var sceneIsField = scene.HasFieldObject();
-            var SceneFreeActors = FreeCandidateList.Where(act => (act.ObjectId == 1
+            var sceneFreeActors = FreeCandidateList.Where(act => (act.ObjectId == 1
                                                                 || (sceneIsField && act.ObjectId == (int)Scene.SceneSpecialObject.FieldKeep)
                                                                 || (sceneIsDungeon && act.ObjectId == (int)Scene.SceneSpecialObject.DungeonKeep))
                                                            && !(act.BlockedScenes != null && act.BlockedScenes.Contains(scene.SceneEnum))
@@ -4511,7 +4524,7 @@ namespace MMR.Randomizer
                 newDungeonOnlyPot.Variants = clayPotDungeonVariants.ToList();
                 newDungeonOnlyPot.AllVariants[(int)GameObjects.ActorType.Ground] = newDungeonOnlyPot.Variants;
 
-                SceneFreeActors.Add(newDungeonOnlyPot);
+                sceneFreeActors.Add(newDungeonOnlyPot);
             }
             // todo do this for tall grass too
             if (VanillaEnemyList.Contains(GameObjects.Actor.TallGrass) && sceneIsField)
@@ -4520,10 +4533,22 @@ namespace MMR.Randomizer
                 newFieldTallGrass.Variants = tallGrassFieldObjectVariants.ToList();
                 newFieldTallGrass.AllVariants[(int)GameObjects.ActorType.Ground] = newFieldTallGrass.Variants;
                 // todo trim variants
-                SceneFreeActors.Add(newFieldTallGrass);
+                sceneFreeActors.Add(newFieldTallGrass);
+            }
+            // giant ice block is now a huge problem in regular grottos, remove them here instead of removing all blocking actors
+            if (scene.SceneEnum == GameObjects.Scene.Grottos)
+            {
+                var iceblock = sceneFreeActors.Find(act => act.ActorEnum == GameObjects.Actor.RegularIceBlock);
+                var blockingVariantsAttr = GameObjects.Actor.RegularIceBlock.GetAttribute<BlockingVariantsAttribute>();
+
+                var newVariants = iceblock.Variants.ToList();
+                newVariants.RemoveAll(var => blockingVariantsAttr.Variants.Contains(var));
+                iceblock.Variants = newVariants;
+                iceblock.AllVariants[(int)GameObjects.ActorType.Ground - 1] = newVariants;
             }
 
-            return SceneFreeActors;
+            thisSceneData.SceneFreeActors = sceneFreeActors;
+            return;
         }
 
         public static List<Actor> GetRoomFreeActors(SceneEnemizerData thisScene, int thisRoomIndex)
@@ -4818,7 +4843,7 @@ namespace MMR.Randomizer
                 // random coin toss, remove one
                 var targetActorEnum = (thisSceneData.RNG.Next() % 2 == 1) ? (GameObjects.Actor.GaboraBlacksmith) : (GameObjects.Actor.Zubora);
                 thisSceneData.AcceptableCandidates.RemoveAll(a => a.ActorEnum == targetActorEnum);
-             }
+            }
         }
 
         private static void SplitSceneLikeLikesIntoTwoActorObjects(SceneEnemizerData thisSceneData)
@@ -4985,7 +5010,7 @@ namespace MMR.Randomizer
             // instead of passing the Random instance, we pass seed and add it to the unique scene number to get a replicatable, but random, seed
             thisSceneData.RNG = new Random(seed + scene.File);
 
-#region Log Handling functions
+            #region Log Handling functions
             // spoiler log already written by this point, for now making a brand new one instead of appending
             void WriteOutput(string str, StringBuilder altLog = null)
             {
@@ -5015,7 +5040,7 @@ namespace MMR.Randomizer
                 Thread.CurrentThread.Priority = ThreadPriority.AboveNormal; // need more time than the other small scenes
             }
             WriteOutput($" starting timestamp : [{DateTime.Now.ToString("hh:mm:ss.fff tt")}]");
-#endregion
+            #endregion
 
             GetSceneEnemyActors(thisSceneData);
             if (thisSceneData.Actors.Count == 0)
@@ -5070,21 +5095,21 @@ namespace MMR.Randomizer
             GenerateActorCandidates(thisSceneData, fairyDroppingActors);
             WriteOutput(" time to generate candidate list: " + GET_TIME(thisSceneData.StartTime) + "ms");
 
+            // keeping track of RAM space usage is getting ugly, try some OO to clean it up
+            thisSceneData.ActorCollection = new ActorsCollection(scene);
+            WriteOutput(" time to separate map/time actors: " + GET_TIME(thisSceneData.StartTime) + "ms");
+
+            GetSceneFreeActors(thisSceneData);
+
             int loopsCount = 0;
             int objectTooLargeCount = 0;
             var previousyAssignedCandidate = new List<Actor>();
-            thisSceneData.SceneFreeActors = GetSceneFreeActors(scene);
-
-            // keeping track of RAM space usage is getting ugly, try some OO to clean it up
-            thisSceneData.ActorCollection = new ActorsCollection(scene);
-
-            WriteOutput(" time to separate map/time actors: " + GET_TIME(thisSceneData.StartTime) + "ms");
-
             var bogoLog = new StringBuilder();
-            DateTime bogoStartTime = DateTime.Now;
+            var bogoStartTime = DateTime.Now;
+
             while (true) /// bogo sort, try to find an actor/object combos that fits in the space we took it out of
             {
-#region loopCounting
+                #region loopCounting
                 /// preventing inf looping, and re-adjustments due to poor looping results not finding a solution
                 //bogoLog.Clear();
                 bogoStartTime = DateTime.Now;
@@ -5093,7 +5118,7 @@ namespace MMR.Randomizer
                 loopsCount++;
                 if (loopsCount % 4 == 0)
                 {
-                    if (objectTooLargeCount > 0 )
+                    if (objectTooLargeCount > 0)
                     {
                         /// if we have run out of object space before, from now limit big object actor changes of getting picked to reduce likehood of next cycle
                         List<Actor> bigObjectActors = thisSceneData.AcceptableCandidates.FindAll(o => o.ObjectSize >= 0x6000); // 0x6000 is roughly the median
@@ -5116,7 +5141,11 @@ namespace MMR.Randomizer
                     GenerateActorCandidates(thisSceneData, fairyDroppingActors);
                     WriteOutput($" re-generate candidates time: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
                 }
+                if (loopsCount >= 500) // inf loop catch
+                {
+                    // this shouldn't happen, un-ravel our weights
 
+                }
                 if (loopsCount >= 900) // inf loop catch
                 {
                     var error = " No enemy combo could be found to fill this scene: " + scene.SceneEnum.ToString() + " w sid:" + scene.Number.ToString("X2");
@@ -5138,7 +5167,7 @@ namespace MMR.Randomizer
                 {
                     thisSceneData.FreeActorRate--;
                 }
-#endregion
+                #endregion
 
                 ShuffleObjects(thisSceneData);
                 WriteOutput($" objects pick time: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
@@ -5187,6 +5216,7 @@ namespace MMR.Randomizer
                 } // end for actors per object
 
                 // finally, randomize actors that have no objects (standalone)
+                if (ACTORSENABLED)
                 {
                     var temporaryMatchEnemyList = new List<Actor>();
                     //List<Actor> subMatches = thisSceneData.CandidatesPerObject[objectIndex].FindAll(act => act.ObjectId == chosenObject);
@@ -5253,14 +5283,15 @@ namespace MMR.Randomizer
             WriteOutput(" time to find matching candidates: " + GET_TIME(thisSceneData.StartTime) + "ms");
             WriteOutput(" Loops used for match candidate: " + loopsCount);
 
-#region Debugging: Actor Forcing
-// #if DEBUG
+            #region Debugging: Actor Forcing
+            // #if DEBUG
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
-            if (scene.SceneEnum == GameObjects.Scene.WestClockTown) // force specific actor/variant for debugging
+            if (scene.SceneEnum == GameObjects.Scene.RoadToIkana) // force specific actor/variant for debugging
             {
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
+                //thisSceneData.Scene.Maps[0].Actors[5].ChangeActor(GameObjects.Actor.BeanSeller, vars: 0); // was not commented out on isghj branch
                 //thisSceneData.Scene.Maps[0].Actors[22].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
                 //thisSceneData.Scene.Maps[0].Actors[9].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
                 //thisSceneData.Scene.Maps[0].Actors[2].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
@@ -5269,9 +5300,9 @@ namespace MMR.Randomizer
                 thisSceneData.Scene.Maps[1].Actors[0].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
             }
             /////////////////////////////
-// #endif
+            // #endif
             /////////////////////////////
-#endregion
+            #endregion
 
             var flagLog = new StringBuilder();
 
@@ -5294,11 +5325,11 @@ namespace MMR.Randomizer
             {
                 var actor = thisSceneData.Actors[a];
                 string dsize = actor.DynaLoad.poly > 0 ? $" dyn: [{actor.DynaLoad.poly}]" : "";
-#if DEBUG
+                #if DEBUG
                 var actorNameData = $"  Old actor:[{thisSceneData.Scene.SceneEnum}][{actor.Room.ToString("D2")}][{actor.OldName}]";
-#else
+                #else
                 var actorNameData = $"  Old actor:[{actor.Room.ToString("D2")}][{actor.OldName}] ";
-#endif
+                #endif
                 WriteOutput(actorNameData +
                     $" replaced by new actor: [{actor.Variants[0].ToString("X4")}]" +
                     $"[{actor.Name}]"
@@ -5324,7 +5355,7 @@ namespace MMR.Randomizer
             FlushLog();
         }
 
-#region Actor Injection
+        #region Actor Injection
 
         public static InjectedActor ParseMMRAMeta(string metaFile)
         {
@@ -5949,7 +5980,7 @@ namespace MMR.Randomizer
             } // end for each injected actor
         }
 
-#endregion
+        #endregion
 
         public static void ShuffleEnemies(OutputSettings outputSettings, CosmeticSettings cosmeticSettings, Models.RandomizedResult randomized)
         {
@@ -6018,7 +6049,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.0\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
