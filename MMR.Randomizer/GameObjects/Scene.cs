@@ -194,6 +194,8 @@ namespace MMR.Randomizer.GameObjects
            Actor.Bo)] // they just fall down to the "floor" and its awkward
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DeathArmos,
             Actor.PatrollingPirate)] // casual, causes a need for stone mask to procede through the temple
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CeilingSpawner,
+           Actor.Shabom)] // can clip through the ceiling becoming impossible to attack
         InvertedStoneTowerTemple = 0x15,
 
         [FileID(1203)]
@@ -703,6 +705,8 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x50)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SmallSnowball,
             Actor.RealBombchu, Actor.Snapper, Actor.Beamos)] // can hit you as you are climbing up blocking assension
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoGoron,
+            Actor.RealBombchu)] // can hit you as you are climbing up blocking assension
 
         MountainVillage = 0x4D,
 
@@ -812,6 +816,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Anju,
         //    Actor.AnjusGrandma, Actor.AnjusGrandmaCredits)] // this this was just cutscenes, not the same bug
         [EnemizerSceneBlockSensitive(Actor.Gorman, -1)]
+        [EnemizerSceneBlockSensitive(Actor.MushroomCloud, -1)] // specifically the one in the lavatory
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RosaSisters,
         //    Actor.StockpotBell, Actor.Bumper, Actor.CircleOfFire, Actor.LightBlock,
         //   Actor.Eyegore)]
