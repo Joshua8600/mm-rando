@@ -2354,7 +2354,7 @@ namespace MMR.Randomizer
                             "TownFairy",
                             pos1: new vec16(2289, -30, -750), new vec16(2523, -30, -750), new vec16(2412, -30, -929));
             }
-            var spinattack = _randomized.ItemList.Single(item => item.NewLocation == GameObjects.Item.MaskGreatFairy).Item;
+            var spinattack = _randomized.ItemList.Single(item => item.NewLocation == GameObjects.Item.FairySpinAttack).Item;
             if (IsActorizerJunk(spinattack))
             {
                 ChangeGreatFairyActors(mapIndex: 1, objectIndex: 0,
@@ -3911,6 +3911,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CutscenePirate)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Dog, GameObjects.Actor.Evan)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortress, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.PatrollingPirate)) continue; 
+                //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.Shellblade, GameObjects.Actor.LabFish)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.WestClockTown, GameObjects.Actor.RosaSisters, GameObjects.Actor.GaboraBlacksmith)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BuisnessScrub)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BeanSeller)) continue;
@@ -5290,6 +5291,11 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
+            //if (scene.SceneEnum == GameObjects.Scene.SwampSpiderHouse) // force specific actor/variant for debugging // was not commented out on isghj branch
+            //{ // was not commented out on isghj branch
+                //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc // was not commented out on isghj branch
+                //thisSceneData.Scene.Maps[0].Actors[9].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
+                //thisSceneData.Scene.Maps[0].Actors[2].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
             if (scene.SceneEnum == GameObjects.Scene.Grottos) // force specific actor/variant for debugging
             {
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
@@ -5526,6 +5532,8 @@ namespace MMR.Randomizer
             // function pointers to interconnect the code
 
             if ( ! Directory.Exists(directory)) return;
+            // if actorizer is off, we need to not read any of these
+            if (!_randomized.Settings.RandomizeEnemies) return; // right now actorizer/enemizer is the only system that uses this
 
             uint END_VANILLA_OBJ_SEGMENT = 0x01E5E600;
 
@@ -6051,7 +6059,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.2\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.3\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

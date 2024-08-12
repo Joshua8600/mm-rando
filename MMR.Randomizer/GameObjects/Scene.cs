@@ -577,7 +577,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.DeathArmos, // light arrow requirement is a bit much, no logical way right now to check if important item behind light arrow
             Actor.Bo, Actor.StoneTowerMirror,
             Actor.MothSwarm, // can block
-            Actor.HookshotWallSpot, // can block climbing TODO fix in the code since this is silly
+            Actor.HookshotWallAndPillar, // can block climbing TODO fix in the code since this is silly
+            Actor.BronzeBoulder, // doesn't stay in spot, falls to floor, blocks climbing start
             Actor.SpiderWeb)] // TODO would be cool if we could allow this if the item was junk, or logic require fire arrows
         [EnemizerSceneBlockSensitive(Actor.BadBat, -1)] // giant ice block, unused stone stuff at least
         [EnemizerSceneBlockSensitive(Actor.PottedPlant, -1)] // right next to swamp shooting gallery door
@@ -707,7 +708,6 @@ namespace MMR.Randomizer.GameObjects
             Actor.RealBombchu, Actor.Snapper, Actor.Beamos)] // can hit you as you are climbing up blocking assension
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoGoron,
             Actor.RealBombchu)] // can hit you as you are climbing up blocking assension
-
         MountainVillage = 0x4D,
 
         [FileID(1419)]
@@ -821,6 +821,7 @@ namespace MMR.Randomizer.GameObjects
         //    Actor.StockpotBell, Actor.Bumper, Actor.CircleOfFire, Actor.LightBlock,
         //   Actor.Eyegore)]
         [EnemizerSceneBlockSensitive(Actor.RosaSisters, -1)]
+        [EnemizerSceneBlockSensitive(Actor.MysteryHand, -1)]
         StockPotInn = 0x5E,
 
         [FileID(1472)]

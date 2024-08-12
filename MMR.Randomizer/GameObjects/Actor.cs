@@ -109,6 +109,7 @@ namespace MMR.Randomizer.GameObjects
         [TreasureFlagsPlacement(mask: 0x1F, shift: 0)]
         //[EnemizerScenesPlacementBlock(Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.SouthernSwampClear, // asummed dyna crash
         //    Scene.StoneTower)]
+        [PlacementWeight(50)]
         TreasureChest = 0x6, // En_Box
 
         [FileID(45)]
@@ -279,9 +280,10 @@ namespace MMR.Randomizer.GameObjects
             Item.BottleCatchFish
         )]
         [ObjectListIndex(1)]
-        // zero is swimming, one is dropped from a bottle (but also the trading post one, -1 is just a differnt color I think
+        // type 0 and 1 are slightly different? I think 0 is dropped from a bottle, a lot of other entries are 1
         // 2 is unk
         [WaterVariants(0, 1)]
+        [VariantsWithRoomMax(max:0, variant:0)]
         [UnkillableAllVariants]
         Fish = 0x17, // En_Fish
 
@@ -1266,6 +1268,16 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableOceansideSpiderHouseEntrancePot1, Item.CollectableOceansideSpiderHouseEntrancePot2, Item.CollectableOceansideSpiderHouseEntrancePot3,
             Item.CollectableOceansideSpiderHouseMainRoomPot1, Item.CollectableOceansideSpiderHouseMainRoomPot2,
             Item.CollectableOceansideSpiderHouseMaskRoomPot1, Item.CollectableOceansideSpiderHouseMaskRoomPot2)] */
+        // these are dungeon object, we can specify per variant
+        [CheckRestricted(Scene.PiratesFortressRooms, variant: ActorConst.ANY_VARIANT,
+            Item.CollectablePiratesFortressInterior100RupeeEggRoomPot1,
+            Item.CollectablePiratesFortressInteriorCellRoomWithPieceOfHeartPot1,
+            Item.CollectablePiratesFortressInteriorTwinBarrelEggRoomPot1,
+            Item.CollectablePiratesFortressInteriorTelescopeRoomPot1, Item.CollectablePiratesFortressInteriorTelescopeRoomPot2,
+            Item.CollectablePiratesFortressInteriorWaterCurrentRoomPot1,
+            Item.CollectablePiratesFortressInteriorBarrelRoomEggPot1, Item.CollectablePiratesFortressInteriorBarrelRoomEggPot2,
+            Item.CollectablePiratesFortressInteriorHookshotRoomPot1, Item.CollectablePiratesFortressInteriorHookshotRoomPot2
+        )]
         [CheckRestricted(Scene.PinnacleRock, variant: ActorConst.ANY_VARIANT,
             Item.CollectablePinnacleRockPot1, Item.CollectablePinnacleRockPot2, Item.CollectablePinnacleRockPot3, Item.CollectablePinnacleRockPot4)]
         [CheckRestricted(Scene.ZoraCape, variant: ActorConst.ANY_VARIANT, Item.CollectableZoraCapeJarGame1,
@@ -1606,14 +1618,17 @@ namespace MMR.Randomizer.GameObjects
         // params are filled
         // type is 0x7 range,0/1 are floor switches, 2 is eye switch, 3 and 4 are crystal, 5 is draw again
         // subtype describes if its set once or toggle or if it resets once you step off
+        // z rot & 1 used for color, but only for the floor switches in sakons hideout (lol)
         [GroundVariants(0x0, 0x20, 0x1, 0x43, 0x14, 0x5)]
         // TODO get wall rotations working so I can just set some on the wall, wall crystal switches make sense
         [WallVariants(0x2,
+            0x902, // stone tower temple
             0x1D82 // stone tower temple
         )]
         [WaterBottomVariants(0x0, 0x1, 0x3, 0x4)]
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 8)]
+        [VariantsWithRoomMax(max:0, variant: 0x2, 0x902, 0x1D82)] // wall types, currently they are the only actor that can be put on free wall spots that break (itemizer overwiting vars)
         [ForbidFromScene(Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
             Scene.BeneathTheWell, Scene.DekuShrine, Scene.IkanaCastle, Scene.PiratesFortressRooms, Scene.SwampSpiderHouse)]
         ObjSwitch = 0x93, // Obj_Switch
@@ -1643,7 +1658,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.SouthernSwampClear, // asummed dyna crash
         //    Scene.StoneTower)]
         [UnkillableAllVariants]
-        HookshotWallSpot = 0x96, // Obj_Hsblock
+        HookshotWallAndPillar = 0x96, // Obj_Hsblock
 
         // ??
         [FileID(141)]
@@ -2214,7 +2229,7 @@ namespace MMR.Randomizer.GameObjects
         [FlyingVariants(0x0)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
-        CursedSwampSpiderhouseMan = 0xD4, // En_Ssh
+        CursedSpiderMan = 0xD4, // En_Ssh
 
         EmptyD5 = 0xD5, // EmptyD5
 
@@ -3602,7 +3617,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [BlockingVariantsAll]
         [UnkillableAllVariants]
-        [PlacementWeight(85)]
+        [PlacementWeight(55)]
         PirateTelescope = 0x178, // En_Warp_Uzu
 
         [ActorizerEnabled]
@@ -4275,6 +4290,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(413)]
         [ObjectListIndex(0x1A9)]
         [CheckRestricted(Item.MundaneItemSeahorse)]
+        // type: 100 and else
         [GroundVariants(0x001, // regular
             0x100, 0x101)] // talking spots I think
         [VariantsWithRoomMax(max:0, variant:0x101, 0x100)] // doesn't spawn correctly
@@ -6216,11 +6232,18 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableIkanaGraveyardHitTag4, Item.CollectableIkanaGraveyardHitTag5, Item.CollectableIkanaGraveyardHitTag6,
             Item.CollectableIkanaGraveyardHitTag7, Item.CollectableIkanaGraveyardHitTag8, Item.CollectableIkanaGraveyardHitTag9,
             Item.CollectableIkanaGraveyardHitTag10, Item.CollectableIkanaGraveyardHitTag11, Item.CollectableIkanaGraveyardHitTag12)]
-        [WallVariants(0xFE00)]
+        // zoey made new ones for the hitspot rando, these are values read from ram of a working seed
+        [WallVariants(
+            0xFE00, // vanilla value
+            0xFF01, 0xFE02, 0xFE03, 0xFE04, 0xFE05, 0xFE06, 0xFE07, 0xFE08, 0xFE09, 0xFE0A, 0xFE0B, 0xFE0C, 0xFE0D, 0xFE0E, 0xFE0F, // new zoey values
+            0xFE10, 0xFE11, 0xFE12, 0xFE13, 0xFE14, 0xFE15, 0xFE16, 0xFE17
+            // dont know which one is which tho, so can't use per-variant yet
+            // esp if my debugging is wrong
+        )]
         [CeilingVariants(0xFC00)]
         [SwitchFlagsPlacement(mask: 0x7F, shift: 9)]
         [OnlyOneActorPerRoom]
-        [PlacementWeight(40)]
+        [PlacementWeight(30)] // TODO
         HitSpot = 0x265, // En_Hit_Tag // hittag
 
         [ActorizerEnabled]
@@ -6712,7 +6735,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x27F)]
         [DynaAttributes(18,16)]
         [GroundVariants(0x0)] // all the same
-        [ForbidFromScene(Scene.PiratesFortress, Scene.StoneTower)]
+        [ForbidFromScene(Scene.PiratesFortress, Scene.StoneTower, Scene.GreatBayCoast)]
         // we could remove from a few places like greatbaycoast
         [UnkillableAllVariants]
         [PlacementWeight(40)] // boring
