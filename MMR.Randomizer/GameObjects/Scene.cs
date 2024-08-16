@@ -41,6 +41,7 @@ namespace MMR.Randomizer.GameObjects
         [ClearEnemyPuzzleRooms(1, 2, 4)]
         [SceneInternalId(0x0C)]
         [EnemizerSceneEnemyReplacementBlock(Actor.CeilingSpawner,
+            Actor.GBTFreezableWaterfall, // blocking platforming
             Actor.UnusedFallingBridge, // can void the player because it forces crushing with the ceiling
             Actor.UnusedStoneTowerPlatform, // same thing, should be disabled earlier but maybe it isnt
             Actor.UnusedStoneTowerStoneElevator, // can void the player because it forces crushing with the ceiling
@@ -519,12 +520,7 @@ namespace MMR.Randomizer.GameObjects
         // 132,88 was working fine
         [DynaHeadroom(132, 100)] // limit not found
         [EnemizerSceneEnemyReplacementBlock(Actor.Bombiwa,
-                    Actor.LikeLike)] // can hard lock if the player leaves and gets instant-grabbed
-        [EnemizerSceneEnemyReplacementBlock(Actor.LikeLike,
-                    Actor.Japas, Actor.Bombiwa, Actor.BronzeBoulder, Actor.Mimi, Actor.TreasureChest)] // small blocking
-                                                                                                       //    Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, Actor.Tijo,
-                                                                                                       //    Actor.Bombiwa, Actor.BronzeBoulder, Actor.CircleOfFire,
-                                                                                                       //    Actor.RegularZora, Actor.SwimmingZora, Actor.WarpDoor)]
+                    Actor.LikeLike)] // can hard lock if the player leaves and gets instant-grabbed, TODO consider making a likelike that has a switch flag
         [EnemizerSceneBlockSensitive(Actor.LikeLike, -1)]
         ZoraCape = 0x35,
 
@@ -623,6 +619,8 @@ namespace MMR.Randomizer.GameObjects
         //    Actor.Peahat, Actor.LikeLike, Actor.Freezard)]
         //[EnemizerSceneEnemyReplacementBlock(Actor.DragonFly, // blocks deku flying 
         //    Actor.UnusedStoneTowerPlatform, Actor.UnusedPirateElevator)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.TallGrass,
+            Actor.ClocktowerGearsAndOrgan, Actor.RegularIceBlock)] // suspected too large and can block the owl
         [EnemizerSceneEnemyReplacementBlock(Actor.Octarok,
             Actor.Obj_Boat, Actor.SwampBoat)] // dyna crashing from just one boat and nothing else
         [EnemizerSceneBlockSensitive(Actor.DragonFly, -1)]
@@ -892,16 +890,16 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Gorman,
         //    Actor.ClocktowerGearsAndOrgan, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // organ is huge, covers the mayor's door
         [EnemizerSceneBlockSensitive(Actor.Gorman, -1)] // was moved next to mayors door, large bodies can actually block this
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Gorman,
+            Actor.LikeLike // can instant grab the player from the door, softlocking on low health builds
+        )]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GateSoldier,
             Actor.Peahat, // small peahat can instant kill 1 heart hero
             Actor.LikeLike,
             Actor.PatrollingPirate, Actor.ClocktowerGearsAndOrgan)] // could be annoying, hard to leave
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BomberHideoutGuard,
                 Actor.Peahat, Actor.Tijo
-                //Actor.ArmosStatue, // blocking
-                //Actor.ClocktowerGearsAndOrgan, 
-                //Actor.CircleOfFire, Actor.GibdoWell, Actor.RegularIceBlock, // worried about big blocking actors
-                /*Actor.Wolfos*/)]
+        )]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Jugglers,
                                                            Actor.UnusedStoneTowerPlatform)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Anju,

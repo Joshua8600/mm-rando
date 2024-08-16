@@ -1098,6 +1098,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x2330)]
         [FileID(112)]
         [ObjectListIndex(0xAB)]
+        [CheckRestricted(Scene.ZoraCape, variant:ActorConst.ANY_VARIANT, Item.HeartPieceGreatBayCapeLikeLike)]
         // 2 is ocean bottom, 0 is one in shallow shore water, 3 is land and one in shallow water
         [WaterBottomVariants(0, 2)]
         [GroundVariants(3)]
@@ -1796,6 +1797,7 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectibleSwampSpiderToken13, Item.CollectibleSwampSpiderToken25
             )] // */
         [GroundVariants(0)]
+        [WaterBottomVariants(0)] // testing
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.Grottos)]
         BeanSeller = 0xA5, // En_Ms
@@ -3986,6 +3988,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [VariantsWithRoomMax(max: 0, 0xFC7F, 0xFCFF,
             0x82, 0x1882, 0x2210, 0x6182)] // situationally appear, otherwise invisible, also assume path
+        [EnemizerScenesPlacementBlock(Scene.WoodsOfMystery)] // freaks out vanilla monkeys, inf loop in "EnMnk_AlreadyExists"
         [PlacementWeight(60)]
         Monkey = 0x19E, // En_Mnk
 
