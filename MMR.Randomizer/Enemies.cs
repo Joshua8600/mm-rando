@@ -3605,6 +3605,9 @@ namespace MMR.Randomizer
 
                 // dont need to modify old as this happens dead last
                 actorChoice.ChangeActor(GameObjects.Actor.NaturalPatchOfGrass, vars:0x0001, modifyOld: false);
+                actorChoice.Position.y += 50; // just in case the previous actor is more under the floor than exactly on the floor, bushes could fall through
+                actorChoice.Rotation.x = ActorUtils.MergeRotationAndFlags(rotation: 0, flags: 0x7F); // set to spawn all day all night every day
+                actorChoice.Rotation.z = ActorUtils.MergeRotationAndFlags(rotation: 0, flags: 0x7F); // set to spawn all day all night every day
             }
         }
 
@@ -3936,6 +3939,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CutscenePirate)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Dog, GameObjects.Actor.Evan)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortress, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.PatrollingPirate)) continue; 
+                //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.ClayPot, GameObjects.Actor.DekuKing)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ZoraCape, GameObjects.Actor.LikeLike, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.Shellblade, GameObjects.Actor.LabFish)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.WestClockTown, GameObjects.Actor.RosaSisters, GameObjects.Actor.GaboraBlacksmith)) continue; 
