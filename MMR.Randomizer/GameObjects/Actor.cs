@@ -827,11 +827,28 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.MountainVillageSpring, 0x5324,
             Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy2)]
         [CheckRestricted(Scene.GreatBayCoast, variant: 0x2324, Item.CollectableGreatBayCoastButterflyFairy1)]
-        [GroundVariants(0x3323, 0x4324, 0x5323)] // beatles on the floor
+        // beatles on the floor
+        [GroundVariants(
+            0x3323, // spiderhouse, ever living
+            0x3323, // doggy race
+            0x2323, // romani ranch, generic grotto
+            0xA323, 0x5323, // well
+            0x5323 // wet grotto
+        )]
         // they dont stick to the wall, they climb in the air
         //[WallVariants(0x3323, 0x2324, 0x4324, 0x5323)] // beatles on the... wall?
-        [FlyingVariants(0x2323, 0x2324, 0x4324)] // butterlies in the air
-        [WaterVariants(0x6322)] // fish swimming in the water
+        // butterlies in the air
+        [FlyingVariants(
+            0x2324, // coast
+            0x4324, 0x5324 // mountain village spring
+        )] 
+        // school of fish
+        [WaterVariants( 0xF322, // pirates fortress
+            0x3322, 0x4322, 0x2322, // pinnacle
+            0x5322, // cape, rots
+            0x8322, // zora hall
+            0x6322
+        )] 
         [UnkillableAllVariants]
         [VariantsWithRoomMax(max: 2, 0x3323, 0x2324, 0x4324)]
         BugsFishButterfly = 0x4F, // Obj_Mure // includes bugs and fish and butterflies
@@ -894,6 +911,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [EnemizerScenesPlacementBlock(Scene.RomaniRanch, // skin crash, not sure why I thought I fixed that
             Scene.GormanRaceTrack)] // skeleton update crash... why
+        [PlacementWeight(75)]
         En_Horse_Link_Child = 0x54, // En_Horse_Link_Child
 
         [ActorizerEnabled]
@@ -1107,6 +1125,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 6, variant: 3)]
         //[GroundVariants(3)]
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // slows down the race
+        [PlacementWeight(95)]
         LikeLike = 0x6C,
 
         //[EnemizerEnabled] // we dont actually want this detected automatically, this will be added per-likelike manually
@@ -1210,6 +1229,7 @@ namespace MMR.Randomizer.GameObjects
         //[VariantsWithRoomMax(max: 5, variant: -1)] 
         //[VariantsWithRoomMax(max: 0, variant: 0xA002, 0x8181, 0x828A)] // items
         [UnkillableAllVariants]
+        [PlacementWeight(90)]
         SmallWoodenBox = 0x81, // Obj_Kibako
 
         // MULTIPLE OBJECT ACTOR, can use object_tsubo object, dungeon keep, and green pot object
@@ -1488,7 +1508,8 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.SouthernSwamp, Scene.OdolwasLair,
             Scene.IkanaCastle, Scene.StoneTowerTemple, Scene.Woodfall, Scene.GreatBayCoast,
             Scene.SecretShrine, Scene.MountainVillageSpring, //Scene.WoodsOfMystery,
-            Scene.LaundryPool, Scene.SnowheadTemple, Scene.RoadToSouthernSwamp,
+            //Scene.LaundryPool,
+            Scene.SnowheadTemple, Scene.RoadToSouthernSwamp,
             //Scene.MilkRoad,
             Scene.IkanaCanyon,
             //Scene.Grottos,
@@ -1566,6 +1587,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(GoldSkulltula, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F)]
         //[ForbidFromScene(Scene.SwampSpiderHouse )] // dont want to mess with this by accident until I know it has proper logic
+        [PlacementWeight(80)]
         SoftSoilAndBeans = 0x91, // Obj_Bean
 
         [ActorizerEnabled]
@@ -1659,6 +1681,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.SouthernSwampClear, // asummed dyna crash
         //    Scene.StoneTower)]
         [UnkillableAllVariants]
+        [PlacementWeight(80)]
         HookshotWallAndPillar = 0x96, // Obj_Hsblock
 
         // ??
@@ -1708,6 +1731,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 9, variant: 0x0FFF)] // 10 without grog is probably broken
         [UnkillableAllVariants]
         //[ForbidFromScene(Scene.CuccoShack)]
+        [PlacementWeight(90)]
         CuccoChick = 0x9D, // En_Nwc
 
         // unsused, might have been part of lens on chest effect they wanted to do like OOT
@@ -1727,6 +1751,8 @@ namespace MMR.Randomizer.GameObjects
         // 0 is pointing in the distance
         [GroundVariants(0,
             1, 2, 3)]
+        [WaterBottomVariants(0x10,
+            0x11, 0x12, 0x13)] // silly
         //[PathingVariants()]
         // pathing 0xFC00 >> A
         // this is the cutscene version, the one that is most likely to break
@@ -1735,6 +1761,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(Cow, CompanionAlignment.InFront, ourVariant:-1)]
         //[VariantsWithRoomMax(max: 0, variant: 1,2,3)] // testing
         [UnkillableAllVariants]
+        [PlacementWeight(50)] // doesn't do anything right now, so really boring
         CutscenePirate = 0x9F, // En_Ge1
 
         [FileID(147)]
@@ -1800,6 +1827,7 @@ namespace MMR.Randomizer.GameObjects
         [WaterBottomVariants(0)] // testing
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.Grottos)]
+        [PlacementWeight(80)]
         BeanSeller = 0xA5, // En_Ms
 
         [ActorizerEnabled]
@@ -1908,6 +1936,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0, variant: 0x2102, 0x1102, 0x0102)] // these are pathing, do not place
         [VariantsWithRoomMax(max: 10, variant: 0xF000)]
         [UnkillableAllVariants]
+        [PlacementWeight(70)]
         En_Owl = 0xAF, // En_Owl
 
         // MULTIPLE OBJECT ACTOR
@@ -1917,7 +1946,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x2)] // pick up rock version
         [ForbidFromScene(Scene.InvertedStoneTower, Scene.SwampSpiderHouse)] // we want the bugs, I think its too much to ask players to leave to get bugs
         [CheckRestricted(Scene.TerminaField, 0x2844, Item.CollectableTerminaFieldRock1)]
-        [CheckRestricted(Scene.TerminaField, 0x2A44, Item.CollectableTerminaFieldRock2)]
+        [CheckRestricted(Scene.TerminaField, 0x2A44, Item.CollectableTerminaFieldRock2)] // wrong?
         [CheckRestricted(Scene.TerminaField, 0x2014, Item.CollectableTerminaFieldRock3)]
         [CheckRestricted(Scene.TerminaField, 0x2214, Item.CollectableTerminaFieldRock4)]
         [CheckRestricted(Scene.TerminaField, 0x2414, Item.CollectableTerminaFieldRock5)]
@@ -1990,7 +2019,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)] // gamplaykeep obj 1
         // 801, opening scene grass, 0x1FXX are ranch and TF
         // 0402 is ikana graveyard rock circle
-        //[CheckRestricted()]
+        [CheckRestricted(Scene.IkanaGraveyard, variant:0x402, Item.ChestGraveyardGrotto)]
         [GroundVariants(0x801, 0x1F02, 0x1F00, 0x0402)]
         [WaterBottomVariants(0x0402)]
         [AlignedCompanionActor(Shiro, CompanionAlignment.OnTop, ourVariant: -1,
@@ -2059,6 +2088,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.RomaniRanch, Scene.Woodfall, Scene.DekuShrine)] // standing variant has really large collider
         [EnemizerScenesPlacementBlock(Scene.TerminaField)] // now that we can recycle objects, this scene will always have too many of him, its obnoxious
         [UnkillableAllVariants]
+        [PlacementWeight(75)]
         En_Ani = 0xBD, // En_Ani
 
         EmptyBE = 0xBE,
@@ -2118,6 +2148,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.BeneathTheWell//,
             /* Scene.IkanaGraveyard, Scene.StoneTower */)] // dyna crash
         //[SwitchFlagsPlacement(mask: 0xFF, shift: 0)]
+        [PlacementWeight(70)]
         UnusedStoneTowerPlatform = 0xC7, // Bg_F40_Swlift
 
         EmptyC8 = 0xC8,
@@ -2163,6 +2194,7 @@ namespace MMR.Randomizer.GameObjects
         // versions: 1200, 1B00, 2800 shows up a lot, 2D00 stonetower, 3200 zora cape, 0x11D is zora cape
         // trading post version is 1
         // wish I could spawn the ones that dance so they are always dancing when the player gets there
+        // TODO  snowhead is missing from this list and above
         [GroundVariants( 0x3200, 0x2D00, 0x0F00, 0x1E00,
             1, 0x2800, 0x11D)]
         [WaterBottomVariants(1)]
@@ -2344,10 +2376,11 @@ namespace MMR.Randomizer.GameObjects
             )]
         //[VariantsWithRoomMax(max:0, variant:)]
         [ForbidFromScene(
-            //Scene.WoodfallTemple,
-            //Scene.Grottos,
-            //Scene.SwampSpiderHouse,
-            //Scene.SouthernSwamp,
+            Scene.WoodfallTemple, 
+            Scene.Grottos,
+            Scene.SwampSpiderHouse,
+            Scene.MountainVillageSpring,
+            Scene.SouthernSwamp, // re-enabled because I need to get around itemizer
             Scene.PiratesFortressRooms // required for cutscene to get actor to leave, for now
             )]
         [UnkillableAllVariants]
@@ -3753,7 +3786,7 @@ namespace MMR.Randomizer.GameObjects
         [DifficultAllVariants]
         [OnlyOneActorPerRoom]
         [VariantsWithRoomMax(max:0, variant:0)] // cutscene variant is hardcoded
-        [PlacementWeight(75)]
+        [PlacementWeight(65)]
         //[ForbidFromScene(Scene.StoneTowerTemple)]
         GaroMaster = 0x182, // En_Jso2
 
@@ -3805,6 +3838,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants] // actorcat PROP, not detected as enemy
         [FlyingToGroundHeightAdjustment(300)]
         [VariantsWithRoomMax(max:0, 0x101E, 0x100D, 0x1011, 0x1019, 0x1014)] // until I can get cieling detection modification, this is weird
+        [PlacementWeight(95)]
         //[ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
         SpikedMine = 0x185, // Obj_Mine
 
@@ -5510,7 +5544,7 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.SouthClockTown, Scene.MilkRoad, Scene.WestClockTown,
              Scene.Woodfall, Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.MountainVillage, Scene.MountainVillageSpring, Scene.Snowhead,
              Scene.GreatBayCoast, Scene.ZoraCape, Scene.IkanaCanyon, Scene.StoneTower, Scene.InvertedStoneTower)]
-        [PlacementWeight(90)]
+        [PlacementWeight(65)]
         //[EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // assumed dyna overflow
         OwlStatue = 0x223, // Obj_Warpstone
 
@@ -5701,6 +5735,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max:0, variant:0x050B, 0x3FFF)] // we dont want a sitting npc to be placed places, just replace, also talking to is softlock, and we cannot modify because rando needs this actor for things
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(mask:0x7F, shift:0)]
+        [PlacementWeight(90)]
         Toto = 0x234, // En_Toto // manager zora band member
 
         [EnemizerEnabled] // does not spawn outside of ikana
@@ -5783,6 +5818,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(Scene.MilkRoad)] // he can detect keg and try to talk to you about it, also small bombs I bet
         [UnkillableAllVariants]
+        [PlacementWeight(80)]
         GoronWithGeroMask = 0x23A, // En_Geg : HungryGoron, sirloin goron, "Hugo"
 
         [ActorizerEnabled]
@@ -5824,6 +5860,7 @@ namespace MMR.Randomizer.GameObjects
         [RespawningAllVariants] // they do NOT respawn, but they do block clear all rooms
         [UnkillableAllVariants]
         [EnemizerScenesPlacementBlock(Scene.Snowhead)] // can mess with hover
+        [PlacementWeight(75)]
         MothSwarm = 0x23D,  // En_Tanron1
 
         [FileID(533)]
@@ -5861,9 +5898,9 @@ namespace MMR.Randomizer.GameObjects
         )]
         [WaterBottomVariants(0xFE02, // dark cutscene version, perfect for dark water bottom shinanigans
             0xF)] // also, do not put regular variant as water our typing system is dumb, doesnt know which is which
-        [VariantsWithRoomMax(max:1, variant: 0xFE0F/*, 0xFE0F*/)]
+        [VariantsWithRoomMax(max:0, variant: 0xFE0F/*, 0xFE0F*/)] // reduced to zero until I can fix his shit
         [UnkillableAllVariants]
-        [PlacementWeight(30)]
+        [PlacementWeight(50)]
         Evan = 0x241, // En_Zos
 
         [ActorizerEnabled]
@@ -5896,7 +5933,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         //[ForbidFromScene(Scene.StockPotInn)]
-        [PlacementWeight(80)]
+        //[PlacementWeight(80)] // currently not placible
         AnjusGrandma = 0x243, // En_Nb
 
         // issue: they dont spawn without at least a pair, this can lead to areas where you get no spawns at all
@@ -5907,6 +5944,7 @@ namespace MMR.Randomizer.GameObjects
         [PerchingVariants(1)]
         [VariantsWithRoomMax(max: 0, variant:1,0)] // actually schedule locked stupidly, going to stop for now hes been a source of issues
         [UnkillableAllVariants]
+        //[Minum]
         [EnemizerScenesPlacementBlock(Scene.RanchBuildings, Scene.ClockTowerInterior,
             Scene.HoneyDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.TreasureChestShop,
             Scene.MarineLab, Scene.AstralObservatory,
@@ -5956,6 +5994,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom] // if two of them are near to each other, and player appears near his nearby music can break
         //[ForbidFromScene(Scene.StockPotInn, Scene.LaundryPool, Scene.MilkBar)] // think him being in milkbar is a credits thing
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // his music can break Frog Choir
+        [PlacementWeight(90)]
         GuruGuru = 0x248, // En_GuruGuru
 
         [FileID(544)]
@@ -6490,6 +6529,7 @@ namespace MMR.Randomizer.GameObjects
         //[OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         //[ForbidFromScene(Scene.WestClockTown)]
+        [PlacementWeight(70)]
         RosaSisters = 0x27B, // En_Rz
 
         [FileID(595)]
@@ -6704,7 +6744,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [FlyingToGroundHeightAdjustment(100)]
         //[ForbidFromScene(Scene.TerminaField)] // do not remove original, esp with rupeeland coming soon
-        [PlacementWeight(75)]
+        [PlacementWeight(60)]
         Takkuri = 0x291, // En_Thiefbird
 
         //todo
@@ -6722,6 +6762,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x26E)]
         [WallVariants(0x2)]
         [UnkillableAllVariants]
+        [PlacementWeight(90)]
         Windows = 0x294, // Obj_Yado
 
         [FileID(620)]
@@ -6758,7 +6799,7 @@ namespace MMR.Randomizer.GameObjects
         [CompanionActor(Flame, ourVariant: -1, 0x7FE)] // blue flames
         [EnemizerScenesPlacementBlock(Scene.TerminaField, Scene.GoronRacetrack)]
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
-        [PlacementWeight(85)]
+        [PlacementWeight(80)]
         AnjuWeddingDress = 0x299, // En_And "En_An + dress"
 
         [FileID(625)]
@@ -6798,13 +6839,13 @@ namespace MMR.Randomizer.GameObjects
         [PerchingVariants(0)] // grandma pls
         [UnkillableAllVariants]
         [CompanionActor(Flame, ourVariant: -1, 0x7FE)] // blue flames
-        [PlacementWeight(65)] // until she does something this is a kinda boring actor
+        [PlacementWeight(40)] // until she does something this is a kinda boring actor
         AnjusGrandmaCredits = 0x2A0, // Dm_Nb
 
-        //[ActorizerEnabled]
+        //[ActorizerEnabled] // double or more objects required
         [FileID(632)]
         [ObjectListIndex(0x18)] // might also need the sunmask object
-        // 0 does not spawn, might need another object
+        // 0 does not spawn, needs more objects
         [GroundVariants(0)]
         [UnkillableAllVariants]
         DressMannequin = 0x2A1, // En_Drs
@@ -6868,7 +6909,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)]
         [VariantsWithRoomMax(max:0, variant:0)]
         [UnkillableAllVariants]
-        [PlacementWeight(80)]
+        [PlacementWeight(50)]
         SoldierMoonLeaveCutscene = 0x2AA, // En_Ending_Hero4
 
         [ActorizerEnabled]

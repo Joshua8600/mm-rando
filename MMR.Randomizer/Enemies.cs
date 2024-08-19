@@ -102,6 +102,7 @@ namespace MMR.Randomizer
         };
         static int[] tallGrassFieldObjectVariants = {
             0x0, 0x800,
+            0x500,
             0x0600, 0x700, 0xC00, 0xD00,
             0x0E00, 0x0E10, 0x0010,
             0x0610
@@ -608,7 +609,8 @@ namespace MMR.Randomizer
                         #if DEBUG
                         else
                         {
-                            log.Append($" in scene [{scene.SceneEnum}][{mapIndex}] actor was skipped over: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}]\n");
+                            log.Append($" in scene [{scene.SceneEnum}][{mapIndex}][{mapActor.OldVariant.ToString("X4")}]" +
+                                $" actor was skipped over: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}]\n");
                         }
                         #endif
                     }
@@ -631,7 +633,8 @@ namespace MMR.Randomizer
                                 var itemText = $"blocked by item [{ (int) importantItem}]";
                                 #endif
 
-                                log.AppendLine($" in scene [{scene.SceneEnum}][{mapIndex}][{mapActor.RoomActorIndex}] actor: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] was " + itemText);
+                                log.AppendLine($" in scene [{scene.SceneEnum}]m[{mapIndex}]r[{mapActor.RoomActorIndex}]v[{mapActor.OldVariant.ToString("X4")}]" +
+                                    $" actor: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] was " + itemText);
                                 return;
                             }
 
@@ -1710,7 +1713,6 @@ namespace MMR.Randomizer
             SceneUtils.UpdateScene(terminaField);
 
             var roadToIkanaCanyonScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.RoadToIkana.FileID());
-
             var roadToIkanaRedHamishi = roadToIkanaCanyonScene.Maps[0].Actors[5];
             if (roadToIkanaRedHamishi.ActorEnum != GameObjects.Actor.BronzeBoulder) // assumption: currently both have to be randomized at the same time
             {
@@ -1730,6 +1732,22 @@ namespace MMR.Randomizer
                 }
             }
             SceneUtils.UpdateScene(capeScene);
+
+            var ikanaGraveyardScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaGraveyard.FileID());
+            var graveyardGrottoRockCircle = ikanaGraveyardScene.Maps[1].Actors[44];
+            if (graveyardGrottoRockCircle.ActorEnum != GameObjects.Actor.GrassRockCluster)
+            {
+                graveyardGrottoRockCircle.Position.z = -1877; // move back from sitting right on top of the grotto
+            }
+            SceneUtils.UpdateScene(ikanaGraveyardScene);
+
+            var snowheadTempleScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SnowheadTemple.FileID());
+            var snowheadTempleFireArrowWiz = snowheadTempleScene.Maps[6].Actors[0];
+            if (snowheadTempleFireArrowWiz.ActorEnum != GameObjects.Actor.Wizrobe)
+            {
+                snowheadTempleFireArrowWiz.Position.x = -1140; // move back to center of the room, not sure why this guy is so close to the door normally
+            }
+            SceneUtils.UpdateScene(snowheadTempleScene);
 
             MoveShopScrubsIfRandomized();
             MovePostmanIfRandomized(terminaField);
@@ -3526,7 +3544,7 @@ namespace MMR.Randomizer
             };
 
             if (ACTORSENABLED == true
-             && _randomized.Settings.LogicMode != Models.LogicMode.NoLogic // crazy bitches need their juice
+             //&& _randomized.Settings.LogicMode != Models.LogicMode.NoLogic // requested off to test
              && scenesToForce.Contains(thisSceneData.Scene.SceneEnum))
             {
                 #if DEBUG
@@ -4875,7 +4893,9 @@ namespace MMR.Randomizer
                      && thisSceneData.RNG.Next(100) > actorPlacementWeight ) // under is pass, over is failure
                 {
                     thisSceneData.AcceptableCandidates.Remove(actor);
+                    #if DEBUG
                     thisSceneData.Log.AppendLine($" (-) actor rng weight trimmed from scene placement: [{actor.Name}]");
+                    #endif
                 }
             }
 
@@ -5374,7 +5394,7 @@ namespace MMR.Randomizer
                 var actor = thisSceneData.Actors[a];
                 string dsize = actor.DynaLoad.poly > 0 ? $" dyn: [{actor.DynaLoad.poly}]" : "";
                 #if DEBUG
-                var actorNameData = $"  Old actor:[{thisSceneData.Scene.SceneEnum}][{actor.Room.ToString("D2")}][{actor.OldName}]";
+                var actorNameData = $"  Old actor:[{thisSceneData.Scene.SceneEnum}]r[{actor.Room.ToString("D2")}]o[{actor.OldName}]";
                 #else
                 var actorNameData = $"  Old actor:[{actor.Room.ToString("D2")}][{actor.OldName}] ";
                 #endif
@@ -6099,7 +6119,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.5\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.6\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
