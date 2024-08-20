@@ -176,6 +176,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.IkanaGravestone, Actor.Bumper, Actor.En_Ani)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CeilingSpawner,
             Actor.Shabom)] // get's stuck in the ceiling where you cannot kill them
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DragonFly,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block the breakable floor under them
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Hiploop,
         //    Actor.En_Ani, Actor.Bumper, Actor.Tijo)]
         [EnemizerSceneBlockSensitive(Actor.Hiploop, -1)]
@@ -768,6 +770,10 @@ namespace MMR.Randomizer.GameObjects
         [DynaHeadroom(64, 64)]  // low default to start
         [EnemizerSceneEnemyReplacementBlock(Actor.HoneyComb,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // until I change the combs to be wall or flying only this is weird
+        [EnemizerSceneEnemyReplacementBlock(Actor.BronzeBoulder,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
+            Actor.RegularIceBlock, Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.Bombiwa, Actor.PushableBlock, Actor.Bg_Heavy_Block,
+            Actor.LostWoodsCutsceneTrees, Actor.Treee)] // tall blocks door
         MountainVillageSpring = 0x57,
 
         [FileID(1449)]

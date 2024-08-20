@@ -872,13 +872,13 @@ namespace MMR.Randomizer
                         if (importantItem != null)
                         {
                             #if DEBUG
-                            var itemText = $"blocked by item [{ importantItem }]";
+                            var itemText = $" item [{ importantItem }]";
                             #else
-                            var itemText = $"blocked by item [{ (int) importantItem}]";
+                            var itemText = $" item [{ (int) importantItem}]";
                             #endif
 
                             thisSceneData.Actors.RemoveAll(act => act.ObjectId == obj);
-                            thisSceneData.Log.AppendLine($" object [{matchingEnum}] replacement " + itemText);
+                            thisSceneData.Log.AppendLine($" object [{matchingEnum}] replacement blocked by" + itemText);
                         }
                         else
                         {
@@ -3360,7 +3360,7 @@ namespace MMR.Randomizer
 
                     // test if dyna is still an issue, if not remove list
                     var act = thisSceneData.ActorCollection;
-                    act.SetNewActors(thisSceneData.Scene, thisSceneData.ChosenReplacementObjects); // have to update dyna values for the later functions to work
+                    act.SetNewActors(thisSceneData.Scene, thisSceneData.AllObjects); // have to update dyna values for the later functions to work
 
                     //act.newMapList[currentRoom].day.DynaPolySize
                     var dayOverloaded = act.isDynaOverLoaded(act.newMapList[currentRoom].day, act.oldMapList[currentRoom].day, currentRoom);
@@ -3945,6 +3945,11 @@ namespace MMR.Randomizer
                     return false;
                 }
 
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.CreamiaCariage)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CreamiaCariage)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.En_Boj_04)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.CuriosityShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.MountainVillage, GameObjects.Actor.PottedPlant, GameObjects.Actor.BeanSeller)) continue;
                 if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.En_Owl)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronKid)) continue;
@@ -3999,7 +4004,6 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoGoron, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.WoodfallTemple, GameObjects.Actor.Snapper, GameObjects.Actor.Mimi)) continue;
 
-                //if (TestHardSetObject(GameObjects.Scene.GormanRaceTrack, GameObjects.Actor.Flagpole, GameObjects.Actor.HookshotWallSpot)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.ChuChu, GameObjects.Actor.UnusedStoneTowerPlatform)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.UglyTree, GameObjects.Actor.MilkbarChairs)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TwinIslands, GameObjects.Actor.LargeSnowball, GameObjects.Actor.MilkbarChairs)) continue;
@@ -5242,7 +5246,7 @@ namespace MMR.Randomizer
                 WriteOutput($" object trim time: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
                 // check if objects fits now, because the rest can take awhile and at least for termina field we can check this waaaaay earlier
-                thisSceneData.ActorCollection.SetNewActors(scene, thisSceneData.ChosenReplacementObjects);
+                thisSceneData.ActorCollection.SetNewActors(scene, thisSceneData.AllObjects);
                 WriteOutput($" set new actors: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
                 var objectOverflowCheck = thisSceneData.ActorCollection.isObjectSizeAcceptable();
@@ -5277,23 +5281,18 @@ namespace MMR.Randomizer
 
                     previousyAssignedCandidate.Clear(); // TODO this might not be needed at all anymore
                 } // end for actors per object
+                WriteOutput($" exit per-object: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
                 // finally, randomize actors that have no objects (standalone)
                 if (ACTORSENABLED)
                 {
                     var knownChangedActorList = new List<Actor>();
-                    //List<Actor> subMatches = thisSceneData.CandidatesPerObject[objectIndex].FindAll(act => act.ObjectId == chosenObject);
 
                     // assuming we dont have free actors with companions
 
                     ShuffleStandaloneActors(thisSceneData/*, previousyAssignedCandidate*/);
-                    //WriteOutput($"  match time: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
-
-                    //TrimAllActors(thisSceneData, previousyAssignedCandidate, knownChangedActorList); // lets let that last check below do this
-                    // WriteOutput($"  trim/free time: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog)
+                    WriteOutput($" exit sandalone randomize: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
                 }
-
-                WriteOutput($" exit per-object: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
                 // this no longer works after object re-write, can just lead to rando thinking it has more objects than it does
                 // for now, disable this and test without. I dont think it is needed anymore, now that we shuffle the available candidiates every x cycles
@@ -5305,7 +5304,7 @@ namespace MMR.Randomizer
                 //}
 
                 // set objects and actors for isSizeAcceptable to use, and our debugging output
-                thisSceneData.ActorCollection.SetNewActors(scene, thisSceneData.ChosenReplacementObjects); // 30~70ms for this? hmm
+                thisSceneData.ActorCollection.SetNewActors(scene, thisSceneData.AllObjects ); // 30~70ms for this? hmm
 
                 WriteOutput($" set for size check: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
@@ -5327,7 +5326,7 @@ namespace MMR.Randomizer
 
                 WriteOutput($" set after final actor trim: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
-                thisSceneData.ActorCollection.SetNewActors(scene, thisSceneData.ChosenReplacementObjects);
+                thisSceneData.ActorCollection.SetNewActors(scene, thisSceneData.AllObjects);
 
                 WriteOutput($" set after second setnewactors for final data test: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
 
@@ -6119,7 +6118,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.6\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.7\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
@@ -6261,7 +6260,8 @@ namespace MMR.Randomizer
 
         // init for new replacements
         // this doesnt set actors anywhere tho, just objects, misnomer?
-        public void SetNewActors(Scene scene, List<ValueSwap> newObjChanges)
+        //public void SetNewActors(Scene scene, List<ValueSwap> newObjChanges)
+        public void SetNewActors(Scene scene, List<List<int>> newObjects)
         {
             // this is the slowest part of our bogo sort, we need to try speeding it up
 
@@ -6271,11 +6271,12 @@ namespace MMR.Randomizer
             {
                 var map = scene.Maps[m];
 
-                if (newObjChanges == null)
+                //if (newObjChanges == null)
+                //{
+                //    throw new Exception("SetNewActors: empty object list");
+                //}
                 {
-                    throw new Exception("SetNewActors: empty object list");
-                }
-                {
+                    /*
                     var newObjList = map.Objects.ToList(); // copy
                     // probably a way to search for this with a lambda, can't think of it right now
                     for (int valueSwap = 0; valueSwap < newObjChanges.Count; ++valueSwap)
@@ -6288,7 +6289,8 @@ namespace MMR.Randomizer
                                 newObjList[o] = newObjChanges[valueSwap].NewV;
                             }
                         }
-                    }
+                    } // */
+                    var newObjList = newObjects[m];
                     this.newMapList.Add(new MapEnemiesCollection(map.Actors, newObjList, scene));
                 }
             }
