@@ -374,6 +374,9 @@ namespace MMR.Randomizer
         private static void PrepareJunkScoopList(List<(string, string)> allSphereItems)
         {
             // if the scoops are vanilla they can never be considered junk
+            if (_randomized.Settings.LogicMode == Models.LogicMode.Vanilla) return;
+            // currently, we cannot discern if scoops are important or not in no logic
+            if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic) return;
 
             var importantBottleItems = allSphereItems.FindAll(item => item.Item1.Contains("Bottle:"));
 
@@ -388,14 +391,17 @@ namespace MMR.Randomizer
 
             // scoops are a special case, they dont count as junk items above since they are all in one category handle separatly
             // for all items in list of items that are scoop types
-            // check if each and every one is an important item?
+            //   check if each and every one is an important item
             var scoopItems = _randomized.ItemList.FindAll(item => item.Item.ItemCategory() == GameObjects.ItemCategory.ScoopedItems);
-            var unImportantScoops = scoopItems.FindAll(scoop => importantBottleItems.Count(important => important.Item2 == scoop.Item.Name()) == 0);
+            var unImportantScoopIOs = scoopItems.FindAll(scoop => importantBottleItems.Count(important => important.Item2 == scoop.Item.Name()) == 0);
+            List<GameObjects.Item> unimportantScoops = unImportantScoopIOs.Select(itemObj => itemObj.Item).ToList();
 
-            List<GameObjects.Item> scoopList = unImportantScoops.Select(itemObj => itemObj.Item).ToList();
-            //addedJunkItems.AddRange(itemList);
-            ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.ScoopedItems].AddRange(scoopList);
-            ActorizerKnownJunkCategories.Add(GameObjects.ItemCategory.ScoopedItems);
+            ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.ScoopedItems].AddRange(unimportantScoops);
+            
+            if (unimportantScoops.Count() == bottleCatches.Count()) // if ALL scoops are unimportant
+            {
+                ActorizerKnownJunkCategories.Add(GameObjects.ItemCategory.ScoopedItems);
+            }
         }
 
         private static void PrepareJunkHeartPieces()
@@ -933,6 +939,7 @@ namespace MMR.Randomizer
             FixSilverIshi();
             FixBabaAndDragonflyShadows();
             AddGrottoVariety();
+            ChangeHotwaterGrottoDekuBabaIntoSomethingElse(rng);
             FixCuccoChicks();
             FixWoodfallTempleGekkoMiniboss();
             FixStreamSfxVolume();
@@ -948,7 +955,6 @@ namespace MMR.Randomizer
             FixInjuredKoume();
             RandomizePinnacleRockSigns();
             RandomizeDekuPalaceBombiwaSigns();
-            ChangeHotwaterGrottoDekuBabaIntoSomethingElse(rng);
             RandomizeGrottoGossipStonesPerGrotto();
             SwapGreatFairies(rng);
             ModifyFireflyKeeseForPerching();
@@ -1731,6 +1737,16 @@ namespace MMR.Randomizer
                     capeHpLikelike.Position.z = 4405; // move back from sitting on hp
                 }
             }
+            var capeGrottoBombiwa = capeScene.Maps[0].Actors[44];
+            if (capeGrottoBombiwa.ActorEnum != GameObjects.Actor.Bombiwa)
+            {
+                var newUnkillableVariants = capeGrottoBombiwa.ActorEnum.UnkillableVariants();
+                if (newUnkillableVariants != null && newUnkillableVariants.Contains(capeGrottoBombiwa.Variants[0]))
+                {
+                    capeGrottoBombiwa.Position.x = -463; // move to the left somewhat, worried its not pointed at the hole but not sure its worth the bother
+                    capeGrottoBombiwa.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: capeGrottoBombiwa.Rotation.y);
+                }
+            }
             SceneUtils.UpdateScene(capeScene);
 
             var ikanaGraveyardScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaGraveyard.FileID());
@@ -2217,17 +2233,17 @@ namespace MMR.Randomizer
             dekuPalaceActors[20].Position.y = -40;
         }
 
-        private static List<(GameObjects.Actor actor, short vars)> shallowWaterReplacements = new List<(GameObjects.Actor actor, short vars)>
+        private static List<(GameObjects.Actor actor, ushort vars)> shallowWaterReplacements = new List<(GameObjects.Actor actor, ushort vars)>
         {
-            (GameObjects.Actor.LikeLike, 0x2),  // water bottom type
-            (GameObjects.Actor.Mikau, 0xC0F),   // water surface type
-            (GameObjects.Actor.GoGoron, 0x7FC1) // ground type (race track goron, stretching)
+            (GameObjects.Actor.LikeLike, 0x2),   // water bottom type
+            (GameObjects.Actor.Octarok, 0xFF00), // water surface type
+            (GameObjects.Actor.GoGoron, 0x7FC1)  // ground type (race track goron, stretching)
         };
 
         public static void ChangeHotwaterGrottoDekuBabaIntoSomethingElse(Random rng)
         {
             /// I want more variety, so I want the hot spring water grotto to have a different actor in it than regular grottos
-            // using likelike as a replacement, sometimes rando will put water and sometimes land
+            // using likelike as a replacement, sometimes rando will put water and sometimes land, and mikau can give us water surface actors
 
             // we want both ground or water types, so we are going to use multiple actors
             int randomValue = rng.Next(shallowWaterReplacements.Count);
@@ -3947,6 +3963,11 @@ namespace MMR.Randomizer
 
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.CreamiaCariage)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CreamiaCariage)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
+                //if (TestHardSetObject(GameObjects.Scene.ZoraCape, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Dog, GameObjects.Actor.Evan)) continue; 
+                //if (TestHardSetObject(GameObjects.Scene.PiratesFortress, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.PatrollingPirate)) continue; 
+                //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.ClayPot, GameObjects.Actor.DekuKing)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.En_Boj_04)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.CuriosityShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.MountainVillage, GameObjects.Actor.PottedPlant, GameObjects.Actor.BeanSeller)) continue;
@@ -4069,8 +4090,8 @@ namespace MMR.Randomizer
 
         public static void ShuffleActors(SceneEnemizerData thisSceneData, int objectIndex, List<Actor> subMatches, List<Actor> candidateAndCompanionGroup, List<Actor> knownChangedActorList)
         {
-#region Special exception if building debug and this build requires actor that doesnt exist
-#if DEBUG
+            #region Special exception if building debug and this build requires actor that doesnt exist
+            #if DEBUG
 
             if (subMatches.Count == 0)
             {
@@ -4078,8 +4099,8 @@ namespace MMR.Randomizer
                                     " If you built the debug version, go back to VisualStudio and build \"Release\" instead\n " +
                                     " Otherwise you probably forgot the actor isn't possible here.");
             }
-#endif
-#endregion
+            #endif
+            #endregion
 
             for (int actorIndex = 0; actorIndex < thisSceneData.ActorsPerObject[objectIndex].Count(); actorIndex++)
             {
@@ -6118,7 +6139,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.7\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.8\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
