@@ -95,6 +95,12 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0,
             0x5080 // road to ikana
             )]
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
+            variant: 0x0, 0x2000, 0x3000, 0x4000, // stone grottos
+            0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
+            0x8200, 0xA200, // secret japanese grottos, hidden
+            0x6233, 0x623B, 0x6218, 0x625C)] // what if there was a hole in front of the treasure chest, remember that part in dark souls?
         //[VariantsWithRoomMax(max: 1, variant: )] // vanilla we do not want to re-place in the world
         [UnkillableAllVariants]
         //[AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1,
@@ -411,7 +417,17 @@ namespace MMR.Randomizer.GameObjects
             0x4)] // 4 is in the astral observatory, and has a spawn kill flag, so don't use
         [RespawningVariants(0x4)] // doesn't respawn after death, so dont put where respawning enemies are bad either
         [VariantsWithRoomMax(max: 0, variant: 4)] // if this actor hides an item, could be annoying going back in time to reset, so do not place
-        //[FlyingToGroundHeightAdjustment(100)] // no longer flying type, that was weird
+        // we can use allignment companion to make skulltula more of a hazard
+        [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
+            0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58, 
+            0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
+        [AlignedCompanionActor(En_Invisible_Ruppe, CompanionAlignment.Above, ourVariant: -1, variant:
+            0x4C, 0x5C, 0x60, 0x64, 0x68,
+            0x6D, 0x71, 0x29, 0x2D, 0x30, 0x34, 0x38, 0x3C
+        )]
+        [AlignedCompanionActor(Item_Etcetera, CompanionAlignment.Above, ourVariant: -1, variant: // secret free inivisble rup, only shows when nearby
+            0x0, 0x1, 0x2, 0x3
+        )]
         [ForbidFromScene(Scene.OceanSpiderHouse)] // shared object with goldskulltula, cannot change without modification
         //[EnemizerScenesPlacementBlock(Scene.TerminaField, Scene.GreatBayCoast, Scene.ZoraCape, Scene.Snowhead, // in the air, bit weird
         //    Scene.MountainVillageSpring, Scene.TwinIslandsSpring)] // not a problem, just weird seeing them fly like that
@@ -631,6 +647,9 @@ namespace MMR.Randomizer.GameObjects
         [CompanionActor(Flame, ourVariant: -1, variant: 0x7F4)]
         [AlignedCompanionActor(Flame, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x7F4)] // I'll just put this over with the rest of the fire
+        [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
+            0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
+            0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
         [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.DekuShrine)] // visible waiting below the bridges
         RedBubble = 0x3C, // En_Bbfall
 
@@ -987,8 +1006,10 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(Obj_Dowsing, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x110)] // rumble
         [AlignedCompanionActor(Butterfly, CompanionAlignment.Above, ourVariant: -1,
             variant: 0, 1, 2)]
-        [AlignedCompanionActor(IshiRock, CompanionAlignment.Above, ourVariant: -1,
+        [AlignedCompanionActor(IshiRock, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0xA1, 0xFE01)] // everyone loves a good hidden grotto under a rock
+        [AlignedCompanionActor(WoodenBarrel, CompanionAlignment.OnTop, ourVariant: -1,
+            variant: 0x8710, 0x8711, 0x7F3F)] // everyone loves a good hidden grotto under a... a cardboard box?
         [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
         //[ForbidFromScene(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead,
         //    Scene.TerminaField)]
@@ -1250,7 +1271,7 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableSouthernSwampClearMagicHagsPotionShopExteriorPot1, Item.CollectableSouthernSwampClearMagicHagsPotionShopExteriorPot2)]
         [CheckRestricted(Scene.SwampSpiderHouse, variant: 0x0005, // swamp spiderhouse
             Item.CollectibleSwampSpiderToken5)]
-        [CheckRestricted(Scene.SwampSpiderHouse, variant: 0x001E,
+        [CheckRestricted(Scene.SwampSpiderHouse, variant: 0x001E, // swamp spiderhouse
             Item.CollectibleSwampSpiderToken30)]
         [CheckRestricted(Scene.DekuPalace, variant: ActorConst.ANY_VARIANT,
             Item.CollectableDekuPalaceEastInnerGardenPot1, Item.CollectableDekuPalaceEastInnerGardenPot2)]
@@ -1624,6 +1645,9 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 3, variant: 0x807F, 0x8004)] // one of these when you break it gives a jingle, you found a puzzle, kind of jingle
         [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)] // regular unhidden grottos
+        [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
+            0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
+            0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
         [UnkillableAllVariants] // not enemy actor group, no fairy no clear room
         //[ForbidFromScene(Scene.Grottos)] //Scene.ZoraCape, Scene.GreatBayCoast
         //[EnemizerScenesPlacementBlock(// Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.SouthernSwampClear 
@@ -1654,6 +1678,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
         [VariantsWithRoomMax(max:0, variant: 0x2, 0x902, 0x1D82)] // wall types, currently they are the only actor that can be put on free wall spots that break (itemizer overwiting vars)
+        [EnemizerScenesPlacementBlock(Scene.StoneTower)] // still unknown illegal instruction crash in stone tower mirror room, same variant works fine in other places
         [ForbidFromScene(Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
             Scene.BeneathTheWell, Scene.DekuShrine, Scene.IkanaCastle, Scene.PiratesFortressRooms, Scene.SwampSpiderHouse)]
         ObjSwitch = 0x93, // Obj_Switch
@@ -1961,11 +1986,11 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableMountainVillageWinterMountainVillageSpringItem1)]
         [CheckRestricted(Scene.GreatBayCoast, variant: 0x32,
             Item.CollectableGreatBayCoastSoftSoil1)]
-        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4014, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock1)]
-        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4234, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock2)]
-        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4624, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock3)]
-        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4214, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock4)]
-        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4814, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock5)]
+        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4014, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock1)] // highest
+        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4214, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock2)] // lowest
+        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4814, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock3)] // 2nd lowest
+        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4424, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock4)] // 2nd highest
+        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4624, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock5)] // middle rock
         //[ObjectListIndex(0x1F6)] // NEVER USED IN MM, damn thing lied to me, even the boulders are object 2
         // it actually uses one of two objects: gameplay_field or object_ishi, which is only in SSHouse
         //6a does not load
@@ -2378,11 +2403,11 @@ namespace MMR.Randomizer.GameObjects
             )]
         //[VariantsWithRoomMax(max:0, variant:)]
         [ForbidFromScene(
-            Scene.WoodfallTemple, 
-            Scene.Grottos,
-            Scene.SwampSpiderHouse,
-            Scene.MountainVillageSpring,
-            Scene.SouthernSwamp, // re-enabled because I need to get around itemizer
+            //Scene.WoodfallTemple, 
+            //Scene.Grottos,
+            //Scene.SwampSpiderHouse,
+            //Scene.MountainVillageSpring,
+            //Scene.SouthernSwamp, // re-enabled because I need to get around itemizer
             Scene.PiratesFortressRooms // required for cutscene to get actor to leave, for now
             )]
         [UnkillableAllVariants]
@@ -2555,19 +2580,28 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(227)]
         [ObjectListIndex(0x146)]
-        // bugged: milksanity breaks these actors params and sometimes their types
-        //[CheckRestricted(Scene.BeneathTheWell, variant: 0x0, Item.ItemWellCowMilk)]
-        //[CheckRestricted(Scene.RanchBuildings, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
-        //[CheckRestricted(Scene.RomaniRanch, variant: 0x2, Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
-        //[CheckRestricted(Scene.Grottos, variant: 0x0, Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
+        [CheckRestricted(Scene.BeneathTheWell, variant: ActorConst.ANY_VARIANT, Item.ItemWellCowMilk)]
+        [CheckRestricted(Scene.RanchBuildings, variant: ActorConst.ANY_VARIANT,
+            Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
+        [CheckRestricted(Scene.RomaniRanch, variant: ActorConst.ANY_VARIANT,
+            Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
+        [CheckRestricted(Scene.Grottos, variant: ActorConst.ANY_VARIANT,
+            Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
         [GroundVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [WallVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [WaterBottomVariants(0)] // silly
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        [ForbidFromScene(Scene.RanchBuildings, Scene.RomaniRanch, Scene.Grottos, Scene.BeneathTheWell)]
+        // used to be bugged: milk sanity would corrupt their parameters
+        [ForbidFromScene(
+            Scene.RanchBuildings,
+            Scene.RomaniRanch//,
+        //    Scene.Grottos,
+        //    Scene.BeneathTheWell
+        )]
         //[ForbidFromScene(Scene.Grottos)]
         //[EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.DekuShrine)] // blocking the way
+        //[PlacementWeight(95)]
         Cow = 0xF3, // En_Cow
 
         EmptyF4 = 0xF4,
@@ -3286,6 +3320,9 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x171)]
         [GroundVariants(0)]
         [VariantsWithRoomMax(max: 10, variant: 0)]
+        [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
+            0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
+            0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // slowing enemies
         Nejiron = 0x155, // Rolling exploding rock in Ikana
 
@@ -3795,12 +3832,18 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled] // free enemy, placed in places where enemies are normally
         [FileID(349)]
         [ObjectListIndex(0x1)] // obj 1: gameplay keep, but can't set that
+        // use of ActorConst.ANY_VARIANT here is because I'm too lazy to update their params to mark them item dependant, and there is only one in those spots anyway
         [CheckRestricted(Scene.SouthClockTown, variant: ActorConst.ANY_VARIANT, Item.ChestSouthClockTownPurpleRupee)]
+        [CheckRestricted(Scene.TerminaField, variant: 0x77, Item.CollectableTerminaFieldInvisibleItem1)]
         [CheckRestricted(Scene.ZoraHallRooms, variant: ActorConst.ANY_VARIANT, Item.HeartPieceZoraHallScrub, Item.TradeItemOceanDeed, Item.ShopItemBusinessScrubGreenPotion)]
-        //[ObjectListIndex(0xF3)] // TESTING
         [DynaAttributes(12,12)] // both gold and pink flowers have the same count
-        [GroundVariants(0x7F, 0x17F)] // 7F is regular, 17F is big yellow
+        // 0xFF param space is completely unused?? lets make 0x0177 and 0x0077 non-vanilla un-safe to remove values for actorizer
+        [GroundVariants(
+            0x77, 0x177, // non-vanilla, marked do not remove without check dependency
+            0x7F, 0x17F // vanilla: 7F is regular, 17F is big yellow
+        )] 
         [UnkillableAllVariants]
+        // TODO need to start removing these and start labeling them
         [ForbidFromScene(Scene.SouthernSwamp, Scene.Woodfall, Scene.DekuPalace, Scene.WoodfallTemple, Scene.OdolwasLair,
             Scene.GoronVillage, Scene.IkanaCanyon, 
             Scene.DekuPlayground, Scene.SwampSpiderHouse, Scene.DekuTrial,
@@ -4072,6 +4115,7 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.RomaniRanch)] // if removed, and another romani teleports player, game is stuck
         RomaniWithBow = 0x1A4, // En_Ma4
 
+        // tag beaver ring
         //[ActorizerEnabled] // none of the types will spawn out of minigame
         // cannot turn into mmra, need to modify the actor to speed up, but even with shifting the actor will not draw, reason unknown
         [FileID(380)]
@@ -4081,6 +4125,7 @@ namespace MMR.Randomizer.GameObjects
         //[WaterVariants(0x2)]
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.WaterfallRapids)] // do not remove the original, yet
+        [EnemizerScenesPlacementBlock(Scene.WaterfallRapids)] // suspected crash if extra rings are added and player uses them, but the code is busted
         ZoraRaceRing = 0x1A5, // En_Twig
 
         [ActorizerEnabled]
@@ -4288,7 +4333,7 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        SwampSpiderHouseCutableIvy = 0x1BE, // Bg_Dkjail_Ivy
+        CuttableIvyWall = 0x1BE, // Bg_Dkjail_Ivy
 
         Empty1BF = 0x1BF,
 
@@ -4317,6 +4362,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [OnlyOneActorPerRoom]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)]
+        [AlignedCompanionActor(GrottoHole, CompanionAlignment.InFront, ourVariant: 1, variant: 0)]
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0146)] // treasure chest shop music
         [EnemizerScenesPlacementBlock(Scene.SouthClockTown)] // can bug out the scene transit into skullkid
         //[ForbidFromScene(Scene.TreasureChestShop)]
@@ -5033,6 +5079,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom] // dyna crash hazard
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         //[EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // dyna crash
+        [PlacementWeight(60)] // bit boring
         DarmaniGrave = 0x1FB, // Obj_Ghaka
 
         [ActorizerEnabled]
@@ -5103,7 +5150,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(Scene.MilkBar)] // can interupt balad of the windfish performance
         [UnkillableAllVariants]
-        [PlacementWeight(80)]
+        [PlacementWeight(20)] // really annoying
         GaboraBlacksmith = 0x1FF, // En_Kgy
 
         // the wackest actor that controls the whole alien invasion event, and a lot of stuff at ranch
@@ -5394,6 +5441,9 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x201)]
         [GroundVariants(0xFF, 0x80FF)] // does this include the really big one?
         [PlacementWeight(90)]
+        [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
+            0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
+            0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
         Leever = 0x216, // En_Neo_Reeba
 
         // unused actor, the object is loaded into milkbar but the actor is never spawned
@@ -5659,6 +5709,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(516)]
         [ObjectListIndex(0x250)]
+        [DynaAttributes(16,12)]
         [CheckRestricted(Scene.GreatBayTemple, variant: ActorConst.ANY_VARIANT,
             Item.CollectableGreatBayTempleEntranceRoomBarrel1,
             Item.CollectableGreatBayTempleBlueChuchuValveRoomBarrel1, Item.CollectableGreatBayTempleBlueChuchuValveRoomBarrel2,
@@ -5677,12 +5728,22 @@ namespace MMR.Randomizer.GameObjects
         // 0x1FF is a PF door
         [GroundVariants(0x8710, 0x8711,
             0x7F3F)] // pirates fort
-        [WaterBottomVariants(0x8710, 0x8711)] // 16 is flexible, 17 is big fairy
+        [WaterBottomVariants( 0x7F00, // pirates fort rooms? are these new or vanilla?
+            0x8710, 0x8711)] // 16 is flexible, 17 is big fairy
+        [WallVariants(0xFF)] // 0x80 + 0x7F (max switch flag)
+        // issue here being these are walls, water is the most accurate replacement
+        [WaterVariants(0x80, 0x81, 0x91 // 0x80 is a flag for the breakable wooden walls
+        )]
+        [VariantsWithRoomMax(max:0, variant: 0x80, 0x81, 0x91)] // do not place these
+        [AlignedCompanionActor(GoldSkulltula, CompanionAlignment.OnTop, ourVariant:-1, variant:
+            0xFF53, 0xFF53, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B)]
+        //[SwitchFlagsPlacement] // only has switch flags for wall breaking variants, what a pain
         [UnkillableAllVariants]
         // switch flags
         //[SwitchFlagsPlacement(size: 0x7F, shift: 0)] // this is only for half of the barrels, lets hand pick these and hope for the best
         [TreasureFlagsPlacement(0x7F, shift:8)]
-        [ForbidFromScene(Scene.PiratesFortressExterior)] // needed for a glitch I think
+        [ForbidFromScene(Scene.PiratesFortressExterior, // needed for a glitch I think
+            Scene.GreatBayTemple)] // TODO find out if I can remove without ruining everything
         [PlacementWeight(40)]
         WoodenBarrel = 0x22D, // Obj_Taru
         
@@ -6967,6 +7028,11 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.TerminaField, 0x75, Item.CollectableTerminaFieldInvisibleItem9)]  // goron jump ocean ramp
         [CheckRestricted(Scene.TerminaField, 0x79, Item.CollectableTerminaFieldInvisibleItem10)] // goron jump ocean chest
         [CheckRestricted(Scene.TerminaField, 0x7D, Item.CollectableTerminaFieldInvisibleItem11)] // goron jump snowfield
+        [CheckRestricted(Scene.SwampSpiderHouse, 0x94, Item.CollectableSwampSpiderHouseInvisibleItem1)] // touch spots on top of the pots in cuttable ivy room
+        [CheckRestricted(Scene.SwampSpiderHouse, 0x98, Item.CollectableSwampSpiderHouseInvisibleItem2)] // in order from closest to second 
+        [CheckRestricted(Scene.SwampSpiderHouse, 0x9C, Item.CollectableSwampSpiderHouseInvisibleItem3)] //   assending down toward small pots and beehives
+        [CheckRestricted(Scene.SwampSpiderHouse, 0xA1, Item.CollectableSwampSpiderHouseInvisibleItem4)]
+        [CheckRestricted(Scene.SwampSpiderHouse, 0xA6, Item.CollectableSwampSpiderHouseInvisibleItem5)]
         [CheckRestricted(Scene.RomaniRanch, 0x29, Item.CollectableRomaniRanchInvisibleItem1)] // ranch fence items
         [CheckRestricted(Scene.RomaniRanch, 0x2D, Item.CollectableRomaniRanchInvisibleItem2)]
         [CheckRestricted(Scene.RomaniRanch, 0x30, Item.CollectableRomaniRanchInvisibleItem3)]

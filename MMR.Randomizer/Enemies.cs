@@ -70,7 +70,7 @@ namespace MMR.Randomizer
     public class Enemies
     {
         public static List<InjectedActor> InjectedActors = new List<InjectedActor>();
-        const int SMALLEST_OBJ = 0xF3;
+        const int SMALLEST_OBJ = 0xF3; // 0x10 size, smallest vanilla object I could find
 
         private static List<GameObjects.Actor> VanillaEnemyList { get; set; }
         private static List<Actor> ReplacementCandidateList { get; set; }
@@ -615,7 +615,7 @@ namespace MMR.Randomizer
                         #if DEBUG
                         else
                         {
-                            log.Append($" in scene [{scene.SceneEnum}][{mapIndex}][{mapActor.OldVariant.ToString("X4")}]" +
+                            log.Append($" in scene [{scene.SceneEnum}][{mapIndex}]" +
                                 $" actor was skipped over: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}]\n");
                         }
                         #endif
@@ -929,6 +929,7 @@ namespace MMR.Randomizer
             EnablePoFusenAnywhere();
 
             FixSpawnLocations();
+            DistinguishLogicRequiredDekuFlowers();
             //DisableActorSpawnCutsceneData();
 
             ExtendGrottoDirectIndexByte();
@@ -962,7 +963,6 @@ namespace MMR.Randomizer
             SplitSnowheadTempleBo();
             BlockBabyGoronIfNoSFXRando();
             FixArmosSpawnPos();
-            FixEvanRotation();
             RandomizeTheSongMonkey();
             MoveTheISTTTunnelTransitionBack();
             FixSwordSchoolPotRandomization();
@@ -1208,16 +1208,7 @@ namespace MMR.Randomizer
                 var rightMountainPot = mountainVillageScene.Maps[0].Actors[36];
                 rightMountainPot.Rotation.y = ActorUtils.MergeRotationAndFlags(270, rightMountainPot.Rotation.y);
 
-                // if the clocktown talk points are randomized, we want to rotate them as they dont have set rotation
-                // this shit does nothing because something funky is going on, the rotation is not what it is in vanilla and its being ignored????
-                /* var westClocktownScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.WestClockTown.FileID());
-                var curiosityshopSign = westClocktownScene.Maps[0].Actors[22];
-                curiosityshopSign.Rotation.y = ActorUtils.MergeRotationAndFlags(180 , flags: curiosityshopSign.Rotation.y);
-                var tradingpostSign = westClocktownScene.Maps[0].Actors[9];
-                tradingpostSign.Rotation.y = ActorUtils.MergeRotationAndFlags(0, flags: tradingpostSign.Rotation.y);
-                var bombshopSign = westClocktownScene.Maps[0].Actors[2];
-                bombshopSign.Rotation.y = ActorUtils.MergeRotationAndFlags(0, flags: bombshopSign.Rotation.y);
-                // */
+                RotateTalkSpotsAndHitSpots();
 
                 // trying to fix clock, nothing
                 //var curiosityShopClock = curiosityShop.Maps[0].Actors[5];
@@ -1228,7 +1219,79 @@ namespace MMR.Randomizer
                 //var secondTorch = mountainVillageSpring.Maps[0].Actors[13];
                 //secondTorch.Rotation.y = ActorUtils.MergeRotationAndFlags(180, secondTorch.Rotation.y);
                 //secondTorch.Position.z -= 50;
+
             }
+        }
+
+        private static void RotateTalkSpotsAndHitSpots()
+        {
+            // lots of talk spots and hit spots have no rotation and need to be adjusted or they are half stuck in the wall weirdly
+
+            var stockpotInnScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.StockPotInn.FileID());
+            var stockpotinnmaskHitSpot = stockpotInnScene.Maps[0].Actors[14];
+            ActorUtils.ClearActorRotationRestrictions(stockpotinnmaskHitSpot);
+            stockpotinnmaskHitSpot.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 270, flags: stockpotinnmaskHitSpot.Rotation.y);
+
+            // if the clocktown talk points are randomized, we want to rotate them as they dont have set rotation
+            // this shit does nothing because something funky is going on, the rotation is not what it is in vanilla and its being ignored????
+            var westClocktownScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.WestClockTown.FileID());
+            var curiosityshopSign = westClocktownScene.Maps[0].Actors[22];
+            curiosityshopSign.ChangeYRotation(180 - 27);
+            ActorUtils.ClearActorRotationRestrictions(curiosityshopSign);
+            var tradingpostSign = westClocktownScene.Maps[0].Actors[9];
+            tradingpostSign.Rotation.y = ActorUtils.MergeRotationAndFlags(180 - 45 , flags: tradingpostSign.Rotation.y);
+            ActorUtils.ClearActorRotationRestrictions(tradingpostSign);
+            var bombshopSign = westClocktownScene.Maps[0].Actors[2];
+            bombshopSign.Rotation.y = ActorUtils.MergeRotationAndFlags(180 - 71, flags: bombshopSign.Rotation.y);
+            ActorUtils.ClearActorRotationRestrictions(bombshopSign);
+            bombshopSign.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
+            var lotterySign = westClocktownScene.Maps[0].Actors[25];
+            lotterySign.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: lotterySign.Rotation.y);
+            ActorUtils.ClearActorRotationRestrictions(lotterySign);
+
+            var eastClockTownScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.EastClockTown.FileID());
+
+            var treasurePoster = eastClockTownScene.Maps[0].Actors[20];
+            treasurePoster.Rotation.y = ActorUtils.MergeRotationAndFlags(90, flags: treasurePoster.Rotation.y);
+            treasurePoster.Rotation.x = ActorUtils.MergeRotationAndFlags(0, flags: treasurePoster.Rotation.x);
+            ActorUtils.ClearActorRotationRestrictions(treasurePoster);
+            var constructionPoster = eastClockTownScene.Maps[0].Actors[17];
+            constructionPoster.Rotation.y = ActorUtils.MergeRotationAndFlags(90, flags: constructionPoster.Rotation.y);
+            constructionPoster.Rotation.x = ActorUtils.MergeRotationAndFlags(0, flags: constructionPoster.Rotation.x);
+            ActorUtils.ClearActorRotationRestrictions(constructionPoster);
+            var zoraPoster1 = eastClockTownScene.Maps[0].Actors[14];
+            zoraPoster1.Rotation.x = ActorUtils.MergeRotationAndFlags(0, flags: zoraPoster1.Rotation.x);
+            zoraPoster1.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: zoraPoster1.Rotation.y);
+            ActorUtils.ClearActorRotationRestrictions(zoraPoster1);
+            var zoraPoster2 = eastClockTownScene.Maps[0].Actors[15];
+            zoraPoster2.Rotation.x = ActorUtils.MergeRotationAndFlags(0, flags: zoraPoster1.Rotation.x);
+            zoraPoster2.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: zoraPoster2.Rotation.y);
+            ActorUtils.ClearActorRotationRestrictions(zoraPoster2);
+            var zoraPoster3 = eastClockTownScene.Maps[0].Actors[16];
+            zoraPoster3.Rotation.y = ActorUtils.MergeRotationAndFlags(90, flags: zoraPoster3.Rotation.y);
+            ActorUtils.ClearActorRotationRestrictions(zoraPoster3);
+
+            var hitspotLeft = eastClockTownScene.Maps[0].Actors[42];
+            hitspotLeft.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: hitspotLeft.Rotation.y);
+            ActorUtils.ClearActorRotationRestrictions(hitspotLeft);
+            hitspotLeft.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
+
+            var hitspotRight = eastClockTownScene.Maps[0].Actors[43];
+            hitspotRight.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: hitspotRight.Rotation.y);
+            ActorUtils.ClearActorRotationRestrictions(hitspotRight);
+            hitspotRight.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
+
+            var basketSpot = eastClockTownScene.Maps[0].Actors[22];
+            basketSpot.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: basketSpot.Rotation.y);
+            ActorUtils.ClearActorRotationRestrictions(basketSpot);
+            basketSpot.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
+
+            var archerySign = eastClockTownScene.Maps[0].Actors[24];
+            archerySign.ChangeYRotation(270 - 45);
+            archerySign.ChangeXRotation(0);
+            ActorUtils.ClearActorRotationRestrictions(archerySign);
+            archerySign.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
+
         }
 
 
@@ -1288,7 +1351,7 @@ namespace MMR.Randomizer
         {
             // the peahat grass drops NOTHING, this has bothered me for ages, here I change it
             var grottosScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
-            grottosScene.Maps[13].Actors[1].Variants[0] = 0x0001; // change the grass in peahat grotto to drop items like TF grass
+            grottosScene.Maps[13].Actors[1].ChangeActor(GameObjects.Actor.NaturalPatchOfGrass, vars: 0x1, modifyOld: true);
 
             if (ACTORSENABLED)
             {
@@ -1671,6 +1734,7 @@ namespace MMR.Randomizer
 
         public static void MoveActorsIfRandomized()
         {
+
             /// if ossan in trading post was randomized we want to move one of them, as there are two of the, assumed for late night
             var tradingpostScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TradingPost.FileID());
             var secondOssan = tradingpostScene.Maps[0].Actors[1];
@@ -1765,6 +1829,7 @@ namespace MMR.Randomizer
             }
             SceneUtils.UpdateScene(snowheadTempleScene);
 
+            FixEvanRotation();
             MoveShopScrubsIfRandomized();
             MovePostmanIfRandomized(terminaField);
         }
@@ -2194,7 +2259,6 @@ namespace MMR.Randomizer
         {
             /// these signs use gameplay_keep, so there is no sign to associate with them
             /// HOWEVER, there is a bombiwa object in the object list that doesnt seem to do anything, we can randomize it
-            /// we do have to live with the log saying there are a lot of bombiwa there that are really not there, but so be it
 
             var listOfSignIds = new List<int> { 14, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 };
 
@@ -2203,7 +2267,7 @@ namespace MMR.Randomizer
             foreach (var aId in listOfSignIds)
             {
                 pinnacleSceneActors[aId].ChangeActor(GameObjects.Actor.Bombiwa, vars: 0x8077, true);
-                pinnacleSceneActors[aId].OldName = "WaypointSign";
+                pinnacleSceneActors[aId].OldName = "WaypointSign"; // so the log doesnt say they are bombiwa, rename here
             }
         }
 
@@ -2991,7 +3055,14 @@ namespace MMR.Randomizer
             // if evan is randomized, then his replacement is staring at the wall
             var zorahallRoomsScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraHallRooms.FileID());
             var evan = zorahallRoomsScene.Maps[3].Actors[0];
-            evan.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: evan.Rotation.y);
+
+            /// if ossan in trading post was randomized we want to move one of them, as there are two of the, assumed for late night
+            if (evan.ActorEnum != GameObjects.Actor.Evan)
+            {
+                evan.Rotation.y = ActorUtils.MergeRotationAndFlags(180 + 90 + 15, flags: evan.Rotation.y);
+                SceneUtils.UpdateScene(zorahallRoomsScene);
+            }
+
         }
 
         private static void RandomizeTheSongMonkey()
@@ -3154,6 +3225,15 @@ namespace MMR.Randomizer
             ranchScene.Maps[2].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
         }
 
+        private static void DistinguishLogicRequiredDekuFlowers()
+        {
+            // for objectless actorizer, some deku flowers must be held back because they require logic, but all deku flowers use the same params
+            // but the 0xFF param space is unused, so we dont have to worry about changing it to mark our requirements
+
+            var tfScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TerminaField.FileID());
+            var aboveCowGrottoFlower = tfScene.Maps[0].Actors[48];
+            aboveCowGrottoFlower.OldVariant = aboveCowGrottoFlower.Variants[0] = 0x0077;
+        }
 
         private static void EnableAllCreditsCutScenes()
         {
@@ -3520,7 +3600,7 @@ namespace MMR.Randomizer
             for (int i = 0; i < thisSceneData.Actors.Count(); i++) // thisSceneData.Actors is only the actors we change
             {
                 var testActor = thisSceneData.Actors[i];
-                if (listTroubleActors.Contains(testActor.ActorEnum))
+                //if (listTroubleActors.Contains(testActor.ActorEnum)) // testing: what if we just remove cutscene for all of our placed actors
                 {
                     // remove the spawn data by setting spawn to 0x7F (-1)
                     testActor.Rotation.y |= 0x7F;
@@ -3956,15 +4036,30 @@ namespace MMR.Randomizer
                             NewV = replacement.ObjectIndex(),
                             ChosenV = replacement.ObjectIndex()
                         });
+                        var cullCheck = thisSceneData.AcceptableCandidates.Find(act => act.ActorEnum == replacement);
+                        if (cullCheck == null) // was weight excluded, need to re-add to test
+                        {
+                            var newActor = new Actor(replacement);
+                            thisSceneData.AcceptableCandidates.Add(newActor);
+                            thisSceneData.CandidatesPerObject[objectIndex].Add(newActor);
+                        }
                         return true;
                     }
                     return false;
                 }
-
+                
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.CreamiaCariage)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CreamiaCariage)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.ZoraCape, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
+
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.Clock)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StoneTowerTemple, GameObjects.Actor.Nejiron, GameObjects.Actor.Peahat)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.Keese)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Anju, GameObjects.Actor.StockpotBell)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.HookshotWallAndPillar)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Dog, GameObjects.Actor.Evan)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortress, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.PatrollingPirate)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.ClayPot, GameObjects.Actor.DekuKing)) continue;
@@ -4044,6 +4139,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.MayorsResidence, GameObjects.Actor.Gorman, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
 
+                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.IronKnuckle)) continue;
+                //#endif
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Monkey)) continue;
 //                #endif
                 #endregion
@@ -5289,6 +5386,9 @@ namespace MMR.Randomizer
                     var chosenObject = thisSceneData.ChosenReplacementObjects[objectIndex].ChosenV;
                     List<Actor> subMatches = thisSceneData.CandidatesPerObject[objectIndex].FindAll(act => act.ObjectId == chosenObject);
 
+                    #if DEBUG
+                    var object_actor = VanillaEnemyList.Find(act => act.ObjectIndex() == chosenObject);
+                    #endif
                     Debug.Assert(subMatches.Count > 0);
 
                     AddCompanionsToCandidates(thisSceneData, objectIndex, subMatches);
@@ -5371,6 +5471,12 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
+            //if (scene.SceneEnum == GameObjects.Scene.AstralObservatory) // force specific actor/variant for debugging
+            //{
+                //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot
+                //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.ObjSwitch, vars: 0x7504); // hitspot
+                //thisSceneData.Scene.Maps[0].Actors[9].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F);
+                //thisSceneData.Scene.Maps[0].Actors[2].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F);
             //if (scene.SceneEnum == GameObjects.Scene.SwampSpiderHouse) // force specific actor/variant for debugging // was not commented out on isghj branch
             //{ // was not commented out on isghj branch
                 //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc // was not commented out on isghj branch
@@ -5414,9 +5520,9 @@ namespace MMR.Randomizer
                 var actor = thisSceneData.Actors[a];
                 string dsize = actor.DynaLoad.poly > 0 ? $" dyn: [{actor.DynaLoad.poly}]" : "";
                 #if DEBUG
-                var actorNameData = $"  Old actor:[{thisSceneData.Scene.SceneEnum}]r[{actor.Room.ToString("D2")}]o[{actor.OldName}]";
+                var actorNameData = $"  Old actor:[{thisSceneData.Scene.SceneEnum}]r[{actor.Room.ToString("D2")}]n[{actor.OldName}]v[0x{actor.OldVariant.ToString("X4")}]";
                 #else
-                var actorNameData = $"  Old actor:[{actor.Room.ToString("D2")}][{actor.OldName}] ";
+                var actorNameData = $"  Old actor:r[{actor.Room.ToString("D2")}]n[{actor.OldName}]v[0x{actor.OldVariant.ToString("X4")}] ";
                 #endif
                 WriteOutput(actorNameData +
                     $" replaced by new actor: [{actor.Variants[0].ToString("X4")}]" +
@@ -6139,7 +6245,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.8\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.9\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
