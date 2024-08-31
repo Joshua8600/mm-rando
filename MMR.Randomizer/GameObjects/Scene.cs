@@ -192,6 +192,7 @@ namespace MMR.Randomizer.GameObjects
         [FairyDroppingEnemies(roomNumber: 1, actorNumber: 3)] // eygore 
         [FairyDroppingEnemies(roomNumber: 1, actorNumber: 1)] // wizrobe
         [EnemizerSceneBlockSensitive(Actor.BlueBubble, -1)]
+        [EnemizerSceneBlockSensitive(Actor.Dexihand, -1)] // replacement needs to not block the floating rupee items
         [ClearEnemyPuzzleRooms(4)] // wizrobe room is a clear all room
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Poe,
            Actor.Bo)] // they just fall down to the "floor" and its awkward
@@ -603,13 +604,14 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1353)]
         [SceneInternalId(0x43)]
         [DynaHeadroom(0, 0)] // seems very low, for now disable
-        [EnemizerSceneEnemyReplacementBlock(Actor.Dampe,
-            Actor.Treee)]// for some reason big poe in the first room can cause camera to lock, unknown reason
+        [EnemizerSceneEnemyReplacementBlock(Actor.TallGrass,
+            Actor.RegularIceBlock)]
         [EnemizerSceneEnemyReplacementBlock(Actor.OrangeGraveyardFlower,
             Actor.En_Ani, Actor.SwampTouristGuide, Actor.Secretary, Actor.Scientist, Actor.Takaraya,
             Actor.BombersBlueHat, Actor.BomberHideoutGuard)] // talking actors can stop gave clipping, requested blocking 
         [EnemizerSceneBlockSensitive(Actor.Dampe, -1)]
         [EnemizerSceneBlockSensitive(Actor.OrangeGraveyardFlower, -1)]
+        [EnemizerSceneBlockSensitive(Actor.TallGrass, -1)]
         IkanaGraveyard = 0x40,
 
         [FileID(1356)]

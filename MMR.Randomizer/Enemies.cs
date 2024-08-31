@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 // dotnet 4.5 req
 using System.Runtime.CompilerServices;
+//using MMR.Randomizer.Attributes;
 
 // todo rename this actorutils.cs and move to MMR.Randomizer/Utils/
 
@@ -589,7 +590,7 @@ namespace MMR.Randomizer
                 for (int actorIndex = 0; actorIndex < scene.Maps[mapIndex].Actors.Count; ++actorIndex) // (var mapActor in scene.Maps[mapIndex].Actors)
                 {
                     var mapActor = scene.Maps[mapIndex].Actors[actorIndex];
-                    var matchingEnemy = VanillaEnemyList.Find(act => (int)act == mapActor.ActorId);
+                    var matchingEnemy = VanillaEnemyList.Find(act => act == mapActor.OldActorEnum);
                     if (matchingEnemy > 0)
                     {
                         var listOfAcceptableVariants = matchingEnemy.AllVariants(); 
@@ -600,7 +601,7 @@ namespace MMR.Randomizer
                         if (matchingEnemy.ScenesRandomizationExcluded().Contains(scene.SceneEnum))
                             continue;
 
-                        if(SpecialMultiObjectCases(mapActor, mapIndex, actorIndex))
+                        if (SpecialMultiObjectCases(mapActor, mapIndex, actorIndex))
                         {
                             sceneObjectlessActors.Add(mapActor);
                             continue;
@@ -620,45 +621,60 @@ namespace MMR.Randomizer
                         }
                         #endif
                     }
-                    else // non-object based actors, standalone
+                    else // non-object based actors, test if standalone actor
                     {
+                        // regular butterfly is only on moon
+                        GameObjects.Actor[] commonScoopableActors = new GameObjects.Actor[] {
+                                    GameObjects.Actor.MushroomCloud, GameObjects.Actor.BugsFishButterfly, GameObjects.Actor.Fish
+                        };
 
-                        void AddIfNoRestrictions(Actor testActor)
+                        var matchingStandaloneActor = FreeCandidateList.Find(act => act.ActorEnum == mapActor.OldActorEnum);
+                        if (matchingStandaloneActor != null)
                         {
-                            /// twas separated because I thought it would be reused
-                            var sceneRestrictions = testActor.ActorEnum.GetAttribute<ForbidFromSceneAttribute>();
+                            var sceneRestrictions = mapActor.OldActorEnum.GetAttribute<ForbidFromSceneAttribute>();
                             if (sceneRestrictions != null && sceneRestrictions.ScenesExcluded.Contains(thisSceneData.Scene.SceneEnum))
-                                return; // continue // not valid to consider this actor
+                                continue; // not valid to consider this actor
 
-                            var importantItem = ObjectIsCheckBlocked(scene, testActor.ActorEnum, testActor.OldVariant);
-                            if (importantItem != null)
+                            var itemRestriction = ObjectIsCheckBlocked(scene, mapActor.ActorEnum, mapActor.OldVariant);
+                            var chanceOfRandomization = (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic) ? (80) : (40);
+                            // if common scoopable actor, some are allowed but not all, for now lets make it random
+                            if (itemRestriction != null && (commonScoopableActors.Contains(mapActor.OldActorEnum)
+                                && itemRestriction.ToString().Contains("BottleCatch")
+                                && thisSceneData.RNG.Next(100) < chanceOfRandomization))
                             {
                                 #if DEBUG
-                                var itemText = $"blocked by item [{ importantItem }]";
+                                var itemText = $"[{ itemRestriction.ToString() }]";
                                 #else
-                                var itemText = $"blocked by item [{ (int) importantItem}]";
+                                var itemText = $"[{ (int) itemRestriction}]";
+                                #endif
+                                log.AppendLine($" in scene [{scene.SceneEnum}]m[{mapIndex}]r[{mapActor.RoomActorIndex}]" +
+                                    $" common scoopable actor: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] skipped the restriction: " +
+                                    itemText);
+                            }// */
+                            else
+                            if (itemRestriction != null)
+                            {
+
+                                #if DEBUG
+                                var itemText = $"blocked by item [{ itemRestriction }]";
+                                #else
+                                var itemText = $"blocked by item [{ (int) itemRestriction}]";
                                 #endif
 
                                 log.AppendLine($" in scene [{scene.SceneEnum}]m[{mapIndex}]r[{mapActor.RoomActorIndex}]v[{mapActor.OldVariant.ToString("X4")}]" +
                                     $" actor: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] was " + itemText);
-                                return;
+                                continue;
                             }
 
-                            if ( ! testActor.Variants.Contains(mapActor.OldVariant))
+                            if (matchingStandaloneActor.Variants.Contains(mapActor.OldVariant) == false)
                             {
                                 log.AppendLine($" in scene [{scene.SceneEnum}][{mapIndex}] standalone was skipped over: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}]");
-                                return; // non valid
+                                continue; // non valid
                             }
 
-                            FixActorLastSecond(testActor, testActor.ActorEnum, mapIndex, actorIndex);
+                            FixActorLastSecond(mapActor, matchingStandaloneActor.ActorEnum, mapIndex, actorIndex);
 
                             sceneObjectlessActors.Add(mapActor);
-                        }
-
-                        var matchingFreeActor = FreeCandidateList.Find(act => act.ActorEnum == mapActor.ActorEnum);
-                        if (matchingFreeActor != null)
-                        {
-                            AddIfNoRestrictions(mapActor);
                         }
                     }
                 }
@@ -874,6 +890,8 @@ namespace MMR.Randomizer
                     if (matchingEnum > 0                                                         // exists in the list of enemies we want to change
                        && !matchingEnum.ScenesRandomizationExcluded().Contains(scene.SceneEnum)) // not excluded from being extracted from this scene
                     {
+                        var replacementChance = matchingEnemy.GetRemovalChance();
+
                         var importantItem = ObjectIsCheckBlocked(scene, matchingEnum);
                         if (importantItem != null)
                         {
@@ -885,6 +903,11 @@ namespace MMR.Randomizer
 
                             thisSceneData.Actors.RemoveAll(act => act.ObjectId == obj);
                             thisSceneData.Log.AppendLine($" object [{matchingEnum}] replacement blocked by" + itemText);
+                        }else if (replacementChance != 100
+                               && thisSceneData.RNG.Next(100) > replacementChance)
+                        {
+                            thisSceneData.Actors.RemoveAll(act => act.ObjectId == obj);
+                            thisSceneData.Log.AppendLine($" object [{matchingEnum}] replacement blocked by removal chance roll");
                         }
                         else
                         {
@@ -1244,7 +1267,7 @@ namespace MMR.Randomizer
             var bombshopSign = westClocktownScene.Maps[0].Actors[2];
             bombshopSign.Rotation.y = ActorUtils.MergeRotationAndFlags(180 - 71, flags: bombshopSign.Rotation.y);
             ActorUtils.ClearActorRotationRestrictions(bombshopSign);
-            bombshopSign.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
+            //bombshopSign.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
             var lotterySign = westClocktownScene.Maps[0].Actors[25];
             lotterySign.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: lotterySign.Rotation.y);
             ActorUtils.ClearActorRotationRestrictions(lotterySign);
@@ -1274,24 +1297,25 @@ namespace MMR.Randomizer
             var hitspotLeft = eastClockTownScene.Maps[0].Actors[42];
             hitspotLeft.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: hitspotLeft.Rotation.y);
             ActorUtils.ClearActorRotationRestrictions(hitspotLeft);
-            hitspotLeft.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
 
             var hitspotRight = eastClockTownScene.Maps[0].Actors[43];
             hitspotRight.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: hitspotRight.Rotation.y);
             ActorUtils.ClearActorRotationRestrictions(hitspotRight);
-            hitspotRight.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
 
             var basketSpot = eastClockTownScene.Maps[0].Actors[22];
             basketSpot.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: basketSpot.Rotation.y);
             ActorUtils.ClearActorRotationRestrictions(basketSpot);
-            basketSpot.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
 
             var archerySign = eastClockTownScene.Maps[0].Actors[24];
             archerySign.ChangeYRotation(270 - 45);
             archerySign.ChangeXRotation(0);
             ActorUtils.ClearActorRotationRestrictions(archerySign);
-            archerySign.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // DEBUGGING
 
+            var soldierSign = eastClockTownScene.Maps[0].Actors[21];
+            soldierSign.ChangeYRotation(270);
+            soldierSign.ChangeXRotation(0);
+            soldierSign.ChangeZRotation(0);
+            ActorUtils.ClearActorRotationRestrictions(soldierSign);
         }
 
 
@@ -3261,7 +3285,7 @@ namespace MMR.Randomizer
         }
 
 
-#endregion
+        #endregion
 
         public static List<GameObjects.Actor> GetSceneFairyDroppingEnemyTypes(SceneEnemizerData thisSceneData)
         {
@@ -3708,7 +3732,11 @@ namespace MMR.Randomizer
                 }
 
                 if (replacementCandidates.Count == 0)//Debug.Assert(replacementCandidates.Count > 0);
-                    throw new Exception("Could not place supply bush, please try another seed.");
+                {
+                    thisSceneData.Log.AppendLine($"Could not place supply bush in scene [{thisSceneData.Scene.SceneEnum}]");
+                    //throw new Exception("Could not place supply bush, please try another seed.");
+                    return;
+                }
 
                 // change them to a bush containing things
                 var actorChoice = replacementCandidates[thisSceneData.RNG.Next(replacementCandidates.Count)];
@@ -3781,13 +3809,26 @@ namespace MMR.Randomizer
                     }
                 }
 
+                // lower swimming off the surface
                 var waterVariants = testActor.ActorEnum.GetAttribute<WaterVariantsAttribute>();
                 if ((waterVariants != null && waterVariants.Variants.Contains(testActor.Variants[0])) && // chosen variant is water (swimming)
                     (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Variants.Contains(testActor.OldVariant))) // previous water surface 
                 {
-                    short randomHeight = (short)(10 + (seedrng.Next() % 20));
+                    short randomHeight = (short)(10 + seedrng.Next(20));
                     testActor.Position.y -= randomHeight; // always lower flying enemies on ceiling placement, its usually way too high
                     log.AppendLine($" - lowered height of actor [{testActor.Name}] by [{randomHeight}] to lower below water surface");
+                    UpdateStrayFairyHeight(testActor);
+                }
+
+                // raise swimming off the floor
+                //var waterVariants = testActor.ActorEnum.GetAttribute<WaterVariantsAttribute>();
+                var oldWaterBottomVariants = testActor.OldActorEnum.GetAttribute<WaterBottomVariantsAttribute>();
+                if ((waterVariants != null && waterVariants.Variants.Contains(testActor.Variants[0])) && // chosen variant is water (swimming)
+                    (oldWaterBottomVariants != null && oldWaterBottomVariants.Variants.Contains(testActor.OldVariant))) // previous water bottom 
+                {
+                    short randomHeight = (short)(10 + seedrng.Next(70));
+                    testActor.Position.y += randomHeight; // always lower flying enemies on ceiling placement, its usually way too high
+                    log.AppendLine($" - raised height of actor [{testActor.Name}] by [{randomHeight}] to above water bottom");
                     UpdateStrayFairyHeight(testActor);
                 }
 
@@ -4048,10 +4089,10 @@ namespace MMR.Randomizer
                     return false;
                 }
                 
-                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.CreamiaCariage)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoGoron)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CreamiaCariage)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
-                //if (TestHardSetObject(GameObjects.Scene.ZoraCape, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.CuttableIvyWall)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.DeathArmos)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.Clock)) continue;
@@ -6246,7 +6287,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 73.9\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 74.2\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
