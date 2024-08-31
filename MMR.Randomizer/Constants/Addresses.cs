@@ -21,5 +21,7 @@
         public const int TransitionOverlayTable = 0xC670F0;
 
         // TODO add audiobank and soundbank pointers
+
+        public const int CodeFile           = 0xB3C000; // "Code" is the name of the file
     }
 }
