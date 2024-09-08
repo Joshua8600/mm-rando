@@ -1321,6 +1321,8 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x660E, Item.CollectableOceansideSpiderHouseMainRoomPot2)] 
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x741E, Item.CollectableOceansideSpiderHouseMaskRoomPot1)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x761E, Item.CollectableOceansideSpiderHouseMaskRoomPot2)]
+        [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x1A, Item.CollectibleOceanSpiderToken26)] // storage room "jar", in the rafters
+        [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x720E, Item.CollectableOceansideSpiderHouseStorageRoomPot1)] // jar sitting on a box, back next to kayaks
         // */
         /*[CheckRestricted(Scene.OceanSpiderHouse, variant: ActorConst.ANY_VARIANT,
             Item.CollectableOceansideSpiderHouseEntrancePot1, Item.CollectableOceansideSpiderHouseEntrancePot2, Item.CollectableOceansideSpiderHouseEntrancePot3,
@@ -1344,6 +1346,11 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.BeneathGraveyard, variant: ActorConst.ANY_VARIANT,
             Item.CollectableBeneathTheGraveyardBadBatRoomPot1, Item.CollectableBeneathTheGraveyardInvisibleRoomPot1,
             Item.CollectableBeneathTheGraveyardMainAreaPot1, Item.CollectableBeneathTheGraveyardMainAreaPot2)]
+        [CheckRestricted(Scene.BeneathTheWell, variant: 0x4415, Item.CollectableBeneathTheWellBugAndBombRoomPot1)] // all five in the same room
+        [CheckRestricted(Scene.BeneathTheWell, variant: 0x4015, Item.CollectableBeneathTheWellBugAndBombRoomPot2)]
+        [CheckRestricted(Scene.BeneathTheWell, variant: 0x4815, Item.CollectableBeneathTheWellBugAndBombRoomPot3)]
+        [CheckRestricted(Scene.BeneathTheWell, variant: 0x4215, Item.CollectableBeneathTheWellBugAndBombRoomPot4)]
+        [CheckRestricted(Scene.BeneathTheWell, variant: 0x4615, Item.CollectableBeneathTheWellBugAndBombRoomPot5)]
         [CheckRestricted(Scene.DampesHouse, variant: ActorConst.ANY_VARIANT,
             Item.CollectableDampesHouseBasementPot1, Item.CollectableDampesHouseBasementPot2,
             Item.CollectableDampesHouseBasementPot3, Item.CollectableDampesHouseBasementPot4,
@@ -1695,8 +1702,8 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
         [VariantsWithRoomMax(max:0, variant: 0x2, 0x902, 0x1D82)] // wall types, currently they are the only actor that can be put on free wall spots that break (itemizer overwiting vars)
         [EnemizerScenesPlacementBlock(Scene.StoneTower)] // still unknown illegal instruction crash in stone tower mirror room, same variant works fine in other places
-        [ForbidFromScene(Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
-            Scene.BeneathTheWell, Scene.DekuShrine, Scene.IkanaCastle, Scene.PiratesFortressRooms, Scene.SwampSpiderHouse)]
+        //[ForbidFromScene(Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
+        //    Scene.BeneathTheWell, Scene.DekuShrine, Scene.IkanaCastle, Scene.PiratesFortressRooms, Scene.SwampSpiderHouse)]
         ObjSwitch = 0x93, // Obj_Switch
 
         Empty94 = 0x94, // Empty94
@@ -4591,7 +4598,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(
             0x191E)] // below well
         [PerchingVariants(0x2034, 0x3EFE)] // non-vanilla variants so they can show up on perchest
-        [VariantsWithRoomMax(max: 8, variant: 0x1932, 0x3FFF)]
+        [VariantsWithRoomMax(max: 3, variant: 0x1932, 0x3FFF)]
         [VariantsWithRoomMax(max: 0, variant: 0x3FA8)] // do not place water variant because dont hav a water wall type yet, which is what this really is, putting in water floats in the water column
         [ForbidFromScene(Scene.StoneTowerTemple)]
         [EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.GoronRacetrack)]

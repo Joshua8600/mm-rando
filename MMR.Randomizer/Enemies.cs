@@ -96,7 +96,8 @@ namespace MMR.Randomizer
             0x761E, 0x001A, 0x400A, 0x0186, 0x018A, 0x680A, 0x6E0A, 0x700A, 0x720E, // ospiderhouse
             0x5A1E, 0x5C1E, 0x400B, 0x420A, 0x521F, 0x440B, 0x4602, 0x561E,         // pirate bay rooms
             0x5013, 0x581E, 0x480B, 0x4A1E, 0x101F, 0x1203, 0x480B, 0x541E, 0x4E0B, // pirate bay rooms
-            0x4015, 0x4215, 0x4415, 0x4615, 0x4815, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, // botw
+            0x4015, 0x4215, 0x4415, 0x4615, 0x4815, // botw (pots with checks)
+            0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, 0xFE3F, // botw (regular pots)
             0x0186, 0x0187, 0x018A, 0x018C, 0x018A, 0x440A, 0x460A, 0x480A, 0x440B, 0x018B, 0x000F, 0x4210, 0x0015, 0x001E, // istt
             0x018A, 0x000F, 0x3811, 0x0015, 0x001E, 0x4210, 0x000A, 0x001E, 0x4C02, 0x4E02, 0x5002, 0x5202, // wft
             0xC00B, 0xC21E, 0xC40E, 0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF81E, 0xF60E, 0xF410 // secret shrine
@@ -5513,10 +5514,13 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
+            //if (scene.SceneEnum == GameObjects.Scene.SwampSpiderHouse) // force specific actor/variant for debugging
+            //{
             //if (scene.SceneEnum == GameObjects.Scene.AstralObservatory) // force specific actor/variant for debugging
             //{
                 //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot
-                //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.ObjSwitch, vars: 0x7504); // hitspot
+                //var hitspot = thisSceneData.Scene.Maps[1].Actors[12];
+                //hitspot.ChangeActor(GameObjects.Actor.ObjSwitch, vars: 0x902); // hitspot
                 //thisSceneData.Scene.Maps[0].Actors[9].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F);
                 //thisSceneData.Scene.Maps[0].Actors[2].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F);
             //if (scene.SceneEnum == GameObjects.Scene.SwampSpiderHouse) // force specific actor/variant for debugging // was not commented out on isghj branch
@@ -6287,7 +6291,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 74.2\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 74.3\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
