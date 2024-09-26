@@ -825,7 +825,9 @@ namespace MMR.Randomizer
                     return map2; // we need to keep this tingle because their items are actual not-junk
                 }
                 // if heartpiece on picture is required, one of them has to remain regardless of their items
-                if (strawPulled && !IsActorizerJunk(GameObjects.Item.HeartPiecePictobox))
+                var check = _randomized.ItemList.Find(item => item.NewLocation != null && item.NewLocation == GameObjects.Item.HeartPiecePictobox);
+                var itemInCheck = check.Item;
+                if (strawPulled && !IsActorizerJunk(itemInCheck))
                 {
                     return GameObjects.Item.HeartPiecePictobox;
                 }
@@ -1864,6 +1866,16 @@ namespace MMR.Randomizer
                 snowheadTempleFireArrowWiz.Position.x = -1140; // move back to center of the room, not sure why this guy is so close to the door normally
             }
             SceneUtils.UpdateScene(snowheadTempleScene);
+
+            var milkroadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkRoad.FileID());;
+            var milkroadPointedSign = milkroadScene.Maps[0].Actors[21];
+            if (milkroadPointedSign.ActorEnum != GameObjects.Actor.PointedSign)
+            {
+                // vanilla angle faces the wall, which is especially bad if its a grotto it locks the player by facing them into wall they fall back in
+                milkroadPointedSign.ChangeYRotation(180 - 15); 
+            }
+            SceneUtils.UpdateScene(milkroadScene);
+
 
             FixEvanRotation();
             MoveShopScrubsIfRandomized();
@@ -4118,6 +4130,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.CuttableIvyWall)) continue;
 
+                //if (TestHardSetObject(GameObjects.Scene.MilkRoad, GameObjects.Actor.MilkroadCarpenter, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.DeathArmos)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.Clock)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StoneTowerTemple, GameObjects.Actor.Nejiron, GameObjects.Actor.Peahat)) continue;
@@ -5537,6 +5550,11 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
+            //if (scene.SceneEnum == GameObjects.Scene.MilkRoad) // force specific actor/variant for debugging
+            //{
+                //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot
+                //var target = thisSceneData.Scene.Maps[0].Actors[21];
+                //target.ChangeActor(GameObjects.Actor.BeanSeller, vars: 0);
             //if (scene.SceneEnum == GameObjects.Scene.ClockTowerInterior) // force specific actor/variant for debugging
             //{
                 //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot

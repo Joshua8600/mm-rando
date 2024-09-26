@@ -108,6 +108,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // they can extend so far they can block the door leading out
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoldSkulltula,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can get the player locked behind them near the grotto stones
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
+            Actor.GBTFreezableWaterfall, Actor.CursedSpiderMan)] // both can block the chest under the skulltula in lens cave
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HoneyComb,
             Actor.Seagulls, // weird
             Actor.UnusedFallingBridge, // might block ability to enter the grotto
@@ -323,6 +325,7 @@ namespace MMR.Randomizer.GameObjects
         //    Actor.Tijo, Actor.Bombiwa, Actor.Bumper)] // blocking a chest
         [EnemizerSceneBlockSensitive(Actor.ZoraEgg, -1)]
         [EnemizerSceneBlockSensitive(Actor.WoodenBarrel, -1)] // in the cage room, can block the ability to hit the switch to leave
+        [EnemizerSceneBlockSensitive(Actor.PatrollingPirate, -1)] // large ice block could block the hookshot room
         PiratesFortressRooms = 0x20, // tag: Sewer
 
         // tag: archery
@@ -393,7 +396,11 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.Monkey,
             Actor.PalaceGuardDeku)] // if placed behind regular guards, they will pop up to look at you and the other guards will also rise
         [EnemizerSceneEnemyReplacementBlock(Actor.SquareSign,
-            Actor.PalaceGuardDeku)] // if it grabs you as you fall into a grotto hole it can hardlock
+            Actor.En_Ani, Actor.GaboraBlacksmith, Actor.BomberHideoutGuard, // their talk box is so big they can dialogue block the flower to go back to top of flowers
+            Actor.Takaraya, Actor.Secretary, Actor.DekuKing, Actor.InjuredKoume, Actor.GoronElder, Actor.GoronKid, Actor.MadamAroma,
+            Actor.ArcheryMiniGameMan, Actor.SwampTouristGuide,
+            Actor.PalaceGuardDeku
+        )]
         //[EnemizerSceneEnemyReplacementBlock(Actor.Bombiwa,
         //    Actor.ClocktowerGearsAndOrgan)] // likely dynacrash if other actors have them too
         [EnemizerSceneBlockSensitive(Actor.Torch, -1)]
@@ -583,6 +590,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.DeathArmos, // light arrow requirement is a bit much, no logical way right now to check if important item behind light arrow
             Actor.Bo, Actor.StoneTowerMirror,
             Actor.MothSwarm, // can block
+            Actor.WoodenBarrel, // also the wooden blocking platform, which blocks climbing
             Actor.HookshotWallAndPillar, // can block climbing TODO fix in the code since this is silly
             Actor.BronzeBoulder, // doesn't stay in spot, falls to floor, blocks climbing start
             Actor.SpiderWeb)] // TODO would be cool if we could allow this if the item was junk, or logic require fire arrows
@@ -651,6 +659,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.ClayPot,
             Actor.En_Ani, Actor.GaboraBlacksmith, Actor.BomberHideoutGuard, // their talk box is so big they can dialogue block the flower
             Actor.Takaraya, Actor.Secretary, Actor.DekuKing, Actor.InjuredKoume, Actor.GoronElder, Actor.GoronKid, Actor.MadamAroma,
+            Actor.ArcheryMiniGameMan, Actor.SwampTouristGuide,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, // assume they will block deku flower pop-up
             Actor.RegularIceBlock,
             Actor.ClocktowerGearsAndOrgan // blocking the flower
@@ -974,6 +983,9 @@ namespace MMR.Randomizer.GameObjects
             Actor.Peahat, // small peahat can instant kill 1 heart hero
             Actor.PatrollingPirate, // could be annoying, hard to leave
             Actor.LikeLike )] // If you start with one heart this can be a softlock
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
+            Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.RegularIceBlock,
+            Actor.Bombiwa, Actor.LargeSnowball)] // can block climbing the ramp to the tower
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         [EnemizerSceneBlockSensitive(Actor.Kafei, -1)]
         SouthClockTown = 0x6C,
