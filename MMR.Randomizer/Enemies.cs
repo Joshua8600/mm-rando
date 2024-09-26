@@ -554,7 +554,12 @@ namespace MMR.Randomizer
                     {
                         var importantItem = ObjectIsCheckBlocked(scene, targetActor.ActorEnum, targetActor.OldVariant);
                         if (importantItem != null)
-                            return false;
+                            if (importantItem != null)
+                            {
+                                thisSceneData.Log.AppendLine($" tallgrass r[{targetActor.Room}]v[{targetActor.OldVariant}]" +
+                                    $" replacement blocked by [{(int)importantItem}]");
+                                return false;
+                            }
 
                         FixActorLastSecond(targetActor, targetActor.OldActorEnum, mapIndex, actorIndex);
                         targetActor.Variants.AddRange(tallGrassFieldObjectVariants);
@@ -572,7 +577,11 @@ namespace MMR.Randomizer
                     {
                         var importantItem = ObjectIsCheckBlocked(scene, targetActor.ActorEnum, targetActor.OldVariant);
                         if (importantItem != null)
+                        {
+                            thisSceneData.Log.AppendLine($" claypot r[{targetActor.Room}]v[{targetActor.OldVariant}]" +
+                                $"  replacement blocked by [{(int)importantItem}]");
                             return false;
+                        }
 
                         FixActorLastSecond(targetActor, targetActor.OldActorEnum, mapIndex, actorIndex);
                         targetActor.Variants.AddRange(clayPotDungeonVariants);
@@ -936,7 +945,7 @@ namespace MMR.Randomizer
             }
         }
 
-#endregion
+        #endregion
 
         private static void EnemizerEarlyFixes(Random rng)
         {
@@ -1009,7 +1018,7 @@ namespace MMR.Randomizer
             MoveActorsIfRandomized();
         }
 
-#region Static Enemizer Changes and Fixes
+        #region Static Enemizer Changes and Fixes
 
         public static void FixSpawnLocations()
         {
@@ -1234,9 +1243,11 @@ namespace MMR.Randomizer
 
                 RotateTalkSpotsAndHitSpots();
 
-                // trying to fix clock, nothing
-                //var curiosityShopClock = curiosityShop.Maps[0].Actors[5];
-                //curiosityShopClock.Position.x = -130;
+                // there is a mushroom spawn at the base of the tree in road to swamp, move it to the south side of the tree
+                var roadToSwampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.RoadToSouthernSwamp.FileID());
+                var roadToSwampMushroom = roadToSwampScene.Maps[0].Actors[43];
+                roadToSwampMushroom.Position = new vec16(366,-182,2200);
+
 
                 // in spring there are two torches on top of each other, which is weird, move the other one to face the first one
                 //var mountainVillageSpring = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillageSpring.FileID());
@@ -1658,13 +1669,13 @@ namespace MMR.Randomizer
         {
             /// if we randomize the shop scrubs, then we have two of them sitting on top of each other, which is weird
             var southernSwamp = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwamp.FileID());
-            var swampScrub = southernSwamp.Maps[0].Actors[1]; // first is zero
-            if (swampScrub.Name != GameObjects.Actor.BuisnessScrub.ToString())
+            var swampScrub = southernSwamp.Maps[0].Actors[0]; // first is zero
+            if (swampScrub.ActorEnum != GameObjects.Actor.BuisnessScrub)
             {
-                var stationaryScrub = southernSwamp.Maps[0].Actors[0]; // needs to be rotated, naturally faces left down the swamp
+                var stationaryScrub = southernSwamp.Maps[0].Actors[1]; // needs to be rotated, naturally faces left down the swamp
                 stationaryScrub.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: stationaryScrub.Rotation.y);
 
-                swampScrub.Position = new vec16(115, 170, 26);
+                stationaryScrub.Position = new vec16(115, 170, 26);
                 SceneUtils.UpdateScene(southernSwamp);
             }
             // TODO cleared swamp
@@ -3092,11 +3103,13 @@ namespace MMR.Randomizer
 
         private static void RandomizeTheSongMonkey()
         {
-            /// we normally cannot randomize just the song monkey in the deku king chamber scene
-            /// because the object is needed for multiple monkeys
-            /// but the scene uses 5 objects, and since they come in pairs that means there is a free space we can add another object, adding the monkey back in
+            /// randomizing monkeys can be annoying, needs finangaling
 
             if (!ReplacementListContains(GameObjects.Actor.Monkey)) return;
+
+            // we normally cannot randomize just the song monkey in the deku king chamber scene
+            // because the object is needed for multiple monkeys
+            // but the scene uses 5 objects, and since they come in pairs that means there is a free space we can add another object, adding the monkey back in
 
             var dekuKingScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DekuKingChamber.FileID());
             dekuKingScene.Maps[0].Objects.Add(GameObjects.Actor.Monkey.ObjectIndex());
@@ -3104,38 +3117,44 @@ namespace MMR.Randomizer
             var dekuKingSceneMap0FileData = RomData.MMFileList[GameObjects.Scene.DekuKingChamber.FileID() + 1].Data;
             dekuKingSceneMap0FileData[0x31] = 0x6; // updating object header object count from 5 to 6
 
-            // swamp monkey are annoying, we want to move them so they dont block things
-            var southernSwampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwamp.FileID());
-            southernSwampScene.Maps[2].Actors[10].Position = new vec16(3826, 15, -1320); // those near witch
-            southernSwampScene.Maps[2].Actors[11].Position = new vec16(3729, 15, -1358);
-            southernSwampScene.Maps[2].Actors[12].Position = new vec16(3619, 15, -1367);
-
-            southernSwampScene.Maps[0].Actors[35].Position = new vec16(380, 64, -950); // near entrance
-            southernSwampScene.Maps[0].Actors[35].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 0 + 30, flags: southernSwampScene.Maps[0].Actors[35].Rotation.y);
-            southernSwampScene.Maps[0].Actors[35].ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
-            southernSwampScene.Maps[0].Actors[35].OldName = "Monkey(Near Road)";
-
-            southernSwampScene.Maps[0].Actors[36].Position = new vec16(499, 58, -890);
-            southernSwampScene.Maps[0].Actors[36].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 270 - 30, flags: southernSwampScene.Maps[0].Actors[36].Rotation.y);
-            southernSwampScene.Maps[0].Actors[36].ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
-            southernSwampScene.Maps[0].Actors[36].OldName = "Monkey(Near Road)";
-
-            southernSwampScene.Maps[0].Actors[37].Position = new vec16(399, 46, -828); // this one is weirdly alright as is for rotation
-            southernSwampScene.Maps[0].Actors[37].ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
-            southernSwampScene.Maps[0].Actors[37].OldName = "Monkey(Near Road)";
-
-            // because we changed the monkey to bombiwa actor, we need to change the object to so that they will respond correctly
-            southernSwampScene.Maps[0].Objects[2] = GameObjects.Actor.Bombiwa.ObjectIndex();
-
-            // same with monkey near the deky palace entrance
-            southernSwampScene.Maps[1].Actors[34].Position = new vec16(-681, 32, 4142);
-            southernSwampScene.Maps[1].Actors[34].ChangeActor(GameObjects.Actor.Snapper, vars: 0x0, modifyOld: true);
-            southernSwampScene.Maps[1].Actors[34].OldName = "Monkey(Palace Entrance)";
-            southernSwampScene.Maps[1].Objects[2] = GameObjects.Actor.Bombiwa.ObjectIndex();
-
+            // monk facing the wrong way, turn
             var dekuPalaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DekuPalace.FileID());
             dekuPalaceScene.Maps[0].Actors[11].Position = new vec16(-74, 0, 1466);
             dekuPalaceScene.Maps[0].Actors[11].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 45, flags: dekuPalaceScene.Maps[0].Actors[11].Rotation.y);
+
+            // changing swamp monkeys into multiple different actor types for variety means different objects per room, which can corrupt objects
+
+            // swamp monkey are annoying, we want to move them so they dont block things
+            var southernSwampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwamp.FileID());
+            southernSwampScene.Maps[2].Actors[10].Position = new vec16(3826, 15, -1320); // those near witch, moved to the porch
+            southernSwampScene.Maps[2].Actors[11].Position = new vec16(3729, 15, -1358);
+            southernSwampScene.Maps[2].Actors[12].Position = new vec16(3619, 15, -1367);
+
+            southernSwampScene.Maps[0].Actors[35].OldName = "Monkey(Near Road)";
+            southernSwampScene.Maps[0].Actors[35].Position = new vec16(380, 64, -950); // near entrance
+            southernSwampScene.Maps[0].Actors[35].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 0 + 30, flags: southernSwampScene.Maps[0].Actors[35].Rotation.y);
+            //southernSwampScene.Maps[0].Actors[35].ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
+
+            southernSwampScene.Maps[0].Actors[36].OldName = "Monkey(Near Road)";
+            southernSwampScene.Maps[0].Actors[36].Position = new vec16(499, 58, -890);
+            southernSwampScene.Maps[0].Actors[36].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 270 - 30, flags: southernSwampScene.Maps[0].Actors[36].Rotation.y);
+            //southernSwampScene.Maps[0].Actors[36].ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
+
+            southernSwampScene.Maps[0].Actors[37].OldName = "Monkey(Near Road)";
+            southernSwampScene.Maps[0].Actors[37].Position = new vec16(399, 46, -828); // this one is weirdly alright as is for rotation
+            //southernSwampScene.Maps[0].Actors[37].ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
+
+            // because we changed the monkey to bombiwa actor, we need to change the object to so that they will respond correctly
+            //southernSwampScene.Maps[0].Objects[2] = GameObjects.Actor.Bombiwa.ObjectIndex();
+
+            // same with monkey near the deku palace entrance
+            southernSwampScene.Maps[1].Actors[34].OldName = "Monkey(Palace Entrance)";
+            southernSwampScene.Maps[1].Actors[34].Position = new vec16(-681, 32, 4142);
+            //southernSwampScene.Maps[1].Actors[34].ChangeActor(GameObjects.Actor.Snapper, vars: 0x0, modifyOld: true);
+            //southernSwampScene.Maps[1].Objects[2] = GameObjects.Actor.Bombiwa.ObjectIndex();
+
+            // if I do come back to this with multiple objects, I should make sure that the object is moved to the end of the list,
+            // so other stuff doesnt shuffle around it
         }
 
         public static void MoveTheISTTTunnelTransitionBack()
@@ -4090,6 +4109,10 @@ namespace MMR.Randomizer
                     return false;
                 }
                 
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronSGoro)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.GoronSGoro)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
+                //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.Tektite)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoGoron)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.CreamiaCariage)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
@@ -5514,6 +5537,11 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
+            //if (scene.SceneEnum == GameObjects.Scene.ClockTowerInterior) // force specific actor/variant for debugging
+            //{
+                //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot
+                //var target = thisSceneData.Scene.Maps[0].Actors[1];
+                //target.ChangeActor(GameObjects.Actor.GoronSGoro, vars: 6);
             //if (scene.SceneEnum == GameObjects.Scene.SwampSpiderHouse) // force specific actor/variant for debugging
             //{
             //if (scene.SceneEnum == GameObjects.Scene.AstralObservatory) // force specific actor/variant for debugging
@@ -5777,6 +5805,7 @@ namespace MMR.Randomizer
             {
                 if (filePath.Contains("SafeBoat.mmra")
                  || filePath.Contains("FairySpot.mmra") // is missing a variant, and was not working, not even sure what it was doing, TODo
+                 || filePath.Contains("BabaIsLoaded.mmra") // talk locking, lost the code, have to disable because no time to rewrite
                  || filePath.Contains("Dinofos"))
                 {
                     //throw new Exception("SafeBoat.mmra no longer works in actorizer 1.16, \n remove the file from MMR/actors and start a new seed.");
@@ -6291,7 +6320,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 74.3\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 74.4\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

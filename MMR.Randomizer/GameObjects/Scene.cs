@@ -586,8 +586,12 @@ namespace MMR.Randomizer.GameObjects
             Actor.HookshotWallAndPillar, // can block climbing TODO fix in the code since this is silly
             Actor.BronzeBoulder, // doesn't stay in spot, falls to floor, blocks climbing start
             Actor.SpiderWeb)] // TODO would be cool if we could allow this if the item was junk, or logic require fire arrows
+        [EnemizerSceneEnemyReplacementBlock(Actor.MushroomCloud, // moved to the side of the tree
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator // could block the tree (through the tree
+        )]
         [EnemizerSceneBlockSensitive(Actor.BadBat, -1)] // giant ice block, unused stone stuff at least
         [EnemizerSceneBlockSensitive(Actor.PottedPlant, -1)] // right next to swamp shooting gallery door
+        //[EnemizerSceneBlockSensitive(Actor.MushroomCloud, -1)] // there is one at the base of the tree funny enough : except I moved it
         RoadToSouthernSwamp = 0x3D,
 
         [FileID(1349)]
@@ -633,8 +637,6 @@ namespace MMR.Randomizer.GameObjects
         //    Actor.UnusedStoneTowerPlatform, Actor.UnusedPirateElevator)]
         [EnemizerSceneEnemyReplacementBlock(Actor.TallGrass,
             Actor.ClocktowerGearsAndOrgan, Actor.RegularIceBlock)] // suspected too large and can block the owl
-        [EnemizerSceneEnemyReplacementBlock(Actor.Octarok,
-            Actor.Obj_Boat, Actor.SwampBoat)] // dyna crashing from just one boat and nothing else
         [EnemizerSceneBlockSensitive(Actor.DragonFly, -1)]
         [EnemizerSceneBlockSensitive(Actor.En_Owl, -1)]
         SouthernSwamp = 0x42,
@@ -828,6 +830,9 @@ namespace MMR.Randomizer.GameObjects
             )]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Gorman,
             /* Actor.StockpotBell, Actor.Bumper, Actor.CircleOfFire,*/ Actor.LikeLike)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RosaSisters,
+            Actor.TreasureChest, Actor.Mimi // cannot open chests on the stairs
+        )]
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Anju,
         //    Actor.AnjusGrandma, Actor.AnjusGrandmaCredits)] // this this was just cutscenes, not the same bug
         [EnemizerSceneBlockSensitive(Actor.Gorman, -1)]
