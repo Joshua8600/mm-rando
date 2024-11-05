@@ -324,7 +324,7 @@ namespace MMR.Randomizer
                 ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.NotebookEntries].AddRange(notebookEntries);
             }
 
-            if (_randomized.Settings.LogicMode != Models.LogicMode.Casual)
+            if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic)
             {
                 var entryRewards = _randomized.ItemList.FindAll(i =>  i.NewLocation.ToString().Contains("Notebook"));
                 var nonJunkCount = 0;
@@ -344,7 +344,7 @@ namespace MMR.Randomizer
                     ActorizerKnownJunkCategories.Add(GameObjects.ItemCategory.NotebookEntries);
                 }
             }
-            else // casual logic
+            else // any logic
             {
                 // check if any notebook entries are in the list of important items
                 var notebookEntryImportantSearch = allSphereItems.Any(u => u.Item1.Contains("Notebook:"));
