@@ -1889,15 +1889,32 @@ namespace MMR.Randomizer
             }
             SceneUtils.UpdateScene(snowheadTempleScene);
 
-            var milkroadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkRoad.FileID());;
+            var milkroadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkRoad.FileID()); ;
             var milkroadPointedSign = milkroadScene.Maps[0].Actors[21];
             if (milkroadPointedSign.ActorEnum != GameObjects.Actor.PointedSign)
             {
                 // vanilla angle faces the wall, which is especially bad if its a grotto it locks the player by facing them into wall they fall back in
-                milkroadPointedSign.ChangeYRotation(180 - 15); 
+                milkroadPointedSign.ChangeYRotation(180 - 15);
             }
             SceneUtils.UpdateScene(milkroadScene);
 
+            // both gorman and postman start behind the door if they are randomized, which puts then out of sight and if likelike can grab you through the door
+            var milkbarScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkBar.FileID());
+            var milkbarPostman = milkbarScene.Maps[0].Actors[12];
+            if (milkbarPostman.ActorEnum != GameObjects.Actor.PostMan)
+            {
+                // weirdly, there is a custscene controlling actor in the very middle, which is right next to madam aroma
+                milkbarPostman.Position = new vec16(0, 0, 0);
+                //milkbarPostman.Position = new vec16(67,20, -271);
+                //milkbarPostman.Rotation =
+            }
+            var milkbarGorman = milkbarScene.Maps[0].Actors[7];
+            if (milkbarGorman.ActorEnum != GameObjects.Actor.Gorman)
+            {
+                milkbarGorman.Position = new vec16(61, 0, -162);
+                // rotation?
+            }
+            SceneUtils.UpdateScene(milkbarScene);
 
             FixEvanRotation();
             MoveShopScrubsIfRandomized();
@@ -4148,8 +4165,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.Tektite)) continue;
 
-                if (TestHardSetObject(GameObjects.Scene.MilkRoad, GameObjects.Actor.MilkroadCarpenter, GameObjects.Actor.BeanSeller)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.Keese)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.MilkBar, GameObjects.Actor.Gorman, GameObjects.Actor.BeanSeller)) continue;
+                if (TestHardSetObject(GameObjects.Scene.MilkBar, GameObjects.Actor.PostMan, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Anju, GameObjects.Actor.StockpotBell)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
