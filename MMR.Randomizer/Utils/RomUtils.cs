@@ -284,7 +284,9 @@ namespace MMR.Randomizer.Utils
                 //GameObjects.Scene.NorthClockTown.FileID(),
                 //GameObjects.Scene.NorthClockTown.FileID() + 1, // room 0
                 //GameObjects.Scene.Grottos.FileID(),
-                //GameObjects.Scene.Grottos.FileID() + 4, // room 4 : regular chest grotto
+                //GameObjects.Scene.Grottos.FileID() + 1 + 4, // room 4 : regular chest grotto
+                GameObjects.Scene.MilkBar.FileID(),
+                GameObjects.Scene.MilkBar.FileID() + 1, // room 0 : main gameplay room
 
                 // THESE TWO are the highest priority, huge imporovement 
                 38, // player overlay

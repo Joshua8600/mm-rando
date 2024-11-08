@@ -181,6 +181,25 @@ namespace MMR.Randomizer.Utils
             return (short) (((rotation & 0x1FF) << 7) | (flags & 0x7F));
         }
 
+        public static void SetActorSpawnTimeFlags(Actor actor, ushort flags = 0x3FF)
+        {
+            // the spawn flags, determining when an actor spawns day/night for days 0-4 (zeroth day and fourth day are mostly unused except for glitches)
+            // each gets two bits, so 0x12 0x3456 0x789A in order of flags parameter, where 0x123 are saved to x rotation and the rest to z
+
+            int upperBits = flags >> 7;
+            int lowerBits = flags & 0x7F;
+
+            // erase old bit data
+            var xrot = actor.Rotation.x & 0xFF80; // technically hidden bits here that dont need to be removed
+            var zrot = actor.Rotation.z & 0xFF80;
+
+            // write flags in the old spots
+            xrot |= upperBits;
+            zrot |= lowerBits;
+            actor.Rotation.x = (short)xrot;
+            actor.Rotation.z = (short)zrot;
+        }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void FlattenPitchRoll(Actor actor)

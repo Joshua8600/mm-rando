@@ -1900,14 +1900,13 @@ namespace MMR.Randomizer
 
             // both gorman and postman start behind the door if they are randomized, which puts then out of sight and if likelike can grab you through the door
             var milkbarScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkBar.FileID());
-            var milkbarPostman = milkbarScene.Maps[0].Actors[12];
+            /*var milkbarPostman = milkbarScene.Maps[0].Actors[12];
+            // this does nothing: something is overrideing this data, not sure if itemizer
             if (milkbarPostman.ActorEnum != GameObjects.Actor.PostMan)
             {
-                // weirdly, there is a custscene controlling actor in the very middle, which is right next to madam aroma
                 milkbarPostman.Position = new vec16(0, 0, 0);
-                //milkbarPostman.Position = new vec16(67,20, -271);
-                //milkbarPostman.Rotation =
-            }
+                ActorUtils.SetActorSpawnTimeFlags(milkbarPostman);
+            } // */
             var milkbarGorman = milkbarScene.Maps[0].Actors[7];
             if (milkbarGorman.ActorEnum != GameObjects.Actor.Gorman)
             {
