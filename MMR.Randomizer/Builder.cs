@@ -1560,11 +1560,20 @@ namespace MMR.Randomizer
             }
         }
 
-        private void WriteEnemies(OutputSettings outputSettings)
+        private void ReadEnemies(OutputSettings outputSettings)
+        {
+            // split from WriteEnemies because some work needs to happen before itemizer actor fixes
+            if (_randomized.Settings.RandomizeEnemies)
+            {
+                Enemies.ReadActors(outputSettings, _cosmeticSettings, _randomized);
+            }
+        }
+
+        private void WriteEnemies()
         {
             if (_randomized.Settings.RandomizeEnemies)
             {
-                Enemies.ShuffleEnemies(outputSettings, _cosmeticSettings, _randomized);
+                Enemies.ShuffleEnemies();
             }
         }
 
@@ -6404,8 +6413,8 @@ namespace MMR.Randomizer
                 progressReporter.ReportProgress(64, "Writing speedups...");
                 WriteSpeedUps(messageTable);
 
-                //progressReporter.ReportProgress(65, "Writing enemies...");
-                //WriteEnemies(outputSettings);
+                progressReporter.ReportProgress(65, "Writing enemies...");
+                ReadEnemies(outputSettings);
 
                 progressReporter.ReportProgress(66, "Writing items...");
                 WriteItems(messageTable);
@@ -6435,7 +6444,7 @@ namespace MMR.Randomizer
                 }
 
                 progressReporter.ReportProgress(70, "Writing enemies..."); // moved to attempt to bypass older variant override over actors
-                WriteEnemies(outputSettings);
+                WriteEnemies();
 
                 // Load Asm data from internal resource files and apply
                 asm = AsmContext.LoadInternal();

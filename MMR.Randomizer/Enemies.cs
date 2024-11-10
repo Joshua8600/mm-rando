@@ -4164,8 +4164,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.Tektite)) continue;
 
-                //if (TestHardSetObject(GameObjects.Scene.MilkBar, GameObjects.Actor.Gorman, GameObjects.Actor.BeanSeller)) continue;
-                if (TestHardSetObject(GameObjects.Scene.MilkBar, GameObjects.Actor.PostMan, GameObjects.Actor.BeanSeller)) continue;
+                if (TestHardSetObject(GameObjects.Scene.CuccoShack, GameObjects.Actor.LargeWoodenCrate, GameObjects.Actor.Armos)) continue;
+                if (TestHardSetObject(GameObjects.Scene.CuccoShack, GameObjects.Actor.Treee, GameObjects.Actor.DekuBaba)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Anju, GameObjects.Actor.StockpotBell)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
@@ -5425,7 +5425,8 @@ namespace MMR.Randomizer
 
                     var knownChangedActorList = new List<Actor>();
                     var chosenObject = thisSceneData.ChosenReplacementObjects[objectIndex].ChosenV;
-                    List<Actor> subMatches = thisSceneData.CandidatesPerObject[objectIndex].FindAll(act => act.ObjectId == chosenObject);
+                    var chosenCandidatesForThisObject = thisSceneData.CandidatesPerObject[objectIndex];
+                    List<Actor> subMatches = chosenCandidatesForThisObject.FindAll(act => act.ObjectId == chosenObject);
 
                     #if DEBUG
                     var object_actor = VanillaEnemyList.Find(act => act.ObjectIndex() == chosenObject);
@@ -6206,14 +6207,30 @@ namespace MMR.Randomizer
 
         #endregion
 
-        public static void ShuffleEnemies(OutputSettings outputSettings, CosmeticSettings cosmeticSettings, Models.RandomizedResult randomized)
+        public static void ReadActors(OutputSettings outputSettings, CosmeticSettings cosmeticSettings, Models.RandomizedResult randomized)
+        {
+            seedrng = new Random(randomized.Seed);
+            _randomized = randomized;
+            _outputSettings = outputSettings;
+            _cosmeticSettings = cosmeticSettings;
+
+            PrepareEnemyLists();
+            PrepareJunkItems();
+
+            SceneUtils.ReadSceneTable();
+            SceneUtils.GetSceneHeaders();
+            SceneUtils.GetMaps();
+            SceneUtils.GetMapHeaders();
+            SceneUtils.GetActors();
+
+            ScanForMMRA(directory: "actors");
+            InjectNewActors();
+        }
+
+        public static void ShuffleEnemies()
         {
             try
             {
-                seedrng = new Random(randomized.Seed);
-                _randomized = randomized;
-                _outputSettings = outputSettings;
-                _cosmeticSettings = cosmeticSettings;
                 DateTime enemizerStartTime = DateTime.Now;
 
                 // for dingus that want moonwarp, re-enable dekupalace
@@ -6222,16 +6239,7 @@ namespace MMR.Randomizer
                     GameObjects.Scene.SakonsHideout // issue: the whole gaunlet is one long room, with two clear enemy room puzles
                     };// , GameObjects.Scene.DekuPalace };
 
-                PrepareEnemyLists();
-                PrepareJunkItems();
-                SceneUtils.ReadSceneTable();
-                SceneUtils.GetSceneHeaders();
-                SceneUtils.GetMaps();
-                SceneUtils.GetMapHeaders();
-                SceneUtils.GetActors();
-                EnemizerEarlyFixes(seedrng);
-                ScanForMMRA(directory: "actors");
-                InjectNewActors();
+                EnemizerEarlyFixes(seedrng); // before we randomize
 
                 var newSceneList = RomData.SceneList;
                 newSceneList.RemoveAll(scene => SceneSkip.Contains(scene.SceneEnum) );
@@ -6246,7 +6254,7 @@ namespace MMR.Randomizer
                     newSceneList.Insert(0, item);
                 }
                 //int seed = random.Next(); // order is up to the cpu scheduler, to keep these matching the seed, set them all to start at the same value
-                int seed = randomized.Seed;
+                int seed = _randomized.Seed;
 
                 var previousThreadPriority = Thread.CurrentThread.Priority;
                 Thread.CurrentThread.Priority = ThreadPriority.Lowest; // do not SLAM
@@ -6261,7 +6269,7 @@ namespace MMR.Randomizer
 
                 Thread.CurrentThread.Priority = previousThreadPriority;
 
-                EnemizerLateFixes();
+                EnemizerLateFixes(); // fix IF randomized
                 //LowerEnemiesResourceLoad();
                 if (ACTORSENABLED)
                 {
