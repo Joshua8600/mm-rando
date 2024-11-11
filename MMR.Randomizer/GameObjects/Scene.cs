@@ -727,6 +727,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1409)]
         [SceneInternalId(0x4D)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
+            Actor.GibdoWell, Actor.GibdoWell)] // can stunlock at the door, doesnt stay down long enough
         GoronVillage = 0x4A,
 
         [FileID(1412)]
