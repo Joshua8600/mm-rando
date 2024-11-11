@@ -1250,6 +1250,9 @@ namespace MMR.Randomizer
                 var roadToSwampMushroom = roadToSwampScene.Maps[0].Actors[43];
                 roadToSwampMushroom.Position = new vec16(366,-182,2200);
 
+                AddCoastFlavor();
+
+
 
                 // in spring there are two torches on top of each other, which is weird, move the other one to face the first one
                 //var mountainVillageSpring = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillageSpring.FileID());
@@ -1344,6 +1347,57 @@ namespace MMR.Randomizer
             bankPoster.ChangeXRotation(0);
             bankPoster.ChangeZRotation(0);
             ActorUtils.ClearActorRotationRestrictions(bankPoster);
+        }
+
+        private static void AddCoastFlavor()
+        {
+            if (!ACTORSENABLED) return;
+
+            // I want some flavor, I want to move npcs to the towels/kayak under the umbrellas to show they are enjoying the beach
+            // the dev that made tatl that can spot zora added like 9 talk spot actors at the beach we can use, not removing all just yet
+
+            // scan through all leavers and turn them 270, or randomily redirect them toward compass directions
+
+            var greatbaycoastScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GreatBayCoast.FileID());
+            var towelScarecrow = greatbaycoastScene.Maps[0].Actors[138]; // standing very close to another in an area the player wouldnt notice the extra density
+            ActorUtils.SetActorSpawnTimeFlags(towelScarecrow); // by default, this one is night only
+            ActorUtils.FlattenPitchRoll(towelScarecrow);
+            towelScarecrow.ChangeYRotation(270);
+            towelScarecrow.Position = new vec16(-18, 80, 3734); // moved to center towel
+            towelScarecrow.ChangeActor(GameObjects.Actor.Scarecrow, 0x1E00, modifyOld: true);
+            // todo test rotation
+
+            var towel2LikeLike = greatbaycoastScene.Maps[0].Actors[143];
+            towel2LikeLike.Position = new vec16(-79, 82, 3975);
+            ActorUtils.FlattenPitchRoll(towel2LikeLike); // uses crazy things
+            ActorUtils.SetActorSpawnTimeFlags(towel2LikeLike);
+            towel2LikeLike.ChangeYRotation(270);
+            towel2LikeLike.ChangeActor(GameObjects.Actor.LikeLike, 3, modifyOld: true);
+            // todo test rotation
+
+            var extraKayakRearActor = greatbaycoastScene.Maps[0].Actors[149];
+            extraKayakRearActor.ChangeActor(GameObjects.Actor.Leever, vars: 0xFF, modifyOld: true);
+            extraKayakRearActor.OldName = "KayakReeba";
+            extraKayakRearActor.Position = new vec16(-101, 103, 4900); // kayak 1 rear
+            ActorUtils.FlattenPitchRoll(extraKayakRearActor); // uses crazy things
+            extraKayakRearActor.ChangeYRotation(270);
+            ActorUtils.SetActorSpawnTimeFlags(extraKayakRearActor);
+
+            var extraKayakRearActor2 = greatbaycoastScene.Maps[0].Actors[145];
+            extraKayakRearActor2.ChangeActor(GameObjects.Actor.Leever, vars: 0xFF, modifyOld: true);
+            extraKayakRearActor2.OldName = "KayakReeba";
+            extraKayakRearActor2.Position = new vec16(-185, 93, 4900); // kayak 1 front
+            ActorUtils.FlattenPitchRoll(extraKayakRearActor2); // uses crazy things
+            extraKayakRearActor2.ChangeYRotation(270);
+            ActorUtils.SetActorSpawnTimeFlags(extraKayakRearActor2);
+
+            var extraBeachLeever1 = greatbaycoastScene.Maps[0].Actors[146];
+            extraBeachLeever1.Position = new vec16(-521, 30, 3094);
+            ActorUtils.FlattenPitchRoll(extraBeachLeever1); // uses crazy things
+            extraBeachLeever1.ChangeYRotation(270);
+            ActorUtils.SetActorSpawnTimeFlags(extraBeachLeever1);
+            extraBeachLeever1.ChangeActor(GameObjects.Actor.Leever, vars: 0xFF, modifyOld: true);
+            //extraBeachLeever1.OldName = "Leaver";
         }
 
 
@@ -4164,8 +4218,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.Tektite)) continue;
 
-                if (TestHardSetObject(GameObjects.Scene.CuccoShack, GameObjects.Actor.LargeWoodenCrate, GameObjects.Actor.Armos)) continue;
-                if (TestHardSetObject(GameObjects.Scene.CuccoShack, GameObjects.Actor.Treee, GameObjects.Actor.DekuBaba)) continue;
+                if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Scarecrow, GameObjects.Actor.BeanSeller)) continue;
+                if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Leever, GameObjects.Actor.DekuBaba)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Anju, GameObjects.Actor.StockpotBell)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
