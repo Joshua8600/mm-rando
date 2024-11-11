@@ -6413,11 +6413,14 @@ namespace MMR.Randomizer
                 progressReporter.ReportProgress(64, "Writing speedups...");
                 WriteSpeedUps(messageTable);
 
-                progressReporter.ReportProgress(65, "Writing enemies...");
+                //Enemies used to be here
+
+                progressReporter.ReportProgress(65, "Writing items...");
+                WriteItems(messageTable);
+
+                progressReporter.ReportProgress(66, "Writing enemies...");
                 ReadEnemies(outputSettings);
 
-                progressReporter.ReportProgress(66, "Writing items...");
-                WriteItems(messageTable);
 
                 progressReporter.ReportProgress(66, "Writing misc hacks...");
                 WriteMiscHacks();
