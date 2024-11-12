@@ -35,7 +35,7 @@ namespace MMR.Randomizer.Utils
             #if DEBUG
             string settingstring = $"{setting} + DEBUG BUILD\x00";
             #else
-            string settingstring = $"{setting} + Isghj's Actorizer Test 75.0\x00";
+            string settingstring = $"{setting} + Isghj's Actorizer Test 75.1\x00";
             #endif
             int f = GetFileIndexForWriting(veraddr);
             var file = RomData.MMFileList[f];
@@ -285,8 +285,8 @@ namespace MMR.Randomizer.Utils
                 //GameObjects.Scene.NorthClockTown.FileID() + 1, // room 0
                 //GameObjects.Scene.Grottos.FileID(),
                 //GameObjects.Scene.Grottos.FileID() + 1 + 4, // room 4 : regular chest grotto
-                GameObjects.Scene.MilkBar.FileID(),
-                GameObjects.Scene.MilkBar.FileID() + 1, // room 0 : main gameplay room
+                //GameObjects.Scene.MilkBar.FileID(),
+                //GameObjects.Scene.MilkBar.FileID() + 1, // room 0 : main gameplay room
 
                 // THESE TWO are the highest priority, huge imporovement 
                 38, // player overlay

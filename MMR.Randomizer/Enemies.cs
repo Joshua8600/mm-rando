@@ -978,7 +978,7 @@ namespace MMR.Randomizer
             ChangeHotwaterGrottoDekuBabaIntoSomethingElse(rng);
             FixCuccoChicks();
             FixWoodfallTempleGekkoMiniboss();
-            FixStreamSfxVolume();
+            //FixStreamSfxVolume();
             RepositionClockTownActors();
             ExpandGoronShineObjects();
             RandomlySwapOutZoraBandMember();
@@ -2764,6 +2764,8 @@ namespace MMR.Randomizer
             /// so here we change it back to the default sfx function almost all actors use to fix it
             /// we are lucky that the old and new function takes the same parameters, so we can change just the jal
             ///   decomp tells me there are no other changes needed to swap them
+
+            // except I now use a custom mmra actor to replace this so that they match water height, this now hits the wrong spot
 
             if (!ReplacementListContains(GameObjects.Actor.En_Stream)) return;
 
@@ -6335,7 +6337,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 75.0\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 75.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
