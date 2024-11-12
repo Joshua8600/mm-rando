@@ -293,6 +293,10 @@ namespace MMR.Randomizer.Utils
                 {
                     throw new Exception("Music: Filename is unparsable: " + filename);
                 }
+                catch (Exception e)
+                {
+                    throw new Exception("Music: could not read file: " + filename);
+                }
             }
         }
 
