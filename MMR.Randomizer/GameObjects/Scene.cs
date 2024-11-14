@@ -704,6 +704,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.Skulltula,
             Actor.BigPoe)] // for some reason big poe in the first room can cause camera to lock, unknown reason
         [EnemizerSceneEnemyReplacementBlock(Actor.Dexihand,
+            Actor.WoodenBarrel, // the wall version is the pirates fortress planks, can block the pots
             Actor.Bumper)] // can block the water channel
         [EnemizerSceneEnemyReplacementBlock(Actor.SkullFish,
             Actor.Desbreko)] // lag
