@@ -4848,8 +4848,18 @@ namespace MMR.Randomizer.GameObjects
         //[SwitchFlagsPlacement(size: 0xFF, shift: 8)] // not actually used by vanilla variants, we can ignore
         IkanaGravestone = 0x1E3, // Obj_Hakaisi
 
+        [ActorizerEnabled]
         [FileID(445)]
         [ObjectListIndex(0x1C7)]
+        [PlacementWeight(65)]
+        // params, 0x10 pulls extra cutscenes, 0x7 is height I think (code only checks for == 0 or == 1), but 2,3,4 are seen in snowhead
+        [GroundVariants(0x0, 0x10, 0x11, 0x12, 0x13, 0x14)] // we dont want to pull them, so not using vanilla params
+        [WaterBottomVariants(0x0, 0x10, 0x11, 0x12, 0x13, 0x14)] // because its silly
+        [SwitchFlagsPlacement(size: 0x7F, shift: 8)] // 0x7F00
+        [ForbidFromScene(Scene.SnowheadTemple, Scene.PiratesFortressExterior, Scene.StoneTowerTemple)]
+        [DynaAttributes(24,17)]
+        [BlockingVariantsAll]
+        [UnkillableAllVariants]
         GoronLinkPoundSwitch = 0x1E4, // Bg_Hakugin_Switch
 
         Empty1E5 = 0x1E5,
