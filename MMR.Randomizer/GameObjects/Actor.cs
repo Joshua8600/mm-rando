@@ -3055,7 +3055,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [FileID(270)]
         [ObjectListIndex(0x15D)]
-        [RemovalChance(80)]
+        [RemovalChance(45)]
         [GroundVariants(0)] // his placement is on the ground, cutscene?
         [VariantsWithRoomMax(max:0, variant:0)] // spawning behavior is weird and can spawn out of bounds
         //[OnlyOneActorPerRoom]
@@ -3906,6 +3906,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled] // AI gets confused, backwalks forever, pathing?
         [ActorInitVarOffset(0x445C)]
         [FileID(350)]
+        [RemovalChance(50)] // miniboss
         [ObjectListIndex(0x18D)]
         // params: 7x >> 6 is switch, 0x3F is unk
         [PathingVariants(0x700, 0x940)]
@@ -5668,7 +5669,7 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.SouthClockTown, Scene.MilkRoad, Scene.WestClockTown,
              Scene.Woodfall, Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.MountainVillage, Scene.MountainVillageSpring, Scene.Snowhead,
              Scene.GreatBayCoast, Scene.ZoraCape, Scene.IkanaCanyon, Scene.StoneTower, Scene.InvertedStoneTower)]
-        [PlacementWeight(65)]
+        [PlacementWeight(70)]
         //[EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // assumed dyna overflow
         OwlStatue = 0x223, // Obj_Warpstone
 
