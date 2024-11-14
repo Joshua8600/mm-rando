@@ -1481,7 +1481,8 @@ namespace MMR.Randomizer.Utils
                     var seqName = usedCombatSequence.Name;
                     log.AppendLine($"Combat sequence {seqName} was too big to match your BGM music, replacing ... ");
                     var combatSlot = RomData.TargetSequences.Find(u => u.Name == "mm-combat");
-                    Debug.Assert(combatSlot != null);
+                    if (combatSlot == null) // it was already removed, no reason to deal with it
+                        return;
                     usedCombatSequence.Replaces = -1; // cancel using this song
                     bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, combatSlot, rng, log);
                     if (status == false)
