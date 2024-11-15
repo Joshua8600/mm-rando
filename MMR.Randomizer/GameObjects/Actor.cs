@@ -2080,12 +2080,24 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)] // while the actor uses gamplaykeep, its just a spawner, and it spawns field stuff
         // 801, opening scene grass, 0x1FXX are ranch and TF
         // 0402 is ikana graveyard rock circle
+        // params: 0x3 is type, 0 is bush ring, 1 is bush scattered, 2 is rock circle
+        // 0x1F00 is the upper params passed to the lower mure/ishi, that's it?
+        //  for bush its the same alignemnt, for rock its right shifted 4
+        //  so 0x1F00 becomes the drop table
+        //  for rocks, we dont have access to 1 or 8 flag, so 0xF0 is used for item collectable, which is fine the table 10 isnt that useful
+        //  0x100 disables drops? that seems to be all its used for? wtf
+        //  so for both bushes and rocks, 0x1F00 is for item drop
         [CheckRestricted(Scene.IkanaGraveyard, variant:0x402, Item.ChestGraveyardGrotto)]
-        [GroundVariants(0x801, 0x1F02, 0x1F00, 0x0402,
-            0x600, // ikana graveyard
-            0x200 // mountain spring
+        [GroundVariants(0x801, // lost woods
+            0x1F02, // TF, road to ikana
+            0x1F00, // unused romani ranch grass
+            0x0402, 
+            0x600, 0x402, // ikana graveyard
+            0x200, // mountain spring
+            0x702, 0xC02, 0x802, 0x902, // non-vanilla rocks with health, magic, small money, and big money
+            0x100, 0xB00, 0xF00, 0x101, 0xB01, 0xF01 // non vanilla grass ring and cluster, added for variety
             )]
-        [WaterBottomVariants(0x0402)]
+        [WaterBottomVariants(0x0402)] // some rocks on the bottom is silly and safe
         [AlignedCompanionActor(Shiro, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0)] // shiro likes his rock friends
         [AlignedCompanionActor(BugsFishButterfly, CompanionAlignment.Above, ourVariant: -1,
@@ -6910,7 +6922,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [FlyingToGroundHeightAdjustment(100)]
         //[ForbidFromScene(Scene.TerminaField)] // do not remove original, esp with rupeeland coming soon
-        [PlacementWeight(60)]
+        [PlacementWeight(50)]
         Takkuri = 0x291, // En_Thiefbird
 
         //todo
