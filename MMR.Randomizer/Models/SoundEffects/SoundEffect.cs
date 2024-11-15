@@ -64,10 +64,19 @@ namespace MMR.Randomizer.Models.SoundEffects
         TatlHides = 0x205F,
 
         [Tags(Short, LowHpBeep)]
+        OcarinaGateOpen = 0x2067,
+
+        [Tags(Short, LowHpBeep)]
         FishFlop = 0x2069,
 
         [Tags(Short, LowHpBeep)]
+        BottleOpen = 0x206C,
+
+        [Tags(Short, LowHpBeep)]
         TatlAttacksDoor = 0x2072,
+
+        [Tags(Short)]
+        DropFall = 0x2072, // untested
 
         [Tags(Long)] // very long
         TreasureChestAppear = 0x207B,
