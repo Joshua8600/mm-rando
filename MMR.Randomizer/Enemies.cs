@@ -1465,8 +1465,7 @@ namespace MMR.Randomizer
                 var laundryPoolScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.LaundryPool.FileID());
                 var laundryPoolTorch = laundryPoolScene.Maps[0].Actors[2];
                 laundryPoolTorch.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 135, flags: 0x7F);
-                laundryPoolTorch.Rotation.x = 0x7F;
-                laundryPoolTorch.Rotation.z = 0x7F;
+                ActorUtils.SetActorSpawnTimeFlags(laundryPoolTorch);
                 //laundryPoolScene.Maps[0].Actors[1].Rotation.z = ActorUtils.MergeRotationAndFlags(rotation: laundryPoolScene.Maps[0].Actors[1].Rotation.z, flags: 0x7F);
 
                 // it was two torches, turn the other into a secret grotto, at least for now
@@ -3451,7 +3450,7 @@ namespace MMR.Randomizer
             {
                 int newIndex = newVariant & 0xF; // in vanilla the array is only 15 long
                 enemy.Rotation.x = ActorUtils.MergeRotationAndFlags(rotation: 0, flags: 0x7F);
-                enemy.Rotation.z = ActorUtils.MergeRotationAndFlags(rotation: newIndex, flags: 0x7F);//: enemy.Rotation.z);
+                enemy.Rotation.z = ActorUtils.MergeRotationAndFlags(rotation: newIndex, flags: 0x7F);
             }
         }
 
@@ -3782,16 +3781,17 @@ namespace MMR.Randomizer
         {
             /// people are complaining that in high sanity they need at least one place where they can get drops of some kind
 
-            GameObjects.Scene[] scenesToForce = new GameObjects.Scene[]{
-                GameObjects.Scene.TerminaField,
-                GameObjects.Scene.GreatBayCoast,
-                GameObjects.Scene.IkanaCanyon,
-                GameObjects.Scene.IkanaGraveyard 
+            (GameObjects.Scene sceneName, int count)[] scenesToForce = new (GameObjects.Scene sceneName, int count)[]{
+                (GameObjects.Scene.TerminaField,3),
+                (GameObjects.Scene.GreatBayCoast,2),
+                (GameObjects.Scene.IkanaGraveyard, 1),
+                (GameObjects.Scene.ZoraCape,1),
+                (GameObjects.Scene.RoadToIkana,1),
+                (GameObjects.Scene.RoadToSouthernSwamp,1),
+                (GameObjects.Scene.IkanaCanyon,1),
             };
 
-            if (ACTORSENABLED == true
-             //&& _randomized.Settings.LogicMode != Models.LogicMode.NoLogic // requested off to test
-             && scenesToForce.Contains(thisSceneData.Scene.SceneEnum))
+            bool AttemptBushPlacement()
             {
                 #if DEBUG
                 var debuggingActorList = thisSceneData.Actors;
@@ -3815,7 +3815,7 @@ namespace MMR.Randomizer
 
                 // find one actor that is either empty or standalone
                 // and ground variety
-                var replacementCandidates = firstRestrictions.FindAll(act =>   thisSceneData.StandaloneActors.Contains(act)
+                var replacementCandidates = firstRestrictions.FindAll(act => thisSceneData.StandaloneActors.Contains(act)
                                                                        || act.ActorEnum == GameObjects.Actor.Empty);
 
                 if (replacementCandidates.Count == 0) // did not find empty or standalone ground types we could replace
@@ -3845,7 +3845,7 @@ namespace MMR.Randomizer
                     }
 
                     var largestIndex = 0;
-                    for(int i = 0; i < bucketList.Count; i++)
+                    for (int i = 0; i < bucketList.Count; i++)
                     {
                         var newList = bucketList[i];
                         var oldList = bucketList[largestIndex];
@@ -3854,14 +3854,14 @@ namespace MMR.Randomizer
                             largestIndex = i;
                         }
                     }
-                    replacementCandidates = firstRestrictions.FindAll( act => act.ActorId == bucketList[largestIndex].type);
+                    replacementCandidates = firstRestrictions.FindAll(act => act.ActorId == bucketList[largestIndex].type);
                 }
 
                 if (replacementCandidates.Count == 0)//Debug.Assert(replacementCandidates.Count > 0);
                 {
                     thisSceneData.Log.AppendLine($"Could not place supply bush in scene [{thisSceneData.Scene.SceneEnum}]");
                     //throw new Exception("Could not place supply bush, please try another seed.");
-                    return;
+                    return false;
                 }
 
                 // change them to a bush containing things
@@ -3872,10 +3872,25 @@ namespace MMR.Randomizer
                            + $" where old actor was [{actorChoice.OldName}][{actorChoice.OldVariant.ToString("X4")}] ");
 
                 // dont need to modify old as this happens dead last
-                actorChoice.ChangeActor(GameObjects.Actor.NaturalPatchOfGrass, vars:0x0001, modifyOld: false);
+                actorChoice.ChangeActor(GameObjects.Actor.NaturalPatchOfGrass, vars: 0x0001, modifyOld: false);
                 actorChoice.Position.y += 50; // just in case the previous actor is more under the floor than exactly on the floor, bushes could fall through
-                actorChoice.Rotation.x = ActorUtils.MergeRotationAndFlags(rotation: 0, flags: 0x7F); // set to spawn all day all night every day
-                actorChoice.Rotation.z = ActorUtils.MergeRotationAndFlags(rotation: 0, flags: 0x7F); // set to spawn all day all night every day
+                ActorUtils.SetActorSpawnTimeFlags(actorChoice);
+
+                return true;
+            }
+
+
+            if (ACTORSENABLED == true)
+            {
+                var sceneSearch = scenesToForce.Where(tuple => tuple.sceneName == thisSceneData.Scene.SceneEnum).ToArray();
+                if (sceneSearch.Count() > 0)
+                {
+                    Debug.Assert(sceneSearch[0].count > 0);
+                    for(int i = 0; i < sceneSearch[0].count; i++)
+                    {
+                        AttemptBushPlacement();
+                    }
+                }
             }
         }
 
@@ -4060,8 +4075,7 @@ namespace MMR.Randomizer
                         randomChest.Variants[0] &= 0x0FFF; // changing type to switch to activate
                         randomChest.Variants[0] |= 0x3000;
                         // in case this actor's last slot only spawned at night or something stupid, set it to always spawn
-                        randomChest.Rotation.x = ActorUtils.MergeRotationAndFlags(randomChest.Rotation.x, 0x7F);
-                        randomChest.Rotation.z = ActorUtils.MergeRotationAndFlags(randomChest.Rotation.z, 0x7F);
+                        ActorUtils.SetActorSpawnTimeFlags(randomChest);
                         //switchChestFlag = usableSwitches[0]; // grab a usable switch flag
                         switchChestFlag = usableSwitches.Find(u => u == 0x66); // grab a usable switch flag
                         ActorUtils.SetActorSwitchFlags(randomChest, (short)switchChestFlag);
