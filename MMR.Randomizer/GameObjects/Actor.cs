@@ -1417,6 +1417,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.AstralObservatory, Scene.GoronTrial, Scene.LinkTrial,
             Scene.MajorasLair)] // we want them for the fight
         [UnkillableAllVariants]
+        [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)]
         [TreasureFlagsPlacement(mask: 0x1F, shift: 0)] // 0x3FC
         ClayPot = 0x82, // Obj_Tsubo
 
