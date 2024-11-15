@@ -1292,10 +1292,14 @@ namespace MMR.Randomizer
             var eastClockTownScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.EastClockTown.FileID());
 
             // TODO now that I have simple rotation functions, go through these and replace them
-            var treasurePoster = eastClockTownScene.Maps[0].Actors[20];
+            var treasurePoster = eastClockTownScene.Maps[0].Actors[20]; // east side
             treasurePoster.Rotation.y = ActorUtils.MergeRotationAndFlags(90, flags: treasurePoster.Rotation.y);
             treasurePoster.Rotation.x = ActorUtils.MergeRotationAndFlags(0, flags: treasurePoster.Rotation.x);
             ActorUtils.ClearActorRotationRestrictions(treasurePoster);
+            var treasurePosterNorth = eastClockTownScene.Maps[0].Actors[20]; // east side
+            treasurePosterNorth.Rotation.y = ActorUtils.MergeRotationAndFlags(180, flags: treasurePosterNorth.Rotation.y);
+            treasurePosterNorth.Rotation.x = ActorUtils.MergeRotationAndFlags(0, flags: treasurePosterNorth.Rotation.x);
+            ActorUtils.ClearActorRotationRestrictions(treasurePosterNorth);
             var constructionPoster = eastClockTownScene.Maps[0].Actors[17];
             constructionPoster.Rotation.y = ActorUtils.MergeRotationAndFlags(90, flags: constructionPoster.Rotation.y);
             constructionPoster.Rotation.x = ActorUtils.MergeRotationAndFlags(0, flags: constructionPoster.Rotation.x);
