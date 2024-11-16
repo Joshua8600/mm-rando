@@ -3426,6 +3426,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x1500)]
         [FileID(313)]
         [ObjectListIndex(0x172)]
+        [RemovalChance(75)] // people like bats
         [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT, Item.CollectableIkanaGraveyardDay2Bats1)]
         // what is the variant?
         [FlyingVariants(0xFF34, // big cluster
@@ -3439,6 +3440,7 @@ namespace MMR.Randomizer.GameObjects
         [DifficultVariants(0xFF34)]
         [VariantsWithRoomMax(max: 1, 0xFF34)] // swarm
         [FlyingToGroundHeightAdjustment(150)]
+        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // only the same bats would trigger, new bats wont trigger dampe and it just confuses people
         //[ForbidFromScene(Scene.IkanaGraveyard)] // need bats for dampe day 2 check
         // switch flags are only for the graveyard, no other version uses it
         // hardcoded to use only in that scene too, so canno't use for anything else without modifying
