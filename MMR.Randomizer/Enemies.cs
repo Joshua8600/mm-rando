@@ -6297,6 +6297,8 @@ namespace MMR.Randomizer
             SceneUtils.GetMapHeaders();
             SceneUtils.GetActors();
 
+            EnemizerEarlyFixes(seedrng); // before we randomize ; moved up
+
             ScanForMMRA(directory: "actors");
             InjectNewActors();
         }
@@ -6313,7 +6315,7 @@ namespace MMR.Randomizer
                     GameObjects.Scene.SakonsHideout // issue: the whole gaunlet is one long room, with two clear enemy room puzles
                     };// , GameObjects.Scene.DekuPalace };
 
-                EnemizerEarlyFixes(seedrng); // before we randomize
+                //EnemizerEarlyFixes(seedrng); // before we randomize ; moved up
 
                 var newSceneList = RomData.SceneList;
                 newSceneList.RemoveAll(scene => SceneSkip.Contains(scene.SceneEnum) );
