@@ -1028,6 +1028,28 @@ namespace MMR.Randomizer
 
         }
 
+        public static void EnemizerItemFixes()
+        {
+            // if itemizer changes something, we need to test first before actors are shuffled
+
+            // cows in the cow grotto are changed to entorch by zoey 
+            var grottosScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
+            var cowGrotto = grottosScene.Maps[10];
+            var cow1 = cowGrotto.Actors[3];
+            var cow2 = cowGrotto.Actors[7];
+
+            if (cow1.ActorEnum == GameObjects.Actor.GrottoChest)
+            {
+                // manually check if restrictions apply
+                var itemRestriction = ObjectIsCheckBlocked(grottosScene, cow1.ActorEnum);
+                if (itemRestriction == null)
+                {
+                    cow1.ChangeActor(GameObjects.Actor.Cow, vars: 0, modifyOld: true);
+                    cow2.ChangeActor(GameObjects.Actor.Cow, vars: 0, modifyOld: true);
+                }
+            }
+        }
+
         public static void EnemizerLateFixes()
         {
             /// changes after randomization, actors objects already written, at this point we can detect IF an actor was randomized
@@ -6459,7 +6481,7 @@ namespace MMR.Randomizer
                     GameObjects.Scene.SakonsHideout // issue: the whole gaunlet is one long room, with two clear enemy room puzles
                     };// , GameObjects.Scene.DekuPalace };
 
-                //EnemizerEarlyFixes(seedrng); // before we randomize ; moved up
+                EnemizerItemFixes(); // before we randomize ; moved up
 
                 var newSceneList = RomData.SceneList;
                 newSceneList.RemoveAll(scene => SceneSkip.Contains(scene.SceneEnum) );
@@ -6501,7 +6523,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 75.2 OrderTest\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 76.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

@@ -3426,6 +3426,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x1500)]
         [FileID(313)]
         [ObjectListIndex(0x172)]
+        [RemovalChance(75)] // people like bats
         [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT, Item.CollectableIkanaGraveyardDay2Bats1)]
         // what is the variant?
         [FlyingVariants(0xFF34, // big cluster
@@ -3439,6 +3440,7 @@ namespace MMR.Randomizer.GameObjects
         [DifficultVariants(0xFF34)]
         [VariantsWithRoomMax(max: 1, 0xFF34)] // swarm
         [FlyingToGroundHeightAdjustment(150)]
+        [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // only the same bats would trigger, new bats wont trigger dampe and it just confuses people
         //[ForbidFromScene(Scene.IkanaGraveyard)] // need bats for dampe day 2 check
         // switch flags are only for the graveyard, no other version uses it
         // hardcoded to use only in that scene too, so canno't use for anything else without modifying
@@ -6519,7 +6521,19 @@ namespace MMR.Randomizer.GameObjects
         [PathingTypeVarsPlacement(mask: 0x1F80, shift: 7)]
         // restrict if not
         [UnkillableAllVariants]
+        [RemovalChance(95)]
+        [EnemizerScenesPlacementBlock(Scene.MilkRoad)] // if they are put back in this area, they can crash if the boulder is removed (wrong location)
         [PlacementWeight(40)]
+        // companions: move to hard rock like things to pick at
+        [AlignedCompanionActor(IkanaGravestone, CompanionAlignment.InFront, ourVariant: -1, variant: 0xFF00, 0xFF02, 0xFF01)]
+        [AlignedCompanionActor(MagicSlab, CompanionAlignment.InFront, ourVariant: -1, variant: 0)]
+        [AlignedCompanionActor(Bumper, CompanionAlignment.InFront, ourVariant: -1, variant: 0)]
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.InFront, ourVariant: 0, variant: 0xFF20, 0xFF64, 0xFF78)]
+        [AlignedCompanionActor(IshiRock, CompanionAlignment.InFront, ourVariant: -1, variant: 0x0, 0x2000, 0x3000, 0x4000,0x7000, 0xC000, 0xE000, 0xF000, 0xD000,
+            0x8200, 0xA200, 0x6233, 0x623B, 0x6218, 0x625C)]
+        [AlignedCompanionActor(Bombiwa, CompanionAlignment.InFront, ourVariant: -1, variant: 0x807F, 0x8002, 0xE,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,0x0102, 0x103, 0x104, 0x105, 0x106,
+            0x101, 0x100,0x0114, 0x0115, 0x0116, 0x0117, 0x0118, 0x8003, 0x807F)]
         MilkroadCarpenter = 0x26A, // En_Daiku2
 
         [ActorizerEnabled]
@@ -6863,7 +6877,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
             variant: 7)] // fairy fountain
-        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         [AlignedCompanionActor(Butler, CompanionAlignment.InFront, ourVariant: -1, variant: 0x8000)]
         [OnlyOneActorPerRoom]
         ButlersSon = 0x289, // En_Nnh
