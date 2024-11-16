@@ -293,6 +293,10 @@ namespace MMR.Randomizer.Utils
                 {
                     throw new Exception("Music: Filename is unparsable: " + filename);
                 }
+                catch (Exception e)
+                {
+                    throw new Exception("Music: could not read file: " + filename);
+                }
             }
         }
 
@@ -471,7 +475,7 @@ namespace MMR.Randomizer.Utils
                 if (song.Instrument > 0x28 || customBankIncluded == 1)
                 {
                     song.Instrument = MARK_REQUIRES_NEW_BANK;
-                    foreach (var seq in song.SequenceBinaryList)
+                    foreach (var seq in song.SequenceBinaryList.FindAll(set => set.InstrumentSet != null))
                     {
                         seq.InstrumentSet.BankSlot = song.Instrument;
                     }
@@ -1477,7 +1481,8 @@ namespace MMR.Randomizer.Utils
                     var seqName = usedCombatSequence.Name;
                     log.AppendLine($"Combat sequence {seqName} was too big to match your BGM music, replacing ... ");
                     var combatSlot = RomData.TargetSequences.Find(u => u.Name == "mm-combat");
-                    Debug.Assert(combatSlot != null);
+                    if (combatSlot == null) // it was already removed, no reason to deal with it
+                        return;
                     usedCombatSequence.Replaces = -1; // cancel using this song
                     bool status = SearchForValidSongReplacement(cosmeticSettings, unassignedSequences, combatSlot, rng, log);
                     if (status == false)

@@ -40,12 +40,15 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1145)]
         [ClearEnemyPuzzleRooms(1, 2, 4)]
         [SceneInternalId(0x0C)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.CeilingSpawner,
+        [EnemizerSceneEnemyReplacementBlock(Actor.CeilingSpawner, // dripping water
             Actor.GBTFreezableWaterfall, // blocking platforming
             Actor.UnusedFallingBridge, // can void the player because it forces crushing with the ceiling
             Actor.UnusedStoneTowerPlatform, // same thing, should be disabled earlier but maybe it isnt
             Actor.UnusedStoneTowerStoneElevator, // can void the player because it forces crushing with the ceiling
             Actor.UnusedPirateElevator // can void the player because it forces crushing with the ceiling
+        )]
+        [EnemizerSceneEnemyReplacementBlock(Actor.Skulltula, // hanging near the ceiling
+            Actor.GBTFreezableWaterfall // blocking platforming
         )]
         [EnemizerSceneEnemyReplacementBlock(Actor.IronKnuckle,
             Actor.Hiploop, // hiploop dies if he touches water? happens in day 2 iron knuckle
@@ -80,6 +83,19 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1522)]
         [SceneInternalId(0x07)]
         [ClearEnemyPuzzleRooms(7, 13)] // 7:dodongo, 13:peahat
+        [EnemizerSceneBlockSensitive(Actor.DekuBabaWithered, -1)] // can block the chest
+        [EnemizerSceneBlockSensitive(Actor.DekuBaba, -1)] // this this is required to keep it off of withered as well
+        /* ****** GOSSIP GROTTO ACTORS ***** */
+        [EnemizerSceneBlockSensitive(Actor.Wolfos, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
+        [EnemizerSceneBlockSensitive(Actor.Snapper, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
+        [EnemizerSceneBlockSensitive(Actor.Leever, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
+        [EnemizerSceneBlockSensitive(Actor.Armos, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Wolfos,  Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper, Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Leever,  Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Armos,   Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
+        /* ********************************* */
+        [EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)] // chests under it in bomb grotto and hot spring grotto
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Peahat, // hidden or very weak enemies suck here, but they are very common in this slot
             Actor.Beamos, // beamos is just because bomb locking this check early is prime seed killer
             Actor.Bo, Actor.Leever, // annoying boring enemies, need to spawn like 10
@@ -97,19 +113,14 @@ namespace MMR.Randomizer.GameObjects
             Actor.Seagulls, // with new height adjust its basically invisible
             Actor.Hiploop// water causes instant death
         )]
-        [EnemizerSceneBlockSensitive(Actor.DekuBabaWithered, -1)] // can block the chest
-        [EnemizerSceneBlockSensitive(Actor.DekuBaba, -1)] // this this is required to keep it off of withered as well
-        [EnemizerSceneBlockSensitive(Actor.Wolfos, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
-        [EnemizerSceneBlockSensitive(Actor.Snapper, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
-        [EnemizerSceneBlockSensitive(Actor.Leever, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
-        [EnemizerSceneBlockSensitive(Actor.Armos, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
-        [EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)] // chests under it in bomb grotto and hot spring grotto
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BioDekuBaba,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // they can extend so far they can block the door leading out
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoldSkulltula,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can get the player locked behind them near the grotto stones
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
             Actor.GBTFreezableWaterfall, Actor.CursedSpiderMan)] // both can block the chest under the skulltula in lens cave
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.TallGrass,
+            Actor.Dodongo)] // if the dodongo spawns in one spawn location, he nudges the player as they fall into the grotto back into the exit
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HoneyComb,
             Actor.Seagulls, // weird
             Actor.UnusedFallingBridge, // might block ability to enter the grotto
@@ -693,6 +704,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.Skulltula,
             Actor.BigPoe)] // for some reason big poe in the first room can cause camera to lock, unknown reason
         [EnemizerSceneEnemyReplacementBlock(Actor.Dexihand,
+            Actor.WoodenBarrel, // the wall version is the pirates fortress planks, can block the pots
             Actor.Bumper)] // can block the water channel
         [EnemizerSceneEnemyReplacementBlock(Actor.SkullFish,
             Actor.Desbreko)] // lag
@@ -716,6 +728,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1409)]
         [SceneInternalId(0x4D)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
+            Actor.GibdoWell, Actor.GibdoWell)] // can stunlock at the door, doesnt stay down long enough
         GoronVillage = 0x4A,
 
         [FileID(1412)]

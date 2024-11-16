@@ -276,6 +276,7 @@ namespace MMR.Randomizer.Models.Rom
 
                 this.AllVariants = BuildVariantList(newActorType);
                 this.Variants = AllVariants.SelectMany(u => u).ToList();
+                this.ActorIdFlags &= ~0xE000; // the flags that specify that the actor should ignore rotations, thats going to be actor specific not spawn specific
             }
 
             if (Variants.Count == 0)
