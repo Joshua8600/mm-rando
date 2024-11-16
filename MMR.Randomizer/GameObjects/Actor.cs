@@ -4482,11 +4482,11 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Item.HeartPiecePictobox, Item.MundaneItemPictographContestBlueRupee, Item.MundaneItemPictographContestRedRupee)]
         [GroundVariants(0)] // he has LEGS :O
         //[VariantsWithRoomMax(0, 0)]
-        [ForbidFromScene(Scene.TouristCenter)]
+        //[ForbidFromScene(Scene.TouristCenter)]
         [UnkillableAllVariants]
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
-        [PlacementWeight(75)]
-        SwampTouristGuide = 0x1C5, // En_Shn
+        [PlacementWeight(50)]
+        SwampTouristGuide = 0x1C5, // En_Shn, // tingle daddy
 
         Empty1C6 = 0x1C6,
 
@@ -4723,15 +4723,21 @@ namespace MMR.Randomizer.GameObjects
         Giant = 0x1DB, // En_Giant
 
         [ActorizerEnabled]
-        [CheckRestricted(Scene.TwinIslands, variant: ActorConst.ANY_VARIANT,
-            Item.CollectablePathToGoronVillageWinterSmallSnowball1, Item.CollectablePathToGoronVillageWinterSmallSnowball2, Item.CollectablePathToGoronVillageWinterSmallSnowball3, //small
-            Item.CollectablePathToGoronVillageWinterLargeSnowball1, Item.CollectablePathToGoronVillageWinterLargeSnowball2, Item.CollectablePathToGoronVillageWinterLargeSnowball3, // large
-            Item.CollectablePathToGoronVillageWinterLargeSnowball4, Item.CollectablePathToGoronVillageWinterLargeSnowball5, Item.CollectablePathToGoronVillageWinterLargeSnowball6,
-            Item.CollectablePathToGoronVillageWinterLargeSnowball7, Item.CollectablePathToGoronVillageWinterLargeSnowball8, Item.CollectablePathToGoronVillageWinterLargeSnowball9,
-            Item.CollectablePathToGoronVillageWinterLargeSnowball10, Item.CollectablePathToGoronVillageWinterLargeSnowball11, Item.CollectablePathToGoronVillageWinterLargeSnowball12,
-            Item.CollectablePathToGoronVillageWinterLargeSnowball13, Item.CollectablePathToGoronVillageWinterLargeSnowball14,
-            Item.SongLullabyIntro
-        )]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x2E0E, Item.CollectablePathToGoronVillageWinterLargeSnowball1)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x300E, Item.CollectablePathToGoronVillageWinterLargeSnowball2)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x310E, Item.CollectablePathToGoronVillageWinterLargeSnowball3)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x330E, Item.CollectablePathToGoronVillageWinterLargeSnowball4)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x350E, Item.CollectablePathToGoronVillageWinterLargeSnowball5)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x280E, Item.CollectablePathToGoronVillageWinterLargeSnowball6)] // day 2
+        [CheckRestricted(Scene.TwinIslands, variant: 0x2A0E, Item.CollectablePathToGoronVillageWinterLargeSnowball7)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x2B0E, Item.CollectablePathToGoronVillageWinterLargeSnowball8)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x2C0E, Item.CollectablePathToGoronVillageWinterLargeSnowball9)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x200E, Item.CollectablePathToGoronVillageWinterLargeSnowball10)] // day 3
+        [CheckRestricted(Scene.TwinIslands, variant: 0x220E, Item.CollectablePathToGoronVillageWinterLargeSnowball11)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x230E, Item.CollectablePathToGoronVillageWinterLargeSnowball12)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x240E, Item.CollectablePathToGoronVillageWinterLargeSnowball13)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x250E, Item.CollectablePathToGoronVillageWinterLargeSnowball14)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x40E, Item.SongLullabyIntro)] // grandpa
         [CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
             Item.CollectableGoronVillageWinterLargeSnowball1, Item.CollectableGoronVillageWinterLargeSnowball2, // small
             Item.CollectableGoronVillageWinterLargeSnowball3, Item.CollectableGoronVillageWinterLargeSnowball4,
@@ -4908,7 +4914,7 @@ namespace MMR.Randomizer.GameObjects
         [CompanionActor(Flame, ourVariant: 0x300, variant: 0x3)]      // amy gets green flames
         // no scene exclusion necessary, get spawned by the poe sisters minigame but they aren't actors in the scene to be randomized
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // might block everything
-        [PlacementWeight(75)]
+        [PlacementWeight(70)]
         PoeSisters = 0x1E8, // En_Po_Sisters
 
         [EnemizerEnabled]
@@ -5056,15 +5062,9 @@ namespace MMR.Randomizer.GameObjects
         SwordsmanSchoolLog = 0x1F8, // En_Maruta
 
         [ActorizerEnabled]
-        [CheckRestricted(Scene.TwinIslands, variant: ActorConst.ANY_VARIANT,
-            Item.CollectablePathToGoronVillageWinterSmallSnowball1, Item.CollectablePathToGoronVillageWinterSmallSnowball2, Item.CollectablePathToGoronVillageWinterSmallSnowball3, //small
-            Item.CollectablePathToGoronVillageWinterLargeSnowball1, Item.CollectablePathToGoronVillageWinterLargeSnowball2, Item.CollectablePathToGoronVillageWinterLargeSnowball3, // large
-            Item.CollectablePathToGoronVillageWinterLargeSnowball4, Item.CollectablePathToGoronVillageWinterLargeSnowball5, Item.CollectablePathToGoronVillageWinterLargeSnowball6,
-            Item.CollectablePathToGoronVillageWinterLargeSnowball7, Item.CollectablePathToGoronVillageWinterLargeSnowball8, Item.CollectablePathToGoronVillageWinterLargeSnowball9,
-            Item.CollectablePathToGoronVillageWinterLargeSnowball10, Item.CollectablePathToGoronVillageWinterLargeSnowball11, Item.CollectablePathToGoronVillageWinterLargeSnowball12,
-            Item.CollectablePathToGoronVillageWinterLargeSnowball13, Item.CollectablePathToGoronVillageWinterLargeSnowball14,
-            Item.SongLullabyIntro
-        )]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x390E, Item.CollectablePathToGoronVillageWinterSmallSnowball1)] // ramp near tree grotto
+        [CheckRestricted(Scene.TwinIslands, variant: 0x360E, Item.CollectablePathToGoronVillageWinterSmallSnowball2)] // near west entrance
+        [CheckRestricted(Scene.TwinIslands, variant: 0x380E, Item.CollectablePathToGoronVillageWinterSmallSnowball3)] // near tingle
         [CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
             Item.CollectableGoronVillageWinterLargeSnowball1, Item.CollectableGoronVillageWinterLargeSnowball2, // small
             Item.CollectableGoronVillageWinterLargeSnowball3, Item.CollectableGoronVillageWinterLargeSnowball4,

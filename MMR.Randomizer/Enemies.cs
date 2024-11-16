@@ -617,6 +617,21 @@ namespace MMR.Randomizer
                             continue;
                         }
 
+                        var itemRestriction = ObjectIsCheckBlocked(scene, mapActor.ActorEnum, mapActor.OldVariant);
+                        if (itemRestriction != null ) // && variant for this limitation is not ANYTHIng
+                        {
+
+                            #if DEBUG
+                            var itemText = $"blocked by item [{ itemRestriction }]";
+                            #else
+                            var itemText = $"blocked by item [{ (int) itemRestriction}]";
+                            #endif
+
+                            log.AppendLine($" in scene (O!) [{scene.SceneEnum}]m[{mapIndex}]r[{mapActor.RoomActorIndex}]v[{mapActor.OldVariant.ToString("X4")}]" +
+                                $" actor: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] was " + itemText);
+                            continue;
+                        }
+
                         if (listOfAcceptableVariants.Contains(mapActor.OldVariant)) // regular actors
                         {
                             FixActorLastSecond(mapActor, matchingEnemy, mapIndex, actorIndex);
@@ -1005,6 +1020,7 @@ namespace MMR.Randomizer
             SwapIntroSeth();
             SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
+            FreeUpTwinIslandsSnowballs();
 
             EnableAllCreditsCutScenes();
 
@@ -3378,6 +3394,15 @@ namespace MMR.Randomizer
             ranchScene.Maps[2].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
         }
 
+        private static void FreeUpTwinIslandsSnowballs()
+        {
+            /// issue: we can't randomize all of them most of the time
+            /// but, there are three objects here, snowball, tektite, and snapper, which dont exist if we remove the snowballs anyway
+
+            var twinislandsScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TwinIslands.FileID());
+            twinislandsScene.Maps[0].Objects[4] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // snapper
+        }
+
         private static void DistinguishLogicRequiredDekuFlowers()
         {
             // for objectless actorizer, some deku flowers must be held back because they require logic, but all deku flowers use the same params
@@ -4233,13 +4258,13 @@ namespace MMR.Randomizer
                     return false;
                 }
                 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronLinkPoundSwitch)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronLinkPoundSwitch)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.GoronSGoro)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
-                if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
-                if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Scarecrow, GameObjects.Actor.BeanSeller)) continue;
-                if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Leever, GameObjects.Actor.DekuBaba)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Scarecrow, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Leever, GameObjects.Actor.DekuBaba)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Anju, GameObjects.Actor.StockpotBell)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
@@ -6357,7 +6382,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 75.1\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 75.2 OrderTest\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
