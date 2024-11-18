@@ -1299,6 +1299,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.WoodfallTemple, variant: 0x4E02, Item.CollectableWoodfallTempleGekkoRoomPot2)]
         [CheckRestricted(Scene.WoodfallTemple, variant: 0x5002, Item.CollectableWoodfallTempleGekkoRoomPot3)]
         [CheckRestricted(Scene.WoodfallTemple, variant: 0x5202, Item.CollectableWoodfallTempleGekkoRoomPot4)]
+        [CheckRestricted(Scene.WoodfallTemple, variant: 0x3811, Item.CollectibleStrayFairyWoodfall13)]
         [CheckRestricted(Scene.MountainVillage, variant: ActorConst.ANY_VARIANT, Item.CollectableMountainVillageWinterPot1)]
         [CheckRestricted(Scene.MountainVillageSpring, variant: ActorConst.ANY_VARIANT, Item.CollectableMountainVillageSpringPot1)]
         [CheckRestricted(Scene.GoronShrine, variant: ActorConst.ANY_VARIANT,
