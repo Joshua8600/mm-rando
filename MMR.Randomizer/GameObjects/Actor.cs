@@ -274,7 +274,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(119)]
         [ObjectListIndex(0x2)]
         // 1 and 2 are vanilla on the moon, 0 is set in init if -1 is params, types unknown
-        [GroundVariants(0, 1, 2)]
+        [FlyingVariants(0, 1, 2)]
         [FlyingToGroundHeightAdjustment(100)] // does this even work properly like this? might have to make the separate actor
         [UnkillableAllVariants]
         Butterfly = 0x15, // En_Butte
@@ -4699,6 +4699,7 @@ namespace MMR.Randomizer.GameObjects
         // params: switch flag(xFF0) and item used(0xF)
         // 8 is bigpo, 0 is blue pot, 7 is hot spring, 9 is milk
         [GroundVariants(1, 2, 3, 4, 5, 6)]
+        [VariantsWithRoomMax(max:1, 1, 2, 3, 4, 5, 6)]
         [RespawningAllVariants] // only to stop them from showing up in places where you need to kill them, since its a hastle
         [ForbidFromScene(Scene.BeneathTheWell, Scene.IkanaCanyon)]
         [EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.Grottos,
@@ -5908,6 +5909,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Item.MaskGibdo)]
         [PathingVariants(0, 0x81, 0x82, 0x83, 0x84, 0x85)]
         [PathingTypeVarsPlacement(mask:0xFF00, shift:8)]
+        [VariantsWithRoomMax(max:1, variant: 0, 0x81, 0x82, 0x83, 0x84, 0x85)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         //[ForbidFromScene(Scene.IkanaCanyon)] // dont replace the train
