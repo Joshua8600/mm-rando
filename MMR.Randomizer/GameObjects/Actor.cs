@@ -5966,16 +5966,19 @@ namespace MMR.Randomizer.GameObjects
         [PlacementWeight(75)]
         Tijo = 0x238, // En_Zod // drummer zora band member
 
-        //[ActorizerEnabled]
+        [ActorizerEnabled]
         [FileID(528)]
         [ObjectListIndex(0x263)]
-        [WallVariants(0xFF)]
+        [CheckRestricted(Item.MundaneItemLotteryPurpleRupee)]
+        // no params exist, another case of mystery 0xFF
+        [WallVariants(0x0)]
         [GroundVariants(0xFF)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
-        [ForbidFromScene(Scene.LotteryShop)]
+        //[ForbidFromScene(Scene.LotteryShop)]
         // not working??
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0144)] // lottery music
+        [RemovalChance(70), PlacementWeight(5)]
         LotteryKiosk = 0x239, // En_Kujiya
 
         [ActorizerEnabled]
@@ -5988,7 +5991,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(Scene.MilkRoad)] // he can detect keg and try to talk to you about it, also small bombs I bet
         [UnkillableAllVariants]
-        [PlacementWeight(80)]
+        [PlacementWeight(70)]
         GoronWithGeroMask = 0x23A, // En_Geg : HungryGoron, sirloin goron, "Hugo"
 
         [ActorizerEnabled]
