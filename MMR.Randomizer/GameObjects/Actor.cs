@@ -2339,7 +2339,12 @@ namespace MMR.Randomizer.GameObjects
         [FileID(178)]
         [ObjectListIndex(0x127)]
         [CheckRestricted(Item.MaskTruth)]
-        [FlyingVariants(0x0)]
+        // vanilla is 0, 0xF is only parameter, used to make them smaller (children from oot, where MM version is "father" size)
+        [CeilingVariants(0x00, // vanilla in swamp spiderhouse
+            0x0F // non-vanilla, vanilla in code, for smaller child
+        )]
+        [VariantsWithRoomMax(max: 5, variant: 0x0F)]
+        [VariantsWithRoomMax(max: 1, variant: 0x0)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         CursedSpiderMan = 0xD4, // En_Ssh
