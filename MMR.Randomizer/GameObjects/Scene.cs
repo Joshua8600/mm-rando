@@ -708,6 +708,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Bumper)] // can block the water channel
         [EnemizerSceneEnemyReplacementBlock(Actor.SkullFish,
             Actor.Desbreko)] // lag
+        [EnemizerSceneEnemyReplacementBlock(Actor.Wart,
+            Actor.Hiploop)] // instant kill on water
         [FairyDroppingEnemies(roomNumber: 8, actorNumber: 7)] // skulltula in first room
         [EnemizerSceneBlockSensitive(Actor.Dexihand, -1)]
         GreatBayTemple = 0x46,
@@ -847,6 +849,8 @@ namespace MMR.Randomizer.GameObjects
         [ClearEnemyPuzzleRooms(2, 3, 4, 5)] // the miniboss rooms
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CeilingSpawner,
             Actor.Shabom)] // report of them not spawning or falling out of bounds and softlock
+        [EnemizerSceneEnemyReplacementBlock(Actor.Wart,
+            Actor.Hiploop)] // instant kill on water
         SecretShrine = 0x5D,
 
         [FileID(1466)]

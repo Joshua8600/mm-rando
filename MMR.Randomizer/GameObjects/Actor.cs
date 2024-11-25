@@ -4454,6 +4454,7 @@ namespace MMR.Randomizer.GameObjects
             0x100, 0x101)] // talking spots I think
         [VariantsWithRoomMax(max:0, variant:0x101, 0x100)] // doesn't spawn correctly
         [UnkillableAllVariants]
+        [RemovalChance(80), PlacementWeight(50)]
         GreatBayFisherman = 0x1C2, // En_Tsn
 
         //[ActorizerEnabled] // we have a better version as a custom actor now, less stupid
@@ -6002,8 +6003,7 @@ namespace MMR.Randomizer.GameObjects
             0xA, 0xB, 0xC, 0xD, 0xE, 0xF,
             0x10, 0x11, 0x12, 0x13, 0x19, 0x1A, 0x1B, 0x1C, 0x1D, 0x1F, 
             0x7F)]
-        //[VariantsWithRoomMax(max:0, variant:0x7F)]
-        [OnlyOneActorPerRoom]
+        [OnlyOneActorPerRoom] // dont waste too many spots
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
         [PlacementWeight(60)] // dont waste too many spots
