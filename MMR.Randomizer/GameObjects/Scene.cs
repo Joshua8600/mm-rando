@@ -162,9 +162,9 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedStoneTowerPlatform // so long, and at the right angle, can block the center ladder
         )]
         [EnemizerSceneBlockSensitive(Actor.PatrollingPirate,
-            0x14EA, // bottom of ladder
-            0x18EA, // bridge to chest room
-            0xEA)] // top of ladder -> bridge
+            22, // vars: 0x14EA bottom of ladder
+            23, // vars: 0x18EA bridge to chest room
+            17)] // vars: 0xEA top of ladder -> bridge
         PiratesFortress = 0x11,
 
         [FileID(1173)]
@@ -540,8 +540,8 @@ namespace MMR.Randomizer.GameObjects
         [DynaHeadroom(250, 250, room: 1)] // 342, X was too big, limit not found (annoying to test)
         //[DynaHeadroom(16,12, room:0)] // we know 16/12 is safe, that might be too conservative
         [EnemizerSceneBlockSensitive(Actor.SquareSign,
-            0x21, // too close to fisherman door
-            0x23)] // too close to lab door
+            150, // vars: 0x21, too close to fisherman door
+            152)] // vars: 0x23, too close to lab door
         [EnemizerSceneEnemyReplacementBlock(Actor.Seagulls,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can stop ting from falling
         GreatBayCoast = 0x34,

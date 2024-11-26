@@ -48,17 +48,17 @@ namespace MMR.Randomizer.Attributes
     class EnemizerSceneBlockSensitiveAttribute : Attribute
     {
         public GameObjects.Actor OriginalEnemy { get; private set; }
-        public List<int> SpecificVariants { get; private set; }
+        public List<int> SpecificMapIndexes { get; private set; }
 
-        public EnemizerSceneBlockSensitiveAttribute(GameObjects.Actor originalEnemy, int blockedReplacement, params int[] blockedReplacements)
+        public EnemizerSceneBlockSensitiveAttribute(GameObjects.Actor originalEnemy, int blockedIndex, params int[] blockedIndexes)
         {
             OriginalEnemy = originalEnemy;
-            var blockedEnemies = new List<int>() { blockedReplacement };
-            if (blockedReplacements.Length > 0)
+            var blockedEnemies = new List<int>() { blockedIndex };
+            if (blockedIndexes.Length > 0)
             {
-                blockedEnemies.AddRange(blockedReplacements);
+                blockedEnemies.AddRange(blockedIndexes);
             }
-            SpecificVariants = blockedEnemies;
+            SpecificMapIndexes = blockedEnemies;
         }
     }
 

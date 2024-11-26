@@ -538,7 +538,8 @@ namespace MMR.Randomizer
                 // TODO: type lookup is not always accurate
                 mapActor.Type = matchingEnemy.GetType(mapActor.OldVariant);
                 mapActor.AllVariants = Actor.BuildVariantList(matchingEnemy);
-                mapActor.Blockable = mapActor.ActorEnum.IsBlockable(scene.SceneEnum, mapActor.RoomActorIndex);
+                //mapActor.Blockable = mapActor.ActorEnum.IsBlockable(scene.SceneEnum, mapActor.RoomActorIndex);
+                mapActor.UpdateBlockable(scene.SceneEnum);
             }
 
             bool SpecialMultiObjectCases(Actor targetActor, int mapIndex, int actorIndex)
@@ -1124,7 +1125,7 @@ namespace MMR.Randomizer
             linkTrialScene.Maps[1].Actors[0].Position.y = 1; // up high dinofos spawn, red bubble would spawn in the air, lower to ground
 
             var piratesFortressCourtyardScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.PiratesFortress.FileID());
-            piratesFortressCourtyardScene.Maps[0].Actors[17].Position.x = 1267;
+            piratesFortressCourtyardScene.Maps[0].Actors[17].Position.x = 1267; // the pirate at the top of ladder, needs to be moved further into the bridge
             piratesFortressCourtyardScene.Maps[0].Actors[17].Position.y = 319;
             piratesFortressCourtyardScene.Maps[0].Actors[20].Position.y = -200; // too high, can cause bombchu to explode
 
@@ -4286,8 +4287,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
-                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Scarecrow, GameObjects.Actor.BeanSeller)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Leever, GameObjects.Actor.DekuBaba)) continue;
+                if (TestHardSetObject(GameObjects.Scene.PiratesFortress, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.Japas)) continue;
+                if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.SquareSign, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Anju, GameObjects.Actor.StockpotBell)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
@@ -5029,7 +5030,10 @@ namespace MMR.Randomizer
                         if (cObj != 1 // gameplay keep is everywhere
                             && cObj != actor.ObjectId // we share the same object we can assure it exists
                             && !thisSceneData.Objects.Contains(cObj)) // the scene's replacement objects will have our required object
+                        {
+                            // TODO: this companion checks for scene objects but scene objects is shifting, is it too early?
                             continue;
+                        }
 
                         var companionType = companion.Companion;
                         // if its banned on this actor slot, also avoid

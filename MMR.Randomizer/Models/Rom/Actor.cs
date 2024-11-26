@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
+using MMR.Randomizer.Attributes;
 
 namespace MMR.Randomizer.Models.Rom
 {
@@ -714,6 +715,33 @@ namespace MMR.Randomizer.Models.Rom
             return 100; // default
         }
 
+        public void UpdateBlockable(GameObjects.Scene scene)
+        {
+            /// moving from actor extension
+            /// checks if a specific actor in a scene at scene read time is blockable
 
+            // quickly check if the scene cares
+            var sceneBlockingConditions = scene.GetAttributes<EnemizerSceneBlockSensitiveAttribute>().ToList();
+
+            var validCondition = sceneBlockingConditions.Find(actor => actor.OriginalEnemy == this.ActorEnum);
+            if (validCondition != null)
+            {
+                /// this scene has this actor as a block statement
+                if (validCondition.SpecificMapIndexes.Count == 1 && validCondition.SpecificMapIndexes[0] == -1) // -1 meaning we dont care
+                {
+                    this.Blockable = false;
+                    return;
+                }
+                // else, check if this is one of the blocked positions specifically listed
+                var sensitivePositions = validCondition.SpecificMapIndexes;
+                if (sensitivePositions.Contains(this.RoomActorIndex))
+                {
+                    this.Blockable = false;
+                    return;
+                }
+            }
+
+            this.Blockable = true; // no block reasons listed, all conditions cleared
+        }
     }
 }
