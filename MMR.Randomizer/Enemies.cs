@@ -409,7 +409,8 @@ namespace MMR.Randomizer
         private static void PrepareJunkHeartPieces()
         {
             // if not casual logic, we want to add these since those crazy people think hearts are junk
-            if (_randomized.Settings.LogicMode != Models.LogicMode.Casual)
+            if (((_randomized.Settings.VictoryMode & Models.VictoryMode.Hearts) == 0) // hearts are NOT required win condition
+               && (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic || _randomized.Settings.LogicMode == Models.LogicMode.Glitched))
             {
                 var heartPieces = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.PiecesOfHeart).Select(itemObj => itemObj.Item).ToList();
                 ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.PiecesOfHeart].AddRange(heartPieces);
