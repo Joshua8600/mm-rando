@@ -216,6 +216,11 @@ namespace MMR.Randomizer.GameObjects
             Actor.PatrollingPirate)] // casual, causes a need for stone mask to procede through the temple
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CeilingSpawner,
            Actor.Shabom)] // can clip through the ceiling becoming impossible to attack
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ClayPot, // these are up above the area when fighing lava ceiling wizrobe
+           Actor.Poe, Actor.Armos,
+            //Actor.Freezard, Actor.Deatharmos, // loud enough you can aleast know they are there
+            Actor.DekuBaba, Actor.DeathArmos, Actor.Beamos,
+            Actor.Bo, Actor.ChuChu, Actor.Leever)] // don't automatically agro, so its hard to reach them
         InvertedStoneTowerTemple = 0x15,
 
         [FileID(1203)]

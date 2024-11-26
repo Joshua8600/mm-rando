@@ -663,7 +663,7 @@ namespace MMR.Randomizer
                                 continue; // not valid to consider this actor
 
                             var itemRestriction = ObjectIsCheckBlocked(scene, mapActor.ActorEnum, mapActor.OldVariant);
-                            var chanceOfRandomization = (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic) ? (80) : (40);
+                            var chanceOfRandomization = (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic) ? (90) : (60);
                             // if common scoopable actor, some are allowed but not all, for now lets make it random
                             if (itemRestriction != null && (commonScoopableActors.Contains(mapActor.OldActorEnum)
                                 && itemRestriction.ToString().Contains("BottleCatch")
@@ -1142,6 +1142,12 @@ namespace MMR.Randomizer
                 var torchRotation = dekuPalaceScene.Maps[2].Actors[26].Rotation.z;
                 torchRotation = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: torchRotation); // reverse, so replacement isn't nose into the wall
 
+                // torch near the hp is facing the wall, actors replacing it also face the same way, bad
+                // one of these is not required and does nothing
+                dekuPalaceScene.Maps[2].Actors[25].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: 0x7F);
+                //dekuPalaceScene.Maps[2].Actors[26].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: dekuPalaceScene.Maps[2].Actors[26].Rotation.y);
+
+
                 // change the torch in pirates fort exterior to all day, remove second one, or free 
                 var piratesExteriorScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.PiratesFortressExterior.FileID());
                 var nightTorch = piratesExteriorScene.Maps[0].Actors[15];
@@ -1536,19 +1542,30 @@ namespace MMR.Randomizer
                 elf6grotto.Position = new vec16(-5539, -275, -701);
                 elf6grotto.ChangeActor(GameObjects.Actor.GrottoHole, vars: hiddenGrottos[seedrng.Next(hiddenGrottos.Count)], modifyOld: true);
 
-                // one of the torches in palace is facing into the wall, actors replacing it also face the same way, bad
-                // one of these is not required and does nothing
-                var dekuPalaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DekuPalace.FileID());
-                dekuPalaceScene.Maps[2].Actors[25].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: 0x7F);
-                dekuPalaceScene.Maps[2].Actors[26].Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: dekuPalaceScene.Maps[2].Actors[26].Rotation.y);
+                Scene dekuPalaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DekuPalace.FileID());
+                ActorUtils.SetActorSpawnTimeFlags(dekuPalaceScene.Maps[2].Actors[25]); // set other torch to always spawn, you wont notice the night one missing
+                var freeTorch = dekuPalaceScene.Maps[2].Actors[26];
+                freeTorch.ChangeActor(GameObjects.Actor.GrottoHole, vars: hiddenGrottos[seedrng.Next(hiddenGrottos.Count)], modifyOld: true);
+                ActorUtils.SetActorSpawnTimeFlags(freeTorch);
+                freeTorch.Position = new vec16(24, -12, 675);
 
-                // goron underwater mode
-                // this has been superseeded by Zoeys underwater code instead, which should be better
-                //var playerFile = RomData.MMFileList[GameObjects.Actor.Player.FileListIndex()].Data;
-                // changes made to function func_8083BB4C
-                //ReadWriteUtils.Arr_WriteU32(playerFile, Dest: 0xE20C, val: 0x00000000); // 80834140 -> NOP
-                //ReadWriteUtils.Arr_WriteU32(playerFile, Dest: 0xE214, val: 0x00000000); // 
-                //ReadWriteUtils.Arr_WriteU32(playerFile, Dest: 0xE220, val: 0x00000000); //
+                var newJpGrotto = dekuPalaceScene.Maps[0].Actors[9];
+                newJpGrotto.ChangeActor(GameObjects.Actor.GrottoHole, vars: 0x8000, modifyOld: true);
+                ActorUtils.SetActorSpawnTimeFlags(newJpGrotto);
+                newJpGrotto.Position = new vec16(1873, 1, 711);
+
+                // grotto entrance list is extra, lets add some
+                var sickEntrances = new List<ushort>() {
+                    0x5050, 0xAE50, 0xC410, 0xC800, 0xD2A0, 0xBC40,
+                    0xC050, 0x2290, 0x22A0, 0x22B0, 0x0C60, 0x10, 0x2C10, 0x3440, 0x54B0
+                };
+                var doorAnaData = RomData.MMFileList[GameObjects.Actor.GrottoHole.FileListIndex()].Data;
+                var firstPullLocation = seedrng.Next(sickEntrances.Count);
+                var entrance1 = sickEntrances[firstPullLocation];
+                sickEntrances.RemoveAt(firstPullLocation);
+                var entrance2 = sickEntrances[seedrng.Next(sickEntrances.Count)];
+                ReadWriteUtils.Arr_WriteU16(doorAnaData, 0x60A, entrance1); // E
+                ReadWriteUtils.Arr_WriteU16(doorAnaData, 0x60C, entrance2); // F
 
                 if (seedrng.Next() % 10 >= 5)
                 {
@@ -1657,6 +1674,8 @@ namespace MMR.Randomizer
             RomUtils.CheckCompressed(GameObjects.Actor.BigPoe.FileListIndex());
             var biopoData = RomData.MMFileList[GameObjects.Actor.BigPoe.FileListIndex()].Data;
             biopoData[0x3A14] |= 0x80; // set the 0x80000000 actor flag to enabled red dot on the minimap
+
+
 
 
             //LightShinanigans();
@@ -6409,7 +6428,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 76.0\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 77.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

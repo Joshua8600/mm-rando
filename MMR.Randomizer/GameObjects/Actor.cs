@@ -1010,11 +1010,15 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x0, 0x2000, 0x3000, 0x4000, // stone grottos
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
+            0xE000,
+            0xE200, 0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [VariantsWithRoomMax(max: 1,
             0x0, 0x2000, 0x3000, 0x4000, // stone grottos
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
+            0xE000,
+            0xE200, 0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [UnkillableAllVariants]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
@@ -1025,6 +1029,10 @@ namespace MMR.Randomizer.GameObjects
             variant: 0xA1, 0xFE01)] // everyone loves a good hidden grotto under a rock
         [AlignedCompanionActor(WoodenBarrel, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x8710, 0x8711, 0x7F3F)] // everyone loves a good hidden grotto under a... a cardboard box?
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1,
+            variant: 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)] // everyone loves a good hidden grotto under a... a cardboard box?
+        [AlignedCompanionActor(UnusedStoneTowerStoneElevator, CompanionAlignment.OnTop, ourVariant: -1,
+            variant: 0)] // everyone loves a good hidden grotto under a... a cardboard box?
         [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
         //[ForbidFromScene(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead,
         //    Scene.TerminaField)]
@@ -1909,6 +1917,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0, variant: 0x01)] // TODO try making version without paths as mmra
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.SouthernSwamp)]
+        [RemovalChance(80)]
         SwampBoat = 0xA7, // Bg_Ingate
 
         [ActorizerEnabled]
