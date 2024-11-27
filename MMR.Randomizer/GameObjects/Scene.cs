@@ -162,9 +162,9 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedStoneTowerPlatform // so long, and at the right angle, can block the center ladder
         )]
         [EnemizerSceneBlockSensitive(Actor.PatrollingPirate,
-            0x14EA, // bottom of ladder
-            0x18EA, // bridge to chest room
-            0xEA)] // top of ladder -> bridge
+            22, // vars: 0x14EA bottom of ladder
+            23, // vars: 0x18EA bridge to chest room
+            17)] // vars: 0xEA top of ladder -> bridge
         PiratesFortress = 0x11,
 
         [FileID(1173)]
@@ -216,6 +216,11 @@ namespace MMR.Randomizer.GameObjects
             Actor.PatrollingPirate)] // casual, causes a need for stone mask to procede through the temple
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CeilingSpawner,
            Actor.Shabom)] // can clip through the ceiling becoming impossible to attack
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ClayPot, // these are up above the area when fighing lava ceiling wizrobe
+           Actor.Poe, Actor.Armos,
+            //Actor.Freezard, Actor.Deatharmos, // loud enough you can aleast know they are there
+            Actor.DekuBaba, Actor.DeathArmos, Actor.Beamos,
+            Actor.Bo, Actor.ChuChu, Actor.Leever)] // don't automatically agro, so its hard to reach them
         InvertedStoneTowerTemple = 0x15,
 
         [FileID(1203)]
@@ -540,8 +545,8 @@ namespace MMR.Randomizer.GameObjects
         [DynaHeadroom(250, 250, room: 1)] // 342, X was too big, limit not found (annoying to test)
         //[DynaHeadroom(16,12, room:0)] // we know 16/12 is safe, that might be too conservative
         [EnemizerSceneBlockSensitive(Actor.SquareSign,
-            0x21, // too close to fisherman door
-            0x23)] // too close to lab door
+            150, // vars: 0x21, too close to fisherman door
+            152)] // vars: 0x23, too close to lab door
         [EnemizerSceneEnemyReplacementBlock(Actor.Seagulls,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can stop ting from falling
         GreatBayCoast = 0x34,
@@ -708,6 +713,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Bumper)] // can block the water channel
         [EnemizerSceneEnemyReplacementBlock(Actor.SkullFish,
             Actor.Desbreko)] // lag
+        [EnemizerSceneEnemyReplacementBlock(Actor.Wart,
+            Actor.Hiploop)] // instant kill on water
         [FairyDroppingEnemies(roomNumber: 8, actorNumber: 7)] // skulltula in first room
         [EnemizerSceneBlockSensitive(Actor.Dexihand, -1)]
         GreatBayTemple = 0x46,
@@ -847,6 +854,8 @@ namespace MMR.Randomizer.GameObjects
         [ClearEnemyPuzzleRooms(2, 3, 4, 5)] // the miniboss rooms
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CeilingSpawner,
             Actor.Shabom)] // report of them not spawning or falling out of bounds and softlock
+        [EnemizerSceneEnemyReplacementBlock(Actor.Wart,
+            Actor.Hiploop)] // instant kill on water
         SecretShrine = 0x5D,
 
         [FileID(1466)]

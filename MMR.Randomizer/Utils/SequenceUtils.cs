@@ -530,8 +530,14 @@ namespace MMR.Randomizer.Utils
 
                         // read categories file
                         ZipArchiveEntry categoriesFileEntry = zip.GetEntry("categories.txt");
-                        if (categoriesFileEntry == null) { 
-                            throw new Exception($"ERROR: cannot find a categories file for {currentSong.Name}");
+                        if (categoriesFileEntry == null) {
+                            // we should have folder detecting code here
+                            var entry = zip.Entries.First(e => e.FullName.Contains("/"));
+                            if (entry != null)
+                            {
+                                throw new Exception($"ERROR: cannot find categories.txt, mmrs contains folder?\n mmrs elements need to be in base of zip, not inside of folder");
+                            }
+                            throw new Exception($"ERROR: cannot find a categories.txt for {currentSong.Name}");
                         }
 
                         ScanMMRSCategories(currentSong, categoriesFileEntry);
