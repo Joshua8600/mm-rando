@@ -2556,10 +2556,16 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x2D60)]
         [FileID(223)]
         [ObjectListIndex(0x142)]
-        // 0x0042 is swinging from tree, looks stupid if spawns in the ground,
-        // 0x0022 is sitting on the edge of a bookcase, looks weird on the ground
-        [PerchingVariants(0x42, 0x22)]
-        [GroundVariants(0x0032)] // 0x32: sitting around the fire
+        // params; 0xF0 is type, four values, 4,3,2 and else, else is never used in-game
+        //  0xF parameter space is not used in vanilla code, its a dummy variable
+        [PerchingVariants(
+            0x42, // is swinging from tree, looks stupid if spawns in the ground,
+            0x22 // is sitting on the edge of a bookcase, looks weird on the ground
+        )]
+        [GroundVariants(
+            0x00, // type zero is never used in vanilla but seems to work fine
+            0x0032 // 0x32: sitting around the fire
+        )]
         [CompanionActor(Flame, ourVariant: -1, variant: 0x7F4)] // they like fire in this game
         [ForbidFromScene(Scene.IkanaGraveyard, Scene.OceanSpiderHouse)]
         [UnkillableAllVariants]
