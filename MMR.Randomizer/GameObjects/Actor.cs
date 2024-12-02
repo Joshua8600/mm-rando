@@ -2296,7 +2296,8 @@ namespace MMR.Randomizer.GameObjects
         // crash: if you teach song to him in TF the ice block cutscene triggers
         // if you try to teach him a song with more than one it can lock
         //[EnemizerScenesPlacementBlock(Scene.TradingPost, Scene.TerminaField)]
-        [ForbidFromScene(Scene.TradingPost, // he now hints song of time, would have to hard code check if hes missing
+        [RemovalChance(50), PlacementWeight(90)]
+        [ForbidFromScene(//Scene.TradingPost, // he now hints song of time, would have to hard code check if hes missing
             Scene.SnowheadTemple // difficult to identify if anything is important after, TODO
         )]//, Scene.AstralObservatory)] // re-disable this if playing Entrando
         Scarecrow = 0xCA, // En_Kakasi

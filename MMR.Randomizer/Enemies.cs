@@ -2059,8 +2059,6 @@ namespace MMR.Randomizer
             SceneUtils.UpdateScene(laundryPoolScene);
         }
 
-
-
         public static void DisableAllLocationRestrictions()
         {
             /// because, sometimes, enemies can be placed inside, all rules of society have shattered
@@ -5202,50 +5200,7 @@ namespace MMR.Randomizer
             SplitSceneLikeLikesIntoTwoActorObjects(thisSceneData);
             AddAniObjectIfTerminaFieldTree(thisSceneData);
             AddExtraObjectToPiratesInterior(thisSceneData);
-        }
-
-        private static void TrimSceneAcceptableCandidateList(SceneEnemizerData thisSceneData)
-        {
-            // some scenes are blocked from having enemy placements, do this ONCE before GetMatchPool, which would do it per-enemy
-            thisSceneData.AcceptableCandidates = ReplacementCandidateList.FindAll(act => !act.ActorEnum.BlockedScenes().Contains(thisSceneData.Scene.SceneEnum))
-                                                                         .FindAll(act => !act.NoPlacableVariants());
-
-            //thisSceneData.AcceptableCandidates.RemoveAll(act => act.NoPlacableVariants());
-
-            // if the dyna limits for this scene are low, we might as well trim all actors that cannot ever be put here,
-            // no point running code on them later
-            var dynaLimitsAttributes = thisSceneData.Scene.SceneEnum.GetAttribute<DynaAttributes>();
-            if (dynaLimitsAttributes != null)
-            {
-                var largeDynaActors = thisSceneData.AcceptableCandidates.FindAll(act => act.DynaLoad.poly > dynaLimitsAttributes.Polygons
-                                                                                     || act.DynaLoad.vert > dynaLimitsAttributes.Verticies);
-                thisSceneData.AcceptableCandidates = thisSceneData.AcceptableCandidates.Except(largeDynaActors).ToList();
-            }
-
-            thisSceneData.Log.AppendLine($" ---------------------------");
-
-            // trim weights
-            foreach (var actor in thisSceneData.AcceptableCandidates.ToList())
-            {
-                int actorPlacementWeight = actor.GetPlacementWeight();
-                if (actorPlacementWeight != 100
-                     && thisSceneData.RNG.Next(100) > actorPlacementWeight ) // under is pass, over is failure
-                {
-                    thisSceneData.AcceptableCandidates.Remove(actor);
-                    #if DEBUG
-                    thisSceneData.Log.AppendLine($" (-) actor rng weight trimmed from scene placement: [{actor.Name}]");
-                    #endif
-                }
-            }
-
-            // special cases
-            if (thisSceneData.AcceptableCandidates.Any(a => a.ActorEnum == GameObjects.Actor.GaboraBlacksmith))
-            {
-                // we cannot place both the blacksmith and his acountaint in the same place, talking to one can BREAK, but almost always only does this if both are present
-                // random coin toss, remove one
-                var targetActorEnum = (thisSceneData.RNG.Next() % 2 == 1) ? (GameObjects.Actor.GaboraBlacksmith) : (GameObjects.Actor.Zubora);
-                thisSceneData.AcceptableCandidates.RemoveAll(a => a.ActorEnum == targetActorEnum);
-            }
+            RemoveScarecrowFromTradingPostIfSOTRandomized(thisSceneData);
         }
 
         private static void SplitSceneLikeLikesIntoTwoActorObjects(SceneEnemizerData thisSceneData)
@@ -5303,8 +5258,8 @@ namespace MMR.Randomizer
                 var newObject = SMALLEST_OBJ;
                 if (thisSceneData.RNG.Next() % 10 > 5) // chance of fixed rare/random actor
                 {
-                    newObject = freeObjList[thisSceneData.RNG.Next() % (freeObjList.Count -1)];
-                } 
+                    newObject = freeObjList[thisSceneData.RNG.Next() % (freeObjList.Count - 1)];
+                }
 
                 // for now we just bypass rando and set it manually
                 thisSceneData.Scene.Maps[0].Objects[6] = newObject;
@@ -5316,6 +5271,8 @@ namespace MMR.Randomizer
             /// With enemizer/actorizer pirates interior is actually kinda dry and boring
             /// the scene has 11 objects, we can add another object to the scene to give enemizer some more free-object actors it can place
             /// also the scene has an unused object (that doesn't get used in enemizer now) we can swap out for something random
+
+            // todo: change one rarely seen actor to a different actor and attach object to it instead
 
             if (thisSceneData.Scene.SceneEnum != GameObjects.Scene.PiratesFortress) return;
 
@@ -5367,6 +5324,68 @@ namespace MMR.Randomizer
                 thisSceneData.Scene.Maps[0].Objects[3] = newObject2;
             }
         }
+
+        private static void RemoveScarecrowFromTradingPostIfSOTRandomized(SceneEnemizerData thisSceneData)
+        {
+            if (thisSceneData.Scene.SceneEnum == GameObjects.Scene.TradingPost)
+            {
+                var songOfTimeShuffled = _randomized.Settings.CustomItemList.Contains(GameObjects.Item.SongTime);
+                var songOfTimeStarting = _randomized.Settings.CustomStartingItemList.Contains(GameObjects.Item.SongTime);
+                if (songOfTimeShuffled && !songOfTimeStarting)
+                {
+                    thisSceneData.Actors.RemoveAll(act => act.ActorEnum == GameObjects.Actor.Scarecrow);
+                    thisSceneData.Objects.RemoveAll(obj => obj == GameObjects.Actor.Scarecrow.ObjectIndex());
+                }
+            }
+
+        }
+
+
+        private static void TrimSceneAcceptableCandidateList(SceneEnemizerData thisSceneData)
+        {
+            // some scenes are blocked from having enemy placements, do this ONCE before GetMatchPool, which would do it per-enemy
+            thisSceneData.AcceptableCandidates = ReplacementCandidateList.FindAll(act => !act.ActorEnum.BlockedScenes().Contains(thisSceneData.Scene.SceneEnum))
+                                                                         .FindAll(act => !act.NoPlacableVariants());
+
+            //thisSceneData.AcceptableCandidates.RemoveAll(act => act.NoPlacableVariants());
+
+            // if the dyna limits for this scene are low, we might as well trim all actors that cannot ever be put here,
+            // no point running code on them later
+            var dynaLimitsAttributes = thisSceneData.Scene.SceneEnum.GetAttribute<DynaAttributes>();
+            if (dynaLimitsAttributes != null)
+            {
+                var largeDynaActors = thisSceneData.AcceptableCandidates.FindAll(act => act.DynaLoad.poly > dynaLimitsAttributes.Polygons
+                                                                                     || act.DynaLoad.vert > dynaLimitsAttributes.Verticies);
+                thisSceneData.AcceptableCandidates = thisSceneData.AcceptableCandidates.Except(largeDynaActors).ToList();
+            }
+
+            thisSceneData.Log.AppendLine($" ---------------------------");
+
+            // trim weights
+            foreach (var actor in thisSceneData.AcceptableCandidates.ToList())
+            {
+                int actorPlacementWeight = actor.GetPlacementWeight();
+                if (actorPlacementWeight != 100
+                     && thisSceneData.RNG.Next(100) > actorPlacementWeight ) // under is pass, over is failure
+                {
+                    thisSceneData.AcceptableCandidates.Remove(actor);
+                    #if DEBUG
+                    thisSceneData.Log.AppendLine($" (-) actor rng weight trimmed from scene placement: [{actor.Name}]");
+                    #endif
+                }
+            }
+
+            // special cases
+            if (thisSceneData.AcceptableCandidates.Any(a => a.ActorEnum == GameObjects.Actor.GaboraBlacksmith))
+            {
+                // we cannot place both the blacksmith and his acountaint in the same place, talking to one can BREAK, but almost always only does this if both are present
+                // random coin toss, remove one
+                var targetActorEnum = (thisSceneData.RNG.Next() % 2 == 1) ? (GameObjects.Actor.GaboraBlacksmith) : (GameObjects.Actor.Zubora);
+                thisSceneData.AcceptableCandidates.RemoveAll(a => a.ActorEnum == targetActorEnum);
+            }
+        }
+
+        
 
 
         [System.Diagnostics.DebuggerDisplay("{Scene.SceneEnum.ToString()}")]
