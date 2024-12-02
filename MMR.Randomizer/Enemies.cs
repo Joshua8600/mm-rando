@@ -1019,8 +1019,7 @@ namespace MMR.Randomizer
             MoveTheISTTTunnelTransitionBack();
             FixSwordSchoolPotRandomization();
             SplitSceneSnowballIntoTwoActorObjects();
-            SwapIntroSeth();
-            SwapIntroBlueKids();
+            SwapIntroActors();
             SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
             FreeUpTwinIslandsSnowballs();
@@ -3404,6 +3403,14 @@ namespace MMR.Randomizer
         }
 
 
+        private static void SwapIntroActors()
+        {
+            SwapIntroSeth();
+            SwapIntroBlueKids();
+            SwapIntroLinkTheGoroAndAnju();
+        }
+
+
         private static void SwapIntroSeth()
         {
             /// for actorizer, seth is a very visible part of the intro and we want to randomize
@@ -3436,6 +3443,28 @@ namespace MMR.Randomizer
 
             // change object
             ectScene.Maps[1].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
+        }
+
+        private static void SwapIntroLinkTheGoroAndAnju()
+        {
+            if (!ReplacementListContains(GameObjects.Actor.Anju)) return;
+
+            var stockpotInnScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.StockPotInn.FileID());
+            var linkTheGoro = stockpotInnScene.Maps[5].Actors[16]; // map 0 setup 1
+
+            linkTheGoro.ChangeActor(GameObjects.Actor.DekuBaba, vars: 0, modifyOld: true);
+            linkTheGoro.OldName = "LinkTheGoro(Intro)";
+            linkTheGoro.Position = new vec16(196, 0, 106); // even in the intro cutscene he spawns behind the door....
+            linkTheGoro.ChangeYRotation(270);
+            stockpotInnScene.Maps[5].Objects[1] = GameObjects.Actor.DekuBaba.ObjectIndex();
+            ActorUtils.SetActorSpawnTimeFlags(linkTheGoro);
+
+            // if we remove him anju doesnt spawn, as it seems this is a cutscene within a cutscene
+            var anju = stockpotInnScene.Maps[5].Actors[19];
+            anju.ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
+            anju.OldName = "Anju(Intro)";
+            stockpotInnScene.Maps[5].Objects[0] = GameObjects.Actor.Bombiwa.ObjectIndex();
+            ActorUtils.SetActorSpawnTimeFlags(anju);
         }
 
         private static void SwapPiratesFortressBgBreakwall()
@@ -4356,7 +4385,7 @@ namespace MMR.Randomizer
 
                 if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
                 if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.SquareSign, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Anju, GameObjects.Actor.StockpotBell)) continue;
+                if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.HookshotWallAndPillar)) continue;
