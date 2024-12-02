@@ -5101,9 +5101,9 @@ namespace MMR.Randomizer.GameObjects
         SwordsmanSchoolLog = 0x1F8, // En_Maruta
 
         [ActorizerEnabled]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x390E, Item.CollectablePathToGoronVillageWinterSmallSnowball1)] // ramp near tree grotto
+        [CheckRestricted(Scene.TwinIslands, variant: 0x390E, Item.CollectablePathToGoronVillageWinterSmallSnowball3)] // ramp near tree grotto
         [CheckRestricted(Scene.TwinIslands, variant: 0x360E, Item.CollectablePathToGoronVillageWinterSmallSnowball2)] // near west entrance
-        [CheckRestricted(Scene.TwinIslands, variant: 0x380E, Item.CollectablePathToGoronVillageWinterSmallSnowball3)] // near tingle
+        [CheckRestricted(Scene.TwinIslands, variant: 0x380E, Item.CollectablePathToGoronVillageWinterSmallSnowball1)] // near tingle
         [CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
             Item.CollectableGoronVillageWinterLargeSnowball1, Item.CollectableGoronVillageWinterLargeSnowball2, // small
             Item.CollectableGoronVillageWinterLargeSnowball3, Item.CollectableGoronVillageWinterLargeSnowball4,
