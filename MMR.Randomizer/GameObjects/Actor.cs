@@ -5011,6 +5011,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Item.HeartPieceLabFish)]
         [WaterVariants(0)]
         [UnkillableAllVariants]
+        [RemovalChance(90), PlacementWeight(90)] // almost always randomized, lets reduce
         //[ForbidFromScene(Scene.MarineLab)]
         //[EnemizerScenesPlacementBlock(Scene.GreatBayCoast, Scene.ZoraCape)] // issue: if both fish and labfish spawn, they eat, and cutscene locks
         LabFish = 0x1F1, // En_Fish2
