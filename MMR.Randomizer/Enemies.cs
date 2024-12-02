@@ -2034,7 +2034,32 @@ namespace MMR.Randomizer
             FixEvanRotation();
             MoveShopScrubsIfRandomized();
             MovePostmanIfRandomized(terminaField);
+            MoveLaundryPoolBellTalkSpotIfRandomized();
         }
+
+        private static void MoveLaundryPoolBellTalkSpotIfRandomized()
+        {
+            /// would just float in the air its weird
+
+            var laundryPoolScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.LaundryPool.FileID());
+            var lpBell = laundryPoolScene.Maps[0].Actors[11];
+            var lpBellTalkSpot = laundryPoolScene.Maps[0].Actors[10];
+            ActorUtils.ClearActorRotationRestrictions(lpBellTalkSpot);
+
+            if (lpBell.ActorEnum != GameObjects.Actor.LaundryPoolBell)
+            {
+                lpBellTalkSpot.Position = new vec16(-1961, -56, 627);
+                lpBellTalkSpot.ChangeYRotation(180);
+            }
+            else
+            {
+                // change rotation to match bell at least
+                lpBellTalkSpot.ChangeYRotation(90); // zero faces into the near wall
+            }
+            SceneUtils.UpdateScene(laundryPoolScene);
+        }
+
+
 
         public static void DisableAllLocationRestrictions()
         {
@@ -5664,7 +5689,7 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
-            if (scene.SceneEnum == GameObjects.Scene.SouthClockTown) // force specific actor/variant for debugging
+            if (scene.SceneEnum == GameObjects.Scene.LaundryPool) // force specific actor/variant for debugging
             {
                 //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot
                 var target = thisSceneData.Scene.Maps[0].Actors[10];

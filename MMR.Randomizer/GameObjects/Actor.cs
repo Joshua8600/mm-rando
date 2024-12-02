@@ -6625,13 +6625,16 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(583)]
         [ObjectListIndex(0x243)]
+        [CheckRestricted(Item.MaskCouple, Item.MaskKeaton, Item.TradeItemMamaLetter, Item.TradeItemPendant,
+            Item.NotebookMeetKafei, Item.NotebookUniteAnjuAndKafei, Item.NotebookPromiseKafei,
+            Item.NotebookMeetCuriosityShopMan, Item.NotebookCuriosityShopManSGift, Item.NotebookPromiseCuriosityShopMan)]
         [UnkillableAllVariants]
         // params doesnt seem to be used
         [GroundVariants(0xF)] // only one toof
         [WaterBottomVariants(0xE)]
         [VariantsWithRoomMax(max: 10, variant: 0xF)]
-        [ForbidFromScene(Scene.LaundryPool)]
-        [PlacementWeight(90)]
+        //[ForbidFromScene(Scene.LaundryPool)]
+        [RemovalChance(95), PlacementWeight(85)]
         LaundryPoolBell = 0x270, // En_Cha
 
         // time locked spawn, need to replace
