@@ -6814,6 +6814,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max:0, variant: 0x0B11, 0x0B22, 0x50F, 0x0513, 0x0910)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
+        [PlacementWeight(40)] // invisible until you start the game
         BombersYouChase = 0x27F, // En_Bomjimb
 
         [ActorizerEnabled]

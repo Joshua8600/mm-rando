@@ -1020,6 +1020,7 @@ namespace MMR.Randomizer
             FixSwordSchoolPotRandomization();
             SplitSceneSnowballIntoTwoActorObjects();
             SwapIntroSeth();
+            SwapIntroBlueKids();
             SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
             FreeUpTwinIslandsSnowballs();
@@ -3417,6 +3418,24 @@ namespace MMR.Randomizer
 
             // change object
             sctScene.Maps[3].Objects[14] = GameObjects.Actor.DekuBaba.ObjectIndex();
+        }
+
+        private static void SwapIntroBlueKids()
+        {
+            /// for intro cutscene its nice to see weird actors, but blue kids are often required to stick around
+
+            if (!ReplacementListContains(GameObjects.Actor.BombersYouChase)) return;
+
+            var ectScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.EastClockTown.FileID());
+            for(int i = 26; i < 26+5; i++) // for all bombers kid in ect, lucky they are sequential
+            {
+                var bomber = ectScene.Maps[1].Actors[i];
+                bomber.ChangeActor(GameObjects.Actor.DekuBaba, vars: 0, modifyOld: true);
+                bomber.OldName = "Bombers(Intro)";
+            }
+
+            // change object
+            ectScene.Maps[1].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
         }
 
         private static void SwapPiratesFortressBgBreakwall()
