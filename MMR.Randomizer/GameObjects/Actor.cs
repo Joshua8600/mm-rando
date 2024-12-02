@@ -4240,9 +4240,18 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
         En_Door_Etc = 0x1A7, // En_Door_Etc
 
+        [EnemizerEnabled]
         [FileID(383)]
         [ObjectListIndex(0x19E)]
-        [ForbidFromScene(Scene.SouthernSwamp, Scene.DekuPalace)]
+        [WaterBottomVariants(0, 1, 6)] // vanilla their spawn is at the bottom of the swamp
+        [WaterTopVariants(7)] // but if you put them in water they work for water surface, with a weak swimming animation
+        // testing
+        //[GroundVariants(0xFF)] // 0xFF is special flag-less condition
+        [SwitchFlagsPlacement(size:0xFF, shift:0)] // technically its all of params, but maybe in the future we want a byte for something else
+        [VariantsWithRoomMax(max: 2, variant: 0, 1, 6)]
+        [VariantsWithRoomMax(max: 5, variant: 7)]
+        //[ForbidFromScene(Scene.SouthernSwamp, Scene.DekuPalace)]
+        [RemovalChance(20), PlacementWeight(60)]
         BigOcto = 0x1A8, // En_Bigokuta
 
         // requires ice surface type

@@ -4378,14 +4378,14 @@ namespace MMR.Randomizer
                     return false;
                 }
                 
-                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronLinkPoundSwitch)) continue;
-                if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Stalchild)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BigOcto)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Stalchild)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
-                if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
-                if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.SquareSign, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
-                if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.LikeLike, GameObjects.Actor.BigOcto)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.HookshotWallAndPillar)) continue;
