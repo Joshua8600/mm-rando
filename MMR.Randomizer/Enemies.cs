@@ -3424,9 +3424,14 @@ namespace MMR.Randomizer
             }
 
             var snowheadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Snowhead.FileID());
-            snowheadScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // previously treasure chest, stupid
+            //snowheadScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // previously treasure chest, stupid
+            snowheadScene.Maps[0].Objects[3] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // unused stalagtite icicle, stupid
             // TODO randomize the unused iceicle and clay pot too
             // TODO 25% chance of goro-iwa randomization too
+
+            var pathToSnowheadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.PathToSnowhead.FileID());
+            pathToSnowheadScene.Maps[0].Objects[5] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // (winter largesnowball) previously gaebora
+            pathToSnowheadScene.Maps[1].Objects[7] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // (spring smallsnowball) previously gaebora
         }
 
 
