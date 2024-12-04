@@ -3423,6 +3423,10 @@ namespace MMR.Randomizer
                 snowball.OldName = snowball.Name = "RandomizedLargeSnowball";
             }
 
+            var snowheadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Snowhead.FileID());
+            snowheadScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // previously treasure chest, stupid
+            // TODO randomize the unused iceicle and clay pot too
+            // TODO 25% chance of goro-iwa randomization too
         }
 
 

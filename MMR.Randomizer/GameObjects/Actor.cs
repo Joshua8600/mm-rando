@@ -4849,13 +4849,19 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectablePathToSnowheadLargeSnowball1, Item.CollectablePathToSnowheadLargeSnowball2, // large
             Item.CollectablePathToSnowheadLargeSnowball3, Item.CollectablePathToSnowheadLargeSnowball4
         )]
-        [CheckRestricted(Scene.Snowhead, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.Snowhead, variant: 0x240E, Item.CollectableSnowheadLargeSnowball1)]
+        [CheckRestricted(Scene.Snowhead, variant: 0x250E, Item.CollectableSnowheadLargeSnowball2)]
+        [CheckRestricted(Scene.Snowhead, variant: 0x260E, Item.CollectableSnowheadLargeSnowball3)]
+        [CheckRestricted(Scene.Snowhead, variant: 0x270E, Item.CollectableSnowheadLargeSnowball4)]
+        [CheckRestricted(Scene.Snowhead, variant: 0x280E, Item.CollectableSnowheadLargeSnowball5)]
+        [CheckRestricted(Scene.Snowhead, variant: 0x290E, Item.CollectableSnowheadLargeSnowball6)]
+        /*[CheckRestricted(Scene.Snowhead, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSnowheadSmallSnowball1, Item.CollectableSnowheadSmallSnowball2, // small
             Item.CollectableSnowheadSmallSnowball3, Item.CollectableSnowheadSmallSnowball10,
             Item.CollectableSnowheadLargeSnowball1, Item.CollectableSnowheadLargeSnowball2, // large
             Item.CollectableSnowheadLargeSnowball3, Item.CollectableSnowheadLargeSnowball4,
             Item.CollectableSnowheadLargeSnowball5, Item.CollectableSnowheadLargeSnowball6
-        )]
+        )] // */
         [CheckRestricted(Scene.SnowheadTemple, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball1, Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball2, // small
             Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball3, Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball4,
@@ -5193,13 +5199,17 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectablePathToSnowheadLargeSnowball1, Item.CollectablePathToSnowheadLargeSnowball2, // large
             Item.CollectablePathToSnowheadLargeSnowball3, Item.CollectablePathToSnowheadLargeSnowball4
         )]
-        [CheckRestricted(Scene.Snowhead, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.Snowhead, variant: 0x211F, Item.CollectableSnowheadSmallSnowball1)]
+        [CheckRestricted(Scene.Snowhead, variant: 0x2015, Item.CollectableSnowheadSmallSnowball2)]
+        [CheckRestricted(Scene.Snowhead, variant: 0x230F, Item.CollectableSnowheadSmallSnowball3)]
+        [CheckRestricted(Scene.Snowhead, variant: 0x2210, Item.CollectableSnowheadSmallSnowball10)] // fairy
+        /* [CheckRestricted(Scene.Snowhead, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSnowheadSmallSnowball1, Item.CollectableSnowheadSmallSnowball2, // small
             Item.CollectableSnowheadSmallSnowball3, Item.CollectableSnowheadSmallSnowball10,
             Item.CollectableSnowheadLargeSnowball1, Item.CollectableSnowheadLargeSnowball2, // large
             Item.CollectableSnowheadLargeSnowball3, Item.CollectableSnowheadLargeSnowball4,
             Item.CollectableSnowheadLargeSnowball5, Item.CollectableSnowheadLargeSnowball6
-        )]
+        )] // */
         [CheckRestricted(Scene.SnowheadTemple, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball1, Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball2, // small
             Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball3, Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball4,

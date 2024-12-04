@@ -6436,7 +6436,7 @@ namespace MMR.Randomizer
                 progressReporter.ReportProgress(65, "Writing items...");
                 WriteItems(messageTable);
 
-                progressReporter.ReportProgress(66, "Writing enemies...");
+                progressReporter.ReportProgress(66, "Writing enemies 1...");
                 ReadEnemies(outputSettings);
 
 
@@ -6464,7 +6464,7 @@ namespace MMR.Randomizer
                     WriteTraps();
                 }
 
-                progressReporter.ReportProgress(70, "Writing enemies..."); // moved to attempt to bypass older variant override over actors
+                progressReporter.ReportProgress(70, "Writing enemies 2..."); // moved to attempt to bypass older variant override over actors
                 WriteEnemies();
 
                 // Load Asm data from internal resource files and apply
