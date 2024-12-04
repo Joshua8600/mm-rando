@@ -3134,7 +3134,11 @@ namespace MMR.Randomizer.GameObjects
         //[CheckRestricted(Scene.Great)]
         // doesn't have real BG right?
         //[GroundVariants(0xFE0F)] // cutscene version that is supposed to be teaching link defense
-        [GroundVariants(0x201, 0x402, 0x602, 804)]
+        [GroundVariants(
+            //0x201, 0x402, 0x602, 0x804, // default fairies
+            0x2, 0x203, 0x402, 0x601, 0x800 // the credits fairy
+        )]
+        [VariantsWithRoomMax(max:1, variant: 0x2, 0x203, 0x402, 0x601, 0x800)]
         [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
         [UnkillableAllVariants]
         GreatFairy = 0x130, // Bg_Dy_Yoseizo
@@ -4128,7 +4132,11 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(372)]
         [ObjectListIndex(0x18C)]
-        [WallVariants(0x907F, 0xA07F)]
+        // params: only 0xF000 is type, the rest is ignored??
+        [WallVariants(0x907F, 0xA07F, // regular clocks
+            0x0001, // massive gear (not 0x7F we dont want to remove)
+            0x2001 // massive clock
+            )]
         [UnkillableAllVariants]
         Clock = 0x19C, // Obj_Tokeidai
 
@@ -4627,7 +4635,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)]
         SoaringEffects = 0x1CE, // En_Test7
 
-        //[ActorizerEnabled]
+        [ActorizerEnabled]
         // this actor CRASHES if you hit it with a light arrow
         // more specifically it spawns Demo_Effect which crashes trying to draw its curv skeleton, reason unknown
         [FileID(424)]
@@ -4635,9 +4643,11 @@ namespace MMR.Randomizer.GameObjects
         [DynaAttributes(12, 8)]
         [GroundVariants(0x101, 0x201)]
         [WaterBottomVariants(0x1)] // dont normally show up down there but its fine
+        [VariantsWithRoomMax(max:0, variant: 0x101, 0x201)]
         [SwitchFlagsPlacement(size: 0xF00, shift: 8)]
         [UnkillableAllVariants] // I think...?
         [BlockingVariantsAll]
+        [RemovalChance(5)/*PlacementChance(30)*/]
         Lightblock = 0x1CF, // Obj_Lightblock
 
         //[EnemizerEnabled] // no spawn, probably requires ikana king as parent
@@ -4760,20 +4770,22 @@ namespace MMR.Randomizer.GameObjects
         Giant = 0x1DB, // En_Giant
 
         [ActorizerEnabled]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x2E0E, Item.CollectablePathToGoronVillageWinterLargeSnowball1)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x300E, Item.CollectablePathToGoronVillageWinterLargeSnowball2)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x310E, Item.CollectablePathToGoronVillageWinterLargeSnowball3)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x330E, Item.CollectablePathToGoronVillageWinterLargeSnowball4)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x350E, Item.CollectablePathToGoronVillageWinterLargeSnowball5)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x2E0E, Item.CollectablePathToGoronVillageWinterLargeSnowball10)] // day 1
+        [CheckRestricted(Scene.TwinIslands, variant: 0x300E, Item.CollectablePathToGoronVillageWinterLargeSnowball11)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x310E, Item.CollectablePathToGoronVillageWinterLargeSnowball12)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x330E, Item.CollectablePathToGoronVillageWinterLargeSnowball13)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x350E, Item.CollectablePathToGoronVillageWinterLargeSnowball14)]
         [CheckRestricted(Scene.TwinIslands, variant: 0x280E, Item.CollectablePathToGoronVillageWinterLargeSnowball6)] // day 2
         [CheckRestricted(Scene.TwinIslands, variant: 0x2A0E, Item.CollectablePathToGoronVillageWinterLargeSnowball7)]
         [CheckRestricted(Scene.TwinIslands, variant: 0x2B0E, Item.CollectablePathToGoronVillageWinterLargeSnowball8)]
         [CheckRestricted(Scene.TwinIslands, variant: 0x2C0E, Item.CollectablePathToGoronVillageWinterLargeSnowball9)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x200E, Item.CollectablePathToGoronVillageWinterLargeSnowball10)] // day 3
-        [CheckRestricted(Scene.TwinIslands, variant: 0x220E, Item.CollectablePathToGoronVillageWinterLargeSnowball11)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x230E, Item.CollectablePathToGoronVillageWinterLargeSnowball12)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x240E, Item.CollectablePathToGoronVillageWinterLargeSnowball13)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x250E, Item.CollectablePathToGoronVillageWinterLargeSnowball14)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x200E, Item.CollectablePathToGoronVillageWinterLargeSnowball1)] // day 3
+        [CheckRestricted(Scene.TwinIslands, variant: 0x220E, Item.CollectablePathToGoronVillageWinterLargeSnowball2)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x230E, Item.CollectablePathToGoronVillageWinterLargeSnowball3)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x240E, Item.CollectablePathToGoronVillageWinterLargeSnowball4)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x250E, Item.CollectablePathToGoronVillageWinterLargeSnowball5)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x40E, Item.SongLullabyIntro)] // grandpa
+        [CheckRestricted(Scene.TwinIslands, variant: 0x80E, Item.SongLullabyIntro)] // grandpa
         [CheckRestricted(Scene.TwinIslands, variant: 0x40E, Item.SongLullabyIntro)] // grandpa
         [CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
             Item.CollectableGoronVillageWinterLargeSnowball1, Item.CollectableGoronVillageWinterLargeSnowball2, // small
