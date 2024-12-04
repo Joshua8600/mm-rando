@@ -4263,6 +4263,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [FileID(383)]
         [ObjectListIndex(0x19E)]
+        [CheckRestricted(Item.MundaneItemPictographContestRedRupee)]
         [WaterBottomVariants(0, 1, 6)] // vanilla their spawn is at the bottom of the swamp
         [WaterTopVariants(7)] // but if you put them in water they work for water surface, with a weak swimming animation
         // testing
@@ -4710,7 +4711,7 @@ namespace MMR.Randomizer.GameObjects
             0, 0x0080, 0x0180, 0x0200, 0x0280, 0x0380, 0x0400)] 
         [UnkillableAllVariants]
         [PlacementWeight(20)]
-        SnowCoveredTrees = 0x1D4, // En_Snowwd
+        SnowCoveredTrees = 0x1D4, // En_Snowwd // tag: snowtree
 
         // I suspect since he has so few vars that he will be hard coded, and req decomp to fix
         // TODO add more options to randomize some but not all of them based on checks
