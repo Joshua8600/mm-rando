@@ -1586,6 +1586,18 @@ namespace MMR.Randomizer
                     twinislandsSceneData[0xD7] = 0x50; // 50 is behind the waterfall 
                 }
 
+                // in actorizer 77, the bugs at the back of doggy race are broken, they get skipped by rando and I dont know why
+                // doggy race has MULTIPLE unused objects wtf// TODO figure out what else we can do with them
+                var doggyRaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DoggyRacetrack.FileID());
+                //doggyRaceScene.Maps[0].Objects[4] for now we dont need to change the tree object, just change the bugs to tree
+                var troublesomeBugs = doggyRaceScene.Maps[0].Actors[3];
+                troublesomeBugs.ChangeActor(GameObjects.Actor.Treee, vars: 0xF, modifyOld: true);
+                troublesomeBugs.ChangeYRotation(90 + 45);
+                troublesomeBugs.OldName = "BugsInTheBack";
+                // while Im here, might as well move the second soil actor (bean) to the side a bit
+                var secondBean = doggyRaceScene.Maps[0].Actors[7];
+                secondBean.Position = new vec16(-4328, 146, 1664);
+
                 EnableAllFormItems();
 
                 // */
@@ -2030,6 +2042,17 @@ namespace MMR.Randomizer
                 // rotation?
             }
             SceneUtils.UpdateScene(milkbarScene);
+
+            /*var doggyRaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DoggyRacetrack.FileID());
+            var swPrize = doggyRaceScene.Maps[0].Actors[8];
+            if (swPrize.ActorEnum != GameObjects.Actor.Sw)
+            {
+                // oh theres a swprize too, we can use that as well
+                var swPrize = doggyRaceScene.Maps[0].Actors[8];
+                swPrize.
+            } // */
+
+
 
             FixEvanRotation();
             MoveShopScrubsIfRandomized();
@@ -4389,7 +4412,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.LikeLike, GameObjects.Actor.BigOcto)) continue;
+                if (TestHardSetObject(GameObjects.Scene.DoggyRacetrack, GameObjects.Actor.Treee, GameObjects.Actor.SquareSign)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
@@ -6531,7 +6554,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 77.0\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 78.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

@@ -298,6 +298,7 @@ namespace MMR.Randomizer.GameObjects
         // type 0 and 1 are slightly different? I think 0 is dropped from a bottle, a lot of other entries are 1
         // 2 is unk
         [WaterVariants(0, 1,
+            0xFFFF, // great bay coast
             2)] // lab
         [VariantsWithRoomMax(max:0, variant:0)]
         [UnkillableAllVariants]
@@ -466,6 +467,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x400A,  0x2C09, 0x2D0A, 0x2409, 0x2909, // great bay
             0x350A, 0x370A, 0x390A,
             0x400A, 0x420A,// milkroad
+            0x430A, // road to ikana
             0x3B0A, 0x080A, 0x0D0A, 0x360A)]
         [UnkillableAllVariants]
         PointedSign = 0x26, // En_A_Obj
@@ -844,9 +846,9 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1)] // gameplay_keep obj 1
         [CheckRestricted(Scene.TerminaField, ActorConst.ANY_VARIANT, Item.CollectableTerminaFieldButterflyFairy1)] // TODO which is it?
         // TODO finish separating them
-        [CheckRestricted(Scene.Grottos, 0x5323, Item.BottleCatchBug)] // north gossip grotto
-        [CheckRestricted(Scene.Grottos, 0x2323, Item.BottleCatchBug)] // west gossip grotto
-        [CheckRestricted(Scene.Grottos, 0x6322, Item.BottleCatchFish)] // regular grotto, TODO do we want to force a fish in a unique place instead?
+        //[CheckRestricted(Scene.Grottos, 0x5323, Item.BottleCatchBug)] // north gossip grotto // replaced by high availability scoop
+        //[CheckRestricted(Scene.Grottos, 0x2323, Item.BottleCatchBug)] // west gossip grotto
+        //[CheckRestricted(Scene.Grottos, 0x6322, Item.BottleCatchFish)] // regular grotto, TODO do we want to force a fish in a unique place instead?
         [CheckRestricted(Scene.Grottos, 0x2324, Item.CollectableGrottosOceanGossipStonesButterflyFairy1)]
         [CheckRestricted(Scene.Grottos, 0x4324, Item.CollectableGrottosMagicBeanSellerSGrottoButterflyFairy1)]
         [CheckRestricted(Scene.Grottos, variant: 0x3324,
@@ -881,6 +883,7 @@ namespace MMR.Randomizer.GameObjects
             0x5322, // cape, rots
             0x8322, // zora hall
             0x7322, // biobaba grotto
+            0x3322, // astral obser
             0x6322
         )] 
         [UnkillableAllVariants]
@@ -1011,6 +1014,9 @@ namespace MMR.Randomizer.GameObjects
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
             0xE000,
+            0x17, 0x2, // coast
+            0x213, // path to snowhead
+            0x3B, // moutain spring
             0xE200, 0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [VariantsWithRoomMax(max: 1,
@@ -1018,6 +1024,9 @@ namespace MMR.Randomizer.GameObjects
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
             0xE000,
+            0x17, 0x2, // coast
+            0x213, // path to snowhead
+            0x3B, // moutain spring
             0xE200, 0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [UnkillableAllVariants]
@@ -2985,6 +2994,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(259)]
         [ObjectListIndex(0x157)]
         [DynaAttributes(13,10)]
+        // params are wack, 0x3, 0xFF00,
         [GroundVariants(0x700, 0xD00, 0xA00, // greatbaytemple
                         0x003F, // goron trial
                         0x1000, 0x0B00, 0x0C00, 0x600, 0x002B)] // snowheattemple
@@ -3056,7 +3066,9 @@ namespace MMR.Randomizer.GameObjects
         // 0xFF == 0 or 1 is different case
         // 0x7F00 >> 8 is flags
         [WallVariants(0x7E01, 0x7D01, 0x7C01)]
-        [CeilingVariants(0x7E01, 0x7D01, 0x7C01)]
+        [CeilingVariants(0x7E01, 0x7D01, 0x7C01,
+            0x1001 // woodfall tem
+            )]
         //[GroundVariants(0x7E00, 0x7D00, 0x7C00)] // work but too low mostly hidden by ground
         [VariantsWithRoomMax(max: 1, 0x7E01, 0x7D01, 0x7C01)]
         [UnkillableAllVariants]
@@ -4641,7 +4653,11 @@ namespace MMR.Randomizer.GameObjects
         [FileID(424)]
         [ObjectListIndex(0x1B3)]
         [DynaAttributes(12, 8)]
-        [GroundVariants(0x101, 0x201)]
+        [GroundVariants(
+            0x300, 0x2A01, 0x2901, // ikana castle
+            0x2601, // ISTT
+            0x600, 0xF00, 0x301, 0x401, // STT
+            0x101, 0x201)]
         [WaterBottomVariants(0x1)] // dont normally show up down there but its fine
         [VariantsWithRoomMax(max:0, variant: 0x101, 0x201)]
         [SwitchFlagsPlacement(size: 0xF00, shift: 8)]
@@ -7007,10 +7023,11 @@ namespace MMR.Randomizer.GameObjects
         [FileID(616)]
         [ObjectListIndex(0x22)]
         [CheckRestricted(Item.CollectableTerminaFieldEnemy1)]
-        //[FlyingVariants(0, 1)] // two? one that steals and one that doesn't?
-        [FlyingVariants(0)] // zero seems safe, does not steal sword or anything, 1 does not spawn
+        // variant 1 sets the flag that allows for takkuri to steal, must continue to exist in TF to set flag
+        [FlyingVariants(0)]
         [DifficultAllVariants]
         [OnlyOneActorPerRoom]
+        [VariantsWithRoomMax(max:0, variant: 0x1)] // code suggests this one only sets the steal flag 
         [FlyingToGroundHeightAdjustment(100)]
         //[ForbidFromScene(Scene.TerminaField)] // do not remove original, esp with rupeeland coming soon
         [PlacementWeight(50)]
@@ -7204,9 +7221,23 @@ namespace MMR.Randomizer.GameObjects
         Unused_Dm_Gm = 0x2AD, // Dm_Gm
 
         // TODO: I should be able to replace these if the beans on top are randomized, just gotta move over the checks
+        // also need to move all of them out of center tho..
+        //[ActorizerEnabled]
         [FileID(645)]
         [ObjectListIndex(0x1)]
+        [GroundVariants(
+            0x0, // doggy race
+            0x0201, // bean grotto
+            0x314, // romani ranch
+            0x19, // coast
+            0x205, 0x30B, 0xE, 0x214, // tf
+            0x300, 0x203, // swamp spiderhouse
+            0x200, // secret shrine
+            0x303 // stone tower inverted
+        )]
+        //wallvars
         [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [UnkillableAllVariants]
         SpawnsItemFromSoil = 0x2AE, // Obj_Swprize
 
         // this is the actor you have to walk into , not the one you hit with ranged attacks
