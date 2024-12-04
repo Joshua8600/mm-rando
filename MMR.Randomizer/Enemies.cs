@@ -1022,7 +1022,7 @@ namespace MMR.Randomizer
             SwapIntroActors();
             SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
-            FreeUpTwinIslandsSnowballs();
+            FreeUpSnowballsDoubleObjects();
 
             EnableAllCreditsCutScenes();
 
@@ -3508,13 +3508,18 @@ namespace MMR.Randomizer
             ranchScene.Maps[2].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
         }
 
-        private static void FreeUpTwinIslandsSnowballs()
+        private static void FreeUpSnowballsDoubleObjects()
         {
             /// issue: we can't randomize all of them most of the time
             /// but, there are three objects here, snowball, tektite, and snapper, which dont exist if we remove the snowballs anyway
 
             var twinislandsScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TwinIslands.FileID());
             twinislandsScene.Maps[0].Objects[4] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // snapper
+
+            // mountain village
+            var mountainVillageScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillage.FileID());
+            mountainVillageScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // wolfos
+
         }
 
         private static void DistinguishLogicRequiredDekuFlowers()
