@@ -1567,15 +1567,15 @@ namespace MMR.Randomizer.Utils
                 }
                 catch (IOException ex)
                 {
-                    Debug.WriteLine("Error reading file: " + filePath + ", error: " + ex.ToString());
+                    throw new Exception("AddtionalSlots:\n Error reading file: " + filePath + ", error: " + ex.ToString());
                 }
                 catch (System.Text.Json.JsonException e)
                 {
-                    Debug.WriteLine("Error reading json: " + filePath + ", error: " + e.ToString());
+                    throw new Exception("AddtionalSlots:\n Error reading json: " + filePath + ", error: " + e.ToString());
                 }
                 catch (Exception e)
                 {
-                    Debug.WriteLine("Error unknown error: " + filePath + ", error: " + e.ToString());
+                    throw new Exception("AddtionalSlots:\n Error unknown error: " + filePath + ", error: " + e.ToString());
                 }
 
             }
