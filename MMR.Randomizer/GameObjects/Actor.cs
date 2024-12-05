@@ -2285,7 +2285,8 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableGoronRacetrackPot17, Item.CollectableGoronRacetrackPot18, Item.CollectableGoronRacetrackPot19, Item.CollectableGoronRacetrackPot20,
             Item.CollectableGoronRacetrackPot21, Item.CollectableGoronRacetrackPot22, Item.CollectableGoronRacetrackPot23,
             Item.CollectableGoronRacetrackPot24, Item.CollectableGoronRacetrackPot25, Item.CollectableGoronRacetrackPot26,
-            Item.CollectableGoronRacetrackPot27, Item.CollectableGoronRacetrackPot28, Item.CollectableGoronRacetrackPot29, Item.CollectableGoronRacetrackPot30
+            Item.CollectableGoronRacetrackPot27, Item.CollectableGoronRacetrackPot28, Item.CollectableGoronRacetrackPot29, Item.CollectableGoronRacetrackPot30,
+            Item.CollectablePathToGoronVillageWinterSmallSnowball3
             )]
         //0x1200, 0x1B00, 0x2800 spawns from the ground after you play a song
         // versions: 1200, 1B00, 2800 shows up a lot, 2D00 stonetower, 3200 zora cape, 0x11D is zora cape
