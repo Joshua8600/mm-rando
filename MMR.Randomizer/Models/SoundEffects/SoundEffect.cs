@@ -164,7 +164,7 @@ namespace MMR.Randomizer.Models.SoundEffects
         [Tags(Short, LowHpBeep)]
         MonkeySad = 0x2121,
 
-        [Tags(Short)] // maybe lowhpbeep
+        [Tags(Short, LowHpBeep)] // maybe lowhpbeep
         TatlUrgentRing= 0x2125,    // notices skullkid left her behind
 
         [Tags(Long)]

@@ -1019,10 +1019,10 @@ namespace MMR.Randomizer
             MoveTheISTTTunnelTransitionBack();
             FixSwordSchoolPotRandomization();
             SplitSceneSnowballIntoTwoActorObjects();
-            SwapIntroSeth();
+            SwapIntroActors();
             SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
-            FreeUpTwinIslandsSnowballs();
+            FreeUpSnowballsDoubleObjects();
 
             EnableAllCreditsCutScenes();
 
@@ -1586,6 +1586,18 @@ namespace MMR.Randomizer
                     twinislandsSceneData[0xD7] = 0x50; // 50 is behind the waterfall 
                 }
 
+                // in actorizer 77, the bugs at the back of doggy race are broken, they get skipped by rando and I dont know why
+                // doggy race has MULTIPLE unused objects wtf// TODO figure out what else we can do with them
+                var doggyRaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DoggyRacetrack.FileID());
+                //doggyRaceScene.Maps[0].Objects[4] for now we dont need to change the tree object, just change the bugs to tree
+                var troublesomeBugs = doggyRaceScene.Maps[0].Actors[3];
+                troublesomeBugs.ChangeActor(GameObjects.Actor.Treee, vars: 0xF, modifyOld: true);
+                troublesomeBugs.ChangeYRotation(90 + 45);
+                troublesomeBugs.OldName = "BugsInTheBack";
+                // while Im here, might as well move the second soil actor (bean) to the side a bit
+                var secondBean = doggyRaceScene.Maps[0].Actors[7];
+                secondBean.Position = new vec16(-4328, 146, 1664);
+
                 EnableAllFormItems();
 
                 // */
@@ -2031,9 +2043,43 @@ namespace MMR.Randomizer
             }
             SceneUtils.UpdateScene(milkbarScene);
 
+            /*var doggyRaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DoggyRacetrack.FileID());
+            var swPrize = doggyRaceScene.Maps[0].Actors[8];
+            if (swPrize.ActorEnum != GameObjects.Actor.Sw)
+            {
+                // oh theres a swprize too, we can use that as well
+                var swPrize = doggyRaceScene.Maps[0].Actors[8];
+                swPrize.
+            } // */
+
+
+
             FixEvanRotation();
             MoveShopScrubsIfRandomized();
             MovePostmanIfRandomized(terminaField);
+            MoveLaundryPoolBellTalkSpotIfRandomized();
+        }
+
+        private static void MoveLaundryPoolBellTalkSpotIfRandomized()
+        {
+            /// would just float in the air its weird
+
+            var laundryPoolScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.LaundryPool.FileID());
+            var lpBell = laundryPoolScene.Maps[0].Actors[11];
+            var lpBellTalkSpot = laundryPoolScene.Maps[0].Actors[10];
+            ActorUtils.ClearActorRotationRestrictions(lpBellTalkSpot);
+
+            if (lpBell.ActorEnum != GameObjects.Actor.LaundryPoolBell)
+            {
+                lpBellTalkSpot.Position = new vec16(-1961, -56, 627);
+                lpBellTalkSpot.ChangeYRotation(180);
+            }
+            else
+            {
+                // change rotation to match bell at least
+                lpBellTalkSpot.ChangeYRotation(90); // zero faces into the near wall
+            }
+            SceneUtils.UpdateScene(laundryPoolScene);
         }
 
         public static void DisableAllLocationRestrictions()
@@ -3377,6 +3423,23 @@ namespace MMR.Randomizer
                 snowball.OldName = snowball.Name = "RandomizedLargeSnowball";
             }
 
+            var snowheadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Snowhead.FileID());
+            //snowheadScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // previously treasure chest, stupid
+            snowheadScene.Maps[0].Objects[3] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // unused stalagtite icicle, stupid
+            // TODO randomize the unused iceicle and clay pot too
+            // TODO 25% chance of goro-iwa randomization too
+
+            var pathToSnowheadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.PathToSnowhead.FileID());
+            pathToSnowheadScene.Maps[0].Objects[5] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // (winter largesnowball) previously gaebora
+            pathToSnowheadScene.Maps[1].Objects[7] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // (spring smallsnowball) previously gaebora
+        }
+
+
+        private static void SwapIntroActors()
+        {
+            SwapIntroSeth();
+            SwapIntroBlueKids();
+            SwapIntroLinkTheGoroAndAnju();
         }
 
 
@@ -3394,6 +3457,46 @@ namespace MMR.Randomizer
 
             // change object
             sctScene.Maps[3].Objects[14] = GameObjects.Actor.DekuBaba.ObjectIndex();
+        }
+
+        private static void SwapIntroBlueKids()
+        {
+            /// for intro cutscene its nice to see weird actors, but blue kids are often required to stick around
+
+            if (!ReplacementListContains(GameObjects.Actor.BombersYouChase)) return;
+
+            var ectScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.EastClockTown.FileID());
+            for(int i = 26; i < 26+5; i++) // for all bombers kid in ect, lucky they are sequential
+            {
+                var bomber = ectScene.Maps[1].Actors[i];
+                bomber.ChangeActor(GameObjects.Actor.DekuBaba, vars: 0, modifyOld: true);
+                bomber.OldName = "Bombers(Intro)";
+            }
+
+            // change object
+            ectScene.Maps[1].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
+        }
+
+        private static void SwapIntroLinkTheGoroAndAnju()
+        {
+            if (!ReplacementListContains(GameObjects.Actor.Anju)) return;
+
+            var stockpotInnScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.StockPotInn.FileID());
+            var linkTheGoro = stockpotInnScene.Maps[5].Actors[16]; // map 0 setup 1
+
+            linkTheGoro.ChangeActor(GameObjects.Actor.DekuBaba, vars: 0, modifyOld: true);
+            linkTheGoro.OldName = "LinkTheGoro(Intro)";
+            linkTheGoro.Position = new vec16(196, 0, 106); // even in the intro cutscene he spawns behind the door....
+            linkTheGoro.ChangeYRotation(270);
+            stockpotInnScene.Maps[5].Objects[1] = GameObjects.Actor.DekuBaba.ObjectIndex();
+            ActorUtils.SetActorSpawnTimeFlags(linkTheGoro);
+
+            // if we remove him anju doesnt spawn, as it seems this is a cutscene within a cutscene
+            var anju = stockpotInnScene.Maps[5].Actors[19];
+            anju.ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
+            anju.OldName = "Anju(Intro)";
+            stockpotInnScene.Maps[5].Objects[0] = GameObjects.Actor.Bombiwa.ObjectIndex();
+            ActorUtils.SetActorSpawnTimeFlags(anju);
         }
 
         private static void SwapPiratesFortressBgBreakwall()
@@ -3437,13 +3540,18 @@ namespace MMR.Randomizer
             ranchScene.Maps[2].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
         }
 
-        private static void FreeUpTwinIslandsSnowballs()
+        private static void FreeUpSnowballsDoubleObjects()
         {
             /// issue: we can't randomize all of them most of the time
             /// but, there are three objects here, snowball, tektite, and snapper, which dont exist if we remove the snowballs anyway
 
             var twinislandsScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TwinIslands.FileID());
             twinislandsScene.Maps[0].Objects[4] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // snapper
+
+            // mountain village
+            var mountainVillageScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillage.FileID());
+            mountainVillageScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // wolfos
+
         }
 
         private static void DistinguishLogicRequiredDekuFlowers()
@@ -3593,6 +3701,12 @@ namespace MMR.Randomizer
                     {
                         kickoutAddr = 1; // zora hall exit 0 is out the water door, softlock if you dont have zora or enough health
                     }
+                    if (actor.ActorEnum == GameObjects.Actor.DekuPatrolGuard
+                     && thisSceneData.Scene.SceneEnum == GameObjects.Scene.PiratesFortressRooms)
+                    {
+                        kickoutAddr = 10; // upper locked room of sewer, best spot I got since I can't guarentee the player can swim, without changing how the guard kickout works
+                    }
+
 
                     // erase the kick location from the old vars
                     int kickoutMask = newKickoutAttr.Mask << newKickoutAttr.Shift;
@@ -4301,11 +4415,14 @@ namespace MMR.Randomizer
                     return false;
                 }
                 
-                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronLinkPoundSwitch)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.GoronSGoro)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BigOcto)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.GreatFairy)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
+                //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.DoggyRacetrack, GameObjects.Actor.Treee, GameObjects.Actor.SquareSign)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortress, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.Japas)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.SquareSign, GameObjects.Actor.ClocktowerGearsAndOrgan)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Scarecrow, GameObjects.Actor.BeanSeller)) continue;
@@ -5260,50 +5377,7 @@ namespace MMR.Randomizer
             SplitSceneLikeLikesIntoTwoActorObjects(thisSceneData);
             AddAniObjectIfTerminaFieldTree(thisSceneData);
             AddExtraObjectToPiratesInterior(thisSceneData);
-        }
-
-        private static void TrimSceneAcceptableCandidateList(SceneEnemizerData thisSceneData)
-        {
-            // some scenes are blocked from having enemy placements, do this ONCE before GetMatchPool, which would do it per-enemy
-            thisSceneData.AcceptableCandidates = ReplacementCandidateList.FindAll(act => !act.ActorEnum.BlockedScenes().Contains(thisSceneData.Scene.SceneEnum))
-                                                                         .FindAll(act => !act.NoPlacableVariants());
-
-            //thisSceneData.AcceptableCandidates.RemoveAll(act => act.NoPlacableVariants());
-
-            // if the dyna limits for this scene are low, we might as well trim all actors that cannot ever be put here,
-            // no point running code on them later
-            var dynaLimitsAttributes = thisSceneData.Scene.SceneEnum.GetAttribute<DynaAttributes>();
-            if (dynaLimitsAttributes != null)
-            {
-                var largeDynaActors = thisSceneData.AcceptableCandidates.FindAll(act => act.DynaLoad.poly > dynaLimitsAttributes.Polygons
-                                                                                     || act.DynaLoad.vert > dynaLimitsAttributes.Verticies);
-                thisSceneData.AcceptableCandidates = thisSceneData.AcceptableCandidates.Except(largeDynaActors).ToList();
-            }
-
-            thisSceneData.Log.AppendLine($" ---------------------------");
-
-            // trim weights
-            foreach (var actor in thisSceneData.AcceptableCandidates.ToList())
-            {
-                int actorPlacementWeight = actor.GetPlacementWeight();
-                if (actorPlacementWeight != 100
-                     && thisSceneData.RNG.Next(100) > actorPlacementWeight ) // under is pass, over is failure
-                {
-                    thisSceneData.AcceptableCandidates.Remove(actor);
-                    #if DEBUG
-                    thisSceneData.Log.AppendLine($" (-) actor rng weight trimmed from scene placement: [{actor.Name}]");
-                    #endif
-                }
-            }
-
-            // special cases
-            if (thisSceneData.AcceptableCandidates.Any(a => a.ActorEnum == GameObjects.Actor.GaboraBlacksmith))
-            {
-                // we cannot place both the blacksmith and his acountaint in the same place, talking to one can BREAK, but almost always only does this if both are present
-                // random coin toss, remove one
-                var targetActorEnum = (thisSceneData.RNG.Next() % 2 == 1) ? (GameObjects.Actor.GaboraBlacksmith) : (GameObjects.Actor.Zubora);
-                thisSceneData.AcceptableCandidates.RemoveAll(a => a.ActorEnum == targetActorEnum);
-            }
+            RemoveScarecrowFromTradingPostIfSOTRandomized(thisSceneData);
         }
 
         private static void SplitSceneLikeLikesIntoTwoActorObjects(SceneEnemizerData thisSceneData)
@@ -5361,8 +5435,8 @@ namespace MMR.Randomizer
                 var newObject = SMALLEST_OBJ;
                 if (thisSceneData.RNG.Next() % 10 > 5) // chance of fixed rare/random actor
                 {
-                    newObject = freeObjList[thisSceneData.RNG.Next() % (freeObjList.Count -1)];
-                } 
+                    newObject = freeObjList[thisSceneData.RNG.Next() % (freeObjList.Count - 1)];
+                }
 
                 // for now we just bypass rando and set it manually
                 thisSceneData.Scene.Maps[0].Objects[6] = newObject;
@@ -5374,6 +5448,8 @@ namespace MMR.Randomizer
             /// With enemizer/actorizer pirates interior is actually kinda dry and boring
             /// the scene has 11 objects, we can add another object to the scene to give enemizer some more free-object actors it can place
             /// also the scene has an unused object (that doesn't get used in enemizer now) we can swap out for something random
+
+            // todo: change one rarely seen actor to a different actor and attach object to it instead
 
             if (thisSceneData.Scene.SceneEnum != GameObjects.Scene.PiratesFortress) return;
 
@@ -5425,6 +5501,68 @@ namespace MMR.Randomizer
                 thisSceneData.Scene.Maps[0].Objects[3] = newObject2;
             }
         }
+
+        private static void RemoveScarecrowFromTradingPostIfSOTRandomized(SceneEnemizerData thisSceneData)
+        {
+            if (thisSceneData.Scene.SceneEnum == GameObjects.Scene.TradingPost)
+            {
+                var songOfTimeShuffled = _randomized.Settings.CustomItemList.Contains(GameObjects.Item.SongTime);
+                var songOfTimeStarting = _randomized.Settings.CustomStartingItemList.Contains(GameObjects.Item.SongTime);
+                if (songOfTimeShuffled && !songOfTimeStarting)
+                {
+                    thisSceneData.Actors.RemoveAll(act => act.ActorEnum == GameObjects.Actor.Scarecrow);
+                    thisSceneData.Objects.RemoveAll(obj => obj == GameObjects.Actor.Scarecrow.ObjectIndex());
+                }
+            }
+
+        }
+
+
+        private static void TrimSceneAcceptableCandidateList(SceneEnemizerData thisSceneData)
+        {
+            // some scenes are blocked from having enemy placements, do this ONCE before GetMatchPool, which would do it per-enemy
+            thisSceneData.AcceptableCandidates = ReplacementCandidateList.FindAll(act => !act.ActorEnum.BlockedScenes().Contains(thisSceneData.Scene.SceneEnum))
+                                                                         .FindAll(act => !act.NoPlacableVariants());
+
+            //thisSceneData.AcceptableCandidates.RemoveAll(act => act.NoPlacableVariants());
+
+            // if the dyna limits for this scene are low, we might as well trim all actors that cannot ever be put here,
+            // no point running code on them later
+            var dynaLimitsAttributes = thisSceneData.Scene.SceneEnum.GetAttribute<DynaAttributes>();
+            if (dynaLimitsAttributes != null)
+            {
+                var largeDynaActors = thisSceneData.AcceptableCandidates.FindAll(act => act.DynaLoad.poly > dynaLimitsAttributes.Polygons
+                                                                                     || act.DynaLoad.vert > dynaLimitsAttributes.Verticies);
+                thisSceneData.AcceptableCandidates = thisSceneData.AcceptableCandidates.Except(largeDynaActors).ToList();
+            }
+
+            thisSceneData.Log.AppendLine($" ---------------------------");
+
+            // trim weights
+            foreach (var actor in thisSceneData.AcceptableCandidates.ToList())
+            {
+                int actorPlacementWeight = actor.GetPlacementWeight();
+                if (actorPlacementWeight != 100
+                     && thisSceneData.RNG.Next(100) > actorPlacementWeight ) // under is pass, over is failure
+                {
+                    thisSceneData.AcceptableCandidates.Remove(actor);
+                    #if DEBUG
+                    thisSceneData.Log.AppendLine($" (-) actor rng weight trimmed from scene placement: [{actor.Name}]");
+                    #endif
+                }
+            }
+
+            // special cases
+            if (thisSceneData.AcceptableCandidates.Any(a => a.ActorEnum == GameObjects.Actor.GaboraBlacksmith))
+            {
+                // we cannot place both the blacksmith and his acountaint in the same place, talking to one can BREAK, but almost always only does this if both are present
+                // random coin toss, remove one
+                var targetActorEnum = (thisSceneData.RNG.Next() % 2 == 1) ? (GameObjects.Actor.GaboraBlacksmith) : (GameObjects.Actor.Zubora);
+                thisSceneData.AcceptableCandidates.RemoveAll(a => a.ActorEnum == targetActorEnum);
+            }
+        }
+
+        
 
 
         [System.Diagnostics.DebuggerDisplay("{Scene.SceneEnum.ToString()}")]
@@ -5747,6 +5885,8 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
+            //if (scene.SceneEnum == GameObjects.Scene.LaundryPool) // force specific actor/variant for debugging
+            //{
             //if (scene.SceneEnum == GameObjects.Scene.SouthClockTown) // force specific actor/variant for debugging
             //{
                 //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot
@@ -6549,7 +6689,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 77.0\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 78.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
