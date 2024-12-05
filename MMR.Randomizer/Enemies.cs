@@ -878,6 +878,17 @@ namespace MMR.Randomizer
 
                 }// else: randomize all
             }
+            if (_randomized.Settings.FreeScarecrow == false && testActor == GameObjects.Actor.Scarecrow && 
+                (scene.SceneEnum == GameObjects.Scene.TradingPost || scene.SceneEnum == GameObjects.Scene.AstralObservatory))
+            {
+                // only two scenes, one is even one is odd, lets use the seed and the scene ID
+                int sceneChosen = ((int)scene.SceneEnum + _randomized.Seed) & 1;
+                if (sceneChosen == 1)
+                {
+                    return GameObjects.Item.SongOath; // there is no scarecrow song to use as a value, will just use this
+                }
+            }
+
             /* // issue: this COMPLETELY ignores bean seller is vanilla and does not show up in sphere list because -- ! ZOEY ! --
             if (testActor == GameObjects.Actor.BeanSeller
                 && (_randomized.Settings.LogicMode != Models.LogicMode.NoLogic && _randomized.Settings.LogicMode != Models.LogicMode.Vanilla))
