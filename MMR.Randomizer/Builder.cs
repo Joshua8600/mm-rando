@@ -69,7 +69,8 @@ namespace MMR.Randomizer
             RomData.TargetSequences = RomData.TargetSequences.OrderBy(x => random.Next()).ToList(); // random ordered slots
 
             // if we have lots of music, let's randomize skulltula house and ikana well to have something unique that isn't cave music
-            if (RomData.SequenceList.Count > 80 && RomData.SequenceList.FindAll(u => u.Categories.Contains(2)).Count >= 8 + 2){ // tested by asking for all targetseq that have a category of 2, counted (8)
+            // original line: if (RomData.SequenceList.Count > 80 && RomData.SequenceList.FindAll(u => u.Categories.Contains(2)).Count >= 8 + 2){ // tested by asking for all targetseq that have a category of 2, counted (8)
+            if (RomData.SequenceList.FindAll(u => u.Categories.Contains(2)).Count >= 8 + 2){ // tested by asking for all targetseq that have a category of 2, counted (8)
                 SequenceUtils.ReassignSongSlots(log, random);
             }
             SequenceUtils.ResetBudget();
