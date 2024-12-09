@@ -2634,7 +2634,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.IkanaCanyon, Scene.RoadToIkana, Scene.LinkTrial, Scene.DekuTrial, Scene.GoronTrial, Scene.ZoraTrial)] // don't replace the originals as we might need for hints
         //[ForbidFromScene(Scene.LinkTrial)] // supposidly, you can play storms on the gossip stone to open the door instead of bombchu
         //[EnemizerScenesPlacementBlock(Scene.ClockTowerInterior)] // crash (reason unk)
-        [PlacementWeight(85)]
+        [PlacementWeight(60)]
         GossipStone = 0xEF, // En_Gs
 
         //[ActorizerEnabled] // best used as a companion instead of being its own actor
@@ -4782,7 +4782,7 @@ namespace MMR.Randomizer.GameObjects
         //0xFE0F doesnt spawn, assumping its the one that is walking away after tatl pisses them off
         //[GroundVariants(0xFE08)]
         [EnemizerScenesPlacementBlock(Scene.AstralObservatory, Scene.Grottos, Scene.IkanaCastle,
-            Scene.WestClockTown, Scene.EastClockTown, Scene.NorthClockTown, Scene.SouthClockTown, Scene.LaundryPool,
+            Scene.WestClockTown, /*Scene.EastClockTown,*/ Scene.NorthClockTown, Scene.SouthClockTown, Scene.LaundryPool,
             Scene.TouristCenter, Scene.DekuKingChamber, Scene.DekuShrine, Scene.MountainSmithy, Scene.GoronGrave, Scene.GoronShrine, Scene.FishermansHut, Scene.ZoraHall, Scene.MarineLab, Scene.SecretShrine, Scene.IkanaCastle, Scene.IgosDuIkanasLair, Scene.SwordsmansSchool,
             Scene.TradingPost, Scene.BombShop, Scene.PotionShop, Scene.GoronShop, Scene.ZoraHallRooms, Scene.TreasureChestShop, Scene.SwampShootingGallery, Scene.TownShootingGallery, Scene.BeneathTheWell,
             Scene.HoneyAndDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.StockPotInn
