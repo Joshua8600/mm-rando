@@ -2890,8 +2890,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x2243)]
         Garo = 0x113, // En_Jso
 
-        // not that interesting, cutscene calapsing bridge
-        [ActorizerEnabled]
+        [ActorizerEnabled] // unused callaping bridge
         [FileID(249)]
         [ObjectListIndex(0xED)]
         [DynaAttributes(12,8)]
@@ -2901,7 +2900,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(//Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.StoneTower, // dyna crash
             Scene.TradingPost)]  // might block door?
-        [PlacementWeight(50)] // waaay too common
+        [PlacementWeight(40)] // waaay too common
         UnusedFallingBridge = 0x114, // Obj_Chikuwa
 
         // TODO would not spawn because I mistyped the ID try again
@@ -3739,7 +3738,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.DekuTrial, Scene.GoronTrial, Scene.ZoraTrial, Scene.LinkTrial,
             Scene.SwordsmansSchool, Scene.ZoraHall, Scene.GoronRacetrack,
             // these are missing special object at all
-            Scene.SPOT00, Scene.HoneyDarling, Scene.MayorsResidence, Scene.MilkBar,
+            Scene.SPOT00, Scene.HoneyAndDarling, Scene.MayorsResidence, Scene.MilkBar,
             Scene.FishermansHut, Scene.PoeHut, Scene.MusicBoxHouse, Scene.StockPotInn, Scene.BombShop, Scene.GiantsChamber,
             Scene.TreasureChestShop, Scene.LotteryShop, Scene.GoronShop, Scene.SakonsHideout, Scene.DekuShrine,
             Scene.OdolwasLair, Scene.GohtsLair, Scene.GyorgsLair, Scene.TwinmoldsLair,
@@ -4785,8 +4784,8 @@ namespace MMR.Randomizer.GameObjects
             Scene.WestClockTown, Scene.EastClockTown, Scene.NorthClockTown, Scene.SouthClockTown, Scene.LaundryPool,
             Scene.TouristCenter, Scene.DekuKingChamber, Scene.DekuShrine, Scene.MountainSmithy, Scene.GoronGrave, Scene.GoronShrine, Scene.FishermansHut, Scene.ZoraHall, Scene.MarineLab, Scene.SecretShrine, Scene.IkanaCastle, Scene.IgosDuIkanasLair, Scene.SwordsmansSchool,
             Scene.TradingPost, Scene.BombShop, Scene.PotionShop, Scene.GoronShop, Scene.ZoraHallRooms, Scene.TreasureChestShop, Scene.SwampShootingGallery, Scene.TownShootingGallery, Scene.BeneathTheWell,
-            Scene.HoneyDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.StockPotInn
-            )]
+            Scene.HoneyAndDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.StockPotInn
+        )]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         Giant = 0x1DB, // En_Giant
@@ -6225,7 +6224,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         //[Minum]
         [EnemizerScenesPlacementBlock(Scene.RanchBuildings, Scene.ClockTowerInterior,
-            Scene.HoneyDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.TreasureChestShop,
+            Scene.HoneyAndDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.TreasureChestShop,
             Scene.MarineLab, Scene.AstralObservatory,
             Scene.TownShootingGallery, Scene.SwampShootingGallery, Scene.PotionShop, Scene.GoronShop, Scene.ZoraHallRooms, 
             Scene.PoeHut, Scene.MusicBoxHouse, Scene.BeneathGraveyard)]

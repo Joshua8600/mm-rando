@@ -35,7 +35,9 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1158)]
         [SceneInternalId(0x11)]
-        HoneyDarling = 0x04,
+        [EnemizerSceneEnemyReplacementBlock(Actor.LotteryKiosk,
+           Actor.UnusedFallingBridge)] // can instant crash you at the door
+        HoneyAndDarling = 0x04,
 
         [FileID(1145)]
         [ClearEnemyPuzzleRooms(1, 2, 4)]
@@ -563,6 +565,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1334)]
         [SceneInternalId(0x39)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.LotteryKiosk,
+           Actor.UnusedFallingBridge)] // can instant crash you at the door
         LotteryShop = 0x36,
 
         // Unused = 0x37,
