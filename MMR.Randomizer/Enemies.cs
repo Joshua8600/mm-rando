@@ -1695,11 +1695,8 @@ namespace MMR.Randomizer
 
             // bigpo deserves a red dot on the minimap
             RomUtils.CheckCompressed(GameObjects.Actor.BigPoe.FileListIndex());
-            var biopoData = RomData.MMFileList[GameObjects.Actor.BigPoe.FileListIndex()].Data;
-            biopoData[0x3A14] |= 0x80; // set the 0x80000000 actor flag to enabled red dot on the minimap
-
-
-
+            var bigpoData = RomData.MMFileList[GameObjects.Actor.BigPoe.FileListIndex()].Data;
+            bigpoData[0x3A14] |= 0x80; // set the 0x80000000 actor flag to enabled red dot on the minimap
 
             //LightShinanigans();
 
@@ -3880,6 +3877,28 @@ namespace MMR.Randomizer
                     TrimAllActors(thisSceneData, uniqueActor, specificActorList, allowLimits: false);
                 }
             }
+
+            // special case: now that we enabled snow everywhere, we can't let it spawn with giant+bubble, its too many particles
+            for (int m = 0; m < thisSceneData.Scene.Maps.Count; ++m)
+            {
+                var map = thisSceneData.Scene.Maps[m];
+                var roomFreeActors = GetRoomFreeActors(thisSceneData, m);
+
+                if (map.Objects.Contains(GameObjects.Actor.Shabom.ObjectIndex()) && map.Objects.Contains(GameObjects.Actor.Giant.ObjectIndex()))
+                {
+                    var objectKankyoSearch = map.Actors.FindAll(act => act.ActorEnum == GameObjects.Actor.ObjectKankyo);
+                    foreach (var objKankyo in objectKankyoSearch)
+                    {
+                        var blockedActors = thisSceneData.Scene.SceneEnum.GetBlockedReplacementActors(objKankyo.OldActorEnum);
+                        List<Actor> acceptableReplacementFreeActors = roomFreeActors.FindAll(a => !blockedActors.Contains(a.ActorEnum)).ToList();
+
+                        EmptyOrFreeActor(thisSceneData, objKankyo, map.Actors, acceptableReplacementFreeActors,
+                                roomIsClearPuzzleRoom: true); // for now marking this true just because I dont want to re-calculate this since its in the wrong spot,
+                        thisSceneData.Log.Append(" -*- trimming object kankyo because of rare double object");
+                    }
+                }
+            }
+
         }
 
         public static void FixBrokenActorSpawnCutscenes(SceneEnemizerData thisSceneData)

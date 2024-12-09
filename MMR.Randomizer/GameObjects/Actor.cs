@@ -927,8 +927,9 @@ namespace MMR.Randomizer.GameObjects
         // 2 is the murk from the ocean, but full time
         // 1 and 3 are snow, but you need to set E2 to non-zero
         // 4 kill itself it not in the giants chamber
-        [FlyingVariants(3)]
+        //[FlyingVariants(3)]
         //[GroundVariants(3)] // 3 is snow
+        [EnemizerScenesPlacementBlock(Scene.PathToMountainVillage, Scene.MountainVillage, Scene.TwinIslands, Scene.GoronVillage, Scene.PathToSnowhead, Scene.Snowhead)] // no point putting them where they can't do anything
         [UnkillableAllVariants]
         ObjectKankyo = 0x51, // Object_Kankyo
 
