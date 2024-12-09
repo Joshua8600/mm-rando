@@ -65,6 +65,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.LikeLike)] // can grab you on the boat ride
         [EnemizerSceneEnemyReplacementBlock(Actor.Lilypad,
             Actor.Desbreko)] // heavy lag
+        [EnemizerSceneEnemyReplacementBlock(Actor.DekuBaba,
+            Actor.Dodongo)] // can clip into the boat ride and knock link off
         SouthernSwampClear = 0x06,
 
         [FileID(1151)]
