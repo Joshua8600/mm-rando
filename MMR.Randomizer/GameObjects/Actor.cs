@@ -4819,7 +4819,8 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.TwinIslands, variant: 0x40E, Item.SongLullabyIntro)] // grandpa
         [CheckRestricted(Scene.TwinIslands, variant: 0x80E, Item.SongLullabyIntro)] // grandpa
         [CheckRestricted(Scene.TwinIslands, variant: 0x40E, Item.SongLullabyIntro)] // grandpa
-        [CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
+
+        /*[CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
             Item.CollectableGoronVillageWinterLargeSnowball1, Item.CollectableGoronVillageWinterLargeSnowball2, // small
             Item.CollectableGoronVillageWinterLargeSnowball3, Item.CollectableGoronVillageWinterLargeSnowball4,
             Item.CollectableGoronVillageWinterLargeSnowball5, Item.CollectableGoronVillageWinterLargeSnowball6,
@@ -4827,7 +4828,13 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableGoronVillageWinterSmallSnowball1, Item.CollectableGoronVillageWinterSmallSnowball2, Item.CollectableGoronVillageWinterSmallSnowball3, // large
             Item.CollectableGoronVillageWinterSmallSnowball4, Item.CollectableGoronVillageWinterSmallSnowball5, Item.CollectableGoronVillageWinterSmallSnowball6,
             Item.CollectableGoronVillageWinterSmallSnowball7, Item.CollectableGoronVillageWinterSmallSnowball8, Item.CollectableGoronVillageWinterSmallSnowball9,
-            Item.CollectableGoronVillageWinterSmallSnowball10)]
+            Item.CollectableGoronVillageWinterSmallSnowball10)] // */
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2002, Item.CollectableGoronVillageWinterLargeSnowball1)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2202, Item.CollectableGoronVillageWinterLargeSnowball2)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2402, Item.CollectableGoronVillageWinterLargeSnowball3)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2102, Item.CollectableGoronVillageWinterLargeSnowball4)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2302, Item.CollectableGoronVillageWinterLargeSnowball5)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2502, Item.CollectableGoronVillageWinterLargeSnowball6)]
         /* [CheckRestricted(Scene.PathToMountainVillage, variant: ActorConst.ANY_VARIANT,
             Item.CollectablePathToMountainVillageSmallSnowball1, Item.CollectablePathToMountainVillageSmallSnowball2, // small
             Item.CollectablePathToMountainVillageSmallSnowball3, Item.CollectablePathToMountainVillageSmallSnowball4,
@@ -5166,14 +5173,24 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.TwinIslands, variant: 0x390E, Item.CollectablePathToGoronVillageWinterSmallSnowball3)] // ramp near tree grotto
         [CheckRestricted(Scene.TwinIslands, variant: 0x360E, Item.CollectablePathToGoronVillageWinterSmallSnowball2)] // near west entrance
         [CheckRestricted(Scene.TwinIslands, variant: 0x380E, Item.CollectablePathToGoronVillageWinterSmallSnowball1)] // near tingle
-        [CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.GoronVillage, variant: 0x331E, Item.CollectableGoronVillageWinterSmallSnowball1)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x341E, Item.CollectableGoronVillageWinterSmallSnowball2)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2B15, Item.CollectableGoronVillageWinterSmallSnowball3)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x301E, Item.CollectableGoronVillageWinterSmallSnowball4)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2D13, Item.CollectableGoronVillageWinterSmallSnowball5)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x3113, Item.CollectableGoronVillageWinterSmallSnowball6)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2C19, Item.CollectableGoronVillageWinterSmallSnowball7)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2F19, Item.CollectableGoronVillageWinterSmallSnowball8)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2E0E, Item.CollectableGoronVillageWinterSmallSnowball9)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x320E, Item.CollectableGoronVillageWinterSmallSnowball10)]
+        /*[CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
             Item.CollectableGoronVillageWinterLargeSnowball1, Item.CollectableGoronVillageWinterLargeSnowball2, // small
             Item.CollectableGoronVillageWinterLargeSnowball3, Item.CollectableGoronVillageWinterLargeSnowball4,
             Item.CollectableGoronVillageWinterLargeSnowball5, Item.CollectableGoronVillageWinterLargeSnowball6,
             Item.CollectableGoronVillageWinterSmallSnowball1, Item.CollectableGoronVillageWinterSmallSnowball2, Item.CollectableGoronVillageWinterSmallSnowball3, // large
             Item.CollectableGoronVillageWinterSmallSnowball4, Item.CollectableGoronVillageWinterSmallSnowball5, Item.CollectableGoronVillageWinterSmallSnowball6,
             Item.CollectableGoronVillageWinterSmallSnowball7, Item.CollectableGoronVillageWinterSmallSnowball8, Item.CollectableGoronVillageWinterSmallSnowball9,
-            Item.CollectableGoronVillageWinterSmallSnowball10)]
+            Item.CollectableGoronVillageWinterSmallSnowball10)] // */
         [CheckRestricted(Scene.PathToMountainVillage, variant: ActorConst.ANY_VARIANT,
             Item.CollectablePathToMountainVillageSmallSnowball1, Item.CollectablePathToMountainVillageSmallSnowball2, // small
             Item.CollectablePathToMountainVillageSmallSnowball3, Item.CollectablePathToMountainVillageSmallSnowball4
@@ -5209,7 +5226,6 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.MountainVillage, variant: 0x2D0F, Item.CollectableMountainVillageWinterSmallSnowball3)] // goron grave 1
         [CheckRestricted(Scene.MountainVillage, variant: 0x2E0F, Item.CollectableMountainVillageWinterSmallSnowball4)] // goron grave 2
         [CheckRestricted(Scene.MountainVillage, variant: 0x3610, Item.CollectableMountainVillageWinterSmallSnowball8)] // fairy near the owl tree
-
         [CheckRestricted(Scene.MountainVillageSpring, variant: ActorConst.ANY_VARIANT,
             Item.CollectableMountainVillageSpringSmallSnowball1, Item.CollectableMountainVillageSpringSmallSnowball2, // small
             Item.CollectableMountainVillageSpringSmallSnowball3, Item.CollectableMountainVillageSpringSmallSnowball4

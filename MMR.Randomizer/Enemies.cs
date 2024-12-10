@@ -3464,6 +3464,11 @@ namespace MMR.Randomizer
             var mountainVillageScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillage.FileID());
             mountainVillageScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // wolfos
 
+            // goron village
+            var goronVillageScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GoronVillage.FileID());
+            // this is a test, not sure if we can really do this
+            goronVillageScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // previously heart piece
+            goronVillageScene.Maps[1].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // previously heart piece (bigsmoth room, likey have to match
         }
 
 
