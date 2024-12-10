@@ -4218,7 +4218,11 @@ namespace MMR.Randomizer
                 {
                     testActor.Position.y -= 90; // too high annoyingly
                 }
-
+                // special case: woodfall wooden flower spawns in the ground, needs to be raised
+                if (testActor.ActorEnum == GameObjects.Actor.WoodfallTempleWoodenFlower && testActor.OldActorEnum != GameObjects.Actor.WoodfallTempleWoodenFlower)
+                {
+                    testActor.Position.y += 100;
+                }
 
             }
             thisSceneData.Log.AppendLine(" ---------- ");
@@ -4444,8 +4448,8 @@ namespace MMR.Randomizer
                     }
                     return false;
                 }
-                
-                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.BigOcto)) continue;
+
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.WoodfallTempleWoodenFlower)) continue;
                 if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.GreatFairy)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;

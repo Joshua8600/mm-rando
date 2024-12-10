@@ -3241,10 +3241,20 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacementXRot]
         Obj_Raillift = 0x13C, // Obj_Raillift
 
+        [ActorizerEnabled]
         [FileID(281)]
         [ObjectListIndex(0x164)]
         // closed is smaller?? (96,48)
         [DynaAttributes(136,72)] // big yikes (opened)
+        // params has a verion 1, but its code does nothing??
+        [GroundVariants(
+            0 // default closed
+        )]
+        [VariantsWithRoomMax(max:1, variant:0, 1)]
+        [ForbidFromScene(Scene.WoodfallTemple)]
+        // uses a weekeventreg instead
+        [SwitchFlagsPlacement(size:0x7F, shift:8)] // this SETS but does not read, is it passing info to a door?
+        [UnkillableAllVariants]
         WoodfallTempleWoodenFlower = 0x13D, // Bg_Numa_Hana
 
         [ActorizerEnabled] // big object, collector flag, boring actor
