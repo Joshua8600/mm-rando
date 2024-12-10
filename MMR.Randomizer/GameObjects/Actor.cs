@@ -2671,8 +2671,8 @@ namespace MMR.Randomizer.GameObjects
             Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
         [CheckRestricted(Scene.RomaniRanch, variant: ActorConst.ANY_VARIANT,
             Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
-        [CheckRestricted(Scene.Grottos, variant: ActorConst.ANY_VARIANT,
-            Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
+        //[CheckRestricted(Scene.Grottos, variant: ActorConst.ANY_VARIANT, // moved to EnemizerItemFixes to handle the en_torch things
+        //    Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
         [GroundVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [WallVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [WaterBottomVariants(0)] // silly

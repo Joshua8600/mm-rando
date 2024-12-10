@@ -1052,12 +1052,20 @@ namespace MMR.Randomizer
 
             if (cow1.ActorEnum == GameObjects.Actor.GrottoChest)
             {
-                // manually check if restrictions apply
-                var itemRestriction = ObjectIsCheckBlocked(grottosScene, cow1.ActorEnum);
-                if (itemRestriction == null)
-                {
-                    cow1.ChangeActor(GameObjects.Actor.Cow, vars: 0, modifyOld: true);
-                    cow2.ChangeActor(GameObjects.Actor.Cow, vars: 0, modifyOld: true);
+                try { 
+                    // manually check if restrictions apply
+                    var tfCow1Item = _randomized.ItemList.Find(item => item.NewLocation != null && item.NewLocation == GameObjects.Item.ItemTerminaGrottoCowMilk1).Item;
+                    var tfCow2Item = _randomized.ItemList.Find(item => item.NewLocation != null && item.NewLocation == GameObjects.Item.ItemTerminaGrottoCowMilk2).Item;
+                    var gbcCow1Item = _randomized.ItemList.Find(item => item.NewLocation != null && item.NewLocation == GameObjects.Item.ItemCoastGrottoCowMilk1).Item;
+                    var gbcCow2Item = _randomized.ItemList.Find(item => item.NewLocation != null && item.NewLocation == GameObjects.Item.ItemCoastGrottoCowMilk2).Item;
+                    if (IsActorizerJunk(tfCow1Item) && IsActorizerJunk(tfCow2Item) && IsActorizerJunk(gbcCow1Item) && IsActorizerJunk(gbcCow2Item))
+                    {
+                        cow1.ChangeActor(GameObjects.Actor.Cow, vars: 0, modifyOld: true);
+                        cow2.ChangeActor(GameObjects.Actor.Cow, vars: 0, modifyOld: true);
+                    }
+
+                }catch(Exception e){
+                    throw new Exception("COW SANITY EVENT:\n" + e.Message);
                 }
             }
         }
