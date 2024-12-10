@@ -1525,10 +1525,10 @@ namespace MMR.Randomizer.GameObjects
         // 64 is size of HSW, 0xC8 in one of snowhead rooms, AA is compass room?
         // ice block room has 0x64 and 0x96, 0xFF in goron block puzzle room
         // smithy uses size 0x78, 0x10 is smol
-        [GroundVariants(0xFF10, 0xFF20, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [GroundVariants(0xFF10, 0xFF20, 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         [BlockingVariants(0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         // all restricted because they add colliders which limits our BGcheck options for other things
-        [VariantsWithRoomMax(max: 1, variant: 0xFF10, 0xFF20, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [VariantsWithRoomMax(max: 1, variant: 0xFF10, 0xFF20, 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         //[VariantsWithRoomMax(max: 1, variant: 0xFFC8, 0xFF96, 0xFF78)]
         [PlacementWeight(60)]
         RegularIceBlock = 0x8E, // Obj_Ice_Poly
@@ -3190,8 +3190,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(277)]
         [ObjectListIndex(0xA1)]
         [ActorInstanceSize(0xB78)]
-        //[CheckRestricted(Scene.GoronVillageSpring, variant:0x7F94, check:Item.MaskDonGero)]
-        //[CheckRestricted(Scene.MountainVillage, variant:0x7F94, check:Item.MaskDonGero)] // share object with the sirloin goron
+        [CheckRestricted(Scene.MountainVillage, variant: 0x7F84, check: Item.MaskDonGero)] // share object with the sirloin goron
+        [CheckRestricted(Scene.MountainVillage, variant: 0x7F94, check: Item.MaskDonGero)] // share object with the sirloin goron
         // 8 is smithy goron; blocked because he is too big
         // 7F85: standing outside of shop (complaining about noise)
         // racetrack gorons
@@ -3211,14 +3211,13 @@ namespace MMR.Randomizer.GameObjects
             0x7FE2, 0x7F85, 0x7F86, 0x7F87,
             0x7F82, 0x7F92)]
         [VariantsWithRoomMax(max: 0, variant: 0x8, // too big
-            0x7F84, 0x7F94, // the two outside of darmani race need to be on the same thing
+            0x7F84, 0x7F94, // the two outside of darmani race need to spawn as a pair or it crashes
             0x8, // keg smith, too big
             0x283, // opens door winter, crashes day 2/3 because pathing type for snowball
             0x7F82, 0x7F92)] // crash? reason unknown
         [UnkillableAllVariants]
-        [ForbidFromScene(Scene.GoronVillage, Scene.GoronVillageSpring)] // dont randomize smithy
-        [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1,
-            variant: 0x3F5F)]
+        [ForbidFromScene(Scene.GoronVillage, Scene.GoronVillageSpring)] // dont randomize smithy by accident
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         GoGoron = 0x138, // En_Go
 
         Empty139 = 0x139,

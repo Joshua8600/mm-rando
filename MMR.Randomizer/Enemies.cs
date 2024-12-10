@@ -620,7 +620,7 @@ namespace MMR.Randomizer
                         }
 
                         var itemRestriction = ObjectIsCheckBlocked(scene, mapActor.ActorEnum, mapActor.OldVariant);
-                        if (itemRestriction != null ) // && variant for this limitation is not ANYTHIng
+                        if (itemRestriction != null )
                         {
 
                             #if DEBUG
@@ -630,7 +630,7 @@ namespace MMR.Randomizer
                             #endif
 
                             log.AppendLine($" in scene (O!) [{scene.SceneEnum}]m[{mapIndex}]r[{mapActor.RoomActorIndex}]v[{mapActor.OldVariant.ToString("X4")}]" +
-                                $" actor:[0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] was " + itemText);
+                                $" actor:[0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] removal " + itemText);
                             continue;
                         }
 
