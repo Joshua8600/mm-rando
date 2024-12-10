@@ -1614,7 +1614,10 @@ namespace MMR.Randomizer
                 troublesomeBugs.OldName = "BugsInTheBack";
                 // while Im here, might as well move the second soil actor (bean) to the side a bit
                 var secondBean = doggyRaceScene.Maps[0].Actors[7];
-                secondBean.Position = new vec16(-4328, 146, 1664);
+                if (secondBean.ActorEnum != secondBean.OldActorEnum)
+                {
+                    secondBean.Position = new vec16(-4328, 146, 1664);
+                }
 
                 EnableAllFormItems();
 
