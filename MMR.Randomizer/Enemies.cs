@@ -1029,11 +1029,10 @@ namespace MMR.Randomizer
             RandomizeTheSongMonkey();
             MoveTheISTTTunnelTransitionBack();
             FixSwordSchoolPotRandomization();
-            SplitSceneSnowballIntoTwoActorObjects();
             SwapIntroActors();
             SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
-            FreeUpSnowballsDoubleObjects();
+            SplitSceneSnowballIntoTwoActorObjects();
 
             EnableAllCreditsCutScenes();
 
@@ -3432,14 +3431,28 @@ namespace MMR.Randomizer
             }
 
             var snowheadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Snowhead.FileID());
+            var snowheadWinter = snowheadScene.Maps[0];
             //snowheadScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // previously treasure chest, stupid
-            snowheadScene.Maps[0].Objects[3] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // unused stalagtite icicle, stupid
+            snowheadWinter.Objects[3] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // unused stalagtite icicle, stupid
             // TODO randomize the unused iceicle and clay pot too
             // TODO 25% chance of goro-iwa randomization too
+            var snowheadSpring = snowheadScene.Maps[1];
+            // again there are multiple unused objects, there is also a treasure chest and clay pot object
+            snowheadSpring.Objects[3] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // unused eeno here previously
 
             var pathToSnowheadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.PathToSnowhead.FileID());
             pathToSnowheadScene.Maps[0].Objects[5] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // (winter largesnowball) previously gaebora
             pathToSnowheadScene.Maps[1].Objects[7] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // (spring smallsnowball) previously gaebora
+
+            /// twin islands has three three objects here, snowball, tektite, and snapper, which dont exist if we remove the snowballs anyway
+
+            var twinislandsScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TwinIslands.FileID());
+            twinislandsScene.Maps[0].Objects[4] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // snapper
+
+            // mountain village
+            var mountainVillageScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillage.FileID());
+            mountainVillageScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // wolfos
+
         }
 
 
@@ -3548,19 +3561,6 @@ namespace MMR.Randomizer
             ranchScene.Maps[2].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
         }
 
-        private static void FreeUpSnowballsDoubleObjects()
-        {
-            /// issue: we can't randomize all of them most of the time
-            /// but, there are three objects here, snowball, tektite, and snapper, which dont exist if we remove the snowballs anyway
-
-            var twinislandsScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TwinIslands.FileID());
-            twinislandsScene.Maps[0].Objects[4] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // snapper
-
-            // mountain village
-            var mountainVillageScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillage.FileID());
-            mountainVillageScene.Maps[0].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // wolfos
-
-        }
 
         private static void DistinguishLogicRequiredDekuFlowers()
         {
