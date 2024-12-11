@@ -4433,6 +4433,20 @@ namespace MMR.Randomizer
             }
         }
 
+        private static void EnsureOnlyOneKankyo(SceneEnemizerData thisSceneData)
+        {
+            // temp, makes sure demo kankyo and object kankyo cannot be in the same area
+            var objSearch = thisSceneData.Actors.FindAll(act => act.ActorEnum == GameObjects.Actor.ObjectKankyo);
+            var demoSearch = thisSceneData.Actors.FindAll(act => act.ActorEnum == GameObjects.Actor.Demo_Kankyo);
+            if (objSearch.Count > 0 && demoSearch.Count > 0)
+            {
+                for(int i = 0; i < demoSearch.Count; ++i)
+                {
+                    demoSearch[i].ChangeActor(GameObjects.Actor.Empty, 0x0);
+                }
+            }
+        }
+
 
         public static void ShuffleObjects(SceneEnemizerData thisSceneData)
         {
@@ -5874,6 +5888,7 @@ namespace MMR.Randomizer
             FixBrokenActorSpawnCutscenes(thisSceneData); // some actors dont like having bad cutscenes
             FixWaterPostboxes(thisSceneData);
             FixSnowballActorSpawns(thisSceneData);
+            EnsureOnlyOneKankyo(thisSceneData);
             // the following modify Variant which can confuse typing system
             FixPathingVars(thisSceneData); // any patrolling types need their vars fixed
             FixKickoutEnemyVars(thisSceneData); // and same with the two actors that have kickout addresses
@@ -6622,7 +6637,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 78.2\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 79.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
