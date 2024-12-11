@@ -2071,7 +2071,15 @@ namespace MMR.Randomizer
                 swPrize.
             } // */
 
-
+            var nctScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.NorthClockTown.FileID());
+            var nctHP = nctScene.Maps[0].Actors[4];
+            var nctUglyTree = nctScene.Maps[0].Actors[7];
+            if (nctUglyTree.ActorEnum != GameObjects.Actor.Gorman)
+            {
+                nctHP.Position = new vec16(141, 375, -2336); // moved to post
+                // rotation?
+            }
+            SceneUtils.UpdateScene(nctScene);
 
             FixEvanRotation();
             MoveShopScrubsIfRandomized();
