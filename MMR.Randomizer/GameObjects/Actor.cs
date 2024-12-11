@@ -1306,7 +1306,7 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectibleSwampSpiderToken5)]
         [CheckRestricted(Scene.SwampSpiderHouse, variant: 0x001E, // swamp spiderhouse
             Item.CollectibleSwampSpiderToken30)]
-        [CheckRestricted(Scene.DekuPalace, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.DekuPalace, variant: ActorConst.ANY_VARIANT, // NOT DUNGEON
             Item.CollectableDekuPalaceEastInnerGardenPot1, Item.CollectableDekuPalaceEastInnerGardenPot2)]
         [CheckRestricted(Scene.DekuShrine, variant: ActorConst.ANY_VARIANT, Item.CollectableDekuShrineGreyBoulderRoomPot1)]
         [CheckRestricted(Scene.Woodfall, variant: ActorConst.ANY_VARIANT,
@@ -1374,7 +1374,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.BeneathTheWell, variant: 0x4815, Item.CollectableBeneathTheWellBugAndBombRoomPot1, Item.CollectableBeneathTheWellBugAndBombRoomPot2, Item.CollectableBeneathTheWellBugAndBombRoomPot3, Item.CollectableBeneathTheWellBugAndBombRoomPot4, Item.CollectableBeneathTheWellBugAndBombRoomPot5)]
         [CheckRestricted(Scene.BeneathTheWell, variant: 0x4215, Item.CollectableBeneathTheWellBugAndBombRoomPot1, Item.CollectableBeneathTheWellBugAndBombRoomPot2, Item.CollectableBeneathTheWellBugAndBombRoomPot3, Item.CollectableBeneathTheWellBugAndBombRoomPot4, Item.CollectableBeneathTheWellBugAndBombRoomPot5)]
         [CheckRestricted(Scene.BeneathTheWell, variant: 0x4615, Item.CollectableBeneathTheWellBugAndBombRoomPot1, Item.CollectableBeneathTheWellBugAndBombRoomPot2, Item.CollectableBeneathTheWellBugAndBombRoomPot3, Item.CollectableBeneathTheWellBugAndBombRoomPot4, Item.CollectableBeneathTheWellBugAndBombRoomPot5)]
-        [CheckRestricted(Scene.DampesHouse, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.DampesHouse, variant: ActorConst.ANY_VARIANT, // NOT DUNGEON
             Item.CollectableDampesHouseBasementPot1, Item.CollectableDampesHouseBasementPot2,
             Item.CollectableDampesHouseBasementPot3, Item.CollectableDampesHouseBasementPot4,
             Item.CollectableDampesHouseBasementPot5, Item.CollectableDampesHouseBasementPot6,
@@ -1385,16 +1385,21 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.IgosDuIkanasLair, variant: ActorConst.ANY_VARIANT,
             Item.CollectableIgosDuIkanaSLairIgosDuIkanaSRoomPot1, Item.CollectableIgosDuIkanaSLairIgosDuIkanaSRoomPot2, Item.CollectableIgosDuIkanaSLairIgosDuIkanaSRoomPot3,
             Item.CollectableIgosDuIkanaSLairPreBossRoomPot1, Item.CollectableIgosDuIkanaSLairPreBossRoomPot2, Item.CollectableIgosDuIkanaSLairPreBossRoomPot3)]
-        [CheckRestricted(Scene.StoneTower, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.StoneTower, variant: ActorConst.ANY_VARIANT, // NOT DUNGEON
             Item.CollectableStoneTowerPot1, Item.CollectableStoneTowerPot2, Item.CollectableStoneTowerPot3, Item.CollectableStoneTowerPot4, Item.CollectableStoneTowerPot5,
             Item.CollectableStoneTowerPot6, Item.CollectableStoneTowerPot7, Item.CollectableStoneTowerPot8, Item.CollectableStoneTowerPot9, Item.CollectableStoneTowerPot10, 
             Item.CollectableStoneTowerPot11, Item.CollectableStoneTowerPot12, Item.CollectableStoneTowerPot13, Item.CollectableStoneTowerPot14)]
         // cannot randomize temple pots yet, uses dungeon keep objects, this will come later
         [CheckRestricted(Scene.InvertedStoneTower, variant: ActorConst.ANY_VARIANT, Item.CollectableStoneTowerInvertedStoneTowerFlippedPot1, Item.CollectableStoneTowerInvertedStoneTowerFlippedPot2, Item.CollectableStoneTowerInvertedStoneTowerFlippedPot3)]
         [CheckRestricted(Scene.StoneTowerTemple, variant: ActorConst.ANY_VARIANT, Item.CollectableStoneTowerTempleInvertedWizzrobeRoomPot1)]
-        [CheckRestricted(Scene.SecretShrine, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.SecretShrine, variant: 0xF81E, Item.CollectableSecretShrineMainRoomPot1)]
+        [CheckRestricted(Scene.SecretShrine, variant: 0xFA1E, Item.CollectableSecretShrineMainRoomPot2)]
+        [CheckRestricted(Scene.SecretShrine, variant: 0xF60E, Item.CollectableSecretShrineMainRoomPot3)]
+        [CheckRestricted(Scene.SecretShrine, variant: 0xFE0E, Item.CollectableSecretShrineMainRoomPot4)]
+        [CheckRestricted(Scene.SecretShrine, variant: 0xF410, Item.CollectableSecretShrineMainRoomPot5)] // or  0xFC0B
+        /*[CheckRestricted(Scene.SecretShrine, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSecretShrineMainRoomPot1, Item.CollectableSecretShrineMainRoomPot2, Item.CollectableSecretShrineMainRoomPot3, Item.CollectableSecretShrineMainRoomPot4,
-            Item.CollectableSecretShrineMainRoomPot5)]
+            Item.CollectableSecretShrineMainRoomPot5)] // */
         // 0xF9 is pot and pot shard
         // according to CM, 0x100 is available everywhere as a pot, where 0x3F defines the drop item
         // so 1F is arrows, F is magic, B is three small rups? 7 is huge 200 rup, 17 is empty
@@ -1403,6 +1408,7 @@ namespace MMR.Randomizer.GameObjects
         // 115 is 5 bombs, 105 is tall dodongo 50 rup, 106 is empty, 116 is empty
         // 101 is one rup, 111 SKULL TOKEN POT??!? 102 was 5 rups 112 empty
         // 103 empty, 113 is 10 deku nuts, 104 is red rup, 114 is empty
+        // params >>7 &3 is type, 0 and 3 are dungeon, 2 is object, 1 is racing
         //[GroundVariants(0x110)] // testing // 115 101 106 10E 10F
         [GroundVariants(0x10B, 0x115, 0x106, 0x101, 0x102, 0x10F, 0x115, 0x11F, 0x113, 0x110, 0x10E, // good variety to place
             0x30A, // trading post (has nothing important
@@ -1416,7 +1422,6 @@ namespace MMR.Randomizer.GameObjects
             0xFE01, // deku shrine
             0x4D10, 0xFF04, 0x4D10,// mountain village spring
             0xC719, 0xC90E, 0xCB0E, 0xCD19, 0xCF0F, 0xD10F, 0xD30F, 0xD519, 0xC119, 0xC319, 0xC50F, 0xC709, // goron shrine
-            0x410E, 0x450A, 0x470A, 0x490A, 0x4B0A, 0x4D0E, 0x530A, 0x550A, 0x570E, 0x590A, 0x5B0E, // pinnacle rock
             0x471E, 0x590E, 0x531E, 0x4114, 0x4314, 0x4B1E, 0x4D0A, 0x5D0A, 0x5F0A, 0x5F03, 0x5714, // beneath the graveyard
             0x0B01, 0x0D01, 0x0F1E, 0x110A, 0x1301, 0x151E, 0x1705, 0x191E, 0x1B1E, 0x1D0A, // damps house
             0x7C10, 0x7E0B, 0x800B, 0x820E, 0x840B, 0x9C10, 0x9E0E, 0xA010, 0xB40E, 0x860B, 0x8813, 0x8A0B, 0x8C0B,// ikana castle
@@ -1424,14 +1429,21 @@ namespace MMR.Randomizer.GameObjects
             0x6514, 0x671E, 0x690E, 0x6B0A, 0x6D0A, 0x6F15, 0x711F, 0x7610, 0x750F, // stone tower (cont)
             0x460B, 0x4610, 0x018D, // stone tower temple
             0x6F0B, 0x710F, 0x7310, 0x7515, 0x770B, // inverted stone tower (is a field scene, but why)
-            0xC00B, 0xC21E, 0xC40E, 0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF81E, 0xF60E, 0xF410, // secret shrine
-            0x4110)] // terminafield pot
+            0xC00B, 0xC21E, 0xC40E, // secret shrine
+            0x4110, // terminafield pot
+            0xFF0B, 0xFF0D // non vanilla
+            )]
+        [WaterBottomVariants(
+            0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF60E, 0xF410, // secret shrine
+            0x410E, 0x450A, 0x470A, 0x490A, 0x4B0A, 0x4D0E, 0x530A, 0x550A, 0x570E, 0x590A, 0x5B0E, // pinnacle rock
+            0xFF0F, 0xFF0B, 0xFF0E, 0xFF03 // non vanilla
+            )]
         [VariantsWithRoomMax(max:0, variant: 0x460B, 0x4610, 0x018D, // stone tower temple (dungeon keep)
             0xFE01, // deku shrine (dungeon keep)
             0x1E, 0x5, // spiderhouse clay pots with spiders
             0x202, 0x602, 0x802, 0xA02, 0xC02)] // swords school, these are dungeon_keep pots cannot place without the object
         [ForbidFromScene( Scene.GoronRacetrack, // these are green pots they use a different object 
-            Scene.SecretShrine, Scene.IkanaCastle, Scene.IgosDuIkanasLair, // dungeon pots, but treasure flags updater still messes with it
+            /*Scene.SecretShrine,*/ Scene.IkanaCastle, Scene.IgosDuIkanasLair, // dungeon pots, but treasure flags updater still messes with it
             Scene.DekuShrine,  Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple,
             Scene.AstralObservatory, Scene.GoronTrial, Scene.LinkTrial,
             Scene.MajorasLair)] // we want them for the fight
