@@ -980,9 +980,10 @@ namespace MMR.Randomizer.GameObjects
             check: Item.HeartPieceTwinIslandsChest)]
         [CheckRestricted(Scene.MountainVillageSpring, variant: ActorConst.ANY_VARIANT,
             check: Item.ChestMountainVillageGrottoRedRupee)]
-        [CheckRestricted(Scene.GreatBayCoast, variant: ActorConst.ANY_VARIANT,
-            check: Item.ChestGreatBayCoastGrotto,
-                   Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.CollectableGrottosCowGrottoButterflyFairy2)]
+        [CheckRestricted(Scene.GreatBayCoast, variant: 0xFF, // cow grotto
+            check:Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.CollectableGrottosCowGrottoButterflyFairy2)]
+        [CheckRestricted(Scene.GreatBayCoast, variant: 0x37, // regular grotto
+            check: Item.ChestGreatBayCoastGrotto)]
         [CheckRestricted(Scene.ZoraCape, variant: ActorConst.ANY_VARIANT,
             check: Item.ChestGreatBayCapeGrotto)]
         [CheckRestricted(Scene.RoadToIkana, variant: ActorConst.ANY_VARIANT,
@@ -991,6 +992,7 @@ namespace MMR.Randomizer.GameObjects
             check: Item.ChestGraveyardGrotto)]
         [CheckRestricted(Scene.IkanaCanyon, variant: ActorConst.ANY_VARIANT,
             check: Item.ChestIkanaSecretShrineGrotto)]
+        // 0x001F, is the gossip stones in TF, assumed to be Z rotation based
         // FF/299 is HSG, 233 is path to snowhead, 3B is mountain village spring grot 3D is swamp grotto, , 5C is mystery woods
         // 96 is goron rock grotto, 218/2B8? is graveyard grotto, 3E is road to swamp
         // 301 is ranch grotto? 214 is log cow grotto
@@ -1015,9 +1017,16 @@ namespace MMR.Randomizer.GameObjects
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
             0xE000,
-            0x17, 0x2, // coast
+            0x1B, // mountain village spring
+            0x1C, // woods of mystery
+            0x1D, // southern swamp
+            0xFF, // coast cow
+            0x37, // coast main grotto
+            0x37, // coast cape grotto
             0x213, // path to snowhead
             0x3B, // moutain spring
+            0x14, // ikana canyon
+            0x0218, // graveyard
             0xE200, 0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [VariantsWithRoomMax(max: 1,
@@ -1025,11 +1034,18 @@ namespace MMR.Randomizer.GameObjects
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
             0xE000,
-            0x17, 0x2, // coast
+            0x1B, // mountain village spring
+            0x1C, // woods of mystery
+            0x1D, // southern swamp
+            0x37, // coast regular grotto
             0x213, // path to snowhead
             0x3B, // moutain spring
+            0x0218, // graveyard
             0xE200, 0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
+        [VariantsWithRoomMax(max: 0, variant:
+            0xFF, // coast cow
+            2)] // bad values
         [UnkillableAllVariants]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [AlignedCompanionActor(Obj_Dowsing, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x110)] // rumble

@@ -3667,7 +3667,7 @@ namespace MMR.Randomizer
             {
                 int newIndex = newVariant & 0xF; // in vanilla the array is only 15 long
                 enemy.Rotation.x = ActorUtils.MergeRotationAndFlags(rotation: 0, flags: 0x7F);
-                enemy.Rotation.z = ActorUtils.MergeRotationAndFlags(rotation: newIndex, flags: 0x7F);
+                enemy.Rotation.z = ActorUtils.MergeRotationAndFlags(rotation: newIndex - 1, flags: 0x7F);
             }
         }
 
