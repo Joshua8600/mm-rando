@@ -5204,8 +5204,8 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.GoronVillage, variant: 0x331E, Item.CollectableGoronVillageWinterSmallSnowball1)]
         [CheckRestricted(Scene.GoronVillage, variant: 0x341E, Item.CollectableGoronVillageWinterSmallSnowball2)]
         [CheckRestricted(Scene.GoronVillage, variant: 0x2B15, Item.CollectableGoronVillageWinterSmallSnowball3)]
-        [CheckRestricted(Scene.GoronVillage, variant: 0x301E, Item.CollectableGoronVillageWinterSmallSnowball4)]
-        [CheckRestricted(Scene.GoronVillage, variant: 0x2D13, Item.CollectableGoronVillageWinterSmallSnowball5)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x3015, Item.CollectableGoronVillageWinterSmallSnowball4)] // across from blacksmith ice near staircase
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2D13, Item.CollectableGoronVillageWinterSmallSnowball5)] // near entrance ramp
         [CheckRestricted(Scene.GoronVillage, variant: 0x3113, Item.CollectableGoronVillageWinterSmallSnowball6)]
         [CheckRestricted(Scene.GoronVillage, variant: 0x2C19, Item.CollectableGoronVillageWinterSmallSnowball7)]
         [CheckRestricted(Scene.GoronVillage, variant: 0x2F19, Item.CollectableGoronVillageWinterSmallSnowball8)]
@@ -5246,11 +5246,11 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableMountainVillageWinterLargeSnowball3, Item.CollectableMountainVillageWinterLargeSnowball4,
             Item.SongLullabyIntro
         )] // */
-        [CheckRestricted(Scene.MountainVillage, variant: 0x351F, Item.CollectableMountainVillageWinterSmallSnowball1)] // near owl statue
-        [CheckRestricted(Scene.MountainVillage, variant: 0x3415, Item.CollectableMountainVillageWinterSmallSnowball2)] // near owl statue
-        [CheckRestricted(Scene.MountainVillage, variant: 0x370F, Item.CollectableMountainVillageWinterSmallSnowball5)] // near owl statue
-        [CheckRestricted(Scene.MountainVillage, variant: 0x270E, Item.CollectableMountainVillageWinterSmallSnowball6)] // near pond tree
-        [CheckRestricted(Scene.MountainVillage, variant: 0x210E, Item.CollectableMountainVillageWinterSmallSnowball7)] // near east exit
+        [CheckRestricted(Scene.MountainVillage, variant: 0x351F, Item.CollectableMountainVillageWinterSmallSnowball1)] // "Winter small" near owl statue
+        [CheckRestricted(Scene.MountainVillage, variant: 0x3415, Item.CollectableMountainVillageWinterSmallSnowball2)] // "Winter 2" near owl statue
+        [CheckRestricted(Scene.MountainVillage, variant: 0x370F, Item.CollectableMountainVillageWinterSmallSnowball5)] // "Winter 3" near owl statue
+        [CheckRestricted(Scene.MountainVillage, variant: 0x210E, Item.CollectableMountainVillageWinterSmallSnowball6)] // "Winter 4" near pond tree
+        [CheckRestricted(Scene.MountainVillage, variant: 0x270E, Item.CollectableMountainVillageWinterSmallSnowball7)] // "Winter 5" near east exit
         [CheckRestricted(Scene.MountainVillage, variant: 0x2D0F, Item.CollectableMountainVillageWinterSmallSnowball3)] // goron grave 1
         [CheckRestricted(Scene.MountainVillage, variant: 0x2E0F, Item.CollectableMountainVillageWinterSmallSnowball4)] // goron grave 2
         [CheckRestricted(Scene.MountainVillage, variant: 0x3610, Item.CollectableMountainVillageWinterSmallSnowball8)] // fairy near the owl tree
