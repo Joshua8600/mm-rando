@@ -2034,6 +2034,12 @@ namespace MMR.Randomizer
             {
                 snowheadTempleFireArrowWiz.Position.x = -1140; // move back to center of the room, not sure why this guy is so close to the door normally
             }
+            // if snowhead temple wizrobe the second is randomized, his spawn is in a bad spot for enemizer
+            var snowheadSecondWizrobe = snowheadTempleScene.Maps[12].Actors[0];
+            if (snowheadSecondWizrobe.ActorEnum != GameObjects.Actor.Wizrobe)
+            {
+                snowheadSecondWizrobe.Position = new vec16(1377, 1800, 0); // moved to other size of room, not next to the door
+            }
             SceneUtils.UpdateScene(snowheadTempleScene);
 
             var milkroadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkRoad.FileID()); ;
@@ -2058,7 +2064,6 @@ namespace MMR.Randomizer
             if (milkbarGorman.ActorEnum != GameObjects.Actor.Gorman)
             {
                 milkbarGorman.Position = new vec16(61, 0, -162);
-                // rotation?
             }
             SceneUtils.UpdateScene(milkbarScene);
 
@@ -2077,7 +2082,6 @@ namespace MMR.Randomizer
             if (nctUglyTree.ActorEnum != GameObjects.Actor.Gorman)
             {
                 nctHP.Position = new vec16(141, 375, -2336); // moved to post
-                // rotation?
             }
             SceneUtils.UpdateScene(nctScene);
 
