@@ -4854,7 +4854,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.TwinIslands, variant: 0x220E, Item.CollectablePathToGoronVillageWinterLargeSnowball2)]
         [CheckRestricted(Scene.TwinIslands, variant: 0x230E, Item.CollectablePathToGoronVillageWinterLargeSnowball3)]
         [CheckRestricted(Scene.TwinIslands, variant: 0x240E, Item.CollectablePathToGoronVillageWinterLargeSnowball4)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x250E, Item.CollectablePathToGoronVillageWinterLargeSnowball5)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x250E, Item.CollectablePathToGoronVillageWinterLargeSnowball5)]  
         [CheckRestricted(Scene.TwinIslands, variant: 0x40E, Item.SongLullabyIntro)] // grandpa
         [CheckRestricted(Scene.TwinIslands, variant: 0x80E, Item.SongLullabyIntro)] // grandpa
         [CheckRestricted(Scene.TwinIslands, variant: 0x40E, Item.SongLullabyIntro)] // grandpa
@@ -5209,9 +5209,9 @@ namespace MMR.Randomizer.GameObjects
         SwordsmanSchoolLog = 0x1F8, // En_Maruta
 
         [ActorizerEnabled]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x390E, Item.CollectablePathToGoronVillageWinterSmallSnowball3)] // ramp near tree grotto
-        [CheckRestricted(Scene.TwinIslands, variant: 0x360E, Item.CollectablePathToGoronVillageWinterSmallSnowball2)] // near west entrance
-        [CheckRestricted(Scene.TwinIslands, variant: 0x380E, Item.CollectablePathToGoronVillageWinterSmallSnowball1)] // near tingle
+        [CheckRestricted(Scene.TwinIslands, variant: 0x390E, Item.CollectablePathToGoronVillageWinterSmallSnowball3)] // "ramp snowball" ramp near tree grotto
+        [CheckRestricted(Scene.TwinIslands, variant: 0x360E, Item.CollectablePathToGoronVillageWinterSmallSnowball1)] // "small snowball1" near west entrancetingle
+        [CheckRestricted(Scene.TwinIslands, variant: 0x380E, Item.CollectablePathToGoronVillageWinterSmallSnowball2)] // "small snowball2" near tingle
         [CheckRestricted(Scene.GoronVillage, variant: 0x331E, Item.CollectableGoronVillageWinterSmallSnowball1)]
         [CheckRestricted(Scene.GoronVillage, variant: 0x341E, Item.CollectableGoronVillageWinterSmallSnowball2)]
         [CheckRestricted(Scene.GoronVillage, variant: 0x2B15, Item.CollectableGoronVillageWinterSmallSnowball3)]
