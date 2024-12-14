@@ -632,6 +632,10 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x41)]
         [EnemizerSceneEnemyReplacementBlock(Actor.ClayPot,
             Actor.RegularIceBlock)] // the big one can reach through the ceiling into the chest, blocking the chest
+        [EnemizerSceneEnemyReplacementBlock(Actor.SquareSign,
+            Actor.ClocktowerGearsAndOrgan, // can block dogs in race
+            Actor.RegularIceBlock)]
+        [EnemizerSceneBlockSensitive(Actor.SquareSign, -1)]
         DoggyRacetrack = 0x3E,
 
         [FileID(1351)]

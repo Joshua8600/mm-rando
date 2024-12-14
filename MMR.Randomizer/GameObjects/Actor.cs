@@ -3279,6 +3279,7 @@ namespace MMR.Randomizer.GameObjects
             0 // default closed
         )]
         [VariantsWithRoomMax(max:1, variant:0, 1)]
+        [BlockingVariantsAll]
         [ForbidFromScene(Scene.WoodfallTemple)]
         // uses a weekeventreg instead
         [SwitchFlagsPlacement(size:0x7F, shift:8)] // this SETS but does not read, is it passing info to a door?
@@ -4065,7 +4066,7 @@ namespace MMR.Randomizer.GameObjects
         Empty189 = 0x189,
         Empty18A = 0x18A,
 
-
+        // todo, try randomizing because it makes iron knuckle room have lots of enemies
         [FileID(355)]
         [ObjectListIndex(0x1)]
         SpringWater = 0x18B, // En_Test5
