@@ -1016,36 +1016,45 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x0, 0x2000, 0x3000, 0x4000, // stone grottos
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
-            0xE000,
+            0xF000,
             0x1B, // mountain village spring
             0x1C, // woods of mystery
             0x1D, // southern swamp
+            0x233, // path to snowhead
             0xFF, // coast cow
             0x37, // coast main grotto
-            0x37, // coast cape grotto
             0x213, // path to snowhead
             0x3B, // moutain spring
-            0x14, // ikana canyon
-            0x0218, // graveyard
-            0xE200, 0xF200, // secret secret
+            0x37, // coast regular grotto
+            0x15, 0x216, // cape
+            0x16, 0x216, // road to ikana
+            0x0218, 0x2B8, // graveyard
+            0x14, 0x54, 0xB4, // ikana canyon
+            0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [VariantsWithRoomMax(max: 1,
             0x0, 0x2000, 0x3000, 0x4000, // stone grottos
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
-            0xE000,
+            0xF000,
             0x1B, // mountain village spring
             0x1C, // woods of mystery
             0x1D, // southern swamp
-            0x37, // coast regular grotto
+            0x233, // path to snowhead
+            0xFF, // coast cow
+            0x216, // road to ikana
             0x213, // path to snowhead
             0x3B, // moutain spring
-            0x0218, // graveyard
-            0xE200, 0xF200, // secret secret
+            0x37, // coast regular grotto
+            0x0218, 0x2B8,// graveyard, 0x18 is in the title screen
+            0x14, 0x54, 0xB4, // ikana canyon
+            0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [VariantsWithRoomMax(max: 0, variant:
-            0xFF, // coast cow
-            2)] // bad values
+            0x16, // road to ikana
+            0x15, // cape
+            2 // bad values
+        )] 
         [UnkillableAllVariants]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [AlignedCompanionActor(Obj_Dowsing, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x110)] // rumble
@@ -1062,6 +1071,7 @@ namespace MMR.Randomizer.GameObjects
         [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
         //[ForbidFromScene(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead,
         //    Scene.TerminaField)]
+        [RemovalChance(45)]
         GrottoHole = 0x55, // Door_Ana
 
         Empty56 = 0x56,

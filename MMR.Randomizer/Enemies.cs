@@ -2876,6 +2876,44 @@ namespace MMR.Randomizer
             }
         }
 
+        private static void FixNewGrottoZRotation(SceneEnemizerData thisSceneData)
+        {
+            /// grottos that have an upper byte of 0x0 with a type of 0x000 or 0x200 are z rotation reading types,
+            /// because they use the lower byte for item/chest characteristic (en_torch)
+            /// so we have to update the zrotation to match
+
+            var allGrottos = thisSceneData.Actors.FindAll(a => a.ActorEnum == GameObjects.Actor.GrottoHole);
+            for(int a = 0; a < allGrottos.Count(); a++)
+            {
+                var actor = allGrottos[a];
+                var variant = actor.Variants[0];
+                var type = (variant & 0x300) >> 8;
+                var upperAddress = variant & 0xF000;
+                if (upperAddress == 0 && (type == 0 || type == 2))
+                {
+                    var lowerByte = variant & 0xFF; // item/chest passed to regular grotto
+                    // 0xFF lower byte is cow grotto, no items passed, we want address A
+                    // else: regular grotto, we want address 4
+                    var newRotation = 0;
+                    switch (lowerByte)
+                    {
+                        case 0xFF:
+                            newRotation = 0xA; // cow grotto needs entrance A
+                            break;
+                        case 0x1F:             // tf grottos, shouldnt be placed because we dont know the rotation they used, this is backup
+                            newRotation = 0x1;
+                            break;
+                        default:
+                            newRotation = 0x4; // other assumes generic grotto
+                            break;
+                    }
+
+                    actor.ChangeZRotation(newRotation);
+                    actor.ActorIdFlags |= 0x2000; // do not convert Z rotation into 360 angle, leave alone to use as parameter
+                }
+            }
+        }
+
         public static void FixWoodfallTempleGekkoMiniboss()
         {
             /// we cannot randomize the snapper in woodfall temple without breaking the gekko miniboss
@@ -5892,6 +5930,7 @@ namespace MMR.Randomizer
             FixBrokenActorSpawnCutscenes(thisSceneData); // some actors dont like having bad cutscenes
             FixWaterPostboxes(thisSceneData);
             FixSnowballActorSpawns(thisSceneData);
+            FixNewGrottoZRotation(thisSceneData);
             EnsureOnlyOneKankyo(thisSceneData);
             // the following modify Variant which can confuse typing system
             FixPathingVars(thisSceneData); // any patrolling types need their vars fixed
