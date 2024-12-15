@@ -63,8 +63,8 @@ namespace MMR.Randomizer.Models.SoundEffects
         [Tags(Short, LowHpBeep)]
         TatlHides = 0x205F,
 
-        [Tags(Short, LowHpBeep)]
-        OcarinaGateOpen = 0x2067,
+        //[Tags(Short, LowHpBeep)]
+        //OOTGateOpen = 0x2067, // suspected looping
 
         [Tags(Short, LowHpBeep)]
         FishFlop = 0x2069,
