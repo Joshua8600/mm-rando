@@ -398,7 +398,6 @@ namespace MMR.Randomizer.Models.Rom
             if (this.AllVariants == null || otherActor.AllVariants == null)
             {
                 throw new Exception("Compare Variants: broken actor variants listoflist");
-                //this.AllVariants = 
             }
 
             // randomly select a type, check if they have matching types

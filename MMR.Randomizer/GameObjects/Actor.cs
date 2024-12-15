@@ -1817,15 +1817,17 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0xF1)]
         [FileID(143)]
         [CheckRestricted(Scene.MayorsResidence, variant: ActorConst.ANY_VARIANT, Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
-        // 1 scoffing at poster, 2 is shouting at the sky looker
+        [GroundVariants(
+            0, // in mayor meeting
+            1, // 1 scoffing at poster,
+            2  // 2 is shouting at the sky looker
+        )]
         // 0x03 is a walking type
-        [GroundVariants(1, 2,
-            0)] // in mayor meeting
-        [VariantsWithRoomMax(max: 0, variant: 0)]
-        [PathingVariants(0x603, 0x503,
-            0x0303// in southclock town doing what?
+        [PathingVariants(
+            0x603, 0x503, 0x0303 // different walking with wooden log
         )]
         [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)]
+        [VariantsWithRoomMax(max: 0, variant: 0)] // mayor meeting, probably has issues without being with the rest of the actors
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0090)]
         [UnkillableAllVariants]
         [PlacementWeight(50)] // boring
