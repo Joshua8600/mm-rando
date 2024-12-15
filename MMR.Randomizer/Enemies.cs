@@ -1034,6 +1034,7 @@ namespace MMR.Randomizer
             SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
             SplitSceneSnowballIntoTwoActorObjects();
+            RearangeSecretShrineObjects();
 
             EnableAllCreditsCutScenes();
 
@@ -3522,9 +3523,138 @@ namespace MMR.Randomizer
             goronVillageScene.Maps[1].Objects[8] = GameObjects.Actor.LargeSnowball.ObjectIndex(); // previously heart piece (bigsmoth room, likey have to match
         }
 
+        private static void RearangeSecretShrineObjects()
+        {
+            /// Secret shrine objects are WILD
+            /// every single room has unnecessary objects, I want to change these to make replacement enemies more interesting
+
+            var secretShrineScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SecretShrine.FileID());
+
+            var possibleGroundActors = ReplacementCandidateList.FindAll(act => act.GetGroundVariants().Count > 0);
+            var possibleWaterActors = ReplacementCandidateList.FindAll(act => act.GetWaterVariants().Count > 0);
+            var possibleWaterBottomActors = ReplacementCandidateList.FindAll(act => act.GetWaterBottomVariants().Count > 0);
+            var possibleFlyingActors = ReplacementCandidateList.FindAll(act => act.GetFlyingVariants().Count > 0);
+            var possibleCeilingActors = ReplacementCandidateList.FindAll(act => act.GetCeilingVariants().Count > 0);
+
+            // lobby
+            if (ACTORSENABLED){
+                var randomIndex = seedrng.Next(possibleGroundActors.Count());
+                secretShrineScene.Maps[0].Objects[4] = possibleGroundActors[randomIndex].ObjectId; // wooden crate 
+                possibleGroundActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleGroundActors.Count());
+                secretShrineScene.Maps[0].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // dinofos 
+                possibleGroundActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                secretShrineScene.Maps[0].Objects[6] = possibleFlyingActors[randomIndex].ObjectId; // water drip 
+                possibleFlyingActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                secretShrineScene.Maps[0].Objects[8] = possibleFlyingActors[randomIndex].ObjectId; // bombchu 
+                possibleFlyingActors.RemoveAt(randomIndex);
+            }
+
+            // center room
+            if (ACTORSENABLED)
+            {
+                var randomIndex = seedrng.Next(possibleWaterActors.Count());
+                secretShrineScene.Maps[1].Objects[5] = possibleWaterActors[randomIndex].ObjectId; // deku baba 
+                possibleWaterActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleWaterBottomActors.Count());
+                secretShrineScene.Maps[1].Objects[6] = possibleWaterBottomActors[randomIndex].ObjectId; // dinofos 
+                possibleWaterBottomActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleWaterBottomActors.Count());
+                secretShrineScene.Maps[1].Objects[8] = possibleWaterBottomActors[randomIndex].ObjectId; // real bombchu
+                possibleWaterBottomActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                secretShrineScene.Maps[1].Objects[9] = possibleFlyingActors[randomIndex].ObjectId; // heart piece
+                possibleFlyingActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleCeilingActors.Count());
+                secretShrineScene.Maps[1].Objects[10] = possibleCeilingActors[randomIndex].ObjectId; // tall grass
+                possibleCeilingActors.RemoveAt(randomIndex);
+
+            }
+
+            // dinofos room
+            {
+                var randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                secretShrineScene.Maps[2].Objects[6] = possibleFlyingActors[randomIndex].ObjectId; // deku baba
+                possibleFlyingActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleCeilingActors.Count());
+                secretShrineScene.Maps[2].Objects[7] = possibleCeilingActors[randomIndex].ObjectId; // skulltula
+                possibleCeilingActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleGroundActors.Count());
+                secretShrineScene.Maps[2].Objects[10] = possibleGroundActors[randomIndex].ObjectId; // real bombchu
+                possibleGroundActors.RemoveAt(randomIndex);
+            }
+
+            // wizrobe room
+            {
+                var randomIndex = seedrng.Next(possibleGroundActors.Count());
+                secretShrineScene.Maps[3].Objects[6] = possibleGroundActors[randomIndex].ObjectId; // blue warp
+                possibleGroundActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleGroundActors.Count());
+                secretShrineScene.Maps[3].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // garo master
+                possibleGroundActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                secretShrineScene.Maps[3].Objects[8] = possibleFlyingActors[randomIndex].ObjectId; // garo master
+                possibleFlyingActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                secretShrineScene.Maps[3].Objects[4] = possibleFlyingActors[randomIndex].ObjectId; // wooden crate
+                possibleFlyingActors.RemoveAt(randomIndex);
+
+            }
+
+            // wart room
+            if (ACTORSENABLED)
+            {
+                var randomIndex = seedrng.Next(possibleGroundActors.Count());
+                secretShrineScene.Maps[4].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // eygore ???
+                possibleGroundActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                secretShrineScene.Maps[4].Objects[6] = possibleFlyingActors[randomIndex].ObjectId; // blue warp ?
+                possibleFlyingActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleCeilingActors.Count());
+                secretShrineScene.Maps[4].Objects[7] = possibleCeilingActors[randomIndex].ObjectId; // dinofos
+                possibleCeilingActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleCeilingActors.Count());
+                secretShrineScene.Maps[4].Objects[10] = possibleCeilingActors[randomIndex].ObjectId; // tall grass
+                possibleCeilingActors.RemoveAt(randomIndex);
+            }
+
+            // garo master room
+            if (ACTORSENABLED)
+            {
+                /// not as much point, its only him and some grass, not much else to put here
+                var randomIndex = seedrng.Next(possibleGroundActors.Count());
+                secretShrineScene.Maps[5].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // wizrobe
+                possibleGroundActors.RemoveAt(randomIndex);
+
+                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                secretShrineScene.Maps[5].Objects[8] = possibleFlyingActors[randomIndex].ObjectId; // blue warp ?
+                possibleFlyingActors.RemoveAt(randomIndex);
+
+            }
+
+        }
 
         private static void SwapIntroActors()
         {
+            /// during the pre-file select cutscenes
+
             SwapIntroSeth();
             SwapIntroBlueKids();
             SwapIntroLinkTheGoroAndAnju();

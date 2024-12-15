@@ -513,6 +513,29 @@ namespace MMR.Randomizer.Models.Rom
             return null; // none found
         }
 
+        // these are here because there are two actortypes now, TODO merge
+        public List<int> GetGroundVariants()
+        {
+            return this.AllVariants[(int)ActorType.Ground - 1];
+        }
+        public List<int> GetWaterVariants()
+        {
+            return this.AllVariants[(int)ActorType.Water - 1];
+        }
+        public List<int> GetWaterBottomVariants()
+        {
+            return this.AllVariants[(int)ActorType.WaterBottom - 1];
+        }
+        public List<int> GetFlyingVariants()
+        {
+            return this.AllVariants[(int)ActorType.Flying - 1];
+        }
+        public List<int> GetCeilingVariants()
+        {
+            return this.AllVariants[(int)ActorType.Ceiling - 1];
+        }
+
+
         // todo remove this as it should be built at enum->actor time
         public List<int> UnkillableVariants()
         {

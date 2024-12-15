@@ -1615,11 +1615,12 @@ namespace MMR.Randomizer.GameObjects
         // for now, until I can identify which ones have drops we need to be careful of, going to block all randimization
         [ForbidFromScene(Scene.SouthernSwamp, Scene.OdolwasLair,
             Scene.IkanaCastle, Scene.StoneTowerTemple, Scene.Woodfall, Scene.GreatBayCoast,
-            Scene.SecretShrine, Scene.MountainVillageSpring, //Scene.WoodsOfMystery,
+             Scene.MountainVillageSpring, //Scene.WoodsOfMystery,
             //Scene.LaundryPool,
             Scene.SnowheadTemple, Scene.RoadToSouthernSwamp,
             //Scene.MilkRoad,
             Scene.IkanaCanyon,
+            //Scene.SecretShrine,
             //Scene.Grottos,
             Scene.BeneathTheWell,
             Scene.WoodfallTemple)]
