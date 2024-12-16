@@ -126,6 +126,12 @@ namespace MMR.Randomizer
                             .ToList();
             //*/
 
+            // special request for enemizer: do not randomize bigocto
+            if ( ! ACTORSENABLED)
+            {
+                VanillaEnemyList.Remove(GameObjects.Actor.BigOcto);
+            }
+
             // list of replacement actors we can use to replace with
             // for now they are the same, in the future players will control how they load
             ReplacementCandidateList = new List<Actor>();
@@ -2022,7 +2028,6 @@ namespace MMR.Randomizer
                     capeHpLikelike.Position.z = 4405; // move back from sitting on hp
                 }
             }
-
 
 
             if (ACTORSENABLED)
