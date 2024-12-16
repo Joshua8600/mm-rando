@@ -1998,36 +1998,6 @@ namespace MMR.Randomizer
             }
             SceneUtils.UpdateScene(roadToIkanaCanyonScene);
 
-            var capeScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraCape.FileID());
-            var capeHpLikelike = capeScene.Maps[0].Actors[18];
-            if (capeHpLikelike.ActorEnum != GameObjects.Actor.LikeLike)
-            {
-                var newUnkillableVariants = capeHpLikelike.ActorEnum.UnkillableVariants();
-                if (newUnkillableVariants != null && newUnkillableVariants.Contains(capeHpLikelike.Variants[0]))
-                {
-                    capeHpLikelike.Position.z = 4405; // move back from sitting on hp
-                }
-            }
-            var capeGrottoBombiwa = capeScene.Maps[0].Actors[44];
-            if (capeGrottoBombiwa.ActorEnum != GameObjects.Actor.Bombiwa)
-            {
-                var newUnkillableVariants = capeGrottoBombiwa.ActorEnum.UnkillableVariants();
-                if (newUnkillableVariants != null && newUnkillableVariants.Contains(capeGrottoBombiwa.Variants[0]))
-                {
-                    capeGrottoBombiwa.Position.x = -463; // move to the left somewhat, worried its not pointed at the hole but not sure its worth the bother
-                    capeGrottoBombiwa.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: capeGrottoBombiwa.Rotation.y);
-                }
-            }
-            SceneUtils.UpdateScene(capeScene);
-
-            var ikanaGraveyardScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaGraveyard.FileID());
-            var graveyardGrottoRockCircle = ikanaGraveyardScene.Maps[1].Actors[44];
-            if (graveyardGrottoRockCircle.ActorEnum != GameObjects.Actor.GrassRockCluster)
-            {
-                graveyardGrottoRockCircle.Position.z = -1877; // move back from sitting right on top of the grotto
-            }
-            SceneUtils.UpdateScene(ikanaGraveyardScene);
-
             var snowheadTempleScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SnowheadTemple.FileID());
             var snowheadTempleFireArrowWiz = snowheadTempleScene.Maps[6].Actors[0];
             if (snowheadTempleFireArrowWiz.ActorEnum != GameObjects.Actor.Wizrobe)
@@ -2042,48 +2012,76 @@ namespace MMR.Randomizer
             }
             SceneUtils.UpdateScene(snowheadTempleScene);
 
-            var milkroadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkRoad.FileID()); ;
-            var milkroadPointedSign = milkroadScene.Maps[0].Actors[21];
-            if (milkroadPointedSign.ActorEnum != GameObjects.Actor.PointedSign)
+            var capeScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraCape.FileID());
+            var capeHpLikelike = capeScene.Maps[0].Actors[18];
+            if (capeHpLikelike.ActorEnum != GameObjects.Actor.LikeLike)
             {
-                // vanilla angle faces the wall, which is especially bad if its a grotto it locks the player by facing them into wall they fall back in
-                milkroadPointedSign.ChangeYRotation(180 - 15);
+                var newUnkillableVariants = capeHpLikelike.ActorEnum.UnkillableVariants();
+                if (newUnkillableVariants != null && newUnkillableVariants.Contains(capeHpLikelike.Variants[0]))
+                {
+                    capeHpLikelike.Position.z = 4405; // move back from sitting on hp
+                }
             }
-            SceneUtils.UpdateScene(milkroadScene);
 
-            // both gorman and postman start behind the door if they are randomized, which puts then out of sight and if likelike can grab you through the door
-            var milkbarScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkBar.FileID());
-            /*var milkbarPostman = milkbarScene.Maps[0].Actors[12];
-            // this does nothing: something is overrideing this data, not sure if itemizer
-            if (milkbarPostman.ActorEnum != GameObjects.Actor.PostMan)
+
+
+            if (ACTORSENABLED)
             {
-                milkbarPostman.Position = new vec16(0, 0, 0);
-                ActorUtils.SetActorSpawnTimeFlags(milkbarPostman);
-            } // */
-            var milkbarGorman = milkbarScene.Maps[0].Actors[7];
-            if (milkbarGorman.ActorEnum != GameObjects.Actor.Gorman)
-            {
-                milkbarGorman.Position = new vec16(61, 0, -162);
+                var capeGrottoBombiwa = capeScene.Maps[0].Actors[44];
+                if (capeGrottoBombiwa.ActorEnum != GameObjects.Actor.Bombiwa)
+                {
+                    var newUnkillableVariants = capeGrottoBombiwa.ActorEnum.UnkillableVariants();
+                    if (newUnkillableVariants != null && newUnkillableVariants.Contains(capeGrottoBombiwa.Variants[0]))
+                    {
+                        capeGrottoBombiwa.Position.x = -463; // move to the left somewhat, worried its not pointed at the hole but not sure its worth the bother
+                        capeGrottoBombiwa.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 180, flags: capeGrottoBombiwa.Rotation.y);
+                    }
+                }
+                SceneUtils.UpdateScene(capeScene);
+
+                var ikanaGraveyardScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaGraveyard.FileID());
+                var graveyardGrottoRockCircle = ikanaGraveyardScene.Maps[1].Actors[44];
+                if (graveyardGrottoRockCircle.ActorEnum != GameObjects.Actor.GrassRockCluster)
+                {
+                    graveyardGrottoRockCircle.Position.z = -1877; // move back from sitting right on top of the grotto
+                }
+                SceneUtils.UpdateScene(ikanaGraveyardScene);
+
+                var milkroadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkRoad.FileID()); ;
+                var milkroadPointedSign = milkroadScene.Maps[0].Actors[21];
+                if (milkroadPointedSign.ActorEnum != GameObjects.Actor.PointedSign)
+                {
+                    // vanilla angle faces the wall, which is especially bad if its a grotto it locks the player by facing them into wall they fall back in
+                    milkroadPointedSign.ChangeYRotation(180 - 15);
+                }
+                SceneUtils.UpdateScene(milkroadScene);
+
+                // both gorman and postman start behind the door if they are randomized, which puts then out of sight and if likelike can grab you through the door
+                var milkbarScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkBar.FileID());
+                /*var milkbarPostman = milkbarScene.Maps[0].Actors[12];
+                // this does nothing: something is overrideing this data, not sure if itemizer
+                if (milkbarPostman.ActorEnum != GameObjects.Actor.PostMan)
+                {
+                    milkbarPostman.Position = new vec16(0, 0, 0);
+                    ActorUtils.SetActorSpawnTimeFlags(milkbarPostman);
+                } // */
+                var milkbarGorman = milkbarScene.Maps[0].Actors[7];
+                if (milkbarGorman.ActorEnum != GameObjects.Actor.Gorman)
+                {
+                    milkbarGorman.Position = new vec16(61, 0, -162);
+                }
+                SceneUtils.UpdateScene(milkbarScene);
+
+                var nctScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.NorthClockTown.FileID());
+                var nctHP = nctScene.Maps[0].Actors[4];
+                var nctUglyTree = nctScene.Maps[0].Actors[7];
+                if (nctUglyTree.ActorEnum != GameObjects.Actor.UglyTree)
+                {
+                    nctHP.Position = new vec16(141, 375, -2336); // moved to post
+                }
+                SceneUtils.UpdateScene(nctScene);
+
             }
-            SceneUtils.UpdateScene(milkbarScene);
-
-            /*var doggyRaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DoggyRacetrack.FileID());
-            var swPrize = doggyRaceScene.Maps[0].Actors[8];
-            if (swPrize.ActorEnum != GameObjects.Actor.Sw)
-            {
-                // oh theres a swprize too, we can use that as well
-                var swPrize = doggyRaceScene.Maps[0].Actors[8];
-                swPrize.
-            } // */
-
-            var nctScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.NorthClockTown.FileID());
-            var nctHP = nctScene.Maps[0].Actors[4];
-            var nctUglyTree = nctScene.Maps[0].Actors[7];
-            if (nctUglyTree.ActorEnum != GameObjects.Actor.Gorman)
-            {
-                nctHP.Position = new vec16(141, 375, -2336); // moved to post
-            }
-            SceneUtils.UpdateScene(nctScene);
 
             FixEvanRotation();
             MoveShopScrubsIfRandomized();
