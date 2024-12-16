@@ -1597,7 +1597,7 @@ namespace MMR.Randomizer.GameObjects
             0, // gossip stones use this, but its field_keep versions
             0x0800, // single in woods of mystery, field_keep
             0x0600, 0x700, 0xC00, 0xD00, // woodfall temple
-            0x0610, // greay bay coast
+            0x0610, // great bay coast
             0x0E00, 0x0E10, 0x0010, // secret jgrotto?
             0x634F, 0x642B, 0x654F, 0x662B, 0x672B, 0x682B, 0x602B, 0x614F, 0x622B, 0x634F, 0x602B, // secret shrine (1)
             0x617B, 0x622B, 0x637B, 0x642B, 0x602B, 0x617B, 0x622B, 0x632B, 0x642B, 0x657B, 0x662B, // secret shrine (2)
@@ -1660,18 +1660,20 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableTerminaFieldSoftSoil1, Item.CollectableTerminaFieldSoftSoil2, Item.CollectableTerminaFieldSoftSoil3, Item.CollectableTerminaFieldSoftSoil4
         )]
         // some of these are pathing type, however they will need flying pathing type to make snese
+        //  for now, treat them all as ground or wall
         // 8 is unused crack in the wall, only exists in unused ranch setup
         // uses Z rot as a param, unknown use
-        // 0xC000 unk, can change draw type
+        // params:
+        // 0xC000 is type, 8 is wall, 4 is pathless soil, ELSE is bean I think
         // 0x80 determins if switch flags are active, great..
         // TODO which of these are invisble and require action?
         [GroundVariants(0x4000, 0x8000,
             0x4101, 0x0102, // bean grotto
-            0x0304, 0x4203, 0x4080, 0x1,// swamp spiderhouse
+            0x4203, 0x0304, 0x4080, 0x1,// swamp spiderhouse
             0x4D19, 0x061A, 0x071A, // great bay coast
             0x4203, 0x0D04, // deku palace
-            0x0101, // doggy race track
-            0x0401, 0x0504, // inverted stone tower
+            0x4080, 0x0101,  // doggy race track
+            0x4080, 0x4203, 0x0401, 0x0504, // inverted stone tower
             0x4305, 0x460B, 0x478E, 0x0506, 0x070C, 0x060F // termina field
         )]
         [WallVariants(0x4000, 0x8000,
@@ -1682,10 +1684,10 @@ namespace MMR.Randomizer.GameObjects
         // havent documented enough to know why
         //[PathingVariants(0x4000)] // TODO figure out if I even can get this to work
         [PathingTypeVarsPlacement(mask: 0x3F, shift: 8)] // 0x3F00
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // THIS HAS TWO, 3F8 is also a switch flag whyyyy
         [VariantsWithRoomMax(max:0, variant: 0x4000, 0x8000, // one of these crashes, not sure which yet TODO later
-            0x0102, // bean grotto
-            0x304, 0x4203, 0x001,// swamp spiderhouse
+            0x0102, 0x4101,// bean grotto
+            0x0304, 0x0001,// swamp spiderhouse
             0x061A, 0x071A, // great bay coast
             0x0D04, // deku palace
             0x0101, // doggy race track
@@ -1695,7 +1697,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(GoldSkulltula, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F)]
         //[ForbidFromScene(Scene.SwampSpiderHouse )] // dont want to mess with this by accident until I know it has proper logic
-        [PlacementWeight(80)]
+        [PlacementWeight(65)]
         SoftSoilAndBeans = 0x91, // Obj_Bean
 
         [ActorizerEnabled]
