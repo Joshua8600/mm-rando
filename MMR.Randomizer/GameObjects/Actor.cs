@@ -1828,9 +1828,10 @@ namespace MMR.Randomizer.GameObjects
         )]
         [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)]
         [VariantsWithRoomMax(max: 0, variant: 0)] // mayor meeting, probably has issues without being with the rest of the actors
+        [VariantsWithRoomMax(max: 2, variant: 1,2,5,6)]
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0090)]
         [UnkillableAllVariants]
-        [PlacementWeight(50)] // boring
+        [PlacementWeight(60)] // boring
         Carpenter = 0x9C, // En_Daiku
 
         // tag: lemons

@@ -9,6 +9,8 @@ namespace MMR.Randomizer.GameObjects
         // base enumerator value matches the ST column, SceneInternal ID matches ID column (F)
         // https://docs.google.com/spreadsheets/d/1J-4OwmZzOKEv2hZ7wrygOpMm0YcRnephEo3Q2FooF6E/edit#gid=1593589171
 
+        //EMPTY = 0, // this needs more details to not break in autogen code
+
         [FileID(1160)]
         [SceneInternalId(0x12)]
         [DynaHeadroom(64, 64)]  // low default to start

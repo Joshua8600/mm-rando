@@ -4524,9 +4524,25 @@ namespace MMR.Randomizer
                         var cullCheck = thisSceneData.AcceptableCandidates.Find(act => act.ActorEnum == replacement);
                         if (cullCheck == null) // was weight excluded, need to re-add to test
                         {
-                            var newActor = new Actor(replacement);
+                            var newActor = ReplacementCandidateList.Find(act => act.ActorEnum == replacement);
+
                             thisSceneData.AcceptableCandidates.Add(newActor);
                             thisSceneData.CandidatesPerObject[objectIndex].Add(newActor);
+
+                            // we need to trim variants to only compatible variants, which was in getmatchpool we skipped
+                            var actorInObject = thisSceneData.ActorsPerObject[objectIndex][0];
+                            var isClearEnemyPuzzleRoom = thisSceneData.Scene.SceneEnum.IsClearEnemyPuzzleRoom(actorInObject.Room);
+                            for (int i = 0; i < 1000; ++i) 
+                            {
+                                // rng allows for weird types, in this case we want to force, so use loop, to get this code you should know what you are doing
+                                var acceptableVariants = actorInObject.CompatibleVariants(newActor, thisSceneData.RNG, isClearEnemyPuzzleRoom);
+                                if (acceptableVariants != null)
+                                {
+                                    newActor.SetVariants(acceptableVariants);
+                                    break; 
+                                }
+                                Debug.Assert(newActor.Variants != null && newActor.Variants.Count > 0);
+                            }
                         }
                         return true;
                     }
@@ -4631,7 +4647,6 @@ namespace MMR.Randomizer
                     break;
                 }
 
-                // not testing for compatible here
                 var newVariant = testActor.Variants[thisSceneData.RNG.Next(testActor.Variants.Count)]; // readability
                 oldActor.ChangeActor(testActor, vars: newVariant);
 
@@ -4719,7 +4734,7 @@ namespace MMR.Randomizer
                         var compatibleVariants = oldActor.CompatibleVariants(compatibilityTestActor, thisSceneData.RNG); // do we want clear enemy room data?
                         if (compatibleVariants != null && compatibleVariants.Count > 0)
                         {
-                            compatibilityTestActor.Variants = compatibleVariants;
+                            compatibilityTestActor.SetVariants(compatibleVariants);
                             trimmedCandidates.Add(compatibilityTestActor);
                         }
                     }
@@ -4847,7 +4862,7 @@ namespace MMR.Randomizer
                     // reduce varieties to meet killable requirements
                     if (MustBeKillable)
                     {
-                        newEnemy.Variants = candidateEnemy.KillableVariants(compatibleVariants); // reduce to available
+                        newEnemy.SetVariants(candidateEnemy.KillableVariants(compatibleVariants)); // reduce to available
                         if (newEnemy.Variants.Count == 0)
                         {
                             continue; // can't put this enemy here: it has no non-respawning variants
@@ -4874,7 +4889,7 @@ namespace MMR.Randomizer
                         }
                         else
                         {
-                            newEnemy.Variants = compatibleVariants;
+                            newEnemy.SetVariants(compatibleVariants);
                             newEnemy.RemoveBlockingTypes();
                             if (newEnemy.Variants.Count == 0) // TODO refactor this into the overall flow
                             {
@@ -4884,7 +4899,7 @@ namespace MMR.Randomizer
                     }
                     else
                     {
-                        newEnemy.Variants = compatibleVariants;
+                        newEnemy.SetVariants(compatibleVariants);
                     }
 
                     // ACCEPTABLE
@@ -5109,7 +5124,7 @@ namespace MMR.Randomizer
             {
                 var newDungeonOnlyPot = new Actor(GameObjects.Actor.ClayPot);
                 // todo trim variants
-                newDungeonOnlyPot.Variants = clayPotDungeonVariants.ToList();
+                newDungeonOnlyPot.SetVariants(clayPotDungeonVariants.ToList());
                 newDungeonOnlyPot.AllVariants[(int)GameObjects.ActorType.Ground] = newDungeonOnlyPot.Variants;
 
                 sceneFreeActors.Add(newDungeonOnlyPot);
@@ -5118,7 +5133,7 @@ namespace MMR.Randomizer
             if (VanillaEnemyList.Contains(GameObjects.Actor.TallGrass) && sceneIsField)
             {
                 var newFieldTallGrass = new Actor(GameObjects.Actor.TallGrass);
-                newFieldTallGrass.Variants = tallGrassFieldObjectVariants.ToList();
+                newFieldTallGrass.SetVariants(tallGrassFieldObjectVariants.ToList());
                 newFieldTallGrass.AllVariants[(int)GameObjects.ActorType.Ground] = newFieldTallGrass.Variants;
                 // todo trim variants
                 sceneFreeActors.Add(newFieldTallGrass);
@@ -5133,7 +5148,7 @@ namespace MMR.Randomizer
                 {
                     var newVariants = iceblock.Variants.ToList();
                     newVariants.RemoveAll(var => blockingVariantsAttr.Variants.Contains(var));
-                    iceblock.Variants = newVariants;
+                    iceblock.SetVariants(newVariants);
                     iceblock.AllVariants[(int)GameObjects.ActorType.Ground - 1] = newVariants;
 
                 }
@@ -5301,7 +5316,7 @@ namespace MMR.Randomizer
                         } // */
 
                         var newCompanion = new Actor(companionType);
-                        newCompanion.Variants = companion.Variants;
+                        newCompanion.SetVariants(companion.Variants);
                         if (objectHasBlockingSensitivity)
                         {
                             var blockingVariants = companionType.GetBlockingVariants();
