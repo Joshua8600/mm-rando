@@ -104,7 +104,8 @@ namespace MMR.Randomizer
             0xFE0F, 0xFE0B, 0xFE0E, 0xFE03 // non-vanilla
         };
         static int[] tallGrassFieldObjectVariants = {
-            0x0, 0x800,
+            0x0, 0x800, // woods of mystery
+            
             0x500,
             0x0600, 0x700, 0xC00, 0xD00,
             0x0E00, 0x0E10, 0x0010,

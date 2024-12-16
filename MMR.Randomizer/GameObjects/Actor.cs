@@ -1589,13 +1589,14 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.MilkRoad, variant: ActorConst.ANY_VARIANT, Item.CollectableMilkRoadGrass1, Item.CollectableMilkRoadGrass2, Item.CollectableMilkRoadGrass3)]
         [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT,
             Item.CollectableIkanaGraveyardIkanaGraveyardLowerGrass1, Item.CollectableIkanaGraveyardIkanaGraveyardLowerGrass2, Item.CollectableIkanaGraveyardIkanaGraveyardLowerGrass3)]
-        // 0 uses field keep to draw regular grass, like ObjGrassUnit
+        // & 3 is type
+        // 0 uses field keep to draw regular grass, like ObjGrassUnit, the other 3 types are kusa object
         // 1 creates a grass circle in termina field, 0 is grotto grass single
         // 642B is a smaller cuttable grass from the ground in secret 
         //[GroundVariants(0, 1)]
         [GroundVariants(
             0, // gossip stones use this, but its field_keep versions
-            0x0800, // single in woods of mystery, field_keep
+            0x2C67, 0x2D43, 0x292B, 0x2A2B, // southern swamp
             0x0600, 0x700, 0xC00, 0xD00, // woodfall temple
             0x0610, // great bay coast
             0x0E00, 0x0E10, 0x0010, // secret jgrotto?
@@ -1613,7 +1614,8 @@ namespace MMR.Randomizer.GameObjects
         //[RespawningAllVariants] // some of them come back over and over, but its a PROP type actor
         [AlignedCompanionActor(Actor.Fairy, CompanionAlignment.OnTop, ourVariant: 1, variant: 2, 7, 9)] // fairies love grass
         // for now, until I can identify which ones have drops we need to be careful of, going to block all randimization
-        [ForbidFromScene(Scene.SouthernSwamp, Scene.OdolwasLair,
+        [ForbidFromScene(//Scene.SouthernSwamp,
+            Scene.OdolwasLair,
             Scene.IkanaCastle, Scene.StoneTowerTemple, Scene.Woodfall, Scene.GreatBayCoast,
             Scene.SecretShrine, Scene.MountainVillageSpring, //Scene.WoodsOfMystery,
             //Scene.LaundryPool,
