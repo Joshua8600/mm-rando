@@ -2124,6 +2124,13 @@ namespace MMR.Randomizer
             // 54 = sword school: hookshot can lock the player
             var sceneSkipList = new List<int> { (int)GameObjects.Scene.ClockTowerRoof, (int)GameObjects.Scene.SwordsmansSchool };
 
+            var witchShopScene = RomData.SceneList.Find(s => s.SceneEnum == GameObjects.Scene.PotionShop);
+            if (witchShopScene.Maps[0].Actors[0].ActorEnum == GameObjects.Actor.ShopKeepKotake)
+            {
+                // if the player gives bottle as FD it can overwrite ocarina
+                sceneSkipList.Add((int)GameObjects.Scene.PotionShop);
+            }
+
             /// player item restrictions is a unique list in the code file (z_parameter)
             //var restrictionTableVRAMStart = 0x801BF6C0; // 0xC55C00 -> DC4 // offset: 119C00
             var tableOffset = 0x119C00;
