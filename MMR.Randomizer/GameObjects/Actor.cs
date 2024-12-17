@@ -4207,6 +4207,7 @@ namespace MMR.Randomizer.GameObjects
             0x2001 // massive clock
             )]
         [UnkillableAllVariants]
+        [PlacementWeight(65)]
         Clock = 0x19C, // Obj_Tokeidai
 
         Empty19D = 0x19D,
