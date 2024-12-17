@@ -4772,7 +4772,7 @@ namespace MMR.Randomizer.GameObjects
             0x0100, // only vanilla param weirdly
             0, 0x0080, 0x0180, 0x0200, 0x0280, 0x0380, 0x0400)] 
         [UnkillableAllVariants]
-        [PlacementWeight(20)]
+        [PlacementWeight(100)]
         SnowCoveredTrees = 0x1D4, // En_Snowwd // tag: snowtree
 
         // I suspect since he has so few vars that he will be hard coded, and req decomp to fix
@@ -4910,7 +4910,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.PathToMountainVillage)]
         [BlockingVariantsAll]
-        [PlacementWeight(20)]
+        [PlacementWeight(100)]
         LargeSnowball = 0x1DC, // Obj_Snowball
 
         [FileID(438)]
@@ -5225,7 +5225,7 @@ namespace MMR.Randomizer.GameObjects
         )]
         //[SwitchFlagsPlacement()] // does not appear to have switch flags
         [UnkillableAllVariants]
-        [PlacementWeight(30)]
+        [PlacementWeight(100)]
         SmallSnowball = 0x1F9, // Obj_Snowball2
 
         [FileID(466)]
