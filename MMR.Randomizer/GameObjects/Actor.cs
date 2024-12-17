@@ -1589,15 +1589,16 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.MilkRoad, variant: ActorConst.ANY_VARIANT, Item.CollectableMilkRoadGrass1, Item.CollectableMilkRoadGrass2, Item.CollectableMilkRoadGrass3)]
         [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT,
             Item.CollectableIkanaGraveyardIkanaGraveyardLowerGrass1, Item.CollectableIkanaGraveyardIkanaGraveyardLowerGrass2, Item.CollectableIkanaGraveyardIkanaGraveyardLowerGrass3)]
-        // 0 uses field keep to draw regular grass, like ObjGrassUnit
+        // & 3 is type
+        // 0 uses field keep to draw regular grass, like ObjGrassUnit, the other 3 types are kusa object
         // 1 creates a grass circle in termina field, 0 is grotto grass single
         // 642B is a smaller cuttable grass from the ground in secret 
         //[GroundVariants(0, 1)]
         [GroundVariants(
             0, // gossip stones use this, but its field_keep versions
-            0x0800, // single in woods of mystery, field_keep
+            0x2C67, 0x2D43, 0x292B, 0x2A2B, // southern swamp
             0x0600, 0x700, 0xC00, 0xD00, // woodfall temple
-            0x0610, // greay bay coast
+            0x0610, // great bay coast
             0x0E00, 0x0E10, 0x0010, // secret jgrotto?
             0x634F, 0x642B, 0x654F, 0x662B, 0x672B, 0x682B, 0x602B, 0x614F, 0x622B, 0x634F, 0x602B, // secret shrine (1)
             0x617B, 0x622B, 0x637B, 0x642B, 0x602B, 0x617B, 0x622B, 0x632B, 0x642B, 0x657B, 0x662B, // secret shrine (2)
@@ -1613,7 +1614,8 @@ namespace MMR.Randomizer.GameObjects
         //[RespawningAllVariants] // some of them come back over and over, but its a PROP type actor
         [AlignedCompanionActor(Actor.Fairy, CompanionAlignment.OnTop, ourVariant: 1, variant: 2, 7, 9)] // fairies love grass
         // for now, until I can identify which ones have drops we need to be careful of, going to block all randimization
-        [ForbidFromScene(Scene.SouthernSwamp, Scene.OdolwasLair,
+        [ForbidFromScene(//Scene.SouthernSwamp,
+            Scene.OdolwasLair,
             Scene.IkanaCastle, Scene.StoneTowerTemple, Scene.Woodfall, Scene.GreatBayCoast,
              Scene.MountainVillageSpring, //Scene.WoodsOfMystery,
             //Scene.LaundryPool,
@@ -1661,18 +1663,20 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableTerminaFieldSoftSoil1, Item.CollectableTerminaFieldSoftSoil2, Item.CollectableTerminaFieldSoftSoil3, Item.CollectableTerminaFieldSoftSoil4
         )]
         // some of these are pathing type, however they will need flying pathing type to make snese
+        //  for now, treat them all as ground or wall
         // 8 is unused crack in the wall, only exists in unused ranch setup
         // uses Z rot as a param, unknown use
-        // 0xC000 unk, can change draw type
+        // params:
+        // 0xC000 is type, 8 is wall, 4 is pathless soil, ELSE is bean I think
         // 0x80 determins if switch flags are active, great..
         // TODO which of these are invisble and require action?
         [GroundVariants(0x4000, 0x8000,
             0x4101, 0x0102, // bean grotto
-            0x0304, 0x4203, 0x4080, 0x1,// swamp spiderhouse
+            0x4203, 0x0304, 0x4080, 0x1,// swamp spiderhouse
             0x4D19, 0x061A, 0x071A, // great bay coast
             0x4203, 0x0D04, // deku palace
-            0x0101, // doggy race track
-            0x0401, 0x0504, // inverted stone tower
+            0x4080, 0x0101,  // doggy race track
+            0x4080, 0x4203, 0x0401, 0x0504, // inverted stone tower
             0x4305, 0x460B, 0x478E, 0x0506, 0x070C, 0x060F // termina field
         )]
         [WallVariants(0x4000, 0x8000,
@@ -1683,10 +1687,10 @@ namespace MMR.Randomizer.GameObjects
         // havent documented enough to know why
         //[PathingVariants(0x4000)] // TODO figure out if I even can get this to work
         [PathingTypeVarsPlacement(mask: 0x3F, shift: 8)] // 0x3F00
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // THIS HAS TWO, 3F8 is also a switch flag whyyyy
         [VariantsWithRoomMax(max:0, variant: 0x4000, 0x8000, // one of these crashes, not sure which yet TODO later
-            0x0102, // bean grotto
-            0x304, 0x4203, 0x001,// swamp spiderhouse
+            0x0102, 0x4101,// bean grotto
+            0x0304, 0x0001,// swamp spiderhouse
             0x061A, 0x071A, // great bay coast
             0x0D04, // deku palace
             0x0101, // doggy race track
@@ -1696,7 +1700,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(GoldSkulltula, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F)]
         //[ForbidFromScene(Scene.SwampSpiderHouse )] // dont want to mess with this by accident until I know it has proper logic
-        [PlacementWeight(80)]
+        [PlacementWeight(65)]
         SoftSoilAndBeans = 0x91, // Obj_Bean
 
         [ActorizerEnabled]
@@ -1818,18 +1822,21 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0xF1)]
         [FileID(143)]
         [CheckRestricted(Scene.MayorsResidence, variant: ActorConst.ANY_VARIANT, Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
-        // 1 scoffing at poster, 2 is shouting at the sky looker
+        [GroundVariants(
+            0, // in mayor meeting
+            1, // 1 scoffing at poster,
+            2  // 2 is shouting at the sky looker
+        )]
         // 0x03 is a walking type
-        [GroundVariants(1, 2,
-            0)] // in mayor meeting
-        [VariantsWithRoomMax(max: 0, variant: 0)]
-        [PathingVariants(0x603, 0x503,
-            0x0303// in southclock town doing what?
+        [PathingVariants(
+            0x603, 0x503, 0x0303 // different walking with wooden log
         )]
         [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)]
+        [VariantsWithRoomMax(max: 0, variant: 0)] // mayor meeting, probably has issues without being with the rest of the actors
+        [VariantsWithRoomMax(max: 2, variant: 1,2,5,6)]
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0090)]
         [UnkillableAllVariants]
-        [PlacementWeight(50)] // boring
+        [PlacementWeight(60)] // boring
         Carpenter = 0x9C, // En_Daiku
 
         // tag: lemons
@@ -4201,6 +4208,7 @@ namespace MMR.Randomizer.GameObjects
             0x2001 // massive clock
             )]
         [UnkillableAllVariants]
+        [PlacementWeight(65)]
         Clock = 0x19C, // Obj_Tokeidai
 
         Empty19D = 0x19D,
@@ -4765,7 +4773,7 @@ namespace MMR.Randomizer.GameObjects
             0x0100, // only vanilla param weirdly
             0, 0x0080, 0x0180, 0x0200, 0x0280, 0x0380, 0x0400)] 
         [UnkillableAllVariants]
-        [PlacementWeight(20)]
+        [PlacementWeight(100)]
         SnowCoveredTrees = 0x1D4, // En_Snowwd // tag: snowtree
 
         // I suspect since he has so few vars that he will be hard coded, and req decomp to fix
@@ -4903,7 +4911,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.PathToMountainVillage)]
         [BlockingVariantsAll]
-        [PlacementWeight(20)]
+        [PlacementWeight(100)]
         LargeSnowball = 0x1DC, // Obj_Snowball
 
         [FileID(438)]
@@ -5218,7 +5226,7 @@ namespace MMR.Randomizer.GameObjects
         )]
         //[SwitchFlagsPlacement()] // does not appear to have switch flags
         [UnkillableAllVariants]
-        [PlacementWeight(30)]
+        [PlacementWeight(100)]
         SmallSnowball = 0x1F9, // Obj_Snowball2
 
         [FileID(466)]

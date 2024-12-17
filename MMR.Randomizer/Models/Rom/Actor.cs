@@ -30,8 +30,8 @@ namespace MMR.Randomizer.Models.Rom
         public int ObjectId; // in-game object list index
         public int OldObjectId; // in-game object list index
         public int ActorIdFlags; // we just want to keep them when re-writing, but I'm not sure they even matter
-        public List<int> Variants = new List<int> { 0 };
-        //public int VariantBeforeFlagsAdjustment; // after flags are adjusted variants change, looking up types can be broken
+        public List<int> Variants { get; private set; }
+        //public List<int> Variants = new List<int> { 0 };
         public List<List<int>> AllVariants = null;
         public int OldVariant;
         public bool MustNotRespawn = false;
@@ -46,7 +46,6 @@ namespace MMR.Randomizer.Models.Rom
         public (int poly, int vert) DynaLoad =  (0, 0);  // dyna load per actor, can be overwritten by injected actor
         public int Room;           // the room the actor is in in the scene
         public int RoomActorIndex; // the actor index of the room the actor is in
-        //public int Stationary; // Deathbasket used to use this, I dont see the point except around water
         public vec16 Position = new vec16();
         public vec16 Rotation = new vec16();
 
@@ -221,7 +220,8 @@ namespace MMR.Randomizer.Models.Rom
 
             Debug.Assert(newActor.AllVariants != null);
 
-            newActor.Variants = newActor.AllVariants.SelectMany(u => u).ToList(); // might as well start with all
+            //newActor.Variants = newActor.AllVariants.SelectMany(u => u).ToList(); // might as well start with all
+            newActor.Variants = this.Variants; // worried that this was previously separate for a reason, dont rebuild
             newActor.OnlyOnePerRoom = this.OnlyOnePerRoom;
             newActor.VariantsWithRoomMax = this.VariantsWithRoomMax.ToList();
 
@@ -381,11 +381,20 @@ namespace MMR.Randomizer.Models.Rom
             AddToSpecificSubtype(ActorType.WaterBottom, injectedActor.waterBottomVariants);
         }
 
+        // TODO: I forgot this exists, should be renamed and other code agressively use this
+        // change actor is more likely to be used
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ChangeVariant(int variant)
         {
             /// deep change: changes old variant as well
             this.OldVariant = this.Variants[0] = variant;
+        }
+
+        public void SetVariants(List<int> variants)
+        {
+            // this is here so I can watch for variant corruption, because not sure how to breakpoint
+            // currentScene is there for debugging, 
+            this.Variants = variants;
         }
 
         // should this function also be checking for other compatibility issues like respawning? currently elsewhere
@@ -398,7 +407,6 @@ namespace MMR.Randomizer.Models.Rom
             if (this.AllVariants == null || otherActor.AllVariants == null)
             {
                 throw new Exception("Compare Variants: broken actor variants listoflist");
-                //this.AllVariants = 
             }
 
             // randomly select a type, check if they have matching types
