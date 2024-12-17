@@ -545,7 +545,7 @@ namespace MMR.Randomizer
                 //Debug.Assert(actorNumber == scene.Maps[mapIndex].Actors.IndexOf(mapActor));
                 // TODO: type lookup is not always accurate
                 mapActor.Type = matchingEnemy.GetType(mapActor.OldVariant);
-                mapActor.AllVariants = Actor.BuildVariantList(matchingEnemy);
+                mapActor.SortedVariants = Actor.BuildVariantList(matchingEnemy);
                 //mapActor.Blockable = mapActor.ActorEnum.IsBlockable(scene.SceneEnum, mapActor.RoomActorIndex);
                 mapActor.UpdateBlockable(scene.SceneEnum);
             }
@@ -573,7 +573,7 @@ namespace MMR.Randomizer
 
                         FixActorLastSecond(targetActor, targetActor.OldActorEnum, mapIndex, actorIndex);
                         targetActor.Variants.AddRange(tallGrassFieldObjectVariants);
-                        targetActor.AllVariants[(int)GameObjects.ActorType.Ground] = targetActor.Variants; // have to update the types for variant compatiblity later
+                        targetActor.SortedVariants[(int)GameObjects.ActorType.Ground] = targetActor.Variants; // have to update the types for variant compatiblity later
                         return true;
                     }
                 }
@@ -595,7 +595,7 @@ namespace MMR.Randomizer
 
                         FixActorLastSecond(targetActor, targetActor.OldActorEnum, mapIndex, actorIndex);
                         targetActor.Variants.AddRange(clayPotDungeonVariants);
-                        targetActor.AllVariants[(int)GameObjects.ActorType.Ground] = targetActor.Variants; // have to update the types for variant compatiblity later
+                        targetActor.SortedVariants[(int)GameObjects.ActorType.Ground] = targetActor.Variants; // have to update the types for variant compatiblity later
                         return true;
                     }
                 }
@@ -613,7 +613,8 @@ namespace MMR.Randomizer
                     var matchingEnemy = VanillaEnemyList.Find(act => act == mapActor.OldActorEnum);
                     if (matchingEnemy > 0)
                     {
-                        var listOfAcceptableVariants = matchingEnemy.AllVariants(); 
+                        // note: injected actor data is added later, this happens before injection
+                        var listOfAcceptableVariants = matchingEnemy.GenerateVariantsFromEnum();
 
                         // TODO: check if the specific actor can be randomized, required before continue:
                         // actor separation, scene reconstruction, object list extension,  
@@ -4979,10 +4980,10 @@ namespace MMR.Randomizer
                     // for all candidates, check if they have only pathing and remove
                     foreach (var candidate in newCandiateList.ToArray())
                     {
-                        var pathingVariants = candidate.AllVariants[(int)GameObjects.ActorType.Pathing - 1];
+                        var pathingVariants = candidate.SortedVariants[(int)GameObjects.ActorType.Pathing - 1];
                         if (pathingVariants != null && pathingVariants.Count > 0)
                         {
-                            var groundVariants = candidate.AllVariants[(int)GameObjects.ActorType.Ground - 1];
+                            var groundVariants = candidate.SortedVariants[(int)GameObjects.ActorType.Ground - 1];
 
                             if (groundVariants == null || groundVariants.Count == 0)
                             {
@@ -5305,7 +5306,7 @@ namespace MMR.Randomizer
                 var newDungeonOnlyPot = new Actor(GameObjects.Actor.ClayPot);
                 // todo trim variants
                 newDungeonOnlyPot.SetVariants(clayPotDungeonVariants.ToList());
-                newDungeonOnlyPot.AllVariants[(int)GameObjects.ActorType.Ground] = newDungeonOnlyPot.Variants;
+                newDungeonOnlyPot.SortedVariants[(int)GameObjects.ActorType.Ground] = newDungeonOnlyPot.Variants;
 
                 sceneFreeActors.Add(newDungeonOnlyPot);
             }
@@ -5314,7 +5315,7 @@ namespace MMR.Randomizer
             {
                 var newFieldTallGrass = new Actor(GameObjects.Actor.TallGrass);
                 newFieldTallGrass.SetVariants(tallGrassFieldObjectVariants.ToList());
-                newFieldTallGrass.AllVariants[(int)GameObjects.ActorType.Ground] = newFieldTallGrass.Variants;
+                newFieldTallGrass.SortedVariants[(int)GameObjects.ActorType.Ground] = newFieldTallGrass.Variants;
                 // todo trim variants
                 sceneFreeActors.Add(newFieldTallGrass);
             }
@@ -5329,7 +5330,7 @@ namespace MMR.Randomizer
                     var newVariants = iceblock.Variants.ToList();
                     newVariants.RemoveAll(var => blockingVariantsAttr.Variants.Contains(var));
                     iceblock.SetVariants(newVariants);
-                    iceblock.AllVariants[(int)GameObjects.ActorType.Ground - 1] = newVariants;
+                    iceblock.SortedVariants[(int)GameObjects.ActorType.Ground - 1] = newVariants;
 
                 }
             }
