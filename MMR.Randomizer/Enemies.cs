@@ -3928,6 +3928,21 @@ namespace MMR.Randomizer
             /// the final trim where we go through every actor that might be over their limit and randomly remove them
             /// this needs to happen because during the last two, we didnt dynamically keep track of actors being put back in
 
+            void RemoveObjectKankyo(Map map, List<Actor> roomFreeActors, String logAppend)
+            {
+                var objectKankyoSearch = map.Actors.FindAll(act => act.ActorEnum == GameObjects.Actor.ObjectKankyo);
+
+                foreach (var objKankyo in objectKankyoSearch)
+                {
+                    var blockedActors = thisSceneData.Scene.SceneEnum.GetBlockedReplacementActors(objKankyo.OldActorEnum);
+                    List<Actor> acceptableReplacementFreeActors = roomFreeActors.FindAll(a => !blockedActors.Contains(a.ActorEnum)).ToList();
+
+                    EmptyOrFreeActor(thisSceneData, objKankyo, map.Actors, acceptableReplacementFreeActors,
+                        roomIsClearPuzzleRoom: true); // for now marking this true just because I dont want to re-calculate this since its in the wrong spot,
+                    thisSceneData.Log.AppendLine(logAppend);
+                }
+            }
+
             for (int m = 0; m < thisSceneData.ActorCollection.newMapList.Count; m++)
             {
                 var map = thisSceneData.ActorCollection.newMapList[m];
@@ -3964,19 +3979,46 @@ namespace MMR.Randomizer
 
                 if (map.Objects.Contains(GameObjects.Actor.Shabom.ObjectIndex()) && map.Objects.Contains(GameObjects.Actor.Giant.ObjectIndex()))
                 {
+                    RemoveObjectKankyo(map, roomFreeActors, " -*- trimming object kankyo because of rare double object");
+                    
+                }
+                var sceneEnum = thisSceneData.Scene.SceneEnum;
+                if (sceneEnum == GameObjects.Scene.TerminaField // rain scenes, just disable the actors spawn on day 2 and you're fine
+                 || sceneEnum == GameObjects.Scene.DekuPalace
+                 || sceneEnum == GameObjects.Scene.RomaniRanch
+                 || sceneEnum == GameObjects.Scene.GreatBayCoast
+                 || sceneEnum == GameObjects.Scene.DoggyRacetrack)
+                {
                     var objectKankyoSearch = map.Actors.FindAll(act => act.ActorEnum == GameObjects.Actor.ObjectKankyo);
+
                     foreach (var objKankyo in objectKankyoSearch)
                     {
-                        var blockedActors = thisSceneData.Scene.SceneEnum.GetBlockedReplacementActors(objKankyo.OldActorEnum);
-                        List<Actor> acceptableReplacementFreeActors = roomFreeActors.FindAll(a => !blockedActors.Contains(a.ActorEnum)).ToList();
+                        ActorUtils.SetActorSpawnTimeFlags(objKankyo, 0x3CF); // off for day/night 2
+                    }
+                    return;
 
-                        EmptyOrFreeActor(thisSceneData, objKankyo, map.Actors, acceptableReplacementFreeActors,
-                                roomIsClearPuzzleRoom: true); // for now marking this true just because I dont want to re-calculate this since its in the wrong spot,
-                        thisSceneData.Log.Append(" -*- trimming object kankyo because of rare double object");
+                }
+                if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic)
+                {
+                    var vanillaBeans = map.Actors.FindAll(act => act.OldActorEnum == GameObjects.Actor.SoftSoilAndBeans && act.ActorEnum == GameObjects.Actor.SoftSoilAndBeans);
+                    if (vanillaBeans != null && vanillaBeans.Count > 0)
+                    {
+                        RemoveObjectKankyo(map, roomFreeActors, " -*- trimming object kankyo because of vanilla beans in no logic reduction");
+                        return;
+                    }
+
+                }
+                else // logic exists
+                {
+                    var allSphereItems = _randomized.Spheres.SelectMany(u => u).ToList();
+                    var stormsSearch = allSphereItems.FindAll(item => item.item == GameObjects.Item.SongStorms.ToString());
+                    if (stormsSearch != null && stormsSearch.Count() > 0)
+                    {
+                        RemoveObjectKankyo(map, roomFreeActors, " -*- trimming object kankyo because of storms");
+
                     }
                 }
             }
-
         }
 
         public static void FixBrokenActorSpawnCutscenes(SceneEnemizerData thisSceneData)
