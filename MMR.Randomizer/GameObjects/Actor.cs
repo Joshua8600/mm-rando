@@ -1568,7 +1568,7 @@ namespace MMR.Randomizer.GameObjects
         // all restricted because they add colliders which limits our BGcheck options for other things
         [VariantsWithRoomMax(max: 1, variant: 0xFF10, 0xFF20, 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         //[VariantsWithRoomMax(max: 1, variant: 0xFFC8, 0xFF96, 0xFF78)]
-        [PlacementWeight(60)]
+        [PlacementWeight(100)]
         RegularIceBlock = 0x8E, // Obj_Ice_Poly
 
         [EnemizerEnabled]
@@ -1637,7 +1637,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.RomaniRanch, variant: ActorConst.ANY_VARIANT, Item.CollectableRomaniRanchSoftSoil1, Item.CollectableRomaniRanchSoftSoil2)]
         [CheckRestricted(Scene.Grottos, variant: ActorConst.ANY_VARIANT, Item.CollectableBeanGrottoSoftSoil1, Item.ChestBeanGrottoRedRupee)]
         [CheckRestricted(Scene.GreatBayCoast, variant: ActorConst.ANY_VARIANT, Item.CollectableGreatBayCoastSoftSoil1, Item.HeartPieceGreatBayCoast)]
-        [CheckRestricted(Scene.DoggyRacetrack, variant: ActorConst.ANY_VARIANT, Item.CollectableDoggyRacetrackSoftSoil1)]
+        [CheckRestricted(Scene.DoggyRacetrack, variant: ActorConst.ANY_VARIANT, Item.CollectableDoggyRacetrackSoftSoil1, Item.ChestDogRacePurpleRupee)]
         [CheckRestricted(Scene.SecretShrine, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSecretShrineSoftSoil1,
             Item.CollectableSecretShrineEntranceRoomItem1, Item.CollectableSecretShrineEntranceRoomItem2, Item.CollectableSecretShrineEntranceRoomItem3,

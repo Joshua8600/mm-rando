@@ -2087,6 +2087,15 @@ namespace MMR.Randomizer
                 }
                 SceneUtils.UpdateScene(nctScene);
 
+                var ikanaCastleScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaCastle.FileID());
+                var ceilingSkulltula1 = ikanaCastleScene.Maps[4].Actors[0];
+                var killableVariants = ceilingSkulltula1.ActorEnum.KillableVariants();
+                if (killableVariants == null || killableVariants.Count == 0)
+                {
+                    ceilingSkulltula1.Position = new vec16(979, -1038, -2203); // moved left and up
+                }
+                SceneUtils.UpdateScene(ikanaCastleScene);
+
             }
 
             FixEvanRotation();
@@ -4605,7 +4614,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
-                if (TestHardSetObject(GameObjects.Scene.DoggyRacetrack, GameObjects.Actor.Treee, GameObjects.Actor.SquareSign)) continue;
+                if (TestHardSetObject(GameObjects.Scene.DoggyRacetrack, GameObjects.Actor.SoftSoilAndBeans, GameObjects.Actor.SquareSign)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;

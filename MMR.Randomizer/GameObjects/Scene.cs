@@ -277,8 +277,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1224)]
         [SceneInternalId(0x1D)]
         [ClearEnemyPuzzleRooms(5)] // wizrobe room
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
-            Actor.Bombiwa)] // can block jumping
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
+        //    Actor.Bombiwa)] // can block jumping
         IkanaCastle = 0x1A,
 
         [FileID(1235)]
