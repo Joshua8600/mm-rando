@@ -2556,8 +2556,10 @@ namespace MMR.Randomizer
 
         private static void RandomizePinnacleRockSigns()
         {
-            /// these signs use gameplay_keep, so there is no sign to associate with them
+            /// these signs use gameplay_keep, so there is no Object to associate with them
             /// HOWEVER, there is a bombiwa object in the object list that doesnt seem to do anything, we can randomize it
+
+            if ( ! ACTORSENABLED) return;
 
             var listOfSignIds = new List<int> { 14, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43 };
 
