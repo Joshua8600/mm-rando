@@ -1526,6 +1526,39 @@ namespace MMR.Randomizer
             }
         }
 
+        private void MakeItRain()
+        {
+            // seasonal to make it snow again
+            int terminaFieldRoom0FID = GameObjects.Scene.TerminaField.FileID() + 1;
+            int roadtosouthernswampRoom0FID = GameObjects.Scene.RoadToSouthernSwamp.FileID() + 1;
+            int milkroadRoom0FID = GameObjects.Scene.MilkRoad.FileID() + 1;
+            int gormantrackRoom0FD = GameObjects.Scene.GormanRaceTrack.FileID() + 1;
+            int greatbaycoastRoom0FID = GameObjects.Scene.GreatBayCoast.FileID() + 1;
+            int pinnacleRockRoom0FID = GameObjects.Scene.PinnacleRock.FileID() + 1;
+            int piratesExteriorRoom0FID = GameObjects.Scene.PiratesFortressExterior.FileID() + 1;
+            int piratesInteriorRoom0FID = GameObjects.Scene.PiratesFortress.FileID() + 1;
+            int zoracapeRoom0FID = GameObjects.Scene.ZoraCape.FileID() + 1;
+            int waterfallRapidsRoom0FID = GameObjects.Scene.WaterfallRapids.FileID() + 1;
+            // not sure if woodfall should be added, its in the swamp, but maybe the mountain is supposed to be really tall and above the clouds
+
+            int[] roomFDs = new int[] { terminaFieldRoom0FID, roadtosouthernswampRoom0FID, milkroadRoom0FID, gormantrackRoom0FD,
+                greatbaycoastRoom0FID, pinnacleRockRoom0FID, piratesExteriorRoom0FID, piratesInteriorRoom0FID,
+                zoracapeRoom0FID,  waterfallRapidsRoom0FID};
+
+            foreach (var fid in roomFDs)
+            {
+                RomUtils.CheckCompressed(fid);
+                for (int Byte = 0; Byte < 0x10 * 70; Byte += 8)
+                {
+                    if (RomData.MMFileList[fid].Data[Byte] == 0x08) // header command starts with 0x08
+                    {
+                        RomData.MMFileList[fid].Data[Byte + 0x6] |= 0x10; // set storm to true
+                        break;
+                    }
+                }
+            }
+        }
+
         private void PutOrCombine(Dictionary<int, byte> dictionary, int key, byte value, bool add = false)
         {
             if (!dictionary.ContainsKey(key))
@@ -6385,7 +6418,7 @@ namespace MMR.Randomizer
                 progressReporter.ReportProgress(65, "Writing items...");
                 WriteItems(messageTable);
 
-                progressReporter.ReportProgress(66, "Writing enemies 1...");
+                progressReporter.ReportProgress(66, "Reading Enemies ...");
                 ReadEnemies(outputSettings);
 
 
@@ -6413,7 +6446,7 @@ namespace MMR.Randomizer
                     WriteTraps();
                 }
 
-                progressReporter.ReportProgress(70, "Writing enemies 2..."); // moved to attempt to bypass older variant override over actors
+                progressReporter.ReportProgress(70, "Writing enemies ..."); // moved to attempt to bypass older variant override over actors
                 WriteEnemies();
 
                 // Load Asm data from internal resource files and apply
@@ -6447,7 +6480,7 @@ namespace MMR.Randomizer
             progressReporter.ReportProgress(72, "Writing cosmetics...");
             WriteTatlColour(new Random(BitConverter.ToInt32(hash, 0)));
             //WriteTunicColor();
-            //MakeItRain();
+            MakeItRain();
             WriteInstruments(new Random(BitConverter.ToInt32(hash, 0)));
 
             progressReporter.ReportProgress(73, "Writing music...");

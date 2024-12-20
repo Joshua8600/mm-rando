@@ -927,8 +927,9 @@ namespace MMR.Randomizer.GameObjects
         // 2 is the murk from the ocean, but full time
         // 1 and 3 are snow, but you need to set E2 to non-zero
         // 4 kill itself it not in the giants chamber
-        [FlyingVariants(3)]
+        //[FlyingVariants(3)]
         //[GroundVariants(3)] // 3 is snow
+        [EnemizerScenesPlacementBlock(Scene.PathToMountainVillage, Scene.MountainVillage, Scene.TwinIslands, Scene.GoronVillage, Scene.PathToSnowhead, Scene.Snowhead)] // no point putting them where they can't do anything
         [UnkillableAllVariants]
         ObjectKankyo = 0x51, // Object_Kankyo
 
@@ -979,9 +980,10 @@ namespace MMR.Randomizer.GameObjects
             check: Item.HeartPieceTwinIslandsChest)]
         [CheckRestricted(Scene.MountainVillageSpring, variant: ActorConst.ANY_VARIANT,
             check: Item.ChestMountainVillageGrottoRedRupee)]
-        [CheckRestricted(Scene.GreatBayCoast, variant: ActorConst.ANY_VARIANT,
-            check: Item.ChestGreatBayCoastGrotto,
-                   Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.CollectableGrottosCowGrottoButterflyFairy2)]
+        [CheckRestricted(Scene.GreatBayCoast, variant: 0xFF, // cow grotto
+            check:Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.CollectableGrottosCowGrottoButterflyFairy2)]
+        [CheckRestricted(Scene.GreatBayCoast, variant: 0x37, // regular grotto
+            check: Item.ChestGreatBayCoastGrotto)]
         [CheckRestricted(Scene.ZoraCape, variant: ActorConst.ANY_VARIANT,
             check: Item.ChestGreatBayCapeGrotto)]
         [CheckRestricted(Scene.RoadToIkana, variant: ActorConst.ANY_VARIANT,
@@ -990,6 +992,7 @@ namespace MMR.Randomizer.GameObjects
             check: Item.ChestGraveyardGrotto)]
         [CheckRestricted(Scene.IkanaCanyon, variant: ActorConst.ANY_VARIANT,
             check: Item.ChestIkanaSecretShrineGrotto)]
+        // 0x001F, is the gossip stones in TF, assumed to be Z rotation based
         // FF/299 is HSG, 233 is path to snowhead, 3B is mountain village spring grot 3D is swamp grotto, , 5C is mystery woods
         // 96 is goron rock grotto, 218/2B8? is graveyard grotto, 3E is road to swamp
         // 301 is ranch grotto? 214 is log cow grotto
@@ -1013,22 +1016,45 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x0, 0x2000, 0x3000, 0x4000, // stone grottos
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
-            0xE000,
-            0x17, 0x2, // coast
+            0xF000,
+            0x1B, // mountain village spring
+            0x1C, // woods of mystery
+            0x1D, // southern swamp
+            0x233, // path to snowhead
+            0xFF, // coast cow
+            0x37, // coast main grotto
             0x213, // path to snowhead
             0x3B, // moutain spring
-            0xE200, 0xF200, // secret secret
+            0x37, // coast regular grotto
+            0x15, 0x216, // cape
+            0x16, 0x216, // road to ikana
+            0x0218, 0x2B8, // graveyard
+            0x14, 0x54, 0xB4, // ikana canyon
+            0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [VariantsWithRoomMax(max: 1,
             0x0, 0x2000, 0x3000, 0x4000, // stone grottos
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
-            0xE000,
-            0x17, 0x2, // coast
+            0xF000,
+            0x1B, // mountain village spring
+            0x1C, // woods of mystery
+            0x1D, // southern swamp
+            0x233, // path to snowhead
+            0xFF, // coast cow
+            0x216, // road to ikana
             0x213, // path to snowhead
             0x3B, // moutain spring
-            0xE200, 0xF200, // secret secret
+            0x37, // coast regular grotto
+            0x0218, 0x2B8,// graveyard, 0x18 is in the title screen
+            0x14, 0x54, 0xB4, // ikana canyon
+            0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
+        [VariantsWithRoomMax(max: 0, variant:
+            0x16, // road to ikana
+            0x15, // cape
+            2 // bad values
+        )] 
         [UnkillableAllVariants]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [AlignedCompanionActor(Obj_Dowsing, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x110)] // rumble
@@ -1045,6 +1071,7 @@ namespace MMR.Randomizer.GameObjects
         [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
         //[ForbidFromScene(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead,
         //    Scene.TerminaField)]
+        [RemovalChance(45)]
         GrottoHole = 0x55, // Door_Ana
 
         Empty56 = 0x56,
@@ -1305,7 +1332,7 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectibleSwampSpiderToken5)]
         [CheckRestricted(Scene.SwampSpiderHouse, variant: 0x001E, // swamp spiderhouse
             Item.CollectibleSwampSpiderToken30)]
-        [CheckRestricted(Scene.DekuPalace, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.DekuPalace, variant: ActorConst.ANY_VARIANT, // NOT DUNGEON
             Item.CollectableDekuPalaceEastInnerGardenPot1, Item.CollectableDekuPalaceEastInnerGardenPot2)]
         [CheckRestricted(Scene.DekuShrine, variant: ActorConst.ANY_VARIANT, Item.CollectableDekuShrineGreyBoulderRoomPot1)]
         [CheckRestricted(Scene.Woodfall, variant: ActorConst.ANY_VARIANT,
@@ -1373,7 +1400,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.BeneathTheWell, variant: 0x4815, Item.CollectableBeneathTheWellBugAndBombRoomPot1, Item.CollectableBeneathTheWellBugAndBombRoomPot2, Item.CollectableBeneathTheWellBugAndBombRoomPot3, Item.CollectableBeneathTheWellBugAndBombRoomPot4, Item.CollectableBeneathTheWellBugAndBombRoomPot5)]
         [CheckRestricted(Scene.BeneathTheWell, variant: 0x4215, Item.CollectableBeneathTheWellBugAndBombRoomPot1, Item.CollectableBeneathTheWellBugAndBombRoomPot2, Item.CollectableBeneathTheWellBugAndBombRoomPot3, Item.CollectableBeneathTheWellBugAndBombRoomPot4, Item.CollectableBeneathTheWellBugAndBombRoomPot5)]
         [CheckRestricted(Scene.BeneathTheWell, variant: 0x4615, Item.CollectableBeneathTheWellBugAndBombRoomPot1, Item.CollectableBeneathTheWellBugAndBombRoomPot2, Item.CollectableBeneathTheWellBugAndBombRoomPot3, Item.CollectableBeneathTheWellBugAndBombRoomPot4, Item.CollectableBeneathTheWellBugAndBombRoomPot5)]
-        [CheckRestricted(Scene.DampesHouse, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.DampesHouse, variant: ActorConst.ANY_VARIANT, // NOT DUNGEON
             Item.CollectableDampesHouseBasementPot1, Item.CollectableDampesHouseBasementPot2,
             Item.CollectableDampesHouseBasementPot3, Item.CollectableDampesHouseBasementPot4,
             Item.CollectableDampesHouseBasementPot5, Item.CollectableDampesHouseBasementPot6,
@@ -1384,16 +1411,21 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.IgosDuIkanasLair, variant: ActorConst.ANY_VARIANT,
             Item.CollectableIgosDuIkanaSLairIgosDuIkanaSRoomPot1, Item.CollectableIgosDuIkanaSLairIgosDuIkanaSRoomPot2, Item.CollectableIgosDuIkanaSLairIgosDuIkanaSRoomPot3,
             Item.CollectableIgosDuIkanaSLairPreBossRoomPot1, Item.CollectableIgosDuIkanaSLairPreBossRoomPot2, Item.CollectableIgosDuIkanaSLairPreBossRoomPot3)]
-        [CheckRestricted(Scene.StoneTower, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.StoneTower, variant: ActorConst.ANY_VARIANT, // NOT DUNGEON
             Item.CollectableStoneTowerPot1, Item.CollectableStoneTowerPot2, Item.CollectableStoneTowerPot3, Item.CollectableStoneTowerPot4, Item.CollectableStoneTowerPot5,
             Item.CollectableStoneTowerPot6, Item.CollectableStoneTowerPot7, Item.CollectableStoneTowerPot8, Item.CollectableStoneTowerPot9, Item.CollectableStoneTowerPot10, 
             Item.CollectableStoneTowerPot11, Item.CollectableStoneTowerPot12, Item.CollectableStoneTowerPot13, Item.CollectableStoneTowerPot14)]
         // cannot randomize temple pots yet, uses dungeon keep objects, this will come later
         [CheckRestricted(Scene.InvertedStoneTower, variant: ActorConst.ANY_VARIANT, Item.CollectableStoneTowerInvertedStoneTowerFlippedPot1, Item.CollectableStoneTowerInvertedStoneTowerFlippedPot2, Item.CollectableStoneTowerInvertedStoneTowerFlippedPot3)]
         [CheckRestricted(Scene.StoneTowerTemple, variant: ActorConst.ANY_VARIANT, Item.CollectableStoneTowerTempleInvertedWizzrobeRoomPot1)]
-        [CheckRestricted(Scene.SecretShrine, variant: ActorConst.ANY_VARIANT,
+        [CheckRestricted(Scene.SecretShrine, variant: 0xF81E, Item.CollectableSecretShrineMainRoomPot1)]
+        [CheckRestricted(Scene.SecretShrine, variant: 0xFA1E, Item.CollectableSecretShrineMainRoomPot2)]
+        [CheckRestricted(Scene.SecretShrine, variant: 0xF60E, Item.CollectableSecretShrineMainRoomPot3)]
+        [CheckRestricted(Scene.SecretShrine, variant: 0xFE0E, Item.CollectableSecretShrineMainRoomPot4)]
+        [CheckRestricted(Scene.SecretShrine, variant: 0xF410, Item.CollectableSecretShrineMainRoomPot5)] // or  0xFC0B
+        /*[CheckRestricted(Scene.SecretShrine, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSecretShrineMainRoomPot1, Item.CollectableSecretShrineMainRoomPot2, Item.CollectableSecretShrineMainRoomPot3, Item.CollectableSecretShrineMainRoomPot4,
-            Item.CollectableSecretShrineMainRoomPot5)]
+            Item.CollectableSecretShrineMainRoomPot5)] // */
         // 0xF9 is pot and pot shard
         // according to CM, 0x100 is available everywhere as a pot, where 0x3F defines the drop item
         // so 1F is arrows, F is magic, B is three small rups? 7 is huge 200 rup, 17 is empty
@@ -1402,6 +1434,7 @@ namespace MMR.Randomizer.GameObjects
         // 115 is 5 bombs, 105 is tall dodongo 50 rup, 106 is empty, 116 is empty
         // 101 is one rup, 111 SKULL TOKEN POT??!? 102 was 5 rups 112 empty
         // 103 empty, 113 is 10 deku nuts, 104 is red rup, 114 is empty
+        // params >>7 &3 is type, 0 and 3 are dungeon, 2 is object, 1 is racing
         //[GroundVariants(0x110)] // testing // 115 101 106 10E 10F
         [GroundVariants(0x10B, 0x115, 0x106, 0x101, 0x102, 0x10F, 0x115, 0x11F, 0x113, 0x110, 0x10E, // good variety to place
             0x30A, // trading post (has nothing important
@@ -1415,7 +1448,6 @@ namespace MMR.Randomizer.GameObjects
             0xFE01, // deku shrine
             0x4D10, 0xFF04, 0x4D10,// mountain village spring
             0xC719, 0xC90E, 0xCB0E, 0xCD19, 0xCF0F, 0xD10F, 0xD30F, 0xD519, 0xC119, 0xC319, 0xC50F, 0xC709, // goron shrine
-            0x410E, 0x450A, 0x470A, 0x490A, 0x4B0A, 0x4D0E, 0x530A, 0x550A, 0x570E, 0x590A, 0x5B0E, // pinnacle rock
             0x471E, 0x590E, 0x531E, 0x4114, 0x4314, 0x4B1E, 0x4D0A, 0x5D0A, 0x5F0A, 0x5F03, 0x5714, // beneath the graveyard
             0x0B01, 0x0D01, 0x0F1E, 0x110A, 0x1301, 0x151E, 0x1705, 0x191E, 0x1B1E, 0x1D0A, // damps house
             0x7C10, 0x7E0B, 0x800B, 0x820E, 0x840B, 0x9C10, 0x9E0E, 0xA010, 0xB40E, 0x860B, 0x8813, 0x8A0B, 0x8C0B,// ikana castle
@@ -1423,14 +1455,21 @@ namespace MMR.Randomizer.GameObjects
             0x6514, 0x671E, 0x690E, 0x6B0A, 0x6D0A, 0x6F15, 0x711F, 0x7610, 0x750F, // stone tower (cont)
             0x460B, 0x4610, 0x018D, // stone tower temple
             0x6F0B, 0x710F, 0x7310, 0x7515, 0x770B, // inverted stone tower (is a field scene, but why)
-            0xC00B, 0xC21E, 0xC40E, 0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF81E, 0xF60E, 0xF410, // secret shrine
-            0x4110)] // terminafield pot
+            0xC00B, 0xC21E, 0xC40E, // secret shrine
+            0x4110, // terminafield pot
+            0xFF0B, 0xFF0D // non vanilla
+            )]
+        [WaterBottomVariants(
+            0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF60E, 0xF410, // secret shrine
+            0x410E, 0x450A, 0x470A, 0x490A, 0x4B0A, 0x4D0E, 0x530A, 0x550A, 0x570E, 0x590A, 0x5B0E, // pinnacle rock
+            0xFF0F, 0xFF0B, 0xFF0E, 0xFF03 // non vanilla
+            )]
         [VariantsWithRoomMax(max:0, variant: 0x460B, 0x4610, 0x018D, // stone tower temple (dungeon keep)
             0xFE01, // deku shrine (dungeon keep)
             0x1E, 0x5, // spiderhouse clay pots with spiders
             0x202, 0x602, 0x802, 0xA02, 0xC02)] // swords school, these are dungeon_keep pots cannot place without the object
         [ForbidFromScene( Scene.GoronRacetrack, // these are green pots they use a different object 
-            Scene.SecretShrine, Scene.IkanaCastle, Scene.IgosDuIkanasLair, // dungeon pots, but treasure flags updater still messes with it
+            /*Scene.SecretShrine,*/ Scene.IkanaCastle, Scene.IgosDuIkanasLair, // dungeon pots, but treasure flags updater still messes with it
             Scene.DekuShrine,  Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple,
             Scene.AstralObservatory, Scene.GoronTrial, Scene.LinkTrial,
             Scene.MajorasLair)] // we want them for the fight
@@ -1524,12 +1563,12 @@ namespace MMR.Randomizer.GameObjects
         // 64 is size of HSW, 0xC8 in one of snowhead rooms, AA is compass room?
         // ice block room has 0x64 and 0x96, 0xFF in goron block puzzle room
         // smithy uses size 0x78, 0x10 is smol
-        [GroundVariants(0xFF10, 0xFF20, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [GroundVariants(0xFF10, 0xFF20, 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         [BlockingVariants(0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         // all restricted because they add colliders which limits our BGcheck options for other things
-        [VariantsWithRoomMax(max: 1, variant: 0xFF10, 0xFF20, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [VariantsWithRoomMax(max: 1, variant: 0xFF10, 0xFF20, 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         //[VariantsWithRoomMax(max: 1, variant: 0xFFC8, 0xFF96, 0xFF78)]
-        [PlacementWeight(60)]
+        [PlacementWeight(100)]
         RegularIceBlock = 0x8E, // Obj_Ice_Poly
 
         [EnemizerEnabled]
@@ -1550,15 +1589,16 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.MilkRoad, variant: ActorConst.ANY_VARIANT, Item.CollectableMilkRoadGrass1, Item.CollectableMilkRoadGrass2, Item.CollectableMilkRoadGrass3)]
         [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT,
             Item.CollectableIkanaGraveyardIkanaGraveyardLowerGrass1, Item.CollectableIkanaGraveyardIkanaGraveyardLowerGrass2, Item.CollectableIkanaGraveyardIkanaGraveyardLowerGrass3)]
-        // 0 uses field keep to draw regular grass, like ObjGrassUnit
+        // & 3 is type
+        // 0 uses field keep to draw regular grass, like ObjGrassUnit, the other 3 types are kusa object
         // 1 creates a grass circle in termina field, 0 is grotto grass single
         // 642B is a smaller cuttable grass from the ground in secret 
         //[GroundVariants(0, 1)]
         [GroundVariants(
             0, // gossip stones use this, but its field_keep versions
-            0x0800, // single in woods of mystery, field_keep
+            0x2C67, 0x2D43, 0x292B, 0x2A2B, // southern swamp
             0x0600, 0x700, 0xC00, 0xD00, // woodfall temple
-            0x0610, // greay bay coast
+            0x0610, // great bay coast
             0x0E00, 0x0E10, 0x0010, // secret jgrotto?
             0x634F, 0x642B, 0x654F, 0x662B, 0x672B, 0x682B, 0x602B, 0x614F, 0x622B, 0x634F, 0x602B, // secret shrine (1)
             0x617B, 0x622B, 0x637B, 0x642B, 0x602B, 0x617B, 0x622B, 0x632B, 0x642B, 0x657B, 0x662B, // secret shrine (2)
@@ -1574,7 +1614,8 @@ namespace MMR.Randomizer.GameObjects
         //[RespawningAllVariants] // some of them come back over and over, but its a PROP type actor
         [AlignedCompanionActor(Actor.Fairy, CompanionAlignment.OnTop, ourVariant: 1, variant: 2, 7, 9)] // fairies love grass
         // for now, until I can identify which ones have drops we need to be careful of, going to block all randimization
-        [ForbidFromScene(Scene.SouthernSwamp, Scene.OdolwasLair,
+        [ForbidFromScene(//Scene.SouthernSwamp,
+            Scene.OdolwasLair,
             Scene.IkanaCastle, Scene.StoneTowerTemple, Scene.Woodfall, Scene.GreatBayCoast,
             Scene.SecretShrine, Scene.MountainVillageSpring, //Scene.WoodsOfMystery,
             //Scene.LaundryPool,
@@ -1596,7 +1637,7 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.RomaniRanch, variant: ActorConst.ANY_VARIANT, Item.CollectableRomaniRanchSoftSoil1, Item.CollectableRomaniRanchSoftSoil2)]
         [CheckRestricted(Scene.Grottos, variant: ActorConst.ANY_VARIANT, Item.CollectableBeanGrottoSoftSoil1, Item.ChestBeanGrottoRedRupee)]
         [CheckRestricted(Scene.GreatBayCoast, variant: ActorConst.ANY_VARIANT, Item.CollectableGreatBayCoastSoftSoil1, Item.HeartPieceGreatBayCoast)]
-        [CheckRestricted(Scene.DoggyRacetrack, variant: ActorConst.ANY_VARIANT, Item.CollectableDoggyRacetrackSoftSoil1)]
+        [CheckRestricted(Scene.DoggyRacetrack, variant: ActorConst.ANY_VARIANT, Item.CollectableDoggyRacetrackSoftSoil1, Item.ChestDogRacePurpleRupee)]
         [CheckRestricted(Scene.SecretShrine, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSecretShrineSoftSoil1,
             Item.CollectableSecretShrineEntranceRoomItem1, Item.CollectableSecretShrineEntranceRoomItem2, Item.CollectableSecretShrineEntranceRoomItem3,
@@ -1621,18 +1662,20 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableTerminaFieldSoftSoil1, Item.CollectableTerminaFieldSoftSoil2, Item.CollectableTerminaFieldSoftSoil3, Item.CollectableTerminaFieldSoftSoil4
         )]
         // some of these are pathing type, however they will need flying pathing type to make snese
+        //  for now, treat them all as ground or wall
         // 8 is unused crack in the wall, only exists in unused ranch setup
         // uses Z rot as a param, unknown use
-        // 0xC000 unk, can change draw type
+        // params:
+        // 0xC000 is type, 8 is wall, 4 is pathless soil, ELSE is bean I think
         // 0x80 determins if switch flags are active, great..
         // TODO which of these are invisble and require action?
         [GroundVariants(0x4000, 0x8000,
             0x4101, 0x0102, // bean grotto
-            0x0304, 0x4203, 0x4080, 0x1,// swamp spiderhouse
+            0x4203, 0x0304, 0x4080, 0x1,// swamp spiderhouse
             0x4D19, 0x061A, 0x071A, // great bay coast
             0x4203, 0x0D04, // deku palace
-            0x0101, // doggy race track
-            0x0401, 0x0504, // inverted stone tower
+            0x4080, 0x0101,  // doggy race track
+            0x4080, 0x4203, 0x0401, 0x0504, // inverted stone tower
             0x4305, 0x460B, 0x478E, 0x0506, 0x070C, 0x060F // termina field
         )]
         [WallVariants(0x4000, 0x8000,
@@ -1643,10 +1686,10 @@ namespace MMR.Randomizer.GameObjects
         // havent documented enough to know why
         //[PathingVariants(0x4000)] // TODO figure out if I even can get this to work
         [PathingTypeVarsPlacement(mask: 0x3F, shift: 8)] // 0x3F00
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // THIS HAS TWO, 3F8 is also a switch flag whyyyy
         [VariantsWithRoomMax(max:0, variant: 0x4000, 0x8000, // one of these crashes, not sure which yet TODO later
-            0x0102, // bean grotto
-            0x304, 0x4203, 0x001,// swamp spiderhouse
+            0x0102, 0x4101,// bean grotto
+            0x0304, 0x0001,// swamp spiderhouse
             0x061A, 0x071A, // great bay coast
             0x0D04, // deku palace
             0x0101, // doggy race track
@@ -1656,7 +1699,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(GoldSkulltula, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F)]
         //[ForbidFromScene(Scene.SwampSpiderHouse )] // dont want to mess with this by accident until I know it has proper logic
-        [PlacementWeight(80)]
+        [PlacementWeight(65)]
         SoftSoilAndBeans = 0x91, // Obj_Bean
 
         [ActorizerEnabled]
@@ -1725,8 +1768,9 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
         //[VariantsWithRoomMax(max:0, variant: 0x2, 0x902, 0x1D82)] // wall types, currently they are the only actor that can be put on free wall spots that break (itemizer overwiting vars)
         [EnemizerScenesPlacementBlock(Scene.StoneTowerTemple)] // still unknown illegal instruction crash in stone tower mirror room, same variant works fine in other places
-        //[ForbidFromScene(Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
-        //    Scene.BeneathTheWell, Scene.DekuShrine, Scene.IkanaCastle, Scene.PiratesFortressRooms, Scene.SwampSpiderHouse)]
+        // for some reason, even without 
+        [ForbidFromScene(Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
+            Scene.BeneathTheWell, Scene.DekuShrine, Scene.IkanaCastle, Scene.PiratesFortressRooms, Scene.SwampSpiderHouse)]
         ObjSwitch = 0x93, // Obj_Switch
 
         Empty94 = 0x94, // Empty94
@@ -1777,18 +1821,21 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0xF1)]
         [FileID(143)]
         [CheckRestricted(Scene.MayorsResidence, variant: ActorConst.ANY_VARIANT, Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
-        // 1 scoffing at poster, 2 is shouting at the sky looker
+        [GroundVariants(
+            0, // in mayor meeting
+            1, // 1 scoffing at poster,
+            2  // 2 is shouting at the sky looker
+        )]
         // 0x03 is a walking type
-        [GroundVariants(1, 2,
-            0)] // in mayor meeting
-        [VariantsWithRoomMax(max: 0, variant: 0)]
-        [PathingVariants(0x603, 0x503,
-            0x0303// in southclock town doing what?
+        [PathingVariants(
+            0x603, 0x503, 0x0303 // different walking with wooden log
         )]
         [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)]
+        [VariantsWithRoomMax(max: 0, variant: 0)] // mayor meeting, probably has issues without being with the rest of the actors
+        [VariantsWithRoomMax(max: 2, variant: 1,2,5,6)]
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0090)]
         [UnkillableAllVariants]
-        [PlacementWeight(50)] // boring
+        [PlacementWeight(60)] // boring
         Carpenter = 0x9C, // En_Daiku
 
         // tag: lemons
@@ -2633,7 +2680,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.IkanaCanyon, Scene.RoadToIkana, Scene.LinkTrial, Scene.DekuTrial, Scene.GoronTrial, Scene.ZoraTrial)] // don't replace the originals as we might need for hints
         //[ForbidFromScene(Scene.LinkTrial)] // supposidly, you can play storms on the gossip stone to open the door instead of bombchu
         //[EnemizerScenesPlacementBlock(Scene.ClockTowerInterior)] // crash (reason unk)
-        [PlacementWeight(85)]
+        [PlacementWeight(60)]
         GossipStone = 0xEF, // En_Gs
 
         //[ActorizerEnabled] // best used as a companion instead of being its own actor
@@ -2669,8 +2716,8 @@ namespace MMR.Randomizer.GameObjects
             Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
         [CheckRestricted(Scene.RomaniRanch, variant: ActorConst.ANY_VARIANT,
             Item.ItemRanchBarnMainCowMilk, Item.ItemRanchBarnOtherCowMilk1, Item.ItemRanchBarnOtherCowMilk2)]
-        [CheckRestricted(Scene.Grottos, variant: ActorConst.ANY_VARIANT,
-            Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
+        //[CheckRestricted(Scene.Grottos, variant: ActorConst.ANY_VARIANT, // moved to EnemizerItemFixes to handle the en_torch things
+        //    Item.ItemCoastGrottoCowMilk1, Item.ItemCoastGrottoCowMilk2, Item.ItemTerminaGrottoCowMilk1, Item.ItemTerminaGrottoCowMilk2)]
         [GroundVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [WallVariants(0, 2)]  // 2 is from romani ranch, 0 is cow grotto, well is also 0
         [WaterBottomVariants(0)] // silly
@@ -2890,8 +2937,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x2243)]
         Garo = 0x113, // En_Jso
 
-        // not that interesting, cutscene calapsing bridge
-        [ActorizerEnabled]
+        [ActorizerEnabled] // unused callaping bridge
         [FileID(249)]
         [ObjectListIndex(0xED)]
         [DynaAttributes(12,8)]
@@ -2901,7 +2947,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(//Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.StoneTower, // dyna crash
             Scene.TradingPost)]  // might block door?
-        [PlacementWeight(50)] // waaay too common
+        [PlacementWeight(40)] // waaay too common
         UnusedFallingBridge = 0x114, // Obj_Chikuwa
 
         // TODO would not spawn because I mistyped the ID try again
@@ -3189,8 +3235,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(277)]
         [ObjectListIndex(0xA1)]
         [ActorInstanceSize(0xB78)]
-        //[CheckRestricted(Scene.GoronVillageSpring, variant:0x7F94, check:Item.MaskDonGero)]
-        //[CheckRestricted(Scene.MountainVillage, variant:0x7F94, check:Item.MaskDonGero)] // share object with the sirloin goron
+        [CheckRestricted(Scene.MountainVillage, variant: 0x7F84, check: Item.MaskDonGero)] // share object with the sirloin goron
+        [CheckRestricted(Scene.MountainVillage, variant: 0x7F94, check: Item.MaskDonGero)] // share object with the sirloin goron
         // 8 is smithy goron; blocked because he is too big
         // 7F85: standing outside of shop (complaining about noise)
         // racetrack gorons
@@ -3210,14 +3256,13 @@ namespace MMR.Randomizer.GameObjects
             0x7FE2, 0x7F85, 0x7F86, 0x7F87,
             0x7F82, 0x7F92)]
         [VariantsWithRoomMax(max: 0, variant: 0x8, // too big
-            0x7F84, 0x7F94, // the two outside of darmani race need to be on the same thing
+            0x7F84, 0x7F94, // the two outside of darmani race need to spawn as a pair or it crashes
             0x8, // keg smith, too big
             0x283, // opens door winter, crashes day 2/3 because pathing type for snowball
             0x7F82, 0x7F92)] // crash? reason unknown
         [UnkillableAllVariants]
-        [ForbidFromScene(Scene.GoronVillage, Scene.GoronVillageSpring)] // dont randomize smithy
-        [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1,
-            variant: 0x3F5F)]
+        [ForbidFromScene(Scene.GoronVillage, Scene.GoronVillageSpring)] // dont randomize smithy by accident
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         GoGoron = 0x138, // En_Go
 
         Empty139 = 0x139,
@@ -3241,10 +3286,21 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacementXRot]
         Obj_Raillift = 0x13C, // Obj_Raillift
 
+        [ActorizerEnabled]
         [FileID(281)]
         [ObjectListIndex(0x164)]
         // closed is smaller?? (96,48)
         [DynaAttributes(136,72)] // big yikes (opened)
+        // params has a verion 1, but its code does nothing??
+        [GroundVariants(
+            0 // default closed
+        )]
+        [VariantsWithRoomMax(max:1, variant:0, 1)]
+        [BlockingVariantsAll]
+        [ForbidFromScene(Scene.WoodfallTemple)]
+        // uses a weekeventreg instead
+        [SwitchFlagsPlacement(size:0x7F, shift:8)] // this SETS but does not read, is it passing info to a door?
+        [UnkillableAllVariants]
         WoodfallTempleWoodenFlower = 0x13D, // Bg_Numa_Hana
 
         [ActorizerEnabled] // big object, collector flag, boring actor
@@ -3739,7 +3795,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.DekuTrial, Scene.GoronTrial, Scene.ZoraTrial, Scene.LinkTrial,
             Scene.SwordsmansSchool, Scene.ZoraHall, Scene.GoronRacetrack,
             // these are missing special object at all
-            Scene.SPOT00, Scene.HoneyDarling, Scene.MayorsResidence, Scene.MilkBar,
+            Scene.SPOT00, Scene.HoneyAndDarling, Scene.MayorsResidence, Scene.MilkBar,
             Scene.FishermansHut, Scene.PoeHut, Scene.MusicBoxHouse, Scene.StockPotInn, Scene.BombShop, Scene.GiantsChamber,
             Scene.TreasureChestShop, Scene.LotteryShop, Scene.GoronShop, Scene.SakonsHideout, Scene.DekuShrine,
             Scene.OdolwasLair, Scene.GohtsLair, Scene.GyorgsLair, Scene.TwinmoldsLair,
@@ -4027,7 +4083,7 @@ namespace MMR.Randomizer.GameObjects
         Empty189 = 0x189,
         Empty18A = 0x18A,
 
-
+        // todo, try randomizing because it makes iron knuckle room have lots of enemies
         [FileID(355)]
         [ObjectListIndex(0x1)]
         SpringWater = 0x18B, // En_Test5
@@ -4151,6 +4207,7 @@ namespace MMR.Randomizer.GameObjects
             0x2001 // massive clock
             )]
         [UnkillableAllVariants]
+        [PlacementWeight(65)]
         Clock = 0x19C, // Obj_Tokeidai
 
         Empty19D = 0x19D,
@@ -4715,7 +4772,7 @@ namespace MMR.Randomizer.GameObjects
             0x0100, // only vanilla param weirdly
             0, 0x0080, 0x0180, 0x0200, 0x0280, 0x0380, 0x0400)] 
         [UnkillableAllVariants]
-        [PlacementWeight(20)]
+        [PlacementWeight(100)]
         SnowCoveredTrees = 0x1D4, // En_Snowwd // tag: snowtree
 
         // I suspect since he has so few vars that he will be hard coded, and req decomp to fix
@@ -4782,11 +4839,11 @@ namespace MMR.Randomizer.GameObjects
         //0xFE0F doesnt spawn, assumping its the one that is walking away after tatl pisses them off
         //[GroundVariants(0xFE08)]
         [EnemizerScenesPlacementBlock(Scene.AstralObservatory, Scene.Grottos, Scene.IkanaCastle,
-            Scene.WestClockTown, Scene.EastClockTown, Scene.NorthClockTown, Scene.SouthClockTown, Scene.LaundryPool,
+            Scene.WestClockTown, /*Scene.EastClockTown,*/ Scene.NorthClockTown, Scene.SouthClockTown, Scene.LaundryPool,
             Scene.TouristCenter, Scene.DekuKingChamber, Scene.DekuShrine, Scene.MountainSmithy, Scene.GoronGrave, Scene.GoronShrine, Scene.FishermansHut, Scene.ZoraHall, Scene.MarineLab, Scene.SecretShrine, Scene.IkanaCastle, Scene.IgosDuIkanasLair, Scene.SwordsmansSchool,
             Scene.TradingPost, Scene.BombShop, Scene.PotionShop, Scene.GoronShop, Scene.ZoraHallRooms, Scene.TreasureChestShop, Scene.SwampShootingGallery, Scene.TownShootingGallery, Scene.BeneathTheWell,
-            Scene.HoneyDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.StockPotInn
-            )]
+            Scene.HoneyAndDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.StockPotInn
+        )]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         Giant = 0x1DB, // En_Giant
@@ -4805,74 +4862,31 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.TwinIslands, variant: 0x220E, Item.CollectablePathToGoronVillageWinterLargeSnowball2)]
         [CheckRestricted(Scene.TwinIslands, variant: 0x230E, Item.CollectablePathToGoronVillageWinterLargeSnowball3)]
         [CheckRestricted(Scene.TwinIslands, variant: 0x240E, Item.CollectablePathToGoronVillageWinterLargeSnowball4)]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x250E, Item.CollectablePathToGoronVillageWinterLargeSnowball5)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x250E, Item.CollectablePathToGoronVillageWinterLargeSnowball5)]  
         [CheckRestricted(Scene.TwinIslands, variant: 0x40E, Item.SongLullabyIntro)] // grandpa
         [CheckRestricted(Scene.TwinIslands, variant: 0x80E, Item.SongLullabyIntro)] // grandpa
         [CheckRestricted(Scene.TwinIslands, variant: 0x40E, Item.SongLullabyIntro)] // grandpa
-        [CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
-            Item.CollectableGoronVillageWinterLargeSnowball1, Item.CollectableGoronVillageWinterLargeSnowball2, // small
-            Item.CollectableGoronVillageWinterLargeSnowball3, Item.CollectableGoronVillageWinterLargeSnowball4,
-            Item.CollectableGoronVillageWinterLargeSnowball5, Item.CollectableGoronVillageWinterLargeSnowball6,
-
-            Item.CollectableGoronVillageWinterSmallSnowball1, Item.CollectableGoronVillageWinterSmallSnowball2, Item.CollectableGoronVillageWinterSmallSnowball3, // large
-            Item.CollectableGoronVillageWinterSmallSnowball4, Item.CollectableGoronVillageWinterSmallSnowball5, Item.CollectableGoronVillageWinterSmallSnowball6,
-            Item.CollectableGoronVillageWinterSmallSnowball7, Item.CollectableGoronVillageWinterSmallSnowball8, Item.CollectableGoronVillageWinterSmallSnowball9,
-            Item.CollectableGoronVillageWinterSmallSnowball10)]
-        /* [CheckRestricted(Scene.PathToMountainVillage, variant: ActorConst.ANY_VARIANT,
-            Item.CollectablePathToMountainVillageSmallSnowball1, Item.CollectablePathToMountainVillageSmallSnowball2, // small
-            Item.CollectablePathToMountainVillageSmallSnowball3, Item.CollectablePathToMountainVillageSmallSnowball4,
-            // because it blocks access, at least check a few winter checks that dont require bombs or goron (single sphere influence)
-            Item.ItemLens, Item.ChestLensCavePurpleRupee, Item.ChestLensCaveRedRupee,
-            Item.ShopItemGoronRedPotion, Item.ShopItemGoronBomb10, Item.ShopItemGoronArrow10,
-            Item.ItemTingleMapSnowhead, Item.ItemTingleMapRanch,
-            Item.CollectableMountainVillageWinterPot1,
-            Item.CollectableGoronVillageWinterSmallSnowball1, Item.CollectableGoronVillageWinterSmallSnowball2, Item.CollectableGoronVillageWinterSmallSnowball3, // large
-            Item.CollectableGoronVillageWinterSmallSnowball4, Item.CollectableGoronVillageWinterSmallSnowball5, Item.CollectableGoronVillageWinterSmallSnowball6,
-            Item.CollectableGoronVillageWinterSmallSnowball7, Item.CollectableGoronVillageWinterSmallSnowball8, Item.CollectableGoronVillageWinterSmallSnowball9,
-            Item.CollectableMountainVillageWinterSmallSnowball1, Item.CollectableMountainVillageWinterSmallSnowball2, // small
-            Item.CollectableMountainVillageWinterSmallSnowball3, Item.CollectableMountainVillageWinterSmallSnowball4,
-            Item.CollectableMountainVillageWinterSmallSnowball5, Item.CollectableMountainVillageWinterSmallSnowball6,
-            Item.CollectableMountainVillageWinterSmallSnowball7, Item.CollectableMountainVillageWinterSmallSnowball8
-        )] // */
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2002, Item.CollectableGoronVillageWinterLargeSnowball1)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2202, Item.CollectableGoronVillageWinterLargeSnowball2)] // south of smith
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2402, Item.CollectableGoronVillageWinterLargeSnowball3)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x210E, Item.CollectableGoronVillageWinterLargeSnowball4)] // bteween smith and owl
+        [CheckRestricted(Scene.GoronVillage, variant: 0x230E, Item.CollectableGoronVillageWinterLargeSnowball5)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x250E, Item.CollectableGoronVillageWinterLargeSnowball6)] //
         [CheckRestricted(Scene.MountainVillage, variant: 0x2802, Item.CollectableMountainVillageWinterLargeSnowball1)] // day 3
         [CheckRestricted(Scene.MountainVillage, variant: 0x2C0E, Item.CollectableMountainVillageWinterLargeSnowball2)] // day 2
         [CheckRestricted(Scene.MountainVillage, variant: 0x2A0E, Item.CollectableMountainVillageWinterLargeSnowball3)] // day 1
         [CheckRestricted(Scene.MountainVillage, variant: 0x2902, Item.CollectableMountainVillageWinterLargeSnowball4)] // day 2 #2
         [CheckRestricted(Scene.MountainVillage, variant: 0xC0E, Item.SongLullabyIntro)] // day 2 #2
-        /*[CheckRestricted(Scene.MountainVillage, variant: ActorConst.ANY_VARIANT,
-            Item.CollectableMountainVillageWinterSmallSnowball1, Item.CollectableMountainVillageWinterSmallSnowball2, // small
-            Item.CollectableMountainVillageWinterSmallSnowball3, Item.CollectableMountainVillageWinterSmallSnowball4,
-            Item.CollectableMountainVillageWinterSmallSnowball5, Item.CollectableMountainVillageWinterSmallSnowball6,
-            Item.CollectableMountainVillageWinterSmallSnowball7, Item.CollectableMountainVillageWinterSmallSnowball8,
-
-            Item.CollectableMountainVillageWinterLargeSnowball1, Item.CollectableMountainVillageWinterLargeSnowball2,
-            Item.CollectableMountainVillageWinterLargeSnowball3, Item.CollectableMountainVillageWinterLargeSnowball4,
-            Item.SongLullabyIntro
-        )]// */
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x600E, Item.CollectablePathToSnowheadLargeSnowball1)]
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x610E, Item.CollectablePathToSnowheadLargeSnowball2)]
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x620E, Item.CollectablePathToSnowheadLargeSnowball3)]
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x630E, Item.CollectablePathToSnowheadLargeSnowball4)]
-
-        /*[CheckRestricted(Scene.PathToSnowhead, variant: ActorConst.ANY_VARIANT,
-            Item.CollectablePathToSnowheadSmallSnowball1, Item.CollectablePathToSnowheadSmallSnowball2, // small
-            Item.CollectablePathToSnowheadSmallSnowball3, Item.CollectablePathToSnowheadSmallSnowball4,
-            Item.CollectablePathToSnowheadLargeSnowball1, Item.CollectablePathToSnowheadLargeSnowball2, // large
-            Item.CollectablePathToSnowheadLargeSnowball3, Item.CollectablePathToSnowheadLargeSnowball4
-        )] // */
         [CheckRestricted(Scene.Snowhead, variant: 0x240E, Item.CollectableSnowheadLargeSnowball1)]
         [CheckRestricted(Scene.Snowhead, variant: 0x250E, Item.CollectableSnowheadLargeSnowball2)]
         [CheckRestricted(Scene.Snowhead, variant: 0x260E, Item.CollectableSnowheadLargeSnowball3)]
         [CheckRestricted(Scene.Snowhead, variant: 0x270E, Item.CollectableSnowheadLargeSnowball4)]
         [CheckRestricted(Scene.Snowhead, variant: 0x280E, Item.CollectableSnowheadLargeSnowball5)]
         [CheckRestricted(Scene.Snowhead, variant: 0x290E, Item.CollectableSnowheadLargeSnowball6)]
-        /*[CheckRestricted(Scene.Snowhead, variant: ActorConst.ANY_VARIANT,
-            Item.CollectableSnowheadSmallSnowball1, Item.CollectableSnowheadSmallSnowball2, // small
-            Item.CollectableSnowheadSmallSnowball3, Item.CollectableSnowheadSmallSnowball10,
-            Item.CollectableSnowheadLargeSnowball1, Item.CollectableSnowheadLargeSnowball2, // large
-            Item.CollectableSnowheadLargeSnowball3, Item.CollectableSnowheadLargeSnowball4,
-            Item.CollectableSnowheadLargeSnowball5, Item.CollectableSnowheadLargeSnowball6
-        )] // */
         [CheckRestricted(Scene.SnowheadTemple, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball1, Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball2, // small
             Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball3, Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball4,
@@ -4896,7 +4910,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.PathToMountainVillage)]
         [BlockingVariantsAll]
-        [PlacementWeight(20)]
+        [PlacementWeight(100)]
         LargeSnowball = 0x1DC, // Obj_Snowball
 
         [FileID(438)]
@@ -5153,53 +5167,31 @@ namespace MMR.Randomizer.GameObjects
         SwordsmanSchoolLog = 0x1F8, // En_Maruta
 
         [ActorizerEnabled]
-        [CheckRestricted(Scene.TwinIslands, variant: 0x390E, Item.CollectablePathToGoronVillageWinterSmallSnowball3)] // ramp near tree grotto
-        [CheckRestricted(Scene.TwinIslands, variant: 0x360E, Item.CollectablePathToGoronVillageWinterSmallSnowball2)] // near west entrance
-        [CheckRestricted(Scene.TwinIslands, variant: 0x380E, Item.CollectablePathToGoronVillageWinterSmallSnowball1)] // near tingle
-        [CheckRestricted(Scene.GoronVillage, variant: ActorConst.ANY_VARIANT,
-            Item.CollectableGoronVillageWinterLargeSnowball1, Item.CollectableGoronVillageWinterLargeSnowball2, // small
-            Item.CollectableGoronVillageWinterLargeSnowball3, Item.CollectableGoronVillageWinterLargeSnowball4,
-            Item.CollectableGoronVillageWinterLargeSnowball5, Item.CollectableGoronVillageWinterLargeSnowball6,
-            Item.CollectableGoronVillageWinterSmallSnowball1, Item.CollectableGoronVillageWinterSmallSnowball2, Item.CollectableGoronVillageWinterSmallSnowball3, // large
-            Item.CollectableGoronVillageWinterSmallSnowball4, Item.CollectableGoronVillageWinterSmallSnowball5, Item.CollectableGoronVillageWinterSmallSnowball6,
-            Item.CollectableGoronVillageWinterSmallSnowball7, Item.CollectableGoronVillageWinterSmallSnowball8, Item.CollectableGoronVillageWinterSmallSnowball9,
-            Item.CollectableGoronVillageWinterSmallSnowball10)]
+        [CheckRestricted(Scene.TwinIslands, variant: 0x390E, Item.CollectablePathToGoronVillageWinterSmallSnowball3)] // "ramp snowball" ramp near tree grotto
+        [CheckRestricted(Scene.TwinIslands, variant: 0x360E, Item.CollectablePathToGoronVillageWinterSmallSnowball1)] // "small snowball1" near west entrancetingle
+        [CheckRestricted(Scene.TwinIslands, variant: 0x380E, Item.CollectablePathToGoronVillageWinterSmallSnowball2)] // "small snowball2" near tingle
+        [CheckRestricted(Scene.GoronVillage, variant: 0x331E, Item.CollectableGoronVillageWinterSmallSnowball1)] // east of owl
+        [CheckRestricted(Scene.GoronVillage, variant: 0x341E, Item.CollectableGoronVillageWinterSmallSnowball2)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2B15, Item.CollectableGoronVillageWinterSmallSnowball3)] // south of scrub
+        [CheckRestricted(Scene.GoronVillage, variant: 0x3015, Item.CollectableGoronVillageWinterSmallSnowball4)] // across from blacksmith ice near staircase
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2D13, Item.CollectableGoronVillageWinterSmallSnowball5)] // near entrance ramp
+        [CheckRestricted(Scene.GoronVillage, variant: 0x3113, Item.CollectableGoronVillageWinterSmallSnowball6)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2C19, Item.CollectableGoronVillageWinterSmallSnowball7)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2F19, Item.CollectableGoronVillageWinterSmallSnowball8)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x2E0E, Item.CollectableGoronVillageWinterSmallSnowball9)]
+        [CheckRestricted(Scene.GoronVillage, variant: 0x320E, Item.CollectableGoronVillageWinterSmallSnowball10)] // next to owl
         [CheckRestricted(Scene.PathToMountainVillage, variant: ActorConst.ANY_VARIANT,
             Item.CollectablePathToMountainVillageSmallSnowball1, Item.CollectablePathToMountainVillageSmallSnowball2, // small
             Item.CollectablePathToMountainVillageSmallSnowball3, Item.CollectablePathToMountainVillageSmallSnowball4
-            /*
-            // because it blocks access, at least check a few winter checks that dont require bombs or goron (single sphere influence)
-            Item.ItemLens, Item.ChestLensCavePurpleRupee, Item.ChestLensCaveRedRupee,
-            Item.ShopItemGoronRedPotion, Item.ShopItemGoronBomb10, Item.ShopItemGoronArrow10,
-            Item.ItemTingleMapSnowhead, Item.ItemTingleMapRanch,
-            Item.CollectableMountainVillageWinterPot1,
-            Item.CollectableGoronVillageWinterSmallSnowball1, Item.CollectableGoronVillageWinterSmallSnowball2, Item.CollectableGoronVillageWinterSmallSnowball3, // large
-            Item.CollectableGoronVillageWinterSmallSnowball4, Item.CollectableGoronVillageWinterSmallSnowball5, Item.CollectableGoronVillageWinterSmallSnowball6,
-            Item.CollectableGoronVillageWinterSmallSnowball7, Item.CollectableGoronVillageWinterSmallSnowball8, Item.CollectableGoronVillageWinterSmallSnowball9,
-            Item.CollectableMountainVillageWinterSmallSnowball1, Item.CollectableMountainVillageWinterSmallSnowball2, // small
-            Item.CollectableMountainVillageWinterSmallSnowball3, Item.CollectableMountainVillageWinterSmallSnowball4,
-            Item.CollectableMountainVillageWinterSmallSnowball5, Item.CollectableMountainVillageWinterSmallSnowball6,
-            Item.CollectableMountainVillageWinterSmallSnowball7, Item.CollectableMountainVillageWinterSmallSnowball8
-            // */
         )]
-        /*[CheckRestricted(Scene.MountainVillage, variant: ActorConst.ANY_VARIANT,
-            Item.CollectableMountainVillageWinterSmallSnowball1, Item.CollectableMountainVillageWinterSmallSnowball2, // small
-            Item.CollectableMountainVillageWinterSmallSnowball3, Item.CollectableMountainVillageWinterSmallSnowball4,
-            Item.CollectableMountainVillageWinterSmallSnowball5, Item.CollectableMountainVillageWinterSmallSnowball6,
-            Item.CollectableMountainVillageWinterSmallSnowball7, Item.CollectableMountainVillageWinterSmallSnowball8,
-            Item.CollectableMountainVillageWinterLargeSnowball1, Item.CollectableMountainVillageWinterLargeSnowball2,
-            Item.CollectableMountainVillageWinterLargeSnowball3, Item.CollectableMountainVillageWinterLargeSnowball4,
-            Item.SongLullabyIntro
-        )] // */
-        [CheckRestricted(Scene.MountainVillage, variant: 0x351F, Item.CollectableMountainVillageWinterSmallSnowball1)] // near owl statue
-        [CheckRestricted(Scene.MountainVillage, variant: 0x3415, Item.CollectableMountainVillageWinterSmallSnowball2)] // near owl statue
-        [CheckRestricted(Scene.MountainVillage, variant: 0x370F, Item.CollectableMountainVillageWinterSmallSnowball5)] // near owl statue
-        [CheckRestricted(Scene.MountainVillage, variant: 0x270E, Item.CollectableMountainVillageWinterSmallSnowball6)] // near pond tree
-        [CheckRestricted(Scene.MountainVillage, variant: 0x210E, Item.CollectableMountainVillageWinterSmallSnowball7)] // near east exit
+        [CheckRestricted(Scene.MountainVillage, variant: 0x351F, Item.CollectableMountainVillageWinterSmallSnowball1)] // "Winter small" near owl statue
+        [CheckRestricted(Scene.MountainVillage, variant: 0x3415, Item.CollectableMountainVillageWinterSmallSnowball2)] // "Winter 2" near owl statue
+        [CheckRestricted(Scene.MountainVillage, variant: 0x370F, Item.CollectableMountainVillageWinterSmallSnowball5)] // "Winter 3" near owl statue
+        [CheckRestricted(Scene.MountainVillage, variant: 0x210E, Item.CollectableMountainVillageWinterSmallSnowball6)] // "Winter 4" near pond tree
+        [CheckRestricted(Scene.MountainVillage, variant: 0x270E, Item.CollectableMountainVillageWinterSmallSnowball7)] // "Winter 5" near east exit
         [CheckRestricted(Scene.MountainVillage, variant: 0x2D0F, Item.CollectableMountainVillageWinterSmallSnowball3)] // goron grave 1
         [CheckRestricted(Scene.MountainVillage, variant: 0x2E0F, Item.CollectableMountainVillageWinterSmallSnowball4)] // goron grave 2
         [CheckRestricted(Scene.MountainVillage, variant: 0x3610, Item.CollectableMountainVillageWinterSmallSnowball8)] // fairy near the owl tree
-
         [CheckRestricted(Scene.MountainVillageSpring, variant: ActorConst.ANY_VARIANT,
             Item.CollectableMountainVillageSpringSmallSnowball1, Item.CollectableMountainVillageSpringSmallSnowball2, // small
             Item.CollectableMountainVillageSpringSmallSnowball3, Item.CollectableMountainVillageSpringSmallSnowball4
@@ -5208,23 +5200,10 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x210F, Item.CollectablePathToSnowheadSmallSnowball4)]
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x220F, Item.CollectablePathToSnowheadSmallSnowball4)]
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x230F, Item.CollectablePathToSnowheadSmallSnowball4)]
-        /*[CheckRestricted(Scene.PathToSnowhead, variant: ActorConst.ANY_VARIANT,
-            Item.CollectablePathToSnowheadSmallSnowball1, Item.CollectablePathToSnowheadSmallSnowball2, // small
-            Item.CollectablePathToSnowheadSmallSnowball3, Item.CollectablePathToSnowheadSmallSnowball4,
-            Item.CollectablePathToSnowheadLargeSnowball1, Item.CollectablePathToSnowheadLargeSnowball2, // large
-            Item.CollectablePathToSnowheadLargeSnowball3, Item.CollectablePathToSnowheadLargeSnowball4
-        )] // */
         [CheckRestricted(Scene.Snowhead, variant: 0x211F, Item.CollectableSnowheadSmallSnowball1)]
         [CheckRestricted(Scene.Snowhead, variant: 0x2015, Item.CollectableSnowheadSmallSnowball2)]
         [CheckRestricted(Scene.Snowhead, variant: 0x230F, Item.CollectableSnowheadSmallSnowball3)]
         [CheckRestricted(Scene.Snowhead, variant: 0x2210, Item.CollectableSnowheadSmallSnowball10)] // fairy
-        /* [CheckRestricted(Scene.Snowhead, variant: ActorConst.ANY_VARIANT,
-            Item.CollectableSnowheadSmallSnowball1, Item.CollectableSnowheadSmallSnowball2, // small
-            Item.CollectableSnowheadSmallSnowball3, Item.CollectableSnowheadSmallSnowball10,
-            Item.CollectableSnowheadLargeSnowball1, Item.CollectableSnowheadLargeSnowball2, // large
-            Item.CollectableSnowheadLargeSnowball3, Item.CollectableSnowheadLargeSnowball4,
-            Item.CollectableSnowheadLargeSnowball5, Item.CollectableSnowheadLargeSnowball6
-        )] // */
         [CheckRestricted(Scene.SnowheadTemple, variant: ActorConst.ANY_VARIANT,
             Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball1, Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball2, // small
             Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball3, Item.CollectableSnowheadTempleIceBlockRoomSmallSnowball4,
@@ -5246,7 +5225,7 @@ namespace MMR.Randomizer.GameObjects
         )]
         //[SwitchFlagsPlacement()] // does not appear to have switch flags
         [UnkillableAllVariants]
-        [PlacementWeight(30)]
+        [PlacementWeight(100)]
         SmallSnowball = 0x1F9, // Obj_Snowball2
 
         [FileID(466)]
@@ -6226,7 +6205,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         //[Minum]
         [EnemizerScenesPlacementBlock(Scene.RanchBuildings, Scene.ClockTowerInterior,
-            Scene.HoneyDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.TreasureChestShop,
+            Scene.HoneyAndDarling, Scene.PostOffice, Scene.MayorsResidence, Scene.TreasureChestShop,
             Scene.MarineLab, Scene.AstralObservatory,
             Scene.TownShootingGallery, Scene.SwampShootingGallery, Scene.PotionShop, Scene.GoronShop, Scene.ZoraHallRooms, 
             Scene.PoeHut, Scene.MusicBoxHouse, Scene.BeneathGraveyard)]

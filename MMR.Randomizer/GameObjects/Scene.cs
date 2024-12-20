@@ -9,6 +9,8 @@ namespace MMR.Randomizer.GameObjects
         // base enumerator value matches the ST column, SceneInternal ID matches ID column (F)
         // https://docs.google.com/spreadsheets/d/1J-4OwmZzOKEv2hZ7wrygOpMm0YcRnephEo3Q2FooF6E/edit#gid=1593589171
 
+        //EMPTY = 0, // this needs more details to not break in autogen code
+
         [FileID(1160)]
         [SceneInternalId(0x12)]
         [DynaHeadroom(64, 64)]  // low default to start
@@ -35,7 +37,9 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1158)]
         [SceneInternalId(0x11)]
-        HoneyDarling = 0x04,
+        [EnemizerSceneEnemyReplacementBlock(Actor.LotteryKiosk,
+           Actor.UnusedFallingBridge)] // can instant crash you at the door
+        HoneyAndDarling = 0x04,
 
         [FileID(1145)]
         [ClearEnemyPuzzleRooms(1, 2, 4)]
@@ -63,6 +67,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.LikeLike)] // can grab you on the boat ride
         [EnemizerSceneEnemyReplacementBlock(Actor.Lilypad,
             Actor.Desbreko)] // heavy lag
+        [EnemizerSceneEnemyReplacementBlock(Actor.DekuBaba,
+            Actor.Dodongo)] // can clip into the boat ride and knock link off
         SouthernSwampClear = 0x06,
 
         [FileID(1151)]
@@ -146,6 +152,9 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1165)]
         [SceneInternalId(0x13)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
+            Actor.IronKnuckle // getting a weird rsp/rdp crash when moving from maps 0->4 or 0->2, not convinced this is the culprit can't debug further
+        )]
         IkanaCanyon = 0x10,
 
         [FileID(1171)]
@@ -271,8 +280,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1224)]
         [SceneInternalId(0x1D)]
         [ClearEnemyPuzzleRooms(5)] // wizrobe room
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
-            Actor.Bombiwa)] // can block jumping
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
+        //    Actor.Bombiwa)] // can block jumping
         IkanaCastle = 0x1A,
 
         [FileID(1235)]
@@ -563,6 +572,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1334)]
         [SceneInternalId(0x39)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.LotteryKiosk,
+           Actor.UnusedFallingBridge)] // can instant crash you at the door
         LotteryShop = 0x36,
 
         // Unused = 0x37,
@@ -626,6 +637,10 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x41)]
         [EnemizerSceneEnemyReplacementBlock(Actor.ClayPot,
             Actor.RegularIceBlock)] // the big one can reach through the ceiling into the chest, blocking the chest
+        [EnemizerSceneEnemyReplacementBlock(Actor.SquareSign,
+            Actor.ClocktowerGearsAndOrgan, // can block dogs in race
+            Actor.RegularIceBlock)]
+        [EnemizerSceneBlockSensitive(Actor.SquareSign, -1)]
         DoggyRacetrack = 0x3E,
 
         [FileID(1351)]
