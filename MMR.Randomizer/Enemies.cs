@@ -1677,12 +1677,15 @@ namespace MMR.Randomizer
             ReadWriteUtils.Arr_WriteU16(playerCodeFile, Dest: 0x1D5D8, val: 0x4489);
             */
 
+            // removing because its suspicious that we are having slime crash in this spot
+            /*
             // can we remove an object from ikana to increase object budget to have more stuff?
             var ikanaScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaCanyon.FileID());
             // nobody follows kafei its fine to remove his object from the main room
             ikanaScene.Maps[0].Objects[10] = SMALLEST_OBJ; // kafei
             ikanaScene.Maps[0].Objects[13] = SMALLEST_OBJ; // piece of heart, used in the east side but not here, we dont need here
             ikanaScene.Maps[0].Objects[18] = SMALLEST_OBJ; // flying scrub ( dont think it matters remove it from this area for most people)
+            // */
 
             // if we remove the woodfall object from terminafield, we have more space for noticible actors and not a static backdrop woodfall
             // so far this has been here over a month and nobody has noticed I removed woodfall lol
@@ -4616,7 +4619,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
-                if (TestHardSetObject(GameObjects.Scene.DoggyRacetrack, GameObjects.Actor.SoftSoilAndBeans, GameObjects.Actor.SquareSign)) continue;
+                if (TestHardSetObject(GameObjects.Scene.IkanaCanyon, GameObjects.Actor.SquareSign, GameObjects.Actor.IronKnuckle)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
