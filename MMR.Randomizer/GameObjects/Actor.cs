@@ -1617,11 +1617,12 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(//Scene.SouthernSwamp,
             Scene.OdolwasLair,
             Scene.IkanaCastle, Scene.StoneTowerTemple, Scene.Woodfall, Scene.GreatBayCoast,
-            Scene.SecretShrine, Scene.MountainVillageSpring, //Scene.WoodsOfMystery,
+             Scene.MountainVillageSpring, //Scene.WoodsOfMystery,
             //Scene.LaundryPool,
             Scene.SnowheadTemple, Scene.RoadToSouthernSwamp,
             //Scene.MilkRoad,
             Scene.IkanaCanyon,
+            //Scene.SecretShrine,
             //Scene.Grottos,
             Scene.BeneathTheWell,
             Scene.WoodfallTemple)]
@@ -2066,6 +2067,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(158)]
         [ActorInstanceSize(0x198)]
         [ObjectListIndex(0x2)] // pick up rock version
+        //[ObjectListIndex(0x1F6)] // NEVER USED IN MM, damn thing lied to me, even the boulders are object 2
+        // it actually uses one of two objects: gameplay_field or object_ishi, which is only in SSHouse
         [ForbidFromScene(Scene.InvertedStoneTower, Scene.SwampSpiderHouse)] // we want the bugs, I think its too much to ask players to leave to get bugs
         [CheckRestricted(Scene.TerminaField, 0x2844, Item.CollectableTerminaFieldRock1)]
         [CheckRestricted(Scene.TerminaField, 0x2A44, Item.CollectableTerminaFieldRock2)] // wrong?
@@ -2086,8 +2089,6 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4814, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock3)] // 2nd lowest
         [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4424, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock4)] // 2nd highest
         [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4624, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock5)] // middle rock
-        //[ObjectListIndex(0x1F6)] // NEVER USED IN MM, damn thing lied to me, even the boulders are object 2
-        // it actually uses one of two objects: gameplay_field or object_ishi, which is only in SSHouse
         //6a does not load
         // params:
         // 3 >> & 1 uses object_ishi instead of gameplay_field

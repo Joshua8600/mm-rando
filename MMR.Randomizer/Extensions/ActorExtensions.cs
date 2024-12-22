@@ -41,7 +41,7 @@ namespace MMR.Randomizer.Extensions
         {
             if (actor.GetAttribute<UnkillableAllVariantsAttribute>() != null) // all are unkillable
             {
-                return AllVariants(actor);
+                return GenerateVariantsFromEnum(actor);
             }
             else
             {
@@ -53,7 +53,7 @@ namespace MMR.Randomizer.Extensions
         {
             if (actor.GetAttribute<RespawningAllVariantsAttribute>() != null) // all are respawning
             {
-                return AllVariants(actor);
+                return GenerateVariantsFromEnum(actor);
             }
             else
             {
@@ -62,7 +62,7 @@ namespace MMR.Randomizer.Extensions
         }
 
 
-        public static List<int> AllVariants(this Actor actor)
+        public static List<int> GenerateVariantsFromEnum(this Actor actor)
         {
             var variants = new List<int>();
             var attrF = actor.GetAttribute<FlyingVariantsAttribute>();
@@ -116,7 +116,7 @@ namespace MMR.Randomizer.Extensions
 
         public static List<int> KillableVariants(this Actor actor, List<int> acceptableVariants = null)
         {
-            var killableVariants = acceptableVariants != null ? acceptableVariants : AllVariants(actor);
+            var killableVariants = acceptableVariants != null ? acceptableVariants : GenerateVariantsFromEnum(actor);
             var unkillableVariants = UnkillableVariants(actor);
             var respawningVariants = RespawningVariants(actor);
             if (unkillableVariants != null && unkillableVariants.Count > 0)
@@ -371,7 +371,7 @@ namespace MMR.Randomizer.Extensions
             if (actor.GetAttribute<BlockingVariantsAll>() != null)
             {
                 // all variants are blockable, return all
-                return actor.AllVariants();
+                return actor.GenerateVariantsFromEnum();
             }
 
             var blockingVariantsAttr = actor.GetAttribute<BlockingVariantsAttribute>();
