@@ -13,6 +13,8 @@
 .definelabel z2_bzero, 0x80089630
 .definelabel z2_sqrtf, 0x8008D700
 .definelabel z2_strlen, 0x8008F1E0
+.definelabel z2_osInvalICache, 0x8008F270
+.definelabel z2_osinvalDCache, 0x8008F2F0
 .definelabel z2_BaseDrawCollectable, 0x800A7128
 .definelabel z2_DrawRupee, 0x800A72AC
 .definelabel z2_DrawHeartPiece, 0x800A75B8
@@ -180,6 +182,7 @@
 .definelabel z2_Message_ContinueTextbox, 0x80151938
 .definelabel z2_GetMessageState, 0x80152498
 .definelabel ShrinkWindow_SetLetterboxTarget, 0x80160C00
+.definelabel z2_kaleidomanager_loadovl, 0x80163758
 .definelabel z2_Play_EnableMotionBlur, 0x8016566C
 .definelabel z2_Play_DisableMotionBlur, 0x80165690
 .definelabel z2_801660B8, 0x801660B8

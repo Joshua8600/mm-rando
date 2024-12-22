@@ -81,7 +81,7 @@ namespace MMR.Randomizer
         private static List<GameObjects.ItemCategory> ActorizerKnownJunkCategories { get; set; }
         private static List<List<GameObjects.Item>> ActorizerKnownJunkItems { get; set; }
         private static Mutex EnemizerLogMutex = new Mutex();
-        private static bool ACTORSENABLED = false;
+        private static bool ACTORSENABLED = true;
         private static Random seedrng;
         private static Models.RandomizedResult _randomized;
         private static OutputSettings _outputSettings;
@@ -2657,7 +2657,7 @@ namespace MMR.Randomizer
             {
                 /// we can use the mikau zora mask object too if rando isn't using it because mikau was randomized
                 var randomMikauMaskIndex = seedrng.Next(replacementCandidates.Count());
-                var randomMikauMaskReplacement = replacementCandidates[randomSkullFishIndex];
+                var randomMikauMaskReplacement = replacementCandidates[randomMikauMaskIndex];
                 greatbayCoast.Maps[0].Objects[4] = randomMikauMaskReplacement.ObjectId; // cutscene mask object
             }
         }
@@ -6679,6 +6679,7 @@ namespace MMR.Randomizer
         public static void UpdateActorOverlayTable()
         {
             // todo: check if enemizer is set, return if not
+
 
             // this is called from romutils.cs right before we build the rom
             /// if overlays have grown, we need to modify their overlay table to use the right values for the new files

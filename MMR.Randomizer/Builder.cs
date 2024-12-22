@@ -6551,7 +6551,10 @@ namespace MMR.Randomizer
             {
                 progressReporter.ReportProgress(75, "Building ROM...");
 
-                Enemies.UpdateActorOverlayTable(); // last second before rom generation
+                if (_randomized.Settings.RandomizeEnemies)
+                {
+                    Enemies.UpdateActorOverlayTable(); // last second before rom generation
+                }
 
                 if (outputSettings.GenerateROM)
                 {
