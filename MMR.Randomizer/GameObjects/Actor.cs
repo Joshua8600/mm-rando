@@ -2353,7 +2353,8 @@ namespace MMR.Randomizer.GameObjects
         // crash: if you teach song to him in TF the ice block cutscene triggers
         // if you try to teach him a song with more than one it can lock
         //[EnemizerScenesPlacementBlock(Scene.TradingPost, Scene.TerminaField)]
-        [RemovalChance(50), PlacementWeight(90)]
+        // until this gets fixed where the actor can softlock, make this actor much less common
+        [RemovalChance(50), PlacementWeight(10)]
         [ForbidFromScene(//Scene.TradingPost, // he now hints song of time, would have to hard code check if hes missing
             Scene.SnowheadTemple // difficult to identify if anything is important after, TODO
         )]//, Scene.AstralObservatory)] // re-disable this if playing Entrando
