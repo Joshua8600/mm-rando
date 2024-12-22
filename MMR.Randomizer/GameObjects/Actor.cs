@@ -4780,12 +4780,32 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(430)]
         [ObjectListIndex(0x107)]
-        [CheckRestricted(Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
+        [CheckRestricted(Scene.NorthClockTown, variant:0,
+            Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
             Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]
+        [CheckRestricted(Scene.EastClockTown, variant: 0,
+            Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
+            Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]
+        [CheckRestricted(Scene.WestClockTown, variant: 0,
+            Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
+            Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]
+        [CheckRestricted(Scene.SouthClockTown, variant: 0,
+            Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
+            Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]
+        [CheckRestricted(Scene.PostOffice, variant: -1,
+            Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
+            Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]
+        [CheckRestricted(Scene.StockPotInn, variant: -1,
+            Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
+            Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]
+        [CheckRestricted(Scene.MilkBar, variant: 0,
+            Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
+            Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]
+        // termina field: this is just credits, we want to randomize
         // this could be pathing, but the paths are part of the schedule
-        [GroundVariants(0x1, // inn, milkbar
+        [PathingVariants(0x1, // inn, milkbar
             0x2, // southclocktown
-            0x0)] // patroling around the world
+            0)] // patroling around the world
         [PathingTypeVarsPlacement(mask: 0xFF, shift: 0)]
         //[VariantsWithRoomMax()]
         [UnkillableAllVariants]
@@ -5017,7 +5037,7 @@ namespace MMR.Randomizer.GameObjects
         [CompanionActor(Flame, ourVariant: 0x300, variant: 0x3)]      // amy gets green flames
         // no scene exclusion necessary, get spawned by the poe sisters minigame but they aren't actors in the scene to be randomized
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // might block everything
-        [PlacementWeight(60)]
+        [PlacementWeight(25)]
         PoeSisters = 0x1E8, // En_Po_Sisters
 
         [EnemizerEnabled]

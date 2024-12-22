@@ -154,6 +154,7 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x13)]
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
         //    Actor.IronKnuckle // getting a weird rsp/rdp crash when moving from maps 0->4 or 0->2, not convinced this is the culprit can't debug further
+        //   // think this is a result of object list mangling, I changed kafei which affects iron knuckle object offset
         //)]
         IkanaCanyon = 0x10,
 
