@@ -2369,7 +2369,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(174)]
         [ObjectListIndex(0x1)]
-        Oceff_Spot = 0xCC, // Oceff_Spot
+        SunSongEffect = 0xCC, // Oceff_Spot
 
         EmptyCD = 0xCD,
 
@@ -3962,6 +3962,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max:0, variant: 0x8000,0x7FFF, 0x0001)] // none of the vanila variants spawn out of location or out of event
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(size: 0x7F, shift: 3)] // 0x3F8
+        // light producing actor
         Butler = 0x17F, // En_Dno
 
         [EnemizerEnabled] // biggest issue: they dont really attack, this isn't the version that spawns over and over
