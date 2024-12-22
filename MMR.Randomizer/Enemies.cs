@@ -562,7 +562,7 @@ namespace MMR.Randomizer
                     //  until we have multi-object code, this needs a special case or rando ignores it
                     if (tallGrassFieldObjectVariants.Contains(targetActor.OldVariant))
                     {
-                        var importantItem = ObjectIsCheckBlocked(scene, targetActor.ActorEnum, targetActor.OldVariant);
+                        var importantItem = ObjectIsCheckBlocked(scene.SceneEnum, targetActor.ActorEnum, targetActor.OldVariant);
                         if (importantItem != null)
                             if (importantItem != null)
                             {
@@ -585,7 +585,7 @@ namespace MMR.Randomizer
                     //  until we have multi-object code, this needs a special case or rando ignores it
                     if (clayPotDungeonVariants.Contains(targetActor.OldVariant))
                     {
-                        var importantItem = ObjectIsCheckBlocked(scene, targetActor.ActorEnum, targetActor.OldVariant);
+                        var importantItem = ObjectIsCheckBlocked(scene.SceneEnum, targetActor.ActorEnum, targetActor.OldVariant);
                         if (importantItem != null)
                         {
                             thisSceneData.Log.AppendLine($" claypot r[{targetActor.Room}]v[{targetActor.OldVariant}]" +
@@ -628,7 +628,7 @@ namespace MMR.Randomizer
                             continue;
                         }
 
-                        var itemRestriction = ObjectIsCheckBlocked(scene, mapActor.ActorEnum, mapActor.OldVariant);
+                        var itemRestriction = ObjectIsCheckBlocked(scene.SceneEnum, mapActor.ActorEnum, mapActor.OldVariant);
                         if (itemRestriction != null )
                         {
 
@@ -671,7 +671,7 @@ namespace MMR.Randomizer
                             if (sceneRestrictions != null && sceneRestrictions.ScenesExcluded.Contains(thisSceneData.Scene.SceneEnum))
                                 continue; // not valid to consider this actor
 
-                            var itemRestriction = ObjectIsCheckBlocked(scene, mapActor.ActorEnum, mapActor.OldVariant);
+                            var itemRestriction = ObjectIsCheckBlocked(scene.SceneEnum, mapActor.ActorEnum, mapActor.OldVariant);
                             var chanceOfRandomization = (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic) ? (90) : (60);
                             // if common scoopable actor, some are allowed but not all, for now lets make it random
                             if (itemRestriction != null && (commonScoopableActors.Contains(mapActor.OldActorEnum)
@@ -760,7 +760,7 @@ namespace MMR.Randomizer
         // todo move to actorutils
         // TODO rename to ACTOR is check blocked, as we will soon need to do this for actors not whole actor objects
         // for now its just the objectlessactors, checkrestricted
-        private static GameObjects.Item? ObjectIsCheckBlocked(Scene scene, GameObjects.Actor testActor, int variant = -1)
+        private static GameObjects.Item? ObjectIsCheckBlocked(GameObjects.Scene sceneEnum, GameObjects.Actor testActor, int variant = -1)
         {
             /// checks if randomizing the actor would interfere with getting access to a check
             /// and then checks if the item is junk, before allowing randimization
@@ -771,11 +771,11 @@ namespace MMR.Randomizer
             var checkRestrictedAttr = testActor.GetAttributes<CheckRestrictedAttribute>();
             if (checkRestrictedAttr != null && checkRestrictedAttr.Count() > 0) // actor has check restrictions
             {
-                var reducedList = checkRestrictedAttr.ToList().FindAll(attr => attr.Scene == scene.SceneEnum || (int) attr.Scene == -1);
+                var reducedList = checkRestrictedAttr.ToList().FindAll(attr => attr.Scene == sceneEnum || (int) attr.Scene == -1);
 
                 foreach (var restriction in reducedList) // can have multiple rules
                 {
-                    if (restriction.Scene != ANYSCENE && restriction.Scene != scene.SceneEnum) continue;
+                    if (restriction.Scene != ANYSCENE && restriction.Scene != sceneEnum) continue;
 
                     if (restriction.Variant != GameObjects.ActorConst.ANY_VARIANT && restriction.Variant != variant)
                         continue; // we dont care about this variant being restricted
@@ -810,7 +810,7 @@ namespace MMR.Randomizer
                 GameObjects.Item map2;
                 var shortStrawTingle = _randomized.Seed % 3;
                 bool strawPulled = false;
-                switch (scene.SceneEnum)
+                switch (sceneEnum)
                 {
                     default:
                     case GameObjects.Scene.NorthClockTown:
@@ -880,7 +880,7 @@ namespace MMR.Randomizer
                     // if we need a mailbox, keep one
                     var shortStrawPostbox = _randomized.Seed % 3;
                     GameObjects.Scene[] postboxScenes = { GameObjects.Scene.NorthClockTown, GameObjects.Scene.SouthClockTown, GameObjects.Scene.EastClockTown };
-                    if (postboxScenes[shortStrawPostbox] == scene.SceneEnum)
+                    if (postboxScenes[shortStrawPostbox] == sceneEnum)
                     {
                         return GameObjects.Item.MaskPostmanHat; // to symbolize what is happening only in the debug output
                     }
@@ -888,10 +888,10 @@ namespace MMR.Randomizer
                 }// else: randomize all
             }
             if (_randomized.Settings.FreeScarecrow == false && testActor == GameObjects.Actor.Scarecrow && 
-                (scene.SceneEnum == GameObjects.Scene.TradingPost || scene.SceneEnum == GameObjects.Scene.AstralObservatory))
+                (sceneEnum == GameObjects.Scene.TradingPost || sceneEnum == GameObjects.Scene.AstralObservatory))
             {
                 // only two scenes, one is even one is odd, lets use the seed and the scene ID
-                int sceneChosen = ((int)scene.SceneEnum + _randomized.Seed) & 1;
+                int sceneChosen = ((int)sceneEnum + _randomized.Seed) & 1;
                 if (sceneChosen == 1)
                 {
                     return GameObjects.Item.SongOath; // there is no scarecrow song to use as a value, will just use this
@@ -941,7 +941,7 @@ namespace MMR.Randomizer
                     {
                         var replacementChance = matchingEnemy.GetRemovalChance();
 
-                        var importantItem = ObjectIsCheckBlocked(scene, matchingEnum);
+                        var importantItem = ObjectIsCheckBlocked(scene.SceneEnum, matchingEnum);
                         if (importantItem != null)
                         {
                             #if DEBUG
@@ -1043,6 +1043,7 @@ namespace MMR.Randomizer
             SwapCreditsCremia();
             SplitSceneSnowballIntoTwoActorObjects();
             RearangeSecretShrineObjects();
+            RandomizeGreatbayCoastSurfaceTypes();
 
             EnableAllCreditsCutScenes();
 
@@ -2588,6 +2589,65 @@ namespace MMR.Randomizer
             dekuPalaceActors[19].Position.y = -40;
             dekuPalaceActors[20].Position.y = -40;
         }
+
+        private static void RandomizeGreatbayCoastSurfaceTypes()
+        {
+            /// the silver boulders in greatbaycoast are gameplay_field actors, and have no object themselves
+            ///  this means there is little variety for what to replace them with
+            /// however, there are two(sometimes three) unused objects in this scene we can swap out for more object variety for them
+            /// note: this does not change cleared greatbay at all, mostly because it gets ignored by players 99% of the time and im lazy
+
+            var greatbayCoast = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.GreatBayCoast);
+            List<Actor> replacementCandidates = ReplacementCandidateList.FindAll(act => act.GetWaterVariants().Count() > 0); // start with water only
+
+            if (seedrng.Next(100) < 40) // some chance of turning into water surface instead of bottom
+            {
+                var replacementWaterTopCandidates = ReplacementCandidateList.FindAll(act => act.GetWaterTopVariants().Count() > 0);
+                replacementCandidates.AddRange(replacementWaterTopCandidates);
+
+                // where 0x32 is on sandy beach
+                var allIshi = greatbayCoast.Maps[0].Actors.FindAll(act => act.ActorEnum == GameObjects.Actor.IshiRock && act.OldVariant != 0x32);
+                // however, most of the ocean top replacements are either water or dyna, especially with actorizer,
+                // so we're only going to randomize and change half of them, or we risk putting 2-3 dyna actors on the surface and _nothing else_
+                allIshi = allIshi.OrderBy(x => seedrng.Next()).ToList(); 
+
+                for (int i = 0; i < allIshi.Count() / 2 ; i++)
+                {
+                    var ishi = allIshi[i];
+                    // change them all to Octarok to trick rando
+                    ishi.ChangeActor(GameObjects.Actor.Octarok, vars: 0xFF00, modifyOld: true);
+                    ishi.OldName = "FormerOceanBottomBoulder";
+                    ishi.Position.y = 0; // move to water surface
+                }
+
+                greatbayCoast.Maps[0].Objects[3] = GameObjects.Actor.Octarok.ObjectIndex(); // unused guay object
+            }
+            else // we want them to stay as water bottom, but lets at least change one of the unused objects to something we can use for more variety
+            {
+                List<Actor> replacementWaterBottomCandidates = ReplacementCandidateList.FindAll(act => act.GetWaterBottomVariants().Count() > 0);
+                replacementCandidates.AddRange(replacementWaterBottomCandidates);
+
+                var randomIndex = seedrng.Next(replacementCandidates.Count());
+                var randomGuayReplacement = replacementCandidates[randomIndex];
+                replacementCandidates.RemoveAt(randomIndex);
+                greatbayCoast.Maps[0].Objects[3] = randomGuayReplacement.ObjectId; // unused guay object
+            }
+
+            // 6 is also an unused object: skullfish
+            var randomSkullFishIndex = seedrng.Next(replacementCandidates.Count());
+            var randomSkullFishReplacement = replacementCandidates[randomSkullFishIndex];
+            replacementCandidates.RemoveAt(randomSkullFishIndex);
+            greatbayCoast.Maps[0].Objects[6] = randomSkullFishReplacement.ObjectId; // skullfish
+
+            if ( ObjectIsCheckBlocked(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Mikau) == null)
+            {
+                /// we can use the mikau zora mask object too if rando isn't using it because mikau was randomized
+                var randomMikauMaskIndex = seedrng.Next(replacementCandidates.Count());
+                var randomMikauMaskReplacement = replacementCandidates[randomSkullFishIndex];
+                greatbayCoast.Maps[0].Objects[4] = randomMikauMaskReplacement.ObjectId; // cutscene mask object
+            }
+        }
+
 
         private static List<(GameObjects.Actor actor, ushort vars)> shallowWaterReplacements = new List<(GameObjects.Actor actor, ushort vars)>
         {

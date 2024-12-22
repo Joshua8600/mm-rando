@@ -13,7 +13,7 @@ using MMR.Randomizer.Attributes;
 
 namespace MMR.Randomizer.Models.Rom
 {
-    [System.Diagnostics.DebuggerDisplay("[{Name}][{ActorId.ToString(\"X4\")}] from [{OldName}]")]
+    [System.Diagnostics.DebuggerDisplay("[{Name}][{ActorId.ToString(\"X4\")}] from [{OldName}][{OldVariant.ToString(\"X4\")}]")]
     public class Actor
     {
         // this is instance data, per actor, per scene.
@@ -534,6 +534,11 @@ namespace MMR.Randomizer.Models.Rom
         {
             return this.SortedVariants[(int)ActorType.WaterBottom - 1];
         }
+        public List<int> GetWaterTopVariants()
+        {
+            return this.SortedVariants[(int)ActorType.WaterTop - 1];
+        }
+
         public List<int> GetFlyingVariants()
         {
             return this.SortedVariants[(int)ActorType.Flying - 1];
