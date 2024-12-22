@@ -6435,6 +6435,8 @@ namespace MMR.Randomizer.GameObjects
         //[WaterTopVariants(0,1)] // these are not actually at the water surface, but 10ft below
         [WaterVariants(0,1)]
         [UnkillableAllVariants]
+        [EnemizerScenesPlacementBlock(Scene.MarineLab)]
+        [PlacementWeight(75)]
         SwimmingZora = 0x260, // En_Zow
 
         // multiple talk spots but also a hit spot? hmm
