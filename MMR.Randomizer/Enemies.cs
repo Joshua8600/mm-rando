@@ -81,7 +81,7 @@ namespace MMR.Randomizer
         private static List<GameObjects.ItemCategory> ActorizerKnownJunkCategories { get; set; }
         private static List<List<GameObjects.Item>> ActorizerKnownJunkItems { get; set; }
         private static Mutex EnemizerLogMutex = new Mutex();
-        private static bool ACTORSENABLED = true;
+        private static bool ACTORSENABLED = true; 
         private static Random seedrng;
         private static Models.RandomizedResult _randomized;
         private static OutputSettings _outputSettings;
@@ -2610,6 +2610,8 @@ namespace MMR.Randomizer
             ///  this means there is little variety for what to replace them with
             /// however, there are two(sometimes three) unused objects in this scene we can swap out for more object variety for them
             /// note: this does not change cleared greatbay at all, mostly because it gets ignored by players 99% of the time and im lazy
+
+            if (!ACTORSENABLED) return;
 
             var greatbayCoast = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.GreatBayCoast);
             List<Actor> replacementCandidates = ReplacementCandidateList.FindAll(act => act.GetWaterVariants().Count() > 0); // start with water only
