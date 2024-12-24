@@ -444,6 +444,7 @@ namespace MMR.CLI
 
             configuration.OutputSettings.InputPatchFilename = argsDictionary.GetValueOrDefault("-inputpatch")?.SingleOrDefault();
             configuration.OutputSettings.GeneratePatch |= argsDictionary.ContainsKey("-outputpatch");
+            configuration.OutputSettings.GenerateCosmeticsPatch |= argsDictionary.ContainsKey("-cosmeticspatch");
             configuration.OutputSettings.GenerateSpoilerLog |= argsDictionary.ContainsKey("-spoiler");
             configuration.OutputSettings.GenerateHTMLLog |= argsDictionary.ContainsKey("-html");
             configuration.OutputSettings.GenerateROM |= argsDictionary.ContainsKey("-rom");
