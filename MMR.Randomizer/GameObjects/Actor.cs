@@ -6583,7 +6583,7 @@ namespace MMR.Randomizer.GameObjects
         [CeilingVariants(0xFC00)]
         [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
         [OnlyOneActorPerRoom]
-        [PlacementWeight(35)] // TODO
+        [RemovalChance(90), PlacementWeight(35)] // TODO
         HitSpot = 0x265, // En_Hit_Tag // hittag
 
         [ActorizerEnabled]
@@ -7269,7 +7269,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         SpawnsItemFromSoil = 0x2AE, // Obj_Swprize
 
-        // this is the actor you have to walk into , not the one you hit with ranged attacks
+        // this is the actor you have to walk into , not the one you hit with ranged attacks, tag: touchspot
         [ActorizerEnabled]
         [FileID(646)]
         [ObjectListIndex(0x1)]
@@ -7309,7 +7309,7 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(size: 0x3F, shift:2)] // 0x1FC
         [OnlyOneActorPerRoom] // as they give items or money, limit to one
         [UnkillableAllVariants]
-        [PlacementWeight(23)] // free stuff, make it more rare
+        [RemovalChance(90), PlacementWeight(23)] // free stuff, make it more rare
         En_Invisible_Ruppe = 0x2AF, // En_Invisible_Ruppe
         
         [FileID(647)]
