@@ -6680,9 +6680,6 @@ namespace MMR.Randomizer
 
         public static void UpdateActorOverlayTable()
         {
-            // todo: check if enemizer is set, return if not
-
-
             // this is called from romutils.cs right before we build the rom
             /// if overlays have grown, we need to modify their overlay table to use the right values for the new files
             /// every time you move an overlay you need to relocate the vram addresses, so instead of shifting all of them
@@ -6695,6 +6692,7 @@ namespace MMR.Randomizer
             //const int theEndOfTakenVROM = 0x03100000; // 0x02EE7XXX <- actual
             // maybe if I set it longer away I can skip the extra samples getting corrupted, probably not
             const int theEndOfTakenVROM = 0x03400000; // 0x02EE7XXX <- actual
+            // WARNING: 0x03880000 is above us, which is Rebbacus's overlay file that was moved, we need to keep that in mind
 
             int actorOvlTblFID = RomUtils.GetFileIndexForWriting(Constants.Addresses.ActorOverlayTable);
             RomUtils.CheckCompressed(actorOvlTblFID);
