@@ -2809,6 +2809,7 @@ namespace MMR.Randomizer
                 elfgroup.OldName = fairyName + "Cloud";
                 elfgroup.Position = pos2;
                 elfgroup.Rotation.y = ActorUtils.MergeRotationAndFlags(270, flags: dyYosei.Rotation.y); // turn to face left
+                ActorUtils.FlattenPitchRoll(elfgroup);
 
                 if (actorIndex3 != -1) // there isnt always a talk spot to randomize, only in ikana and town
                 {
@@ -2816,6 +2817,7 @@ namespace MMR.Randomizer
                     talkalot.ChangeActor(coinTossResultActor.actor, vars: coinTossResultActor.vars, modifyOld: true);
                     talkalot.OldName = fairyName + "TalkSpot";
                     talkalot.Position = pos3;
+                    ActorUtils.FlattenPitchRoll(talkalot);
                 }
 
                 map.Objects[objectIndex] = coinTossResultActor.actor.ObjectIndex();
