@@ -6785,21 +6785,25 @@ namespace MMR.Randomizer.GameObjects
         // 0xFC08, 0x1000 are clear swamp
         //0x4 is a flag, meaning the actor has a path, checks if 0xFC00 is a path or not and self terminates
         //[GroundVariants(0xFC08, 0x1000, 0xFC04, 0xFC07, 0x1001, 0x0402, 0xFC06, 0x0001, 0x1800, 0x1003)]
-        [PathingVariants(0xFC08,  0xFC04, 0x1001, 0x1003,
+        // while this is pathing, I can't trust it to replace with good pathing actors
+        [GroundVariants(
+            0xFC08,  0xFC04, 0x1001, 0x1003,
             0x1800, 0x7F, // southern swamp
             0x1000, 0xFC05, // clear southern swamp
             0xFC06, 0x0001, // goron village winter
             0xFC07, 0x0402, // zora halls
             0x1403, 0x0003  // ikana canyon
-            )]
+        )]
         [PathingTypeVarsPlacement(mask:0x3F, shift:10)]
         [OnlyOneActorPerRoom]
-        [VariantsWithRoomMax(max: 0, variant: 0xFC08, 0xFC04, 0x1001, 0x1003,
+        [VariantsWithRoomMax(max: 0, variant:
+            0xFC08, 0xFC04, 0x1001, 0x1003,
             0x1800, 0x7F, // southern swamp
             0x1000, 0xFC05, // clear southern swamp
             0xFC06, 0x0001, // goron village winter
-            0x1403, 0x0003,
-            0xFC07, 0x0402)]
+            0xFC07, 0x0402, // zora halls
+            0x0003, 0x0402 // ikana canyon
+        )]
         [UnkillableAllVariants]
         [AlignedCompanionActor(DekuFlower, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x017F)] // treasure chest shop music
         //[ForbidFromScene( //Scene.SouthernSwamp, Scene.SouthernSwampClear,
