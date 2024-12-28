@@ -2882,6 +2882,36 @@ namespace MMR.Randomizer
         }
 
 
+        public static void RandomizePerGrottoActor(SceneEnemizerData thisSceneData)
+        {
+            if (thisSceneData.Scene.SceneEnum != GameObjects.Scene.Grottos) return;
+
+            /// the generic grotto in MM is reused 13 times, where the only difference is the chest
+            /// the chest uses code to look up which grotto it is in to change its contents, we can do this with actors too
+            ///  I created a new custom actor, because entorch is already overloaded
+            ///  and I also expanded the generic grotto room object list to have 14 objects (the original 2, box and dekubaba)
+
+            // TODO if grotto scene or grotto actor is missing, abort
+
+            // randomly select 13 different ground/flying/ceiling? actors
+            var newObjectList = new List<int>[13];
+            for (int o = 0; o < 13; o++)
+            {
+
+            }
+              // check to make sure all four of those objects are small enough to fit
+              // custom code to control which grottos are limited by actor placement
+              // custom code to turn freezard in the front OFF or turn around, or move back? also dino
+
+
+            // update array of actors in the custom grotto actor
+
+            // update objects in the thing
+            
+
+            // somehow print the actor results for our randomization to log
+        }
+
         public static void FixKafeiPlacements()
         {
             if (!VanillaEnemyList.Contains(GameObjects.Actor.Kafei)) return;
