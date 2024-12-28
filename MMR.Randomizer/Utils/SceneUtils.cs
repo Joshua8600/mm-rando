@@ -7,6 +7,9 @@ using System;
 using MMR.Randomizer.Attributes.Actor;
 using MMR.Randomizer.Attributes.Entrance;
 using MMR.Common.Extensions;
+using System.IO;
+using System.IO.Compression;
+using System.Text;
 
 namespace MMR.Randomizer.Utils
 {
@@ -46,6 +49,122 @@ namespace MMR.Randomizer.Utils
             int f = RomUtils.GetFileIndexForWriting(SCENE_FLAG_MASKS);
             int addr = SCENE_FLAG_MASKS - RomData.MMFileList[f].Addr + offset;
             RomData.MMFileList[f].Data[addr] |= (byte)bit;
+        }
+
+        public static List<string> GenerateExternalSceneFileList(string directory)
+        {
+            var directories = new List<string> { };
+
+            directories.AddRange(Directory.GetDirectories(directory).ToList()); // depth 1
+            foreach (string d in directories.ToList()) // another layer deep to be safe
+            {
+                List<String> deeperDirectories = Directory.GetDirectories(d).ToList();
+                directories.AddRange(deeperDirectories); // depth 2
+            }
+            directories.Add(directory); // added after to avoid contamination
+
+            var files = new List<string> { };
+
+            foreach (var dir in directories)
+            {
+                files.AddRange(Directory.GetFiles(dir, "*.mmr_scene"));
+            }
+
+            return files;
+        }
+
+
+        public static void ReadExternalSceneFiles()
+        {
+            /// read new binary scenes from files in MMR/scenes
+
+            // for now, the only metadata we have is fileid, just return instead of parsing more data
+            int ParseMetaFile(string metaFile)
+            {
+                foreach (var line in metaFile.Split('\n'))
+                {
+                    var asignment = line.Split('#')[0].Trim(); // remove comments
+
+                    if (asignment.Length == 0) // comment or empty line: ignore
+                    {
+                        continue;
+                    }
+
+                    var asignmentSplit = asignment.Split('=');
+                    var command = asignmentSplit[0].Trim();
+                    //if (command == "unkillable")
+                    string valueStr = asignmentSplit[1].Trim();
+                    if (command == "scene_fid" || command == "file_id")
+                    {
+                        return Convert.ToInt32(valueStr, fromBase: 10);
+                    }
+
+                }
+                return -1;
+            }
+
+
+            if (!Directory.Exists("scenes")) return;
+            // if actorizer is off, we need to not read any of these
+            //if (!_randomized.Settings.RandomizeEnemies) return; // right now actorizer/enemizer is the only system that uses this
+
+            foreach (string filePath in GenerateExternalSceneFileList("scenes"))
+            {
+                /*
+                if (filePath.Contains("SafeBoat.mmra")
+                    || filePath.Contains("Dinofos"))
+                {
+                    //throw new Exception("SafeBoat.mmra no longer works in actorizer 1.16, \n remove the file from MMR/actors and start a new seed.");
+                    continue;
+                } // */
+
+                try
+                {
+                    using (ZipArchive zip = ZipFile.OpenRead(filePath))
+                    {
+
+                        if (zip.Entries.Where(e => e.Name.Contains(".bin")).Count() == 0)
+                        {
+                            throw new Exception($"ERROR: cannot find a single binary actor in file {filePath}");
+                        }
+
+                        // per binary, since MMRA should support multiple binaries
+                        foreach (ZipArchiveEntry binFile in zip.Entries.Where(e => e.Name.Contains(".bin")))
+                        {
+                            var filename = binFile.Name.Substring(0, binFile.Name.LastIndexOf(".bin"));
+
+                            // read overlay binary data
+                            int newBinLen = ((int)binFile.Length) + ((int)binFile.Length % 0x10); // dma padding
+                            var overlayData = new byte[newBinLen];
+                            binFile.Open().Read(overlayData, 0, overlayData.Length);
+
+                            // read the associated meta file
+                            var metaFileEntry = zip.GetEntry(filename + ".meta");
+                            if (metaFileEntry == null) // meta not found
+                                throw new Exception($"Could not find a meta for actor bin [{binFile.Name}]\n   in [{filePath}]");
+
+                            //var injectedActor = ParseMMRAMeta(new StreamReader(metaFileEntry.Open(), Encoding.Default).ReadToEnd());
+                            var fileId = ParseMetaFile(new StreamReader(metaFileEntry.Open(), Encoding.Default).ReadToEnd());
+                            if (fileId == -1)
+                            {
+                                throw new Exception($"BROKEN SCENE FILE [{filename}] had file id [{fileId}]");
+                            }
+
+                            // inject ZZZ
+                            RomData.MMFileList[fileId].Data = overlayData;
+                            RomData.MMFileList[fileId].WasEdited = true;
+                            RomData.MMFileList[fileId].IsCompressed = false;
+
+                        } // foreach bin entry
+
+                    }// zip as file end
+                } // try end
+                catch (Exception e)
+                {
+                    throw new Exception($"Error attempting to read archive: {filePath} -- \n" + e);
+                }
+
+            } // for each mmra end
         }
 
         public static void ReadSceneTable()

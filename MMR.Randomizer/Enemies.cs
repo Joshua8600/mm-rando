@@ -6887,6 +6887,8 @@ namespace MMR.Randomizer
             PrepareEnemyLists();
             PrepareJunkItems();
 
+
+            SceneUtils.ReadExternalSceneFiles();
             SceneUtils.ReadSceneTable();
             SceneUtils.GetSceneHeaders();
             SceneUtils.GetMaps();
