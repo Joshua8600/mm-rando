@@ -400,7 +400,7 @@ namespace MMR.Randomizer.Models.Rom
             {
                 for (int c = 0; c < this.SortedVariants.Count; c++)
                 {
-                    this.SortedVariants[c] = this.SortedVariants[c].Union(variants).ToList();
+                    this.SortedVariants[c] = this.SortedVariants[c].Except(variants).ToList();
                 }
             }
         }
