@@ -1631,7 +1631,7 @@ namespace MMR.Randomizer.GameObjects
             //Scene.Grottos,
             Scene.BeneathTheWell,
             Scene.WoodfallTemple)]
-        [PlacementWeight(75)] // object is tiny, the weight is gonna need to be small because of how common it is
+        [PlacementWeight(45)] // object is tiny, the weight is gonna need to be small because of how common it is
         TallGrass = 0x90, // En_Kusa
 
         // this one might be a pain... without modification it looks like the actor wants to be doubled up on top of itself
@@ -1805,7 +1805,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.SouthernSwampClear, // asummed dyna crash
         //    Scene.StoneTower)]
         [UnkillableAllVariants]
-        [PlacementWeight(80)]
+        [PlacementWeight(30)]
         HookshotWallAndPillar = 0x96, // Obj_Hsblock
 
         // ??
@@ -2570,9 +2570,11 @@ namespace MMR.Randomizer.GameObjects
             //Scene.SwampSpiderHouse,
             Scene.StoneTowerTemple,
             Scene.Grottos, // buisness scrib?>
-            Scene.OceanSpiderHouse, Scene.GreatBayTemple)]
+            Scene.OceanSpiderHouse,
+            Scene.GreatBayTemple
+        )]
         [UnkillableAllVariants]
-        [PlacementWeight(55)]
+        [PlacementWeight(40)] // boring
         LargeWoodenCrate = 0xE5, // Obj_Kibako2
 
         EmptyE6 = 0xE6, // EmptyE6

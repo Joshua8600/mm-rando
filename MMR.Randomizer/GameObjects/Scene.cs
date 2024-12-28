@@ -758,6 +758,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1403)]
         [SceneInternalId(0x4C)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.Evan,
+            Actor.HookshotWallAndPillar, Actor.LargeWoodenCrate, Actor.WoodenBarrel, Actor.TallGrass)] // boring
         ZoraHallRooms = 0x49,
 
         [FileID(1409)]
