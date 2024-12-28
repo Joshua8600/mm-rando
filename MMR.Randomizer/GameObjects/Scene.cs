@@ -180,14 +180,11 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1173)]
         [SceneInternalId(0x15)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.GuruGuru,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
-        [EnemizerSceneEnemyReplacementBlock(Actor.Gorman,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
-        [EnemizerSceneEnemyReplacementBlock(Actor.HoneyAndDarling,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
-        [EnemizerSceneEnemyReplacementBlock(Actor.Gorman,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
+        [ActorizerSceneCreditsActor(room: 1, Actor.RosaSisters, Actor.GateSoldier)] // guruguru mask
+        [ActorizerSceneCreditsActor(room: 2, Actor.Tijo, Actor.Japas, Actor.Evan, Actor.Gorman, Actor.CarpentersFromCutscene, Actor.RegularZora)] // 
+        [ActorizerSceneCreditsActor(room: 3, Actor.Tijo, Actor.Japas, Actor.Evan, Actor.Gorman, Actor.Toto, Actor.HoneyAndDarling, Actor.RosaSisters)] // 
+        [ActorizerSceneCreditsActor(room: 4, Actor.GuruGuru, Actor.RegularZora, Actor.CarpentersFromCutscene, Actor.SoldierMoonLeaveCutscene,
+            Actor.GaboraBlacksmith, Actor.Zubora)] // breman mask
         MilkBar = 0x12,
 
         [FileID(1175)]
@@ -471,19 +468,30 @@ namespace MMR.Randomizer.GameObjects
             Actor.RegularIceBlock, // I dont want to block on all of them, but the big one is a problem for peahat grotto
             Actor.LikeLike)] // can grab you on grotto exit and softlock with only one heart, TODO make special code instead moving them?
         // these actors are only seen in the credits, we should block all large object actors from these spots to save generation time
+        // also ban pots, I want pots to have a higher chance to show up in regular TF not only in the credits
+        [ActorizerSceneCreditsActor(room: 7, Actor.HappyMaskSalesman)] // skullkid dialogue
+        // this is not actual credits music worthy, but invisible actors are still boring here
+        [ActorizerSceneCreditsActor(room: 8, Actor.SoldierMoonLeaveCutscene, Actor.CarpentersFromCutscene,
+            Actor.ViscenMoonLeaveCutscene, Actor. MutoMoonLeaveCutscene)] // moon leaves
+        [ActorizerSceneCreditsActor(room: 9, Actor.CuriosityShopMan, Actor.AnjuWeddingDress, Actor.Cremia, Actor.AnjuMotherWedding, Actor.AnjusGrandmaCredits, Actor.ViscenMoonLeaveCutscene, Actor.PostMan, Actor.MutoMoonLeaveCutscene, Actor.Tingle)] // wedding and postman running are both in this setup
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ViscenMoonLeaveCutscene,
-            Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+            Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.MutoMoonLeaveCutscene,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.AnjusGrandmaCredits,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.AnjuMotherWedding,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.AnjuWeddingDress,
+                        Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CuriosityShopMan,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CarpentersFromCutscene,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
-        //*/
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SoldierMoonLeaveCutscene,
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PostMan,
+                        Actor.ClayPot, Actor.GoronElder)]
         TerminaField = 0x2A, // keikoku, c800 dyna size
 
         [FileID(1312)]
@@ -537,10 +545,7 @@ namespace MMR.Randomizer.GameObjects
         // we know nothing here, TODO recheck
         // 234, 162 was fine holy shit
         [DynaHeadroom(235, 200)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.Cremia,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
-        [EnemizerSceneEnemyReplacementBlock(Actor.LargeWoodenCrate,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
+        [ActorizerSceneCreditsActor(room:2, Actor.Cremia, Actor.LargeWoodenCrate)]
         RomaniRanch = 0x32, // F01, 0xF000 dyna size
 
         [FileID(1328)]
@@ -647,6 +652,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1351)]
         [SceneInternalId(0x42)]
         [ClearEnemyPuzzleRooms(0, 1)] // respawning enemies can break chick round-up
+        // flower pot is too far from the camera, right?
+        [ActorizerSceneCreditsActor(room: 1, Actor.Grog, Actor.FriendlyCucco, Actor.Treee)]
         CuccoShack = 0x3F,
 
         [FileID(1353)]
@@ -999,6 +1006,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.LikeLike)] // If you start with one heart this can be a softlock
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BombersYouChase,
             Actor.UnusedStoneTowerStoneElevator)]//, Actor.UnusedStoneTowerPlatform)]
+        [ActorizerSceneCreditsActor(Actor.CreditsBombShopMan, Actor.BombShopLady)]
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         WestClockTown = 0x6A, // wct
 

@@ -658,6 +658,24 @@ namespace MMR.Randomizer.Models.Rom
             return true;
         }
 
+        public List<int> CreditsBlockedVariants()
+        {
+            var allCreditsVariantsBlockedAttr = this.ActorEnum.GetAttribute<CreditsBlockedAllVariantsAttribute>();
+            if (allCreditsVariantsBlockedAttr != null)
+            {
+                return this.Variants;
+            }
+
+            var creditsBlockedVariants = this.ActorEnum.GetAttribute<CreditsBlockedVariantsAttribute>();
+            if (creditsBlockedVariants != null)
+            {
+                return creditsBlockedVariants.Variants;
+            }
+
+
+            return null;
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool HasVariantsWithRoomLimits()
         {

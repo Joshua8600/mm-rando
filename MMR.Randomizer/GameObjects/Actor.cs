@@ -143,14 +143,15 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x1B30)]
         [FileID(48)]
         [ObjectListIndex(0x9)]
-        //[GroundVariants(1)] //issue: also used for replacement, puts ground enemies in air so we cannot
-        [FlyingVariants(1)]
+        // do not mark vanilla as ground type, it puts ground on vanilla which is always in the air
+        [FlyingVariants(0x0001)]
         // 81 is trapped in ice, floats back up to the ceiling after melting
-        [GroundVariants(0x81)]
-        [BlockingVariants(0x81)]
+        [GroundVariants(0x0081)]
+        [BlockingVariants(0x0081)] // ice block
         [VariantsWithRoomMax(max: 5, variant: 1)] // have to limit because it can block and I don't have variant blocking
         [DifficultAllVariants]
-        [RespawningVariants(variant: 0x81)] // if they fly away after melt they might not come down (bug), so not killable
+        [RespawningVariants(variant: 0x0081)] // if they fly away after melt they might not come down (bug), so not killable
+        [CreditsBlockedVariants(variant: 0x0001)] // inivible until player gets close, so invible for credits
         [SwitchFlagsPlacement(size: 0xFF, shift: 8)]
         //[EnemizerScenesPlacementBlock(Scene.TerminaField)] // temporary, melting them can unmelt the north ice block, but why
         WallMaster = 0xA, // En_Wallmas
@@ -230,6 +231,8 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled] // now that they are testy, lets count them as enemies
         [FileID(54)]
         [ObjectListIndex(0xF)]
+        // credits, but we also need the object to stick around for cucco chicks
+        [CheckRestricted(Scene.CuccoShack, variant: 0xFFFF,  Item.MaskBunnyHood, Item.NotebookMeetGrog, Item.NotebookGrogsThanks)]
         // all variants less than zero get turned into zero, so we can add ones 
         [GroundVariants(0x0, 0xFFFF)] // FFFF is in ranch barn
         [FlyingVariants(0xFEEE)] // non-vanilla, want to see how they do if they spawn on flying, do they fall from the sky like normal?
@@ -656,6 +659,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(82)]
         [ObjectListIndex(0x51)]
         [GroundVariants(0)]
+        [CreditsBlockedAllVariants] // inivible until player gets close, so invible for credits
         [CompanionActor(Flame, ourVariant: -1, variant: 0x7F4)]
         [AlignedCompanionActor(Flame, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x7F4)] // I'll just put this over with the rest of the fire
@@ -1484,12 +1488,13 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x26EC)]
         [FileID(127)]
         [ObjectListIndex(0xD8)]
-        [RemovalChance(90)] // miniboss
+        [RemovalChance(90), PlacementWeight(95)] // miniboss
         // 0xFF(decrement) is armor type, the upper byte is completely unused and is even cleared
         [GroundVariants(0xFF03, 0xFF02, 0xFF01)]
         [WaterBottomVariants(0x0103, 0x0102, 0x0101)] // non vanilla
         [DifficultAllVariants]
-        [VariantsWithRoomMax(max: 2, 0xFF03, 0xFF02, 0xFF01)]
+        [CreditsBlockedVariants(0x0103, 0x0102, 0x0101)] // start combat music which breaks the cutscene
+        [VariantsWithRoomMax(max: 1, 0xFF03, 0xFF02, 0xFF01)]
         [VariantsWithRoomMax(max: 1, 0x0103, 0x0102, 0x0101)]
         [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // can crash the scheduler, no I dont know why
         IronKnuckle = 0x84, // En_Ik
@@ -2608,6 +2613,7 @@ namespace MMR.Randomizer.GameObjects
         // so we do not want to put them in rooms where you have to clear all enemies
         [RespawningVariants(0xFF80, 0xFF81)]
         [BlockingVariants(0xFF80, 0xFF81)] // iceblock they spawn
+        [CreditsBlockedAllVariants] // inivible until player gets close, so invible for credits
         [VariantsWithRoomMax(max: 1, variant: 0xFF81)]
         [VariantsWithRoomMax(max: 1, variant: 0xFF80)]
         Wolfos = 0xEC, // En_Wf
@@ -3456,6 +3462,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x14B)]
         [WaterBottomVariants(0)]
         [UnkillableAllVariants]
+        [CreditsBlockedAllVariants] // singing audio can break credits
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // her new actor plays flute, this can break frog choir if close enough
         [PlacementWeight(90)]
@@ -3989,6 +3996,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0, // stt light arrow fight
             1)]  // the other fights
         [DifficultAllVariants]
+        [CreditsBlockedAllVariants] // inivible until player gets close, so invible for credits
         [OnlyOneActorPerRoom]
         [VariantsWithRoomMax(max: 0, variant: 0)] // cutscene variant is hardcoded
         [PlacementWeight(50)]
@@ -5636,6 +5644,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(493)]
         [ObjectListIndex(0x201)]
         [GroundVariants(0xFF, 0x80FF)] // does this include the really big one?
+        [CreditsBlockedAllVariants] // inivible until player gets close, so invible for credits
         [PlacementWeight(90)]
         [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
             0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
@@ -5968,12 +5977,16 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x211)]
         [GroundVariants(//0, // this... works? but is not vanilla? where did I get this variant?
             0x1, // concert in zora hall
-            0xF)] // credits version in milkbar, and the one in his room
-        [WaterBottomVariants(2, // cutscene version for mikau healing cutscene
-            0)] // non vanilla, we dont need to put ocean things in his room
+            0xF // credits version in milkbar, and the one in his room
+        )]
+        [WaterBottomVariants(
+            2, // dark cutscene version for mikau healing cutscene
+            0 // non vanilla, we dont need to put ocean things in his room
+        )]
         [VariantsWithRoomMax(max: 0,
             0x1)] // wont spawn until after you clear the temple
         [UnkillableAllVariants]
+        [CreditsBlockedVariants(0x1, 0xF, 0x0)] // the credits version is fine in milkbar but not the rest I think
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         [ForbidFromScene(Scene.ZoraHallRooms)]
@@ -6062,10 +6075,19 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(527)]
         [ObjectListIndex(0x216)]
-        [GroundVariants(0xFE0F)]
-        [WaterBottomVariants(0xFE0F, 0xFE02, 0xFE01)]
+        [GroundVariants(
+            0xFE0F, // regular
+            0x0E01 // concert
+            )]
+        [WaterBottomVariants(
+            0xFE0F, // regular
+            0xFE02 // mikau cutscene, dark
+            //0xFE01 // huh? non vanilla? where did I get this?
+            )]
         [OnlyOneActorPerRoom]
         [BlockingVariantsAll]
+        [VariantsWithRoomMax(max:0, variant: 0x0E01)] // does not spawn without cutscene
+        [CreditsBlockedVariants(0xFE0F, 0x0E01)]
         [UnkillableAllVariants]
         [PlacementWeight(75)]
         Tijo = 0x238, // En_Zod // drummer zora band member
@@ -6174,7 +6196,8 @@ namespace MMR.Randomizer.GameObjects
         )]
         [WaterBottomVariants(0xFE02, // dark cutscene version, perfect for dark water bottom shinanigans
             0xF)] // also, do not put regular variant as water our typing system is dumb, doesnt know which is which
-        [VariantsWithRoomMax(max: 0, variant: 0xFE0F/*, 0xFE0F*/)] // reduced to zero until I can fix his shit
+        [CreditsBlockedVariants(0xFE0F)] // music playing TODO I dont know if music playing from these actors actually breaks credits like miniboss does
+        [VariantsWithRoomMax(max: 0, variant: 0xFE0F)] // reduced to zero until I can fix his shit
         [UnkillableAllVariants]
         [PlacementWeight(50)]
         Evan = 0x241, // En_Zos
@@ -6273,6 +6296,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0, variant: 1)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
+        [CreditsBlockedAllVariants]
         [OnlyOneActorPerRoom] // if two of them are near to each other, and player appears near his nearby music can break
         //[ForbidFromScene(Scene.StockPotInn, Scene.LaundryPool, Scene.MilkBar)] // think him being in milkbar is a credits thing
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // his music can break Frog Choir
@@ -6290,7 +6314,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)]
         [VariantsWithRoomMax(max: 1, variant: 0)]
         [UnkillableAllVariants]
-        //[ForbidFromScene(Scene.RoadToIkana)]
+        [CreditsBlockedAllVariants] // invisible
         [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.SouthernSwamp, Scene.SouthernSwampClear)] // the scene has lens reversed, so you can see him render without lens, but if you use lens he disspears
         Shiro = 0x24A, // En_Stone_heishi
 

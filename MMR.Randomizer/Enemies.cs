@@ -5077,7 +5077,7 @@ namespace MMR.Randomizer
 
         public static List<Actor> GetMatchPool(SceneEnemizerData thisSceneData, List<Actor> oldActors, bool containsFairyDroppingEnemy, bool hasBlockingSensitivity)
         {
-            var reducedCandidateList = Actor.CopyActorList(thisSceneData.AcceptableCandidates);
+            var earlyReducedCandidateList = Actor.CopyActorList(thisSceneData.AcceptableCandidates);
             var enemyMatchesPool = new List<Actor>();
 
             // we cannot currently swap out specific enemies, so if ONE must be killable, all shared enemies must
@@ -5097,35 +5097,60 @@ namespace MMR.Randomizer
             for (var e = 0; e < blockedReplacementActors.Count; e++)
             {
                 var blockedActor = blockedReplacementActors[e];
-                ReplacementListRemove(reducedCandidateList, blockedActor);
+                ReplacementListRemove(earlyReducedCandidateList, blockedActor);
+            }
+
+            // pre-load credit limited actor placements
+            List<GameObjects.Actor> sceneCreditsActors = null;
+            var creditsLimitations = thisSceneData.Scene.SceneEnum.GetAttributes<Attributes.ActorizerSceneCreditsActor>().ToList();
+            if (creditsLimitations != null)
+            {
+                for (int a = 0; a < creditsLimitations.Count; a++)
+                {
+                    var limitedAttr = creditsLimitations[a];
+                    if (limitedAttr.Room == oldActors[0].Room)
+                    {
+                        sceneCreditsActors = limitedAttr.CreditsActors;
+                    }
+                }
             }
 
             // TODO does this NEED to be a double loop? does anything change per enemy copy that we should worry about?
             for (var oldActorIndex = 0; oldActorIndex < oldActors.Count; oldActorIndex++) // this is all copies of an enemy in a scene, so all bo or all guay
             {
                 var oldActor = oldActors[oldActorIndex];
+                List<Actor> lateReducedCandidateList = earlyReducedCandidateList.ToList();
 
                 // the enemy we got from the scene has the specific variant number, the general game object has all
-                foreach (var candidateEnemy in reducedCandidateList)
+                foreach (var candidateEnemy in lateReducedCandidateList)
                 {
                     // if current test actor not already in the new pool
                     //   TODO why would we get duplicates this late? shouldnt the candidates be unique list?
                     if (enemyMatchesPool.Any(act => act.ActorId == candidateEnemy.ActorId)) continue;
 
                     var compatibleVariants = oldActor.CompatibleVariants(candidateEnemy, thisSceneData.RNG);
-
                     if (compatibleVariants == null || compatibleVariants.Count == 0) continue;
 
                     var newEnemy = candidateEnemy.CopyActor();
+
+                    if (sceneCreditsActors != null && sceneCreditsActors.Contains(oldActor.ActorEnum)) // scene demands we check
+                    {
+                        var candidateCreditsBlockedVariants = candidateEnemy.CreditsBlockedVariants();
+
+                        if (candidateCreditsBlockedVariants != null)
+                        {
+                            newEnemy.SetVariants(newEnemy.Variants.Except(candidateCreditsBlockedVariants).ToList());
+                            if (newEnemy.Variants.Count == 0)
+                                continue; // nothing more to do
+                        }
+                    }
 
                     // reduce varieties to meet killable requirements
                     if (MustBeKillable)
                     {
                         newEnemy.SetVariants(candidateEnemy.KillableVariants(compatibleVariants)); // reduce to available
                         if (newEnemy.Variants.Count == 0)
-                        {
                             continue; // can't put this enemy here: it has no non-respawning variants
-                        }
 
                         // if the actor is in a kill all enemy room, reduce the chances of boring enemies from showing up here
                         if ((oldActor.MustNotRespawn
@@ -5134,16 +5159,13 @@ namespace MMR.Randomizer
                         {
                             newEnemy.RemoveEasyEmemies();
                             if (newEnemy.Variants.Count == 0) // TODO refactor this into the overall flow
-                            {
                                 continue;
-                            }
                         }
 
                     }
                     else if (oldActor.Blockable == false)
                     {
-                        if (newEnemy.ActorEnum.GetAttribute<BlockingVariantsAll>() != null)
-                        {
+                        if (newEnemy.ActorEnum.GetAttribute<BlockingVariantsAll>() != null) {
                             continue;
                         }
                         else
@@ -5151,9 +5173,7 @@ namespace MMR.Randomizer
                             newEnemy.SetVariants(compatibleVariants);
                             newEnemy.RemoveBlockingTypes();
                             if (newEnemy.Variants.Count == 0) // TODO refactor this into the overall flow
-                            {
                                 continue;
-                            }
                         }
                     }
                     else
