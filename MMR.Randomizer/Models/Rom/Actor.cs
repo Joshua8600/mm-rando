@@ -395,6 +395,14 @@ namespace MMR.Randomizer.Models.Rom
             // this is here so I can watch for variant corruption, because not sure how to breakpoint
             // currentScene is there for debugging, 
             this.Variants = variants;
+
+            if (this.SortedVariants != null)
+            {
+                for (int c = 0; c < this.SortedVariants.Count; c++)
+                {
+                    this.SortedVariants[c] = this.SortedVariants[c].Union(variants).ToList();
+                }
+            }
         }
 
         // should this function also be checking for other compatibility issues like respawning? currently elsewhere
