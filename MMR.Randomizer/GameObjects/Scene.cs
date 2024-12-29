@@ -905,6 +905,7 @@ namespace MMR.Randomizer.GameObjects
         //    Actor.AnjusGrandma, Actor.AnjusGrandmaCredits)] // this this was just cutscenes, not the same bug
         [ActorizerSceneCreditsActor(Actor.DekuBaba)] // used for anju replacement in the intro, we dont want invisible actors there thats lame
         [ActorizerSceneCreditsActor(Actor.Bombiwa)] // used for goro-link replacement in the intro, we dont want invisible actors there thats lame
+        [ActorizerSceneCreditsActor(room:5, Actor.RosaSisters)]
         [EnemizerSceneBlockSensitive(Actor.Gorman, -1)]
         [EnemizerSceneBlockSensitive(Actor.MushroomCloud, -1)] // specifically the one in the lavatory
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RosaSisters,
@@ -1051,7 +1052,8 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
             Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.RegularIceBlock,
             Actor.Bombiwa, Actor.LargeSnowball)] // can block climbing the ramp to the tower
-        [ActorizerSceneCreditsActor(Actor.DekuBaba)] // used for seth replacement in the intro, we dont want invisible actors there thats lame
+        [ActorizerSceneCreditsActor(room: 3, Actor.Carpenter, Actor.Dog, Actor.GateSoldier, Actor.Postbox, Actor.BuisnessScrub,
+                                            Actor.DekuBaba)] // used for seth replacement in the intro, we dont want invisible actors there thats lame
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         [EnemizerSceneBlockSensitive(Actor.Kafei, -1)]
         SouthClockTown = 0x6C,
