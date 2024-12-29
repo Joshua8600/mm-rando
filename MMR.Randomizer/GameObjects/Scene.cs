@@ -834,6 +834,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1444)]
         [SceneInternalId(0x59)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HookshotWallAndPillar,
+            Actor.WoodfallTempleWoodenFlower)] // can block the chests ABOVE IT on the terrace
         InvertedStoneTower = 0x56, // NOT TEMPLE
 
         [FileID(1446)]
@@ -922,6 +924,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1477)]
         [SceneInternalId(0x64)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper,
+        //    Actor.WoodfallTempleWoodenFlower)] // can block the whole thing
         WoodsOfMystery = 0x61,
 
         [FileID(1487)]

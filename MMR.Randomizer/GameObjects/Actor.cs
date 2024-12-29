@@ -3311,6 +3311,7 @@ namespace MMR.Randomizer.GameObjects
         // uses a weekeventreg instead
         [SwitchFlagsPlacement(size: 0x7F, shift: 8)] // this SETS but does not read, is it passing info to a door?
         [UnkillableAllVariants]
+        [EnemizerScenesPlacementBlock(Scene.WoodsOfMystery)]
         WoodfallTempleWoodenFlower = 0x13D, // Bg_Numa_Hana
 
         [ActorizerEnabled] // big object, collector flag, boring actor
