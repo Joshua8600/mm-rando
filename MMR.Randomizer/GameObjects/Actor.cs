@@ -1463,21 +1463,23 @@ namespace MMR.Randomizer.GameObjects
             0xC00B, 0xC21E, 0xC40E, // secret shrine
             0x4110, // terminafield pot
             0xFF0B, 0xFF0D // non vanilla
-            )]
+        )]
         [WaterBottomVariants(
             0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF60E, 0xF410, // secret shrine
             0x410E, 0x450A, 0x470A, 0x490A, 0x4B0A, 0x4D0E, 0x530A, 0x550A, 0x570E, 0x590A, 0x5B0E, // pinnacle rock
             0xFF0F, 0xFF0B, 0xFF0E, 0xFF03 // non vanilla
-            )]
+        )]
         [VariantsWithRoomMax(max: 0, variant: 0x460B, 0x4610, 0x018D, // stone tower temple (dungeon keep)
             0xFE01, // deku shrine (dungeon keep)
             0x1E, 0x5, // spiderhouse clay pots with spiders
-            0x202, 0x602, 0x802, 0xA02, 0xC02)] // swords school, these are dungeon_keep pots cannot place without the object
+            0x202, 0x602, 0x802, 0xA02, 0xC02 // swords school, these are dungeon_keep pots cannot place without the object
+        )]
         [ForbidFromScene(Scene.GoronRacetrack, // these are green pots they use a different object 
             /*Scene.SecretShrine,*/ Scene.IkanaCastle, Scene.IgosDuIkanasLair, // dungeon pots, but treasure flags updater still messes with it
             Scene.DekuShrine, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple,
             Scene.AstralObservatory, Scene.GoronTrial, Scene.LinkTrial,
-            Scene.MajorasLair)] // we want them for the fight
+            Scene.MajorasLair // we want them for the fight
+        )]
         [UnkillableAllVariants]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)]
         [TreasureFlagsPlacement(mask: 0x1F, shift: 0)] // 0x3FC
@@ -1760,7 +1762,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(138)]
         [ObjectListIndex(3)] // bleh, always with the dangeon object
-        [DynaAttributes(12, 12)]
+        [DynaAttributes(12, 12)] // switcch on the floor is dyna
         //[ObjectListIndex(0x4B)] // fake for object force testing
         // params are filled
         // type is 0x7 range,0/1 are floor switches, 2 is eye switch, 3 and 4 are crystal, 5 is draw again
@@ -1772,11 +1774,12 @@ namespace MMR.Randomizer.GameObjects
             0x902, // stone tower temple
             0x1D82 // stone tower temple
         )]
-        [WaterBottomVariants(0x0, 0x1, 0x3, 0x4)]
+        [WaterBottomVariants(0x0, 0x1, 0x13, 0x14)]
         [UnkillableAllVariants]
         [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
         //[VariantsWithRoomMax(max:0, variant: 0x2, 0x902, 0x1D82)] // wall types, currently they are the only actor that can be put on free wall spots that break (itemizer overwiting vars)
-        [EnemizerScenesPlacementBlock(Scene.StoneTowerTemple)] // still unknown illegal instruction crash in stone tower mirror room, same variant works fine in other places
+        [EnemizerScenesPlacementBlock( Scene.SecretShrine, // crystal switches crash rsp if placed in clay pots (0x7CX4)
+            Scene.StoneTowerTemple)] // still unknown illegal instruction crash in stone tower mirror room, same variant works fine in other places
         // for some reason, even without 
         [ForbidFromScene(Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
             Scene.BeneathTheWell, Scene.DekuShrine, Scene.IkanaCastle, Scene.PiratesFortressRooms, Scene.SwampSpiderHouse)]
@@ -3849,6 +3852,7 @@ namespace MMR.Randomizer.GameObjects
         [FlyingToGroundHeightAdjustment(150)]
         //[ForbidFromScene(Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.TwinIslandsSpring, Scene.NorthClockTown, Scene.MilkRoad, Scene.GreatBayCoast, Scene.IkanaCanyon)]
         //[EnemizerScenesPlacementBlock(Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.TwinIslandsSpring, Scene.NorthClockTown, Scene.MilkRoad, Scene.GreatBayCoast, Scene.IkanaCanyon)]
+        [PlacementWeight(85)]
         Tingle = 0x176, // En_Bal
 
         [ActorizerEnabled]
@@ -3870,8 +3874,7 @@ namespace MMR.Randomizer.GameObjects
         [PlacementWeight(55)]
         PirateTelescope = 0x178, // En_Warp_Uzu
 
-        [ActorizerEnabled]
-        // flying ice platforms leading to lens cave
+        [ActorizerEnabled] // platforms leading to goron graveyard
         [FileID(339)]
         [ObjectListIndex(0x187)]
         [DynaAttributes(22, 13)]
@@ -4539,7 +4542,7 @@ namespace MMR.Randomizer.GameObjects
 
         Empty1BF = 0x1BF,
 
-        [ActorizerEnabled]
+        [ActorizerEnabled] // also leading to hp at pathtosnowhead
         [FileID(411)]
         [ObjectListIndex(0x1A8)]
         [DynaAttributes(10, 8)]
@@ -5109,7 +5112,9 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableSwordsmanSSchoolPot1, Item.CollectableSwordsmanSSchoolPot2, Item.CollectableSwordsmanSSchoolPot3, Item.CollectableSwordsmanSSchoolPot4, Item.CollectableSwordsmanSSchoolPot5)]
         [GroundVariants(0xFF01, // shivering at night
             0)] // regular
-        [VariantsWithRoomMax(max: 0, variant: 0xFF01, 0)] // does not spawn, missing... objects?
+        // 0xFF01,
+        [VariantsWithRoomMax(max: 0, variant:  0, 0xFF01)] // does not spawn, missing... objects?
+        //[VariantsWithRoomMax(max:5, variant:0xFF01)]
         [UnkillableAllVariants]
         //[ForbidFromScene(Scene.SwordsmansSchool)] // dont remove
         KendoSensei = 0x1EF, // En_Kendo_Js
@@ -7251,6 +7256,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(639)]
         [ObjectListIndex(0x247)]
         [GroundVariants(0)] // wedding
+        [VariantsWithRoomMax(max:3, variant:0)]
         [UnkillableAllVariants]
         [PlacementWeight(15)] // kinda boring until I can fix him
         ViscenMoonLeaveCutscene = 0x2A8, // En_Ending_Hero2 // captain

@@ -3244,6 +3244,8 @@ namespace MMR.Randomizer
                 grottosScene.Maps[7].Actors[randomIndex].ChangeActor(GameObjects.Actor.Bo, vars: 0xFF01, modifyOld: true); // match actor to object
             }
 
+            // TODO do the same for peahat grotto
+
             // peahat grotto has a deku baba object, switch to BO so we can get bo actors from jp grotto
             var peahatGrottoObjecList = grottosScene.Maps[13].Objects;
             peahatGrottoObjecList[2] = GameObjects.Actor.Bo.ObjectIndex();
@@ -6232,11 +6234,13 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
-            if (scene.SceneEnum == GameObjects.Scene.LaundryPool) // force specific actor/variant for debugging
+            if (scene.SceneEnum == GameObjects.Scene.SecretShrine) // force specific actor/variant for debugging
             {
                 //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot
-                var target = thisSceneData.Scene.Maps[0].Actors[10];
-                target.ChangeActor(GameObjects.Actor.Clock, vars: 0x907F);
+                var target = thisSceneData.Scene.Maps[0].Actors[23];
+                // 23 to 25
+                //target.ChangeActor(GameObjects.Actor.ObjSwitch, vars: 0x7C14); // crashes
+                target.ChangeActor(GameObjects.Actor.ObjSwitch, vars: 0x7C04); // 2 also crashes
                 //thisSceneData.Scene.Maps[0].Actors[9].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F);
                 //thisSceneData.Scene.Maps[0].Actors[2].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F);
             }
