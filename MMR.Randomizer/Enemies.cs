@@ -2102,6 +2102,24 @@ namespace MMR.Randomizer
                 }
                 SceneUtils.UpdateScene(ikanaCastleScene);
 
+                var roadToMountainsScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.PathToMountainVillage.FileID());
+                // some winter snowballs are sitting on top of each other, they should be moved
+                // snowballs 24 and 48 are dupllicates, sitting on top of each other, move them so they arent
+                roadToMountainsScene.Maps[0].Actors[48].Position.z = 6227;
+                ActorUtils.FlattenPitchRoll(roadToMountainsScene.Maps[0].Actors[48]);
+                // snowball 29 and 32 are on top of each other
+                roadToMountainsScene.Maps[0].Actors[32].Position.x = 568;
+                roadToMountainsScene.Maps[0].Actors[32].Position.z = 6418;
+                ActorUtils.FlattenPitchRoll(roadToMountainsScene.Maps[0].Actors[32]);
+                // snowball 28 and 30 are on top of each other
+                roadToMountainsScene.Maps[0].Actors[30].Position.x = 1790;
+                roadToMountainsScene.Maps[0].Actors[30].Position.z = 6841;
+                ActorUtils.FlattenPitchRoll(roadToMountainsScene.Maps[0].Actors[30]);
+                // snowball 26 and 44 are on top of each other
+                roadToMountainsScene.Maps[0].Actors[44].Position.x = 2000;
+                roadToMountainsScene.Maps[0].Actors[44].Position.z = 6612;
+                ActorUtils.FlattenPitchRoll(roadToMountainsScene.Maps[0].Actors[44]);
+
             }
 
             FixEvanRotation();
