@@ -473,6 +473,7 @@ namespace MMR.Randomizer.GameObjects
             0x430A, // road to ikana
             0x3B0A, 0x080A, 0x0D0A, 0x360A)]
         [UnkillableAllVariants]
+        [PlacementWeight(80)]
         PointedSign = 0x26, // En_A_Obj
 
         [FileID(68)]
@@ -1568,6 +1569,8 @@ namespace MMR.Randomizer.GameObjects
         // 64 is size of HSW, 0xC8 in one of snowhead rooms, AA is compass room?
         // ice block room has 0x64 and 0x96, 0xFF in goron block puzzle room
         // smithy uses size 0x78, 0x10 is smol
+        [WallVariants(0xFF10, 0xFF20, 0xFF44, 0xFF64)]
+        [PerchingVariants(0xFF10, 0xFF20, 0xFF44, 0xFF64)]
         [GroundVariants(0xFF10, 0xFF20, 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         [BlockingVariants(0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         // all restricted because they add colliders which limits our BGcheck options for other things

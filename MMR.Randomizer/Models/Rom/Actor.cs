@@ -395,12 +395,15 @@ namespace MMR.Randomizer.Models.Rom
             // this is here so I can watch for variant corruption, because not sure how to breakpoint
             // currentScene is there for debugging, 
             this.Variants = variants;
+        }
 
+        public void TrimVariantsList()
+        {
             if (this.SortedVariants != null)
             {
                 for (int c = 0; c < this.SortedVariants.Count; c++)
                 {
-                    this.SortedVariants[c] = this.SortedVariants[c].Except(variants).ToList();
+                    this.SortedVariants[c] = this.SortedVariants[c].Except(this.Variants).ToList();
                 }
             }
         }

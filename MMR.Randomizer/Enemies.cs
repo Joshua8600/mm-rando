@@ -4830,7 +4830,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.IkanaCanyon, GameObjects.Actor.SquareSign, GameObjects.Actor.IronKnuckle)) continue;
+                if (TestHardSetObject(GameObjects.Scene.SecretShrine, GameObjects.Actor.TallGrass, GameObjects.Actor.Snapper)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
@@ -5156,6 +5156,7 @@ namespace MMR.Randomizer
                         if (candidateCreditsBlockedVariants != null)
                         {
                             newEnemy.SetVariants(newEnemy.Variants.Except(candidateCreditsBlockedVariants).ToList());
+                            newEnemy.TrimVariantsList();
                             if (newEnemy.Variants.Count == 0)
                                 continue; // nothing more to do
                         }
@@ -5165,6 +5166,7 @@ namespace MMR.Randomizer
                     if (MustBeKillable)
                     {
                         newEnemy.SetVariants(candidateEnemy.KillableVariants(compatibleVariants)); // reduce to available
+                        newEnemy.TrimVariantsList();
                         if (newEnemy.Variants.Count == 0)
                             continue; // can't put this enemy here: it has no non-respawning variants
 
@@ -5187,6 +5189,7 @@ namespace MMR.Randomizer
                         else
                         {
                             newEnemy.SetVariants(compatibleVariants);
+                            newEnemy.TrimVariantsList();
                             newEnemy.RemoveBlockingTypes();
                             if (newEnemy.Variants.Count == 0) // TODO refactor this into the overall flow
                                 continue;
