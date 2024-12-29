@@ -901,6 +901,8 @@ namespace MMR.Randomizer.GameObjects
         )]
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Anju,
         //    Actor.AnjusGrandma, Actor.AnjusGrandmaCredits)] // this this was just cutscenes, not the same bug
+        [ActorizerSceneCreditsActor(Actor.DekuBaba)] // used for anju replacement in the intro, we dont want invisible actors there thats lame
+        [ActorizerSceneCreditsActor(Actor.Bombiwa)] // used for goro-link replacement in the intro, we dont want invisible actors there thats lame
         [EnemizerSceneBlockSensitive(Actor.Gorman, -1)]
         [EnemizerSceneBlockSensitive(Actor.MushroomCloud, -1)] // specifically the one in the lavatory
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RosaSisters,
@@ -994,6 +996,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.GaroMaster)] // if spawning in sct partial, can fall through the floor and dissapear but leave their annoying music
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Postbox,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // Flying can block the roof leading to the chest
+        [ActorizerSceneCreditsActor(Actor.DekuBaba)] // used for blue baba replacement in the intro, we dont want invisible actors there thats lame
         [EnemizerSceneBlockSensitive(Actor.BombersYouChase, -1)] // chicken holder leads to a chest
         [EnemizerSceneBlockSensitive(Actor.BomberHideoutGuard, -1)] // leads to a whole area with like 4 things
         EastClockTown = 0x69, // ect
@@ -1044,6 +1047,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
             Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.RegularIceBlock,
             Actor.Bombiwa, Actor.LargeSnowball)] // can block climbing the ramp to the tower
+        [ActorizerSceneCreditsActor(Actor.DekuBaba)] // used for seth replacement in the intro, we dont want invisible actors there thats lame
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         [EnemizerSceneBlockSensitive(Actor.Kafei, -1)]
         SouthClockTown = 0x6C,

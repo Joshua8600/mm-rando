@@ -3489,6 +3489,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
             0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
             0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
+        [CreditsBlockedAllVariants] // invisible until on top of them
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // slowing enemies
         Nejiron = 0x155, // Rolling exploding rock in Ikana
 
@@ -7053,10 +7054,11 @@ namespace MMR.Randomizer.GameObjects
         //[TableVariants]
         // I think 2 is time gated behind delivery, so dont place
         [GroundVariants(0x0, 0x1, 0x2)]
-        [VariantsWithRoomMax(max:0, 0x2)]
+        [VariantsWithRoomMax(max: 0, 0x2)]
+        [VariantsWithRoomMax(max: 7, 0x0, 0x1)]
         [UnkillableAllVariants]
         [PlacementWeight(30)]
-        Milkjar = 0x28B, // Obj_Milk_Bin
+        Milkjar = 0x28B, // Obj_Milk_Bin // tag:bottle
 
         // spawned by the grass itself, no point actorizing as it dissapears if the player is not wearing the mask I think
         [FileID(611)]
