@@ -3234,10 +3234,15 @@ namespace MMR.Randomizer
 
             var grottosScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
 
-            // dodongo grotto has a blue icecycle object, switch to BO so we can get bo actors from jp grotto
-            // TODO is this actually getting updated without an actor tho?f
+            // dodongo grotto has a useless blue icicle object. switch to Bo object so we can get Bo actors from jp grotto
             var dodongoGrottoObjectList = grottosScene.Maps[7].Objects;
             dodongoGrottoObjectList[2] = GameObjects.Actor.Bo.ObjectIndex();
+            var randomActorChangeRoll = seedrng.Next(100);
+            if (randomActorChangeRoll < 25)
+            {
+                var randomIndex = randomActorChangeRoll < 12 ? (0) : (1);
+                grottosScene.Maps[7].Actors[randomIndex].ChangeActor(GameObjects.Actor.Bo, vars: 0xFF01, modifyOld: true); // match actor to object
+            }
 
             // peahat grotto has a deku baba object, switch to BO so we can get bo actors from jp grotto
             var peahatGrottoObjecList = grottosScene.Maps[13].Objects;
@@ -4824,7 +4829,7 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Lulu)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.KendoSensei)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
