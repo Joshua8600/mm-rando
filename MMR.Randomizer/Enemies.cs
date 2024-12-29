@@ -1438,13 +1438,12 @@ namespace MMR.Randomizer
             // scan through all leavers and turn them 270, or randomily redirect them toward compass directions
 
             var greatbaycoastScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GreatBayCoast.FileID());
-            var towelScarecrow = greatbaycoastScene.Maps[0].Actors[138]; // standing very close to another in an area the player wouldnt notice the extra density
-            ActorUtils.SetActorSpawnTimeFlags(towelScarecrow); // by default, this one is night only
-            ActorUtils.FlattenPitchRoll(towelScarecrow);
-            towelScarecrow.ChangeYRotation(270);
-            towelScarecrow.Position = new vec16(-18, 80, 3734); // moved to center towel
-            towelScarecrow.ChangeActor(GameObjects.Actor.Scarecrow, 0x1E00, modifyOld: true);
-            // todo test rotation
+            var towelLeever = greatbaycoastScene.Maps[0].Actors[138]; // standing very close to another in an area the player wouldnt notice the extra density
+            ActorUtils.SetActorSpawnTimeFlags(towelLeever); // by default, this one is night only
+            ActorUtils.FlattenPitchRoll(towelLeever);
+            towelLeever.ChangeYRotation(270);
+            towelLeever.Position = new vec16(-18, 80, 3734); // moved to center towel
+            towelLeever.ChangeActor(GameObjects.Actor.Leever, vars: 0xFF, modifyOld: true);
 
             var towel2LikeLike = greatbaycoastScene.Maps[0].Actors[143];
             towel2LikeLike.Position = new vec16(-79, 82, 3975);
@@ -1452,7 +1451,6 @@ namespace MMR.Randomizer
             ActorUtils.SetActorSpawnTimeFlags(towel2LikeLike);
             towel2LikeLike.ChangeYRotation(270);
             towel2LikeLike.ChangeActor(GameObjects.Actor.LikeLike, 3, modifyOld: true);
-            // todo test rotation
 
             var extraKayakRearActor = greatbaycoastScene.Maps[0].Actors[149];
             extraKayakRearActor.ChangeActor(GameObjects.Actor.Leever, vars: 0xFF, modifyOld: true);
