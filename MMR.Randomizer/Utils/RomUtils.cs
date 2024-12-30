@@ -322,8 +322,17 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-        public static byte[] BuildROM(OutputSettings settings)
+        public static byte[] BuildROM(OutputSettings settings, GameplaySettings settings2)
         {
+
+            // I want to move this AFTER vrom updates so I can see where the ACTUAL vrom to work with is
+            // currently tho, its broken, 
+            if (settings2.RandomizeEnemies)
+            {
+                Enemies.UpdateActorOverlayTable(); // last second before rom generation
+            }
+
+
             SetFilesToRemainDecompressed(settings);
 
             CompressMMFiles();
@@ -370,6 +379,7 @@ namespace MMR.Randomizer.Utils
 
             // should this be moved up now that I split up the file updated values?
             SequenceUtils.UpdateBankInstrumentPointers(ROM);
+
 
             UpdateDMAFileTable(ROM);
             SignROM(ROM);

@@ -6551,14 +6551,16 @@ namespace MMR.Randomizer
             {
                 progressReporter.ReportProgress(75, "Building ROM...");
 
-                if (_randomized.Settings.RandomizeEnemies)
-                {
-                    Enemies.UpdateActorOverlayTable(); // last second before rom generation
-                }
+                // todo try moving this after vrom update
+                //if (_randomized.Settings.RandomizeEnemies)
+                //{
+                //    Enemies.UpdateActorOverlayTable(); // last second before rom generation
+                //}
 
+                byte[] ROM = null;
                 if (outputSettings.GenerateROM)
                 {
-                    byte[] ROM = RomUtils.BuildROM(outputSettings);
+                    ROM = RomUtils.BuildROM(outputSettings, _randomized.Settings);
                     if (ROM.Length > 0x4000000) // over 64mb
                     {
                         throw new ROMOverflowException("64 MB", "hardware (Everdrive)");
@@ -6587,7 +6589,7 @@ namespace MMR.Randomizer
                             );
                     }
 
-                    byte[] ROM = RomUtils.BuildROM(outputSettings);
+                    //byte[] ROM = RomUtils.BuildROM(outputSettings, _randomized.Settings);
                     if (ROM.Length > 0x2800000) // Over 40MB. The upper limit is likely 48MB, but let's stick with 40 for now.
                     {
                         throw new ROMOverflowException("40 MB", "WiiVC");
