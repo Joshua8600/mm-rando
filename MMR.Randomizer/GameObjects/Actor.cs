@@ -5425,7 +5425,7 @@ namespace MMR.Randomizer.GameObjects
             )]
         [PathingVariants(0x8001)] // really a pathing variant (walking through east/south to go see the laundry pool
         [PathingTypeVarsPlacement(mask: 0xFF, shift: 0)]
-        [VariantsWithRoomMax(max: 0, variant: 0x8001)] // too hard coded to do anything with
+        [VariantsWithRoomMax(max: 0, variant: 0x8001, 0x80FF)] // too hard coded to do anything with
         [VariantsWithRoomMax(max: 0, variant: 2)] // too hard coded to do anything with
         // dont remove from laundrypool, its the only way to see link mask in the wild, and its a trip
         [ForbidFromScene(Scene.LaundryPool/*, Scene.StockPotInn */)]
