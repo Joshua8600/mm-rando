@@ -96,11 +96,12 @@ namespace MMR.Randomizer.GameObjects
             0x5080 // road to ikana
             )]
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
-        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
+        /*[AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x0, 0x2000, 0x3000, 0x4000, // stone grottos
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
             0x8200, 0xA200, // secret japanese grottos, hidden
             0x6233, 0x623B, 0x6218, 0x625C)] // what if there was a hole in front of the treasure chest, remember that part in dark souls?
+        // */
         //[VariantsWithRoomMax(max: 1, variant: )] // vanilla we do not want to re-place in the world
         [UnkillableAllVariants]
         //[AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1,
@@ -414,6 +415,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 1, 2, 3, 4, 0xF)]
         [VariantsWithRoomMax(max: 0, variant: 0xF0, 0xF1, 0xF2, 0xF3, 0xF4)] // spring only
         [UnkillableAllVariants]
+        [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
         //[ForbidFromScene(Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.LaundryPool)]
         RegularFrogs = 0x22, // En_Minifrog
 
@@ -712,7 +714,6 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0, variant: 0xFF0D)] // 0xFF0D crashes TF do not use (is from the cucco shack)
         [VariantsWithRoomMax(max: 1, variant: 0xA1A, 0xFF1A)] // has EnAni, more than one is odd
         [VariantsWithRoomMax(max: 1, variant: 0xA)] // UGLY is also BG
-        [AlignedCompanionActor(GrottoHole, CompanionAlignment.InFront, ourVariant: -1, variant: 0x8200, 0xA200)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         Treee = 0x41, // En_Wood2
@@ -1066,7 +1067,11 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(Butterfly, CompanionAlignment.Above, ourVariant: -1,
             variant: 0, 1, 2)]
         [AlignedCompanionActor(IshiRock, CompanionAlignment.OnTop, ourVariant: -1,
-            variant: 0xA1, 0xFE01)] // everyone loves a good hidden grotto under a rock
+            variant: 0xA1,
+            0xFE01 // silver boulders underwater
+            )] // everyone loves a good hidden grotto under a rock
+        [AlignedCompanionActor(BronzeBoulder, CompanionAlignment.OnTop, ourVariant: -1,
+            variant: 0x0, 0xFF)] // everyone loves a good hidden grotto under a rock
         [AlignedCompanionActor(WoodenBarrel, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x8710, 0x8711, 0x7F3F)] // everyone loves a good hidden grotto under a... a cardboard box?
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1,
@@ -3388,6 +3393,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0, 1, 2, 3, 4, 5)] // 6 colors
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [UnkillableAllVariants] // animated kill but not enemy category
+        [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
         ImposterFrog = 0x147, // En_Fg  // unused beta frog
 
         // not even sure if its used, empty draw function, almost no code
@@ -3475,6 +3481,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // her new actor plays flute, this can break frog choir if close enough
         [PlacementWeight(90)]
+        [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
         CutsceneZelda = 0x0152, // Dm_Zl
 
         [FileID(305)]
@@ -3667,6 +3674,7 @@ namespace MMR.Randomizer.GameObjects
         //[PerchingVariants(0x2808, 0x3208, 0xC208, 0xFA08)] // non vanilla using non existent 0x8 flag to hide from vanilla code
         [VariantsWithRoomMax(max: 2, variant: 0x9605, 0x3205, 0x6405, 0x8C05, 0xFA01, 0xFA00)]
         [VariantsWithRoomMax(max: 1, variant: 0xFF00, 0x6404, 0x7804, 0x7800, 0x2800, 0x3200, 0xFF01, 0xFF05, 0xC200)]
+        [CreditsBlockedAllVariants] // I can't remember which ones are actually an issue and which are not
         [CompanionActor(ClayPot, ourVariant: -1, variant: 0x10B, 0x115, 0x106, 0x101, 0x102, 0x10F, 0x115, 0x11F, 0x113, 0x110, 0x10E)]
         Bo = 0x164, // En_Mkk, boe, small ball of snow or soot
 
@@ -4567,7 +4575,6 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [OnlyOneActorPerRoom]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)]
-        [AlignedCompanionActor(GrottoHole, CompanionAlignment.InFront, ourVariant: 1, variant: 0)]
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0146)] // treasure chest shop music
         [EnemizerScenesPlacementBlock(Scene.SouthClockTown)] // can bug out the scene transit into skullkid
         //[ForbidFromScene(Scene.TreasureChestShop)]
@@ -5394,6 +5401,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0, variant: 0x1401, 0x3FF1, 0x1402)] // softlock if you enter the song teach cutscene, which in rando is proximity
         //VariantsWithRoomMax(max: 0, variant: 0x1400)] // holy shit this is annoying nvm
         //[ForbidFromScene(Scene.GoronShrine, Scene.GoronRacetrack, Scene.TwinIslandsSpring)]
+        [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
         [SwitchFlagsPlacement(size: 0x3F, shift: 8)]
         [PlacementWeight(77)]
         GoronKid = 0x201, // En_Gk, baby goron, child goron
@@ -5773,6 +5781,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.RanchBuildings)]
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // her new actor sings, this can break frog choir if close enough
+        [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
         RomaniYts = 0x21F, // En_Ma_Yts
 
         // todo flesh this actor out
@@ -5876,6 +5885,7 @@ namespace MMR.Randomizer.GameObjects
         [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
         [VariantsWithRoomMax(max: 1, variant: 0x140A, 0xFC05, 0x2, 0x3, 0x4)]
         [VariantsWithRoomMax(max: 1, variant: 0xFC08, 0xFC07, 0xFC06, 0xFC13, 0xFC14, 0xFC15, 0xFC00)]
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         [ForbidFromScene(Scene.ZoraCape)]//, Scene.ZoraHall)]
         [PlacementWeight(80)]
         [UnkillableAllVariants]
@@ -6002,6 +6012,8 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         [ForbidFromScene(Scene.ZoraHallRooms)]
+        [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
+        [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
         [OnlyOneActorPerRoom]
         [PlacementWeight(50)]
         Japas = 0x231, // En_Zob
@@ -6101,6 +6113,8 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max:0, variant: 0x0E01)] // does not spawn without cutscene
         [CreditsBlockedVariants(0xFE0F, 0x0E01)]
         [UnkillableAllVariants]
+        [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
+        [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
         [PlacementWeight(75)]
         Tijo = 0x238, // En_Zod // drummer zora band member
 
@@ -6211,6 +6225,8 @@ namespace MMR.Randomizer.GameObjects
         [CreditsBlockedVariants(0xFE0F)] // music playing TODO I dont know if music playing from these actors actually breaks credits like miniboss does
         [VariantsWithRoomMax(max: 0, variant: 0xFE0F)] // reduced to zero until I can fix his shit
         [UnkillableAllVariants]
+        [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: 0xFE0F, variant: 0x13, 0x14, 0x15)]
+        [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: 0xFE0F, variant: 0x1E0, 1, 2, 9)]
         [PlacementWeight(50)]
         Evan = 0x241, // En_Zos
 
@@ -6305,14 +6321,18 @@ namespace MMR.Randomizer.GameObjects
         // 01 is laundry pool, but he only spawns at night, ignoring actor time spawn settings for a scene
         // 02 is the music-only one that spawns so you can hear him through the walls of the inn
         [GroundVariants(0x0, 0x1, 0x2)]
-        [VariantsWithRoomMax(max: 0, variant: 1)]
+        [VariantsWithRoomMax(max: 1, variant: 1)]
+        [VariantsWithRoomMax(max: 0, variant: 0x2)]
+        [VariantsWithRoomMax(max: 2, variant: 0x0)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         [CreditsBlockedAllVariants]
         [OnlyOneActorPerRoom] // if two of them are near to each other, and player appears near his nearby music can break
         //[ForbidFromScene(Scene.StockPotInn, Scene.LaundryPool, Scene.MilkBar)] // think him being in milkbar is a credits thing
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // his music can break Frog Choir
-        [RemovalChance(95), PlacementWeight(65)]
+        [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
+        [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
+        [RemovalChance(95), PlacementWeight(55)]
         GuruGuru = 0x248, // En_GuruGuru
 
         [FileID(544)]
@@ -6401,6 +6421,7 @@ namespace MMR.Randomizer.GameObjects
             0xE01)] // failure to spawn
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
+        [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
         [RemovalChance(90), PlacementWeight(80)]
         //[ForbidFromScene(Scene.ZoraCape)]
         Lulu = 0x252, // Ee_Zov

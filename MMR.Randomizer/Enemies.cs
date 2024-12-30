@@ -2118,6 +2118,9 @@ namespace MMR.Randomizer
                 roadToMountainsScene.Maps[0].Actors[44].Position.z = 6612;
                 ActorUtils.FlattenPitchRoll(roadToMountainsScene.Maps[0].Actors[44]);
 
+                var stockpotInnScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.StockPotInn.FileID());
+                stockpotInnScene.Maps[4].Actors[4].ChangeYRotation(270); // mushroom was facing the right wall
+
             }
 
             FixEvanRotation();
@@ -7006,7 +7009,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 80.1\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 81.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
