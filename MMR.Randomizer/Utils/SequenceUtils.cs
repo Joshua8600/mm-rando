@@ -934,8 +934,8 @@ namespace MMR.Randomizer.Utils
             NewInstrumentSetAddress = 0xB3C000 + 0xBE300 + 0x10;
 
             // clear old audiobank
-            var zero = new byte[0x2A0];
-            ReadWriteUtils.WriteToROM(0xB3C000 + 0x13B6C0, zero);
+            var zero = new byte[0x190];
+            ReadWriteUtils.WriteToROM(0xB3C000 + 0x13B7D0, zero);
 
             // instrumentset_patch: modifies audiobank metadata read and writes, instrument/drum/sfx pointer read and writes,
             // nops a metadata copy function, and sets a fixed size for the audiobank pointer index

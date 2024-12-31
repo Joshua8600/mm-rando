@@ -223,6 +223,10 @@ namespace MMR.Randomizer.Utils
 
                 ReadWriteUtils.Arr_Insert(RomData.MMFileList[i].Data, 0, fileLength, ROM, ROMAddr);
                 ROMAddr += fileLength;
+                if ((ROMAddr & 0xF) != 0)
+                {
+                    ROMAddr = (ROMAddr | 0xF) + 1;
+                }
 
             }
             SequenceUtils.UpdateBankInstrumentPointers(ROM);
@@ -304,6 +308,7 @@ namespace MMR.Randomizer.Utils
 
         public static void ReadFileTable(BinaryReader ROM)
         {
+            int dmaId = 0;
             RomData.MMFileList = new List<MMFile>();
             ROM.BaseStream.Seek(FILE_TABLE, SeekOrigin.Begin);
             while (true)
@@ -320,7 +325,11 @@ namespace MMR.Randomizer.Utils
                 {
                     break;
                 }
-                RomData.MMFileList.Add(Current_File);
+                if (dmaId < 0x0603)
+                {
+                    RomData.MMFileList.Add(Current_File);
+                }
+                dmaId += 1;
             }
             ExtractAll(ROM);
         }
