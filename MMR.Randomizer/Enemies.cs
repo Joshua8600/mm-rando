@@ -1004,15 +1004,16 @@ namespace MMR.Randomizer
             DistinguishLogicRequiredDekuFlowers();
             //DisableActorSpawnCutsceneData();
 
+            AddGrottoVariety();
             ExtendGrottoDirectIndexByte();
+            FixJPGrottos();
+
             ShortenChickenPatience();
             //FixSeth2();
             AllowGuruGuruOutside();
             RemoveSTTUnusedPoe();
             FixSilverIshi();
             FixBabaAndDragonflyShadows();
-            AddGrottoVariety();
-            ChangeHotwaterGrottoDekuBabaIntoSomethingElse(rng);
             FixCuccoChicks();
             FixWoodfallTempleGekkoMiniboss();
             //FixStreamSfxVolume();
@@ -1020,7 +1021,6 @@ namespace MMR.Randomizer
             ExpandGoronShineObjects();
             RandomlySwapOutZoraBandMember();
             ExpandGoronRaceObjects();
-            SplitSpiderGrottoSkulltulaObject();
             SplitOceanSpiderhouseSpiderObject();
             FixDekuPalaceReceptionGuards();
             FixBomberKidsGameFinishWarp();
@@ -1028,7 +1028,6 @@ namespace MMR.Randomizer
             FixInjuredKoume();
             RandomizePinnacleRockSigns();
             RandomizeDekuPalaceBombiwaSigns();
-            RandomizeGrottoGossipStonesPerGrotto();
             SwapGreatFairies(rng);
             ModifyFireflyKeeseForPerching();
             SplitPirateSewerMines();
@@ -2401,16 +2400,37 @@ namespace MMR.Randomizer
 
         private static void ExtendGrottoDirectIndexByte()
         {
-            /// in MM the top nibble of the grotto variable is never used, 
+            /// in MM the top nibble of the grotto variable is never used (0xF000)
             /// but in the vanilla code it be detected and used as a grotto warp index of the static grottos entrances array (-1)
-            /// MM normally uses the z rotation instead to index warp, but we can use either or
+            ///  MM normally uses the z rotation instead to index warp, but we can use either or
             /// however, only the 3 lower bits of this nibble are used, the code ANDS with 7
             /// why? the fourth bit isn't ever used by any grotto, and looking at the code shows it is never used
             /// so here, we set the ANDI 7 to F instead, allowing us extended access to the entrance array
-            /// TODO and by 0xF800 and shift less to get more range, requires re-writting all
+            // TODO and by 0xF800 and shift less to get more range, requires re-writting all variants in actor list
             var grotholeFID = GameObjects.Actor.GrottoHole.FileListIndex();
             RomUtils.CheckCompressed(grotholeFID);
             RomData.MMFileList[grotholeFID].Data[0x2FF] = 0xF; // ANDI 0x7 -> ANDI 0xF
+        }
+
+        private static void FixJPGrottos()
+        {
+            /// JP grottos are unused, but we can summon them for actorizer
+            /// however, they have unique exists in the grotto scene exit table that always return to deku palace
+            ///   we can change the table to make some of the exists generic exists
+
+            // exit table starts at 234, 0:0xFFFF, 1:lens grotto
+            // vanilla vines grotto is   50A0 <- (lower:1480) <=> (upper: 14F0) -> 5060
+            // vanilla straight grotto is   5080 <- (brighter"A":1460) <=> (darker"B": 14E0) -> 5070
+
+            var grottoScene = RomData.MMFileList[GameObjects.Scene.Grottos.FileID()].Data;
+            ReadWriteUtils.Arr_WriteU16(grottoScene, 0x23C, 0xFFFF); // replace vines lower with generic exit
+
+            // straight grotto: I want the player to enter from A side because its brighter and looks better
+            // but B exit is boring compared to A exit, so I want to swap the B exit to exit to old A exit
+            ReadWriteUtils.Arr_WriteU16(grottoScene, 0x238, 0xFFFF); // replace straight A with generic exit
+            ReadWriteUtils.Arr_WriteU16(grottoScene, 0x23A, 0x5080); // replace straight B with old straight A exit
+
+            // TODO make the jp grotto warps go to magical places? we can't change that on the fly can we
         }
 
         private static void EnablePoFusenAnywhere()
@@ -3264,6 +3284,10 @@ namespace MMR.Randomizer
         {
             /// turns out the grottos have unused objects, some of them can be swapped
             ///   without affecting the original enemy placement, and gives us some variety
+
+            SplitSpiderGrottoSkulltulaObject();
+            ChangeHotwaterGrottoDekuBabaIntoSomethingElse(seedrng);
+            RandomizeGrottoGossipStonesPerGrotto();
 
             var grottosScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
 
