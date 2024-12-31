@@ -6589,7 +6589,10 @@ namespace MMR.Randomizer
                             );
                     }
 
-                    //byte[] ROM = RomUtils.BuildROM(outputSettings, _randomized.Settings);
+                    if (ROM == null) // wasnt previously run for n64 rom
+                    {
+                        ROM = RomUtils.BuildROM(outputSettings, _randomized.Settings);
+                    }
                     if (ROM.Length > 0x2800000) // Over 40MB. The upper limit is likely 48MB, but let's stick with 40 for now.
                     {
                         throw new ROMOverflowException("40 MB", "WiiVC");
