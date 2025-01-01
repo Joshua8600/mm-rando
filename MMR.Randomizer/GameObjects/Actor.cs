@@ -1743,11 +1743,20 @@ namespace MMR.Randomizer.GameObjects
             0x0102, 0x103, 0x104, 0x105, 0x106, // road to ikana
             0x101, 0x100, // cape covering the fairy hole
             0x0114, 0x0115, 0x0116, 0x0117, 0x0118, // hotspring water
-            0x8003, 0x807F)]
+            0x8003 // creates jingle
+        )]
         [FlyingVariants(0x44, 0x8044)] // does not exist, for fun placement
         [WaterBottomVariants(0x07F, // exists under a sign in the deku palace
-            0x8077)] // does not exist, used for the bottom of the ocean signs in pinnacle rock (hack)
-        [VariantsWithRoomMax(max: 3, variant: 0x807F, 0x8004)] // one of these when you break it gives a jingle, you found a puzzle, kind of jingle
+            0x77)] // does not exist, used for the bottom of the ocean signs in pinnacle rock (hack)
+        [VariantsWithRoomMax(max: 3, variant: 0x07F, // exists under a sign in the deku palace
+            0x77)]
+        [VariantsWithRoomMax(max: 1, variant: 0xE, // swamp spiderhouse
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106, // road to ikana
+            0x101, 0x100, // cape covering the fairy hole
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118 // hotspring water
+        )] 
+        [VariantsWithRoomMax(max: 0, variant: 0x807F, 0x8004, 0x8002, 0x8003)] // gives a "secret found" jingle
         [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)] // regular unhidden grottos
         [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
