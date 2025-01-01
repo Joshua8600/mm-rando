@@ -1002,6 +1002,10 @@ namespace MMR.Randomizer.GameObjects
             Actor.GaroMaster)] // if spawning in sct partial, can fall through the floor and dissapear but leave their annoying music
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Postbox,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // Flying can block the roof leading to the chest
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.WallTalkSpot,
+            Actor.WoodenBarrel)] // this is also the wooden planks blocking pirates fortress, dyna, block jumping
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HitSpot,
+            Actor.WoodenBarrel)] // this is also the wooden planks blocking pirates fortress, dyna, block jumping
         [ActorizerSceneCreditsActor(Actor.DekuBaba)] // used for blue baba replacement in the intro, we dont want invisible actors there thats lame
         [EnemizerSceneBlockSensitive(Actor.BombersYouChase, -1)] // chicken holder leads to a chest
         [EnemizerSceneBlockSensitive(Actor.BomberHideoutGuard, -1)] // leads to a whole area with like 4 things
