@@ -6550,11 +6550,7 @@ namespace MMR.Randomizer
                 progressReporter.ReportProgress(65, "Reading Enemies ...");
                 ReadEnemies(outputSettings);
 
-
-                progressReporter.ReportProgress(66, "Writing misc hacks...");
-                WriteMiscHacks();
-
-                progressReporter.ReportProgress(67, "Writing cutscenes...");
+                progressReporter.ReportProgress(66, "Writing cutscenes...");
                 WriteCutscenes(messageTable);
 
                 progressReporter.ReportProgress(67, "Writing gimmicks...");
