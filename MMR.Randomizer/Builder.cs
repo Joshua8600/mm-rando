@@ -1269,6 +1269,12 @@ namespace MMR.Randomizer
                 ResourceUtils.ApplyIndexedHack(damageMultiplier-1, Resources.mods.dm_1, Resources.mods.dm_2, Resources.mods.dm_3, Resources.mods.dm_4);
             }
 
+            int deathMode = (int)_randomized.Settings.DeathMode;
+            if (deathMode > 0)
+            {
+                ResourceUtils.ApplyIndexedHack(deathMode - 1, Resources.mods.death_moon_crash, Resources.mods.death_reduces_max_hearts);
+            }
+
             int damageEffect = (int)_randomized.Settings.DamageEffect;
             if (damageEffect > 0)
             {
@@ -1325,11 +1331,6 @@ namespace MMR.Randomizer
             if (_randomized.Settings.ByoAmmo)
             {
                 ResourceUtils.ApplyHack(Resources.mods.byo_ammo);
-            }
-
-            if (_randomized.Settings.DeathMoonCrash)
-            {
-                ResourceUtils.ApplyHack(Resources.mods.death_moon_crash);
             }
 
             if (_randomized.Settings.HookshotAnySurface)
@@ -6434,21 +6435,21 @@ namespace MMR.Randomizer
                 progressReporter.ReportProgress(62, "Writing dungeons...");
                 WriteDungeons();
 
-                progressReporter.ReportProgress(63, "Writing gimmicks...");
-                WriteGimmicks(messageTable);
-
-                progressReporter.ReportProgress(64, "Writing speedups...");
+                progressReporter.ReportProgress(63, "Writing speedups...");
                 WriteSpeedUps(messageTable);
 
-                progressReporter.ReportProgress(65, "Writing enemies...");
+                progressReporter.ReportProgress(64, "Writing enemies...");
                 WriteEnemies();
 
-                progressReporter.ReportProgress(66, "Writing items...");
+                progressReporter.ReportProgress(65, "Writing items...");
                 WriteItems(messageTable);
-                WriteMiscHacks();
 
-                progressReporter.ReportProgress(67, "Writing cutscenes...");
+                progressReporter.ReportProgress(66, "Writing cutscenes...");
                 WriteCutscenes(messageTable);
+
+                progressReporter.ReportProgress(67, "Writing gimmicks...");
+                WriteGimmicks(messageTable);
+                WriteMiscHacks();
 
                 progressReporter.ReportProgress(68, "Writing messages...");
                 WriteGossipQuotes(messageTable);
