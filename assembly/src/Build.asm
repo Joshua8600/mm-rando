@@ -111,6 +111,7 @@
 .include "Thiefbird.Patch.asm"
 .include "WorldColors.Patch.asm"
 .include "ZoraLand.Patch.asm"
+.include "Effects.Patch.asm"
 
 // patching base game for kaleido payload
 .include "Kaleido_Pause.Patch.asm"
