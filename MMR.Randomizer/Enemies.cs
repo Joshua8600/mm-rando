@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 
 // dotnet 4.5 req
 using System.Runtime.CompilerServices;
+using MMR.Randomizer.Models;
 //using MMR.Randomizer.Attributes;
 
 // todo rename this actorutils.cs and move to MMR.Randomizer/Utils/
@@ -165,7 +166,7 @@ namespace MMR.Randomizer
             FreeOnlyCandidateList = freeOnlyCandidates.Select(act => new Actor(act, InjectedActors.Find(i => i.ActorId == (int) act))).ToList();
         }
 
-        private static void PrepareJunkSpiderTokens(List<(string, string)> allSphereItems) // tag: spiderhouse
+        private static void PrepareJunkSpiderTokens(List<ItemLocationPair> allSphereItems) // tag: spiderhouse
         {
             /// TODO this can be simplified, it was more complex before I realized spheres are kinda useless
             List<GameObjects.Item> allSpiderTokens = _randomized.ItemList.FindAll(item => item.Item.ItemCategory() == GameObjects.ItemCategory.SkulltulaTokens).Select(u => u.Item).ToList();
@@ -220,7 +221,7 @@ namespace MMR.Randomizer
                 var swampSkullReward = _randomized.ItemList.Find(item => item.NewLocation == GameObjects.Item.MaskTruth).Item;
                 if (extendedJunkCategories.Contains(swampSkullReward.ItemCategory() ?? GameObjects.ItemCategory.None))
                 {
-                    var swampTokenImportantSearch = allSphereItems.Any(u => u.Item1 == "Swamp Skulltula Spirit");
+                    var swampTokenImportantSearch = allSphereItems.Any(u => u.Item == "Swamp Skulltula Spirit");
                     if (!swampTokenImportantSearch)
                     {
                         AddTokens("Swamp");
@@ -237,7 +238,7 @@ namespace MMR.Randomizer
                     && extendedJunkCategories.Contains(oceanSkullReward3.ItemCategory() ?? GameObjects.ItemCategory.None))
                 {
 
-                    var oceanTokenImportantSearch = allSphereItems.Any(u => u.Item1 == "Ocean Skulltula Spirit");
+                    var oceanTokenImportantSearch = allSphereItems.Any(u => u.Item == "Ocean Skulltula Spirit");
                     if (!oceanTokenImportantSearch)
                     {
                         AddTokens("Ocean");
@@ -250,7 +251,7 @@ namespace MMR.Randomizer
             }
         }
 
-        private static void PrepareJunkStrayFairies(List<(string, string)> allSphereItems) // tag: strayfairy
+        private static void PrepareJunkStrayFairies(List<ItemLocationPair> allSphereItems) // tag: strayfairy
         {
             var allFaires = _randomized.ItemList.FindAll(item => item.Item.ClassicCategory() == GameObjects.ClassicCategory.StrayFairies).Select(u => u.Item).ToList();
 
@@ -292,7 +293,7 @@ namespace MMR.Randomizer
 
                 void AddBasedOnSphere(string testToken, string searchToken)
                 {
-                    var search = allSphereItems.Any(u => u.Item1 == testToken);
+                    var search = allSphereItems.Any(u => u.Item == testToken);
                     // check if any of the fairies are considered important, if they aren't then they are junk 
                     if (!search)
                     {
@@ -319,7 +320,7 @@ namespace MMR.Randomizer
             }
         }
 
-        private static void PrepareJunkNotebookEntries(List<(string, string)> allSphereItems)
+        private static void PrepareJunkNotebookEntries(List<ItemLocationPair> allSphereItems)
         {
             /// Notebook entries are junk IF the settings do not specify getting all notebook is required to beat the seed
 
@@ -355,12 +356,12 @@ namespace MMR.Randomizer
             else // any logic
             {
                 // check if any notebook entries are in the list of important items
-                var notebookEntryImportantSearch = allSphereItems.Any(u => u.Item1.Contains("Notebook:"));
+                var notebookEntryImportantSearch = allSphereItems.Any(u => u.Item.Contains("Notebook:"));
                 if (!notebookEntryImportantSearch)
                 {
                     AddNotebookEntires();
 
-                    var notebookLocationSearch = allSphereItems.Any(u => u.Item2.Contains("Notebook")); // important items BEHIND notebook
+                    var notebookLocationSearch = allSphereItems.Any(u => u.Location.Contains("Notebook")); // important items BEHIND notebook
                     if (!notebookLocationSearch)
                     {
                         ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.MainInventory].Add(GameObjects.Item.ItemNotebook);
@@ -371,7 +372,7 @@ namespace MMR.Randomizer
 
         }
 
-        private static void PrepareKegEntry(List<(string, string)> allSphereItems)
+        private static void PrepareKegEntry(List<ItemLocationPair> allSphereItems)
         {
             //var kegImportantSearch = allSphereItems.Any(u => u.Item1 == "Powder Keg");
             //if (!kegImportantSearch)
@@ -381,14 +382,14 @@ namespace MMR.Randomizer
 
         }
 
-        private static void PrepareJunkScoopList(List<(string, string)> allSphereItems)
+        private static void PrepareJunkScoopList(List<ItemLocationPair> allSphereItems)
         {
             // if the scoops are vanilla they can never be considered junk
             if (_randomized.Settings.LogicMode == Models.LogicMode.Vanilla) return;
             // currently, we cannot discern if scoops are important or not in no logic
             if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic) return;
 
-            var importantBottleItems = allSphereItems.FindAll(item => item.Item1.Contains("Bottle:"));
+            var importantBottleItems = allSphereItems.FindAll(item => item.Item.Contains("Bottle:"));
 
             // get all bottles as items that are not randomized for now we have to assume they are important
             var bottleCatches = _randomized.ItemList
@@ -397,13 +398,17 @@ namespace MMR.Randomizer
             var unrandomizedBottles = bottleCatches.Where(item => !item.IsRandomized).ToList();
             // add that list to importantBottleItems
             foreach (var itemstring in unrandomizedBottles)
-                importantBottleItems.Add(("", itemstring.DisplayName()));
+                importantBottleItems.Add(new ItemLocationPair
+                {
+                    Item = "",
+                    Location = itemstring.DisplayName()
+                });
 
             // scoops are a special case, they dont count as junk items above since they are all in one category handle separatly
             // for all items in list of items that are scoop types
             //   check if each and every one is an important item
             var scoopItems = _randomized.ItemList.FindAll(item => item.Item.ItemCategory() == GameObjects.ItemCategory.ScoopedItems);
-            var unImportantScoopIOs = scoopItems.FindAll(scoop => importantBottleItems.Count(important => important.Item2 == scoop.Item.Name()) == 0);
+            var unImportantScoopIOs = scoopItems.FindAll(scoop => importantBottleItems.Count(important => important.Location == scoop.Item.Name()) == 0);
             List<GameObjects.Item> unimportantScoops = unImportantScoopIOs.Select(itemObj => itemObj.Item).ToList();
 
             ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.ScoopedItems].AddRange(unimportantScoops);
@@ -480,7 +485,7 @@ namespace MMR.Randomizer
                 ActorizerKnownJunkItems.Add(new List<GameObjects.Item>());
             }
 
-            var allSphereItems = new List<(string item, string location)>();
+            var allSphereItems = new List<ItemLocationPair>();
             if (_randomized.Settings.LogicMode == Models.LogicMode.Casual)
             {
                 allSphereItems = _randomized.Spheres.SelectMany(u => u).ToList();
@@ -4276,7 +4281,7 @@ namespace MMR.Randomizer
                 else // logic exists
                 {
                     var allSphereItems = _randomized.Spheres.SelectMany(u => u).ToList();
-                    var stormsSearch = allSphereItems.FindAll(item => item.item == GameObjects.Item.SongStorms.ToString());
+                    var stormsSearch = allSphereItems.FindAll(item => item.Item == GameObjects.Item.SongStorms.Name());
                     if (stormsSearch != null && stormsSearch.Count() > 0)
                     {
                         RemoveObjectKankyo(map, roomFreeActors, " -*- trimming object kankyo because of storms");
