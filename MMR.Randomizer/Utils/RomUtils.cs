@@ -149,6 +149,10 @@ namespace MMR.Randomizer.Utils
         {
             int index = AddrToFile(rAddr);
             CheckCompressed(index);
+            if (RomData.MMFileList[index].IsReadOnly)
+            {
+                throw new Exception($"Cannot write to read-only file {index}");
+            }
             return index;
         }
 
