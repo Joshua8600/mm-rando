@@ -4280,13 +4280,13 @@ namespace MMR.Randomizer
                 }
                 else // logic exists
                 {
-                    var allSphereItems = _randomized.Spheres.SelectMany(u => u).ToList();
-                    var stormsSearch = allSphereItems.FindAll(item => item.Item == GameObjects.Item.SongStorms.Name());
-                    if (stormsSearch != null && stormsSearch.Count() > 0)
-                    {
-                        RemoveObjectKankyo(map, roomFreeActors, " -*- trimming object kankyo because of storms");
+                    //var allSphereItems = _randomized.Spheres.SelectMany(u => u).ToList();
+                    //var stormsSearch = allSphereItems.FindAll(item => item.Item == GameObjects.Item.SongStorms.Name());
+                    //if (stormsSearch != null && stormsSearch.Count() > 0)
+                    //{
+                    //    RemoveObjectKankyo(map, roomFreeActors, " -*- trimming object kankyo because of storms");
 
-                    }
+                    //}
                 }
             }
         }
