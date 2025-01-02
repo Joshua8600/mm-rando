@@ -935,8 +935,21 @@ namespace MMR.Randomizer.GameObjects
         // 4 kill itself it not in the giants chamber
         //[FlyingVariants(3)]
         //[GroundVariants(3)] // 3 is snow
-        [EnemizerScenesPlacementBlock(Scene.PathToMountainVillage, Scene.MountainVillage, Scene.TwinIslands, Scene.GoronVillage, Scene.PathToSnowhead, Scene.Snowhead)] // no point putting them where they can't do anything
+        [EnemizerScenesPlacementBlock(
+            // these areas already have one, no point putting them there
+            Scene.PathToMountainVillage, Scene.MountainVillage, Scene.TwinIslands, Scene.GoronVillage, Scene.PathToSnowhead, Scene.Snowhead,
+            // indoors they dont work without modifications at the scene level
+            Scene.StockPotInn, Scene.TradingPost, Scene.PostOffice, Scene.MayorsResidence,
+            Scene.TreasureChestShop, Scene.TownShootingGallery, Scene.SwampShootingGallery,
+            Scene.TouristCenter, Scene.PotionShop,
+            Scene.GoronShop, Scene.GoronShrine, Scene.GoronGrave,
+            Scene.MarineLab, Scene.ZoraHall, Scene.ZoraHallRooms, Scene.FishermansHut, Scene.PiratesFortressRooms,
+            Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
+            Scene.Grottos,
+            Scene.BeneathTheWell
+        )] 
         [UnkillableAllVariants]
+        [PlacementWeight(15)]
         ObjectKankyo = 0x51, // Object_Kankyo
 
         Empty52 = 0x52,
@@ -4806,13 +4819,13 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(429)]
         [ObjectListIndex(0x1B7)]
-        [RemovalChance(90)] // opinion
+        [RemovalChance(50)] // opinion
         // 0xF80 is the drop table
         [GroundVariants(
             0x0100, // only vanilla param weirdly
             0, 0x0080, 0x0180, 0x0200, 0x0280, 0x0380, 0x0400)]
         [UnkillableAllVariants]
-        [PlacementWeight(100)]
+        [PlacementWeight(20)]
         SnowCoveredTrees = 0x1D4, // En_Snowwd // tag: snowtree
 
         // I suspect since he has so few vars that he will be hard coded, and req decomp to fix
@@ -4970,7 +4983,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.PathToMountainVillage)]
         [BlockingVariantsAll]
-        [PlacementWeight(100)]
+        [PlacementWeight(25)]
         LargeSnowball = 0x1DC, // Obj_Snowball
 
         [FileID(438)]
@@ -5054,6 +5067,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0xFF00, 0xFF01, 0, 1)]
         [DifficultVariants(1, 0xF001)]
         [VariantsWithRoomMax(max: 1, variant: 1, 0xF001)] // limit the bigger one
+        [PlacementWeight(90)]
         Eeno = 0x1E6, // En_Snowman
 
         // gold skull bonk detector
@@ -5287,7 +5301,7 @@ namespace MMR.Randomizer.GameObjects
         )]
         //[SwitchFlagsPlacement()] // does not appear to have switch flags
         [UnkillableAllVariants]
-        [PlacementWeight(100)]
+        [PlacementWeight(25)]
         SmallSnowball = 0x1F9, // Obj_Snowball2
 
         [FileID(466)]

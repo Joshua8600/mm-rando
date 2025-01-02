@@ -6530,7 +6530,7 @@ namespace MMR.Randomizer
             progressReporter.ReportProgress(72, "Writing cosmetics...");
             WriteTatlColour(new Random(BitConverter.ToInt32(hash, 0)));
             //WriteTunicColor();
-            MakeItRain();
+            //MakeItRain(); 
             WriteInstruments(new Random(BitConverter.ToInt32(hash, 0)));
 
             progressReporter.ReportProgress(73, "Writing music...");
