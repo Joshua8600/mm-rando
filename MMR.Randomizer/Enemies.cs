@@ -6660,6 +6660,7 @@ namespace MMR.Randomizer
                                 // thankfully, this updating end isn't actually necessary it seems, we can leave this vanilla
                                 //RomData.MMFileList[newFID].End = RomData.MMFileList[newFID].Addr + newBinLen;
                                 RomData.MMFileList[newFID].WasEdited = true;
+                                RomData.MMFileList[newFID].IsReadOnly = true;
                                 // injectedActor.overlayBin = overlayData; // we dont save bin if its a previous file
                             }
 
