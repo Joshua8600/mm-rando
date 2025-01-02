@@ -935,8 +935,21 @@ namespace MMR.Randomizer.GameObjects
         // 4 kill itself it not in the giants chamber
         //[FlyingVariants(3)]
         //[GroundVariants(3)] // 3 is snow
-        [EnemizerScenesPlacementBlock(Scene.PathToMountainVillage, Scene.MountainVillage, Scene.TwinIslands, Scene.GoronVillage, Scene.PathToSnowhead, Scene.Snowhead)] // no point putting them where they can't do anything
+        [EnemizerScenesPlacementBlock(
+            // these areas already have one, no point putting them there
+            Scene.PathToMountainVillage, Scene.MountainVillage, Scene.TwinIslands, Scene.GoronVillage, Scene.PathToSnowhead, Scene.Snowhead,
+            // indoors they dont work without modifications at the scene level
+            Scene.StockPotInn, Scene.TradingPost, Scene.PostOffice, Scene.MayorsResidence,
+            Scene.TreasureChestShop, Scene.TownShootingGallery, Scene.SwampShootingGallery,
+            Scene.TouristCenter, Scene.PotionShop,
+            Scene.GoronShop, Scene.GoronShrine, Scene.GoronGrave,
+            Scene.MarineLab, Scene.ZoraHall, Scene.ZoraHallRooms, Scene.FishermansHut, Scene.PiratesFortressRooms,
+            Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
+            Scene.Grottos,
+            Scene.BeneathTheWell
+        )] 
         [UnkillableAllVariants]
+        [PlacementWeight(15)]
         ObjectKankyo = 0x51, // Object_Kankyo
 
         Empty52 = 0x52,
@@ -1743,11 +1756,20 @@ namespace MMR.Randomizer.GameObjects
             0x0102, 0x103, 0x104, 0x105, 0x106, // road to ikana
             0x101, 0x100, // cape covering the fairy hole
             0x0114, 0x0115, 0x0116, 0x0117, 0x0118, // hotspring water
-            0x8003, 0x807F)]
+            0x8003 // creates jingle
+        )]
         [FlyingVariants(0x44, 0x8044)] // does not exist, for fun placement
         [WaterBottomVariants(0x07F, // exists under a sign in the deku palace
-            0x8077)] // does not exist, used for the bottom of the ocean signs in pinnacle rock (hack)
-        [VariantsWithRoomMax(max: 3, variant: 0x807F, 0x8004)] // one of these when you break it gives a jingle, you found a puzzle, kind of jingle
+            0x77)] // does not exist, used for the bottom of the ocean signs in pinnacle rock (hack)
+        [VariantsWithRoomMax(max: 3, variant: 0x07F, // exists under a sign in the deku palace
+            0x77)]
+        [VariantsWithRoomMax(max: 1, variant: 0xE, // swamp spiderhouse
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106, // road to ikana
+            0x101, 0x100, // cape covering the fairy hole
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118 // hotspring water
+        )] 
+        [VariantsWithRoomMax(max: 0, variant: 0x807F, 0x8004, 0x8002, 0x8003)] // gives a "secret found" jingle
         [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)] // regular unhidden grottos
         [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
@@ -1896,6 +1918,8 @@ namespace MMR.Randomizer.GameObjects
         // this is the cutscene version, the one that is most likely to break
         // in some testing it just dissapears, but can it break?
         [VariantsWithRoomMax(max: 0, variant: 0)]
+        [VariantsWithRoomMax(max: 2, variant: 0,
+            1, 2, 3, 0x10, 0x11, 0x12, 0x13)]
         [AlignedCompanionActor(Cow, CompanionAlignment.InFront, ourVariant: -1)]
         //[VariantsWithRoomMax(max: 0, variant: 1,2,3)] // testing
         [UnkillableAllVariants]
@@ -4776,11 +4800,11 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(
             0x191E)] // below well
         [PerchingVariants(0x2034, 0x3EFE)] // non-vanilla variants so they can show up on perchest
-        [VariantsWithRoomMax(max: 3, variant: 0x1932, 0x3FFF)]
+        [VariantsWithRoomMax(max: 3, variant: 0x1932, 0x3FFF, 0x191E)]
         [VariantsWithRoomMax(max: 0, variant: 0x3FA8)] // do not place water variant because dont hav a water wall type yet, which is what this really is, putting in water floats in the water column
         [ForbidFromScene(Scene.StoneTowerTemple)]
         [EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.GoronRacetrack)]
-        [PlacementWeight(85)]
+        [PlacementWeight(80)]
         Dexihand = 0x1D1, // En_WdHand : ???'s water logged brother
 
         [FileID(427)]
@@ -4795,13 +4819,13 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(429)]
         [ObjectListIndex(0x1B7)]
-        [RemovalChance(90)] // opinion
+        [RemovalChance(50)] // opinion
         // 0xF80 is the drop table
         [GroundVariants(
             0x0100, // only vanilla param weirdly
             0, 0x0080, 0x0180, 0x0200, 0x0280, 0x0380, 0x0400)]
         [UnkillableAllVariants]
-        [PlacementWeight(100)]
+        [PlacementWeight(20)]
         SnowCoveredTrees = 0x1D4, // En_Snowwd // tag: snowtree
 
         // I suspect since he has so few vars that he will be hard coded, and req decomp to fix
@@ -4959,7 +4983,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.PathToMountainVillage)]
         [BlockingVariantsAll]
-        [PlacementWeight(100)]
+        [PlacementWeight(25)]
         LargeSnowball = 0x1DC, // Obj_Snowball
 
         [FileID(438)]
@@ -5043,6 +5067,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0xFF00, 0xFF01, 0, 1)]
         [DifficultVariants(1, 0xF001)]
         [VariantsWithRoomMax(max: 1, variant: 1, 0xF001)] // limit the bigger one
+        [PlacementWeight(90)]
         Eeno = 0x1E6, // En_Snowman
 
         // gold skull bonk detector
@@ -5276,7 +5301,7 @@ namespace MMR.Randomizer.GameObjects
         )]
         //[SwitchFlagsPlacement()] // does not appear to have switch flags
         [UnkillableAllVariants]
-        [PlacementWeight(100)]
+        [PlacementWeight(25)]
         SmallSnowball = 0x1F9, // Obj_Snowball2
 
         [FileID(466)]

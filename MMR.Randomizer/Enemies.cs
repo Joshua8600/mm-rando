@@ -87,6 +87,7 @@ namespace MMR.Randomizer
         private static Models.RandomizedResult _randomized;
         private static OutputSettings _outputSettings;
         private static CosmeticSettings _cosmeticSettings;
+        private static StringBuilder _syncedLog;
 
         // these have to be separate from Actor Enum for now beacuse they are for special objects, not regular types
         static int[] clayPotDungeonVariants = {
@@ -1009,15 +1010,16 @@ namespace MMR.Randomizer
             DistinguishLogicRequiredDekuFlowers();
             //DisableActorSpawnCutsceneData();
 
+            AddGrottoVariety();
             ExtendGrottoDirectIndexByte();
+            FixJPGrottos();
+
             ShortenChickenPatience();
             //FixSeth2();
             AllowGuruGuruOutside();
             RemoveSTTUnusedPoe();
             FixSilverIshi();
             FixBabaAndDragonflyShadows();
-            AddGrottoVariety();
-            ChangeHotwaterGrottoDekuBabaIntoSomethingElse(rng);
             FixCuccoChicks();
             FixWoodfallTempleGekkoMiniboss();
             //FixStreamSfxVolume();
@@ -1025,7 +1027,6 @@ namespace MMR.Randomizer
             ExpandGoronShineObjects();
             RandomlySwapOutZoraBandMember();
             ExpandGoronRaceObjects();
-            SplitSpiderGrottoSkulltulaObject();
             SplitOceanSpiderhouseSpiderObject();
             FixDekuPalaceReceptionGuards();
             FixBomberKidsGameFinishWarp();
@@ -1033,7 +1034,6 @@ namespace MMR.Randomizer
             FixInjuredKoume();
             RandomizePinnacleRockSigns();
             RandomizeDekuPalaceBombiwaSigns();
-            RandomizeGrottoGossipStonesPerGrotto();
             SwapGreatFairies(rng);
             ModifyFireflyKeeseForPerching();
             SplitPirateSewerMines();
@@ -1586,11 +1586,6 @@ namespace MMR.Randomizer
                 ActorUtils.SetActorSpawnTimeFlags(newJpGrotto);
                 newJpGrotto.Position = new vec16(1873, 1, 711);
 
-                // grotto entrance list is extra, lets add some
-                var sickEntrances = new List<ushort>() {
-                    0x5050, 0xAE50, 0xC410, 0xC800, 0xD2A0, 0xBC40,
-                    0xC050, 0x2290, 0x22A0, 0x22B0, 0x0C60, 0x10, 0x2C10, 0x3440, 0x54B0
-                };
                 var doorAnaData = RomData.MMFileList[GameObjects.Actor.GrottoHole.FileListIndex()].Data;
                 var firstPullLocation = seedrng.Next(sickEntrances.Count);
                 var entrance1 = sickEntrances[firstPullLocation];
@@ -1598,6 +1593,8 @@ namespace MMR.Randomizer
                 var entrance2 = sickEntrances[seedrng.Next(sickEntrances.Count)];
                 ReadWriteUtils.Arr_WriteU16(doorAnaData, 0x60A, entrance1); // E
                 ReadWriteUtils.Arr_WriteU16(doorAnaData, 0x60C, entrance2); // F
+                _syncedLog.AppendLine($"grotto list added address 1: [{entrance1.ToString("X4")}]");
+                _syncedLog.AppendLine($"grotto list added address 2: [{entrance2.ToString("X4")}]");
 
                 if (seedrng.Next() % 10 >= 5)
                 {
@@ -2406,17 +2403,90 @@ namespace MMR.Randomizer
 
         private static void ExtendGrottoDirectIndexByte()
         {
-            /// in MM the top nibble of the grotto variable is never used, 
+            /// in MM the top nibble of the grotto variable is never used (0xF000)
             /// but in the vanilla code it be detected and used as a grotto warp index of the static grottos entrances array (-1)
-            /// MM normally uses the z rotation instead to index warp, but we can use either or
+            ///  MM normally uses the z rotation instead to index warp, but we can use either or
             /// however, only the 3 lower bits of this nibble are used, the code ANDS with 7
             /// why? the fourth bit isn't ever used by any grotto, and looking at the code shows it is never used
             /// so here, we set the ANDI 7 to F instead, allowing us extended access to the entrance array
-            /// TODO and by 0xF800 and shift less to get more range, requires re-writting all
+            // TODO and by 0xF800 and shift less to get more range, requires re-writting all variants in actor list
             var grotholeFID = GameObjects.Actor.GrottoHole.FileListIndex();
             RomUtils.CheckCompressed(grotholeFID);
             RomData.MMFileList[grotholeFID].Data[0x2FF] = 0xF; // ANDI 0x7 -> ANDI 0xF
         }
+
+        // grotto entrance list is extra, lets add some
+        private static List<ushort> sickEntrances = new List<ushort>() {
+            0x0010, // infont of mayor
+            0x0C60, // clear swamp
+            0x22A0, 0x22B0, // pirates fortress
+            0x2C10, // clock tower roof
+            0x3400, 0x3440, // ikana castle
+            0x3C00, 0x3000, 0x2600, 0x2A00,  // dungeons
+            0x9000, // WELL
+            0x5050, // deku palace (the boring years)
+            0x54B0, // termina field
+            0xAE50, // (spring) mountain village
+            0xBC40, // stockpot inn
+            0xBE00, // gbt?
+            0xC050, // clock tower interior
+            0xC410, // lost woods
+            0xC800, // clock tower
+            0xD2A0, // east clock town
+        };
+
+
+        private static void FixJPGrottos()
+        {
+            /// JP grottos are unused, but we can summon them for actorizer
+            /// however, they have unique exists in the grotto scene exit table that always return to deku palace
+            ///   we can change the table to make some of the exists generic exists
+
+            // exit table starts at 234, 0:0xFFFF, 1:lens grotto
+            // vanilla vines grotto is   50A0 <- (lower:1480) <=> (upper: 14F0) -> 5060
+            // vanilla straight grotto is   5080 <- (brighter"A":1460) <=> (darker"B": 14E0) -> 5070
+
+            var grottoScene = RomData.MMFileList[GameObjects.Scene.Grottos.FileID()].Data;
+            ReadWriteUtils.Arr_WriteU16(grottoScene, 0x23C, 0xFFFF); // replace vines lower with generic exit
+
+            // straight grotto: I want the player to enter from A side because its brighter and looks better
+            // but B exit is boring compared to A exit, so I want to swap the B exit to exit to old A exit
+            ReadWriteUtils.Arr_WriteU16(grottoScene, 0x238, 0xFFFF); // replace straight A with generic exit
+            ReadWriteUtils.Arr_WriteU16(grottoScene, 0x23A, 0x5080); // replace straight B with old straight A exit
+
+            // lets change one of the JP entrances at random to some other place
+            var randomGrottoExitAddress = (seedrng.Next(2) == 1) ? (0x23A) : (0x23E); // the two exits in the grotto scene exit list
+            var randomSickEntrance = sickEntrances[seedrng.Next(sickEntrances.Count())];
+            sickEntrances.Remove(randomSickEntrance);
+            _syncedLog.AppendLine($"randomized jp_grotto exit address: [{randomSickEntrance.ToString("X4")}]");
+
+            ReadWriteUtils.Arr_WriteU16(grottoScene, randomGrottoExitAddress, randomSickEntrance);
+
+            var grottosScene = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.Grottos);
+
+            // straight jp grotto has only one object, padding of scene data means there is space for an object right behind it that we can use
+            //  we can use the second object to give this area a chest by taking one of the useless mushrooms and changing it
+            // expand object list to have both of our new objects, change dekubaba to dodongo to increase likelyhood of killable
+            grottosScene.Maps[6].Objects = new List<int> { GameObjects.Actor.Peahat.ObjectIndex(),
+                                                           GameObjects.Actor.TreasureChest.ObjectIndex() };
+            // we have to tell the room to load the extra object though
+            var straightJPGrottoRoomFile = RomData.MMFileList[GameObjects.Scene.Grottos.FileID() + 7];
+            straightJPGrottoRoomFile.Data[0x29] = 0x2; // setting object header object count from 1 to 2
+            // change dekubaba to peahat so its killable to get the new chest
+            grottosScene.Maps[6].Actors[2].ChangeActor(GameObjects.Actor.Peahat, vars: 0, modifyOld: true);
+            grottosScene.Maps[6].Actors[2].OldName = grottosScene.Maps[6].Actors[2].Name = "JpGrottoEnemy";
+
+            var newChestActor = grottosScene.Maps[6].Actors[7];
+            // chest params: should be invisible until you kill the enemy, should not collide with any other chest flags in the scene, item: dont know
+            // flag 1D, type 7, item 6D (unknown)
+            newChestActor.ChangeActor(GameObjects.Actor.TreasureChest, 0x26ED, modifyOld: true);
+            newChestActor.Position = new vec16(-230, 0, 1130); // move into the grass area
+            newChestActor.Rotation.y = ActorUtils.MergeRotationAndFlags(90, grottosScene.Maps[6].Actors[7].Rotation.y); // rotate to face the center
+            // turn the other useless mushroom into another buterfly for ambiance
+            grottosScene.Maps[6].Actors[8].ChangeActor(GameObjects.Actor.Butterfly, 0x5324, modifyOld: true);
+            grottosScene.Maps[6].Actors[8].Position.y = 58; // dont want spawning in the ground, we want flying around
+        }
+
 
         private static void EnablePoFusenAnywhere()
         {
@@ -2597,7 +2667,7 @@ namespace MMR.Randomizer
 
             foreach (var aId in listOfSignIds)
             {
-                pinnacleSceneActors[aId].ChangeActor(GameObjects.Actor.Bombiwa, vars: 0x8077, true);
+                pinnacleSceneActors[aId].ChangeActor(GameObjects.Actor.Bombiwa, vars: 0x77, true);
                 pinnacleSceneActors[aId].OldName = "WaypointSign"; // so the log doesnt say they are bombiwa, rename here
             }
         }
@@ -3270,6 +3340,10 @@ namespace MMR.Randomizer
             /// turns out the grottos have unused objects, some of them can be swapped
             ///   without affecting the original enemy placement, and gives us some variety
 
+            SplitSpiderGrottoSkulltulaObject();
+            ChangeHotwaterGrottoDekuBabaIntoSomethingElse(seedrng);
+            RandomizeGrottoGossipStonesPerGrotto();
+
             var grottosScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
 
             // dodongo grotto has a useless blue icicle object. switch to Bo object so we can get Bo actors from jp grotto
@@ -3293,27 +3367,7 @@ namespace MMR.Randomizer
             //newPeahat.Position = new vec16(5010, -20, 600); // move over near peahat one
             newPeahat.Position = new vec16(5010, -20, 600); // move over near peahat one
 
-            // straight jp grotto has only one object, padding of scene data means there is space for an object right behind it that we can use
-            //  we can use the second object to give this area a chest by taking one of the useless mushrooms and changing it
-            // expand object list to have both of our new objects, change dekubaba to dodongo to increase likelyhood of killable
-            grottosScene.Maps[6].Objects = new List<int> { GameObjects.Actor.Peahat.ObjectIndex(),
-                                                           GameObjects.Actor.TreasureChest.ObjectIndex() };
-            // change dekubaba to dodongo so its killable to get the new chest
-            grottosScene.Maps[6].Actors[2].ChangeActor(GameObjects.Actor.Peahat, vars: 0, modifyOld: true);
-            grottosScene.Maps[6].Actors[2].OldName = grottosScene.Maps[6].Actors[2].Name = "JpGrottoEnemy";
-            // we have to tell the room to load the extra object though
-            var straightJPGrottoRoomFile = RomData.MMFileList[GameObjects.Scene.Grottos.FileID() + 7];
-            straightJPGrottoRoomFile.Data[0x29] = 0x2; // setting object header object count from 1 to 2
-
-            var newChestActor = grottosScene.Maps[6].Actors[7];
-            // chest params: should be invisible until you kill the enemy, should not collide with any other chest flags in the scene, item: dont know
-            // flag 1D, type 7, item 6D (unknown)
-            newChestActor.ChangeActor(GameObjects.Actor.TreasureChest, 0x26ED, modifyOld: true);
-            newChestActor.Position = new vec16(-230, 0, 1130); // move into the grass area
-            newChestActor.Rotation.y = ActorUtils.MergeRotationAndFlags(90, grottosScene.Maps[6].Actors[7].Rotation.y); // rotate to face the center
-            // turn the other useless mushroom into another buterfly for ambiance
-            grottosScene.Maps[6].Actors[8].ChangeActor(GameObjects.Actor.Butterfly, 0x5324, modifyOld: true);
-            grottosScene.Maps[6].Actors[8].Position.y = 58; // dont want spawning in the ground, we want flying around
+            
 
             // biobaba grotto has a worthless dekubaba object, lets swap it for the ice block object so we can freeze the water
             grottosScene.Maps[11].Objects[3] = 0x1E7; // iceflowe
@@ -3444,8 +3498,6 @@ namespace MMR.Randomizer
                 {
                     actor.ChangeActor(GameObjects.Actor.SkulltulaDummy, 0, modifyOld: true);
                     actor.OldName = actor.Name = "HangingMine";
-                    // ceiling type should handle this by default now
-                    //actor.Position.y -= 30; // touching the ceiling, lets drop a bit
                 }
             }
 
@@ -3976,6 +4028,8 @@ namespace MMR.Randomizer
 
         public static void SetupGrottoActor(Actor enemy, int newVariant)
         {
+            // todo is this a duplicate of the other function I just wrote?
+
             /// Grottos can get their address index from an array, where the index can be their Z rotation.
             ///   so we re-encoded variants to hold the data we want, check out the actor enum entry for more info
             ///   the lower two bytes are used to set the chest, but we have a chest grotto with upper byte index, so reuse for rotation here
@@ -6973,6 +7027,7 @@ namespace MMR.Randomizer
             _randomized = randomized;
             _outputSettings = outputSettings;
             _cosmeticSettings = cosmeticSettings;
+            _syncedLog = new StringBuilder();
 
             PrepareEnemyLists();
             PrepareJunkItems();
@@ -7045,6 +7100,7 @@ namespace MMR.Randomizer
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
+                    sw.Write(_syncedLog.ToString());
                     sw.Write("Enemizer version: Isghj's Actorizer Test 81.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
