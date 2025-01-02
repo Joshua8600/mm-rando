@@ -1905,6 +1905,8 @@ namespace MMR.Randomizer.GameObjects
         // this is the cutscene version, the one that is most likely to break
         // in some testing it just dissapears, but can it break?
         [VariantsWithRoomMax(max: 0, variant: 0)]
+        [VariantsWithRoomMax(max: 2, variant: 0,
+            1, 2, 3, 0x10, 0x11, 0x12, 0x13)]
         [AlignedCompanionActor(Cow, CompanionAlignment.InFront, ourVariant: -1)]
         //[VariantsWithRoomMax(max: 0, variant: 1,2,3)] // testing
         [UnkillableAllVariants]
