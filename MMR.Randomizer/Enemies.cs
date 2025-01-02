@@ -6985,9 +6985,6 @@ namespace MMR.Randomizer
             SceneUtils.GetActors();
 
             EnemizerEarlyFixes(seedrng); // before we randomize ; moved up
-
-            ScanForMMRA(directory: "actors");
-            InjectNewActors();
         }
 
         public static void ShuffleEnemies()
@@ -6995,6 +6992,9 @@ namespace MMR.Randomizer
             try
             {
                 DateTime enemizerStartTime = DateTime.Now;
+
+                ScanForMMRA(directory: "actors");
+                InjectNewActors();
 
                 // for dingus that want moonwarp, re-enable dekupalace
                 var SceneSkip = new GameObjects.Scene[] { //};
