@@ -6213,7 +6213,10 @@ namespace MMR.Randomizer
             ReadWriteUtils.Arr_WriteU32(bootFile, 0x2EBC, 0x10000022); // branch all the way down to the function exit
 
             // todo: figure out if we can make the screenshots say they are screen shots at the top
-            // todo: can we add a symbol to the screen if autoscroll is turned on
+
+            // change the "THREAD" at the first page to CRASH for visual indicator to the players, the value behind it is still the thread number
+            var newCrashLabel = Encoding.ASCII.GetBytes("CRASH: "); // replaces "THREAD:"
+            ReadWriteUtils.Arr_Insert(newCrashLabel, 0, newCrashLabel.Length, bootFile, 0x0185D4);
         }
 
         private void WriteStartupStrings()
