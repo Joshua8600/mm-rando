@@ -4800,11 +4800,11 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(
             0x191E)] // below well
         [PerchingVariants(0x2034, 0x3EFE)] // non-vanilla variants so they can show up on perchest
-        [VariantsWithRoomMax(max: 3, variant: 0x1932, 0x3FFF)]
+        [VariantsWithRoomMax(max: 3, variant: 0x1932, 0x3FFF, 0x191E)]
         [VariantsWithRoomMax(max: 0, variant: 0x3FA8)] // do not place water variant because dont hav a water wall type yet, which is what this really is, putting in water floats in the water column
         [ForbidFromScene(Scene.StoneTowerTemple)]
         [EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.GoronRacetrack)]
-        [PlacementWeight(85)]
+        [PlacementWeight(80)]
         Dexihand = 0x1D1, // En_WdHand : ???'s water logged brother
 
         [FileID(427)]
