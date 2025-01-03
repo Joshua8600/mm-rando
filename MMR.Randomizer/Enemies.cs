@@ -515,6 +515,7 @@ namespace MMR.Randomizer
             return ReplacementCandidateList.Find(act => act.ActorEnum == actor) != null;
         }
 
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ReplacementListRemove(List<Actor> replaceList, GameObjects.Actor actor)
         {
@@ -2384,7 +2385,7 @@ namespace MMR.Randomizer
         {
             /// if tingle can be randomized, he can end up on any flying enemy in scenes that don't already have a tingle
             /// some of these scenes would drop him into water or off the cliff where he cannot be reached
-            if (!ReplacementListContains(GameObjects.Actor.Tingle)) return;
+            if ( ! ReplacementListContains(GameObjects.Actor.Tingle)) return;
 
             var woodfallexteriorScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Woodfall.FileID());
             var firstDragonfly = woodfallexteriorScene.Maps[0].Actors[4];
@@ -2529,8 +2530,6 @@ namespace MMR.Randomizer
             /// Cuccos take too many hits before they get mad, let's shrink this
             /// niw health is `rand(0-9.9) + 10.0` (10-20 hits), lets replace with 0-2 + 1
 
-            if (!ReplacementListContains(GameObjects.Actor.FriendlyCucco)) return;
-
             RomUtils.CheckCompressed(GameObjects.Actor.FriendlyCucco.FileListIndex());
             var niwData = RomData.MMFileList[GameObjects.Actor.FriendlyCucco.FileListIndex()].Data;
             // both of these changes made in EnNiw_Init
@@ -2557,7 +2556,7 @@ namespace MMR.Randomizer
         {
             /// seth 2, the guy waving his arms in the termina field telescope, like oot spiderhouse
             /// his init code checks for a value, and does not spawn if the value is different than expected
-            if (!ReplacementListContains(GameObjects.Actor.Seth2)) return;
+            if ( ! ReplacementListContains(GameObjects.Actor.Seth2)) return;
 
             var sethFid = GameObjects.Actor.Seth2.FileListIndex();
             RomUtils.CheckCompressed(sethFid);
@@ -2597,7 +2596,7 @@ namespace MMR.Randomizer
             /// however there is a (as far as I can tell) unused object in this scene we can swap
             /// object_dns which is the object used by the dancing deku guards in the king's chamber
             /// nothing seems to use their object in the regular palace scene, no idea why the object is there
-            if (!ReplacementListContains(GameObjects.Actor.DekuPatrolGuard)) return;
+            if (! VanillaEnemyList.Contains(GameObjects.Actor.DekuPatrolGuard)) return;
 
             var frontGuardOID = GameObjects.Actor.DekuPatrolGuard.ObjectIndex();
             var dekuPalaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DekuPalace.FileID());
@@ -2629,13 +2628,15 @@ namespace MMR.Randomizer
             // sometimes uses the other entrance calculation where it gets it from the exit list
             // lets just jump past that
             ReadWriteUtils.Arr_WriteU32(bombjimbData, 0x1E28, 0x10000016); // BNEZ BREQ -> J to L80C02D24
-
         }
 
         private static void ModifyAllGraveyardBatsToFly() {
             /// some graveyard bats are wall types, and MMR enemizer still gets confused by multiple types,
             /// so we want to swap all of them to flying type
-            if (!ReplacementListContains(GameObjects.Actor.Dampe)) return;
+            
+            // TODO this is stil busted, I sometimes find perching and wall types in the air
+
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.Dampe)) return;
 
             // single flying bat, visible
             var newVariant = 0x0101;
@@ -2649,7 +2650,7 @@ namespace MMR.Randomizer
         private static void FixInjuredKoume()
         {
             /// Injured koume in the woods of mystery, her code checks if she is in the woods of mystery and self culls
-            if (!ReplacementListContains(GameObjects.Actor.InjuredKoume)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.InjuredKoume)) return;
 
             var koumeFID = GameObjects.Actor.InjuredKoume.FileListIndex();
             RomUtils.CheckCompressed(koumeFID);
@@ -2683,7 +2684,7 @@ namespace MMR.Randomizer
             /// In deku palace, there are signs pointing you to the left and right across lilipads, on top of bombiwa
             /// leaving the signs while randomizing the bombiwa would be weird, so I am going to move the signs and turn them into bombiwa to add immersion
 
-            if (!ReplacementListContains(GameObjects.Actor.Bombiwa)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.Bombiwa)) return;
 
             var dekuPalaceActors = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DekuPalace.FileID()).Maps[0].Actors;
 
@@ -2822,7 +2823,7 @@ namespace MMR.Randomizer
             /// and then randomize three of the gossip stones to something new and random
             /// should be doable without breaking the gossip stone quest
 
-            if (!ReplacementListContains(GameObjects.Actor.GossipStone)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.GossipStone)) return;
 
             var grottosScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
 
@@ -3165,7 +3166,7 @@ namespace MMR.Randomizer
 
             // except I now use a custom mmra actor to replace this so that they match water height, this now hits the wrong spot
 
-            if (!ReplacementListContains(GameObjects.Actor.En_Stream)) return;
+            //if (!ReplacementListContains(GameObjects.Actor.En_Stream)) return;
 
             var streamFid = GameObjects.Actor.En_Stream.FileListIndex();
             RomUtils.CheckCompressed(streamFid);
@@ -3225,7 +3226,7 @@ namespace MMR.Randomizer
         {
             /// guruguru's actor spawns or kills itself based on time flags, ignoring that the spawn points themselves have timeflags
             /// if we want guruguru to be placed in the world without being restricted to day/night only (which is lame) we have to stop this
-            if (!ReplacementListContains(GameObjects.Actor.GuruGuru)) return;
+            if ( ! ReplacementListContains(GameObjects.Actor.GuruGuru)) return;
 
             var guruFid = GameObjects.Actor.GuruGuru.FileListIndex();
             RomUtils.CheckCompressed(guruFid);
@@ -3288,7 +3289,7 @@ namespace MMR.Randomizer
             ReadWriteUtils.Arr_WriteU32(dragonflyData, Dest: 0x2498, val: 0x10000018); // <irrelevant code> -> Jump to 24E4
             */
 
-            if (!ReplacementListContains(GameObjects.Actor.BabaIsUnused)) return;
+            if ( ! ReplacementListContains(GameObjects.Actor.BabaIsUnused)) return;
 
             var babaFid = GameObjects.Actor.BabaIsUnused.FileListIndex();
             RomUtils.CheckCompressed(babaFid);
@@ -3385,7 +3386,7 @@ namespace MMR.Randomizer
             ///   and for some reason it crashes if there isnt one there at all, unknown reason
             /// except both rooms use the same 5 objects, and object list is padded to word length
             ///   so there is a space object space in the list we can use, we can add a second goron object which we leave alone
-            if (!ReplacementListContains(GameObjects.Actor.GoronSGoro)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.GoronSGoro)) return;
 
             var goronShrine = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GoronShrine.FileID());
             goronShrine.Maps[0].Objects = new List<int> {
@@ -3411,7 +3412,7 @@ namespace MMR.Randomizer
             /// except, all band member objects are present all the time even though they only show up outside for the concert
             /// so randomly choose one to turn into a duplicate zora object, so we can change one and leave the other for door zora
             ///   since most rando players dont care about the concert anyway, and wouldnt even notice one member missing
-            if (!ReplacementListContains(GameObjects.Actor.RegularZora)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.RegularZora)) return;
 
             // 2:japas, 3:evan, 5:tijo, can't remove lulu or the concert is completely broken? meh
             var replacableBandObj = new int[] { 2, 3, 5, 4 };
@@ -3431,7 +3432,7 @@ namespace MMR.Randomizer
             /// we cannot randomize any goron in the racetrack because they all use the same object
             ///   this breaks the race because the racegorons cannot load their assets if their object is missing
             /// except the one room uses 7 objects, odd number, and objects are padded in the room files to dma, so we can add one more
-            if (!ReplacementListContains(GameObjects.Actor.GoGoron)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.GoGoron)) return;
 
             var goronRace = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GoronRacetrack.FileID());
             goronRace.Maps[0].Objects.Add(GameObjects.Actor.GoGoron.ObjectIndex()); // add a second Generic Goron
@@ -3452,7 +3453,7 @@ namespace MMR.Randomizer
             /// this scene room has 3 objects, one is dekubaba, wasted
             /// in order to split the actor, however, I have to change the actor to something else and give it a different object
 
-            if (!ReplacementListContains(GameObjects.Actor.Skulltula)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.Skulltula)) return;
 
             var grottoScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
             var spiderRoom = grottoScene.Maps[1];
@@ -3469,7 +3470,7 @@ namespace MMR.Randomizer
             /// we cannot randomize one without the other because they both use the same object
             /// except... if we change the actor and object out for dummy, we can trick rando to allow us to change them
 
-            if (!ReplacementListContains(GameObjects.Actor.Skulltula)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.Skulltula)) return;
 
             var grottoScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.OceanSpiderHouse.FileID());
             var spiderChestRoom = grottoScene.Maps[4];
@@ -3579,7 +3580,7 @@ namespace MMR.Randomizer
 
         private static void FixEvanRotation()
         {
-            if (!ReplacementListContains(GameObjects.Actor.Evan)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.Evan)) return;
 
             // if evan is randomized, then his replacement is staring at the wall
             var zorahallRoomsScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraHallRooms.FileID());
@@ -3598,7 +3599,7 @@ namespace MMR.Randomizer
         {
             /// randomizing monkeys can be annoying, needs finangaling
 
-            if (!ReplacementListContains(GameObjects.Actor.Monkey)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.Monkey)) return;
 
             // we normally cannot randomize just the song monkey in the deku king chamber scene
             // because the object is needed for multiple monkeys
@@ -3669,7 +3670,7 @@ namespace MMR.Randomizer
             /// however the pots just need a regular pot object, its a small scene with space for one, and the object list has 7 objects
             ///   which means we can expand the list and add another pot object
 
-            if (!ReplacementListContains(GameObjects.Actor.ClayPot)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.ClayPot)) return;
 
             var swordSchoolScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SwordsmansSchool.FileID());
             swordSchoolScene.Maps[0].Objects.Add(GameObjects.Actor.ClayPot.ObjectIndex()); // add clay pot object
@@ -3686,7 +3687,7 @@ namespace MMR.Randomizer
             /// so we take the snapper object in the same room and replace it with another large snowball object, we're free
 
             // if small snowball is randomized
-            if (!ReplacementListContains(GameObjects.Actor.SmallSnowball)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.SmallSnowball)) return;
 
             var roadToMountainVillageScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.PathToMountainVillage.FileID());
 
@@ -3875,7 +3876,7 @@ namespace MMR.Randomizer
             /// for actorizer, seth is a very visible part of the intro and we want to randomize
             ///  but we do not want to randomize the actual seth in sct because he hints the rewards for the spiderhouse, which is kinda important
 
-            if (!ReplacementListContains(GameObjects.Actor.Seth1)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.Seth1)) return;
 
             var sctScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthClockTown.FileID());
             var introSeth = sctScene.Maps[3].Actors[2];
@@ -3890,7 +3891,7 @@ namespace MMR.Randomizer
         {
             /// for intro cutscene its nice to see weird actors, but blue kids are often required to stick around
 
-            if (!ReplacementListContains(GameObjects.Actor.BombersYouChase)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.BombersYouChase)) return;
 
             var ectScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.EastClockTown.FileID());
             for(int i = 26; i < 26+5; i++) // for all bombers kid in ect, lucky they are sequential
@@ -3906,7 +3907,7 @@ namespace MMR.Randomizer
 
         private static void SwapIntroLinkTheGoroAndAnju()
         {
-            if (!ReplacementListContains(GameObjects.Actor.Anju)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.Anju)) return;
 
             var stockpotInnScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.StockPotInn.FileID());
             var linkTheGoro = stockpotInnScene.Maps[5].Actors[16]; // map 0 setup 1
@@ -3956,7 +3957,7 @@ namespace MMR.Randomizer
             /// cremia in the credits is in the ranch, and the ranch cremia randomization is tied to actual checks
             /// we want to swap the cremia actor in the credits for variety, we have to change the actor and object to not confuse actorizer with the regular cremias
 
-            if (!ReplacementListContains(GameObjects.Actor.Cremia)) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.Cremia)) return;
 
             var ranchScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.RomaniRanch.FileID());
             var creditsCremia = ranchScene.Maps[2].Actors[11];
@@ -4940,7 +4941,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
-                if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
@@ -7115,7 +7116,7 @@ namespace MMR.Randomizer
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
                     sw.Write(_syncedLog.ToString());
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 82.0\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 82.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
