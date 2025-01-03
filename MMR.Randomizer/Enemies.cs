@@ -1330,8 +1330,6 @@ namespace MMR.Randomizer
 
                 AddCoastFlavor();
 
-
-
                 // in spring there are two torches on top of each other, which is weird, move the other one to face the first one
                 //var mountainVillageSpring = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillageSpring.FileID());
                 //var secondTorch = mountainVillageSpring.Maps[0].Actors[13];
@@ -1340,6 +1338,7 @@ namespace MMR.Randomizer
 
             }
         }
+
 
         private static void RotateTalkSpotsAndHitSpots()
         {
@@ -1950,6 +1949,20 @@ namespace MMR.Randomizer
 
         }
 
+        private static void RotateSignActors()
+        {
+            var milkroadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkRoad.FileID()); ;
+            var milkroadPointedSign = milkroadScene.Maps[0].Actors[21];
+            if (milkroadPointedSign.ActorEnum != GameObjects.Actor.PointedSign)
+            {
+                // vanilla angle faces the wall, which is especially bad if its a grotto it locks the player by facing them into wall they fall back in
+                milkroadPointedSign.ChangeYRotation(180 - 15);
+            }
+            SceneUtils.UpdateScene(milkroadScene);
+
+        }
+
+
         public static void MoveActorsIfRandomized()
         {
 
@@ -2057,14 +2070,9 @@ namespace MMR.Randomizer
                 }
                 SceneUtils.UpdateScene(ikanaGraveyardScene);
 
-                var milkroadScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkRoad.FileID()); ;
-                var milkroadPointedSign = milkroadScene.Maps[0].Actors[21];
-                if (milkroadPointedSign.ActorEnum != GameObjects.Actor.PointedSign)
-                {
-                    // vanilla angle faces the wall, which is especially bad if its a grotto it locks the player by facing them into wall they fall back in
-                    milkroadPointedSign.ChangeYRotation(180 - 15);
-                }
-                SceneUtils.UpdateScene(milkroadScene);
+                
+
+                RotateSignActors();
 
                 // both gorman and postman start behind the door if they are randomized, which puts then out of sight and if likelike can grab you through the door
                 var milkbarScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkBar.FileID());
@@ -4925,13 +4933,14 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.KendoSensei)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.RedBubble)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.SquareSign, GameObjects.Actor.IronKnuckle)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
-                if (TestHardSetObject(GameObjects.Scene.SecretShrine, GameObjects.Actor.TallGrass, GameObjects.Actor.Snapper)) continue;
+                if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
@@ -6834,12 +6843,14 @@ namespace MMR.Randomizer
             ///  we just move the new larger files to the end and leave a hole behind for now
 
             // TODO can we _detect_ this value by looking at rando is already doing?
-            const uint theEndOfTakenVRAM = 0x80C27000; // 0x80C260A0 <- actual
+            // 0x80C260A0 <- known last vanilla vram value
+            const uint theEndOfTakenVRAM = 0x80D00000; // changed to make it visually obvious this is a new actor
             // can't even remember why I raised it
             //const uint theEndOfTakenVRAM = 0x80CA0000; // TODO change back to lower
             //const int theEndOfTakenVROM = 0x03100000; // 0x02EE7XXX <- actual
             // maybe if I set it longer away I can skip the extra samples getting corrupted, probably not
-            const int theEndOfTakenVROM = 0x03400000; // 0x02EE7XXX <- actual
+            //const int theEndOfTakenVROM = 0x03400000; // stable, was used for like 30 actorizer versions
+            const int theEndOfTakenVROM = 0x05000000; // stable, was used for like 30 actorizer versions
             // WARNING: 0x03880000 is above us, which is Rebbacus's overlay file that was moved, we need to keep that in mind
 
             int actorOvlTblFID = RomUtils.GetFileIndexForWriting(Constants.Addresses.ActorOverlayTable);

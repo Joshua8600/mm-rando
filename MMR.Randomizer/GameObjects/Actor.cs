@@ -3149,12 +3149,13 @@ namespace MMR.Randomizer.GameObjects
 
         // wont spawn if you place him outside of his observatory, needs modification
         // the astral observatory viewer
-        //[ActorizerEnabled] // TODO randomize this only if casual logic too lazy to do that tonight tho
+        [ActorizerEnabled] // TODO randomize this only if casual logic too lazy to do that tonight tho
         [FileID(264)]
         [ObjectListIndex(0xDE)]
         [CheckRestricted(Item.TradeItemMoonTear, Item.HeartPieceTerminaBusinessScrub, Item.CollectableTerminaFieldTelescopeGuay1)]
         [GroundVariants(0xFFFF)]
-        [VariantsWithRoomMax(max: 0, variant: 0xFFFF)]
+        [VariantsWithRoomMax(max: 0, variant: 0xFFFF)] // cannot place, hard coded wont spawn
+        [RemovalChance(40)]
         [UnkillableAllVariants]
         Shikashi = 0x124, // En_Bji_01
 
