@@ -113,11 +113,11 @@
 .definelabel Math_ApproachF, 0x800FFDF8
 .definelabel Math_ApproachZeroF, 0x800FFE68
 .definelabel z2_Math_SmoothStepToS, 0x800FFEBC
-.definelabel Effect_GetPlayState, 0x800af710
+.definelabel z2_Effect_GetPlayState, 0x800af710
 .definelabel z2_Lib_SegmentedToVirtual, 0x80100504
 .definelabel z2_WriteHeartColors, 0x8010069C
 .definelabel z2_LifeMeter_IsCritical, 0x80101930
-.definelabel LightContext_RemoveLight, 0x80102684
+.definelabel z2_LightContext_RemoveLight, 0x80102684
 .definelabel z2_Gfx_DrawTexRectIA8, 0x8010CD98
 .definelabel z2_8010CFBC, 0x8010CFBC
 .definelabel z2_8010D480, 0x8010D480
