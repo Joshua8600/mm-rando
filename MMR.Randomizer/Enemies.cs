@@ -1047,6 +1047,7 @@ namespace MMR.Randomizer
             SplitSceneSnowballIntoTwoActorObjects();
             RearangeSecretShrineObjects();
             RandomizeGreatbayCoastSurfaceTypes();
+            IncreaseWoodsOfMysteryVariety();
 
             EnableAllCreditsCutScenes();
 
@@ -2763,6 +2764,45 @@ namespace MMR.Randomizer
                 greatbayCoast.Maps[0].Objects[4] = randomMikauMaskReplacement.ObjectId; // cutscene mask object
             }
         }
+
+        private static void IncreaseWoodsOfMysteryVariety()
+        {
+            /// there is an extra object slot in each room, we can add a new object for more variety
+
+            var woodsOfMysteryScene = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.WoodsOfMystery);
+
+            // randomly select a new object
+            var possibleCandidateObjects = ReplacementCandidateList.FindAll(act => act.GetGroundVariants().Count > 0 || act.GetFlyingVariants().Count > 0);
+            // TODO remove banned objects from the scene
+            var randomCandidate = possibleCandidateObjects[seedrng.Next(possibleCandidateObjects.Count)];
+            _syncedLog.AppendLine($"++ [{woodsOfMysteryScene.ToString()}] new extra object is for [{randomCandidate.Name}]");
+            var randomObject = randomCandidate.ObjectId;
+
+
+            // expand the list for every room
+            for (var roomId = 0; roomId < 9; roomId++)
+            {
+                // add object to the object list for the room
+                var thisRoomMap = woodsOfMysteryScene.Maps[roomId];
+                thisRoomMap.Objects.Append(randomObject);
+
+                // specify to the room object header that the object list is larger and load the extra object
+                var roomFileId = GameObjects.Scene.WoodsOfMystery.FileID() + roomId;
+                var roomData = RomData.MMFileList[roomFileId].Data;
+                // search the headers for the objectlist, change the byte for the value
+                for(int headerOffset = 0; headerOffset < 0x300; headerOffset += 0x8)
+                {
+                    if (roomData[0] == 0x14) throw new Exception("this woods of mystery room was supposed to have an object list");
+
+                    if (roomData[0] == 0xB) // object list found
+                    {
+                        roomData[1]++; // increaese the count of the objects in the object list to be loaded into  memory
+                    }
+                }
+            }
+
+        }
+
 
 
         private static List<(GameObjects.Actor actor, ushort vars)> shallowWaterReplacements = new List<(GameObjects.Actor actor, ushort vars)>
@@ -5906,6 +5946,7 @@ namespace MMR.Randomizer
             // for now there should only be some chance of this happening in case the object budget is too close to call
             //if (thisSceneData.RNG.Next() % 10 > 2) // nvm seems fine
             {
+                // this is archaic, and should be replaced with the candidate replacement list randomized for type
                 List<int> freeObjList = new List<int>
                 {
                     GameObjects.Actor.ClayPot.ObjectIndex(), // flying clay pot for enemizer, actual clay pots for actorizer
