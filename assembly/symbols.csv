@@ -21,6 +21,7 @@
 0x800A7730,z2_fixed_drop_spawn
 0x800A7AD4,z2_rupee_drop_spawn
 0x800A7D28,z2_random_drop_spawn
+0x800af710,Effect_GetPlayState
 0x800B16B8,z2_EffectSsKiraKira_SpawnSmall
 0x800B26A8,z2_EffectSsHitmark_SpawnCustomScale
 0x800B320C,z2_EffectSsIceSmoke_Spawn
@@ -114,6 +115,7 @@
 0x80100504,z2_Lib_SegmentedToVirtual
 0x8010069C,z2_WriteHeartColors
 0x80101930,z2_LifeMeter_IsCritical
+0x80102684,LightContext_RemoveLight
 0x8010CD98,z2_Gfx_DrawTexRectIA8
 0x8010CFBC,z2_8010CFBC
 0x8010D480,z2_8010D480
