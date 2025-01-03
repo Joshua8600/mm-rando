@@ -116,8 +116,7 @@ namespace MMR.Randomizer
 
         public static void PrepareEnemyLists()
         {
-
-            // list of slots to use
+            // list of actor slots to use
             VanillaEnemyList = Enum.GetValues(typeof(GameObjects.Actor)).Cast<GameObjects.Actor>()
                             .Where(act => act.ObjectIndex() > 3
                                 && (act.IsEnemyRandomized() || (ACTORSENABLED && act.IsActorRandomized()))) // both
@@ -126,8 +125,7 @@ namespace MMR.Randomizer
             /* var EnemiesOnly = Enum.GetValues(typeof(GameObjects.Actor)).Cast<GameObjects.Actor>()
                             .Where(act => act.ObjectIndex() > 3
                                 && (act.IsEnemyRandomized()))
-                            .ToList();
-            //*/
+                            .ToList(); //*/
 
             // special request for enemizer: do not randomize bigocto
             if ( ! ACTORSENABLED)
@@ -138,7 +136,7 @@ namespace MMR.Randomizer
             // list of replacement actors we can use to replace with
             // for now they are the same, in the future players will control how they load
             ReplacementCandidateList = new List<Actor>();
-            //foreach (var actor in EnemiesOnly)
+            //foreach (var actor in EnemiesOnly) // for use with enemies only
             foreach (var actor in VanillaEnemyList)
             {
                 if (actor.NoPlacableVariants() == false)
@@ -6102,6 +6100,8 @@ namespace MMR.Randomizer
             WriteOutput("time to read scene enemies: " + GET_TIME(thisSceneData.StartTime) + "ms");
 
             thisSceneData.Objects = GetSceneEnemyObjects(thisSceneData);
+            if (thisSceneData.Objects.Count == 0)
+                return;
             //var sceneObjectLimit = SceneUtils.GetSceneObjectBankSize(scene.SceneEnum); // er, this isnt used here anymore, why did intelesense not tell me?
             WriteOutput(" time to read scene objects: " + GET_TIME(thisSceneData.StartTime) + "ms");
 
@@ -6392,7 +6392,7 @@ namespace MMR.Randomizer
             WriteOutput($" time to complete randomizing [{scene.SceneEnum}]: " + GET_TIME(thisSceneData.StartTime) + "ms");
             WriteOutput($" ending timestamp : [{DateTime.Now.ToString("hh:mm:ss.fff tt")}]");
             FlushLog();
-        }
+        } // SwapSceneEnemies
 
         #region Actor Injection
 
@@ -7058,7 +7058,6 @@ namespace MMR.Randomizer
 
                 // for dingus that want moonwarp, re-enable dekupalace
                 var SceneSkip = new GameObjects.Scene[] { //};
-                    //GameObjects.Scene.GiantsChamber,
                     GameObjects.Scene.SakonsHideout // issue: the whole gaunlet is one long room, with two clear enemy room puzles
                     };// , GameObjects.Scene.DekuPalace };
 
