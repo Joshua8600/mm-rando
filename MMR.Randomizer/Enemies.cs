@@ -4259,6 +4259,7 @@ namespace MMR.Randomizer
                 foreach (var objKankyo in objectKankyoSearch)
                 {
                     var blockedActors = thisSceneData.Scene.SceneEnum.GetBlockedReplacementActors(objKankyo.OldActorEnum);
+                    blockedActors.Add(objKankyo.ActorEnum);
                     List<Actor> acceptableReplacementFreeActors = roomFreeActors.FindAll(a => !blockedActors.Contains(a.ActorEnum)).ToList();
 
                     EmptyOrFreeActor(thisSceneData, objKankyo, map.Actors, acceptableReplacementFreeActors,
@@ -4306,6 +4307,9 @@ namespace MMR.Randomizer
                     RemoveObjectKankyo(map, roomFreeActors, " -*- trimming object kankyo because of rare double object");
                     
                 }
+
+                // used for rain detection if we re-enable rain in TF, but for now its disabled due to lag
+                /*
                 var sceneEnum = thisSceneData.Scene.SceneEnum;
                 if (sceneEnum == GameObjects.Scene.TerminaField // rain scenes, just disable the actors spawn on day 2 and you're fine
                  || sceneEnum == GameObjects.Scene.DekuPalace
@@ -4334,14 +4338,14 @@ namespace MMR.Randomizer
                 }
                 else // logic exists
                 {
-                    //var allSphereItems = _randomized.Spheres.SelectMany(u => u).ToList();
-                    //var stormsSearch = allSphereItems.FindAll(item => item.Item == GameObjects.Item.SongStorms.Name());
-                    //if (stormsSearch != null && stormsSearch.Count() > 0)
-                    //{
-                    //    RemoveObjectKankyo(map, roomFreeActors, " -*- trimming object kankyo because of storms");
+                    var allSphereItems = _randomized.Spheres.SelectMany(u => u).ToList();
+                    var stormsSearch = allSphereItems.FindAll(item => item.Item == GameObjects.Item.SongStorms.Name());
+                    if (stormsSearch != null && stormsSearch.Count() > 0)
+                    {
+                        RemoveObjectKankyo(map, roomFreeActors, " -*- trimming object kankyo because of storms");
 
-                    //}
-                }
+                    }
+                } // */
             }
         }
 
@@ -7101,7 +7105,7 @@ namespace MMR.Randomizer
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
                     sw.Write(_syncedLog.ToString());
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 81.0\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 82.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

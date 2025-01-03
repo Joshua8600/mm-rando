@@ -624,6 +624,15 @@ namespace MMR.Randomizer.Models.Settings
         [SettingTab(SettingTabAttribute.Type.Gimmicks)]
         public bool ByoAmmo { get; set; }
 
+        /// (jan2025)HOTFIX this was put back after zoey removed it switching to a different way to keep track of moon crash
+        /// 
+        /// <summary>
+        /// Dying causes the moon to crash, with all that that implies.
+        /// </summary>
+        [Description("Dying causes the moon to crash, with all that that implies.")]
+        [SettingTab(SettingTabAttribute.Type.Gimmicks)]
+        public bool DeathMoonCrash { get; set; }
+
         [Description("If the moon crashes, your save files will be erased.")]
         [SettingTab(SettingTabAttribute.Type.Gimmicks)]
         public bool MoonCrashErasesFile

@@ -946,7 +946,13 @@ namespace MMR.Randomizer.GameObjects
             Scene.MarineLab, Scene.ZoraHall, Scene.ZoraHallRooms, Scene.FishermansHut, Scene.PiratesFortressRooms,
             Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
             Scene.Grottos,
-            Scene.BeneathTheWell
+            Scene.BeneathTheWell,
+
+            Scene.TerminaField, // these scenes either dont work withotu rain fix or require rain as a logical reason to sprout bean
+            Scene.DekuPalace,
+            Scene.RomaniRanch,
+            Scene.GreatBayCoast,
+            Scene.DoggyRacetrack
         )] 
         [UnkillableAllVariants]
         [PlacementWeight(15)]
