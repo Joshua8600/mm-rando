@@ -239,6 +239,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1205)]
         [SceneInternalId(0x1A)]
+        [ActorizerSceneCreditsActor(Actor.ButlersSon)]
         BeforeThePortalToTermina = 0x17,
 
         [FileID(1208)]
