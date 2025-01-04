@@ -143,7 +143,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1520)]
         [SceneInternalId(0x08)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HappyMaskSalesman,
-            Actor.ClayPot, Actor.SmallWoodenBox, // falls off camera
+            Actor.ImposterFrog, Actor.ClayPot, Actor.SmallWoodenBox, // falls off camera
             Actor.IkanaGravestone // crashes on n64 because there is no floor below it to matrix rotate to
         )]
         SPOT00 = 0x0E, // cutscene map
@@ -152,9 +152,10 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1165)]
         [SceneInternalId(0x13)]
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
-            Actor.IronKnuckle // getting a weird rsp/rdp crash when moving from maps 0->4 or 0->2, not convinced this is the culprit can't debug further
-        )]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
+        //    Actor.IronKnuckle // getting a weird rsp/rdp crash when moving from maps 0->4 or 0->2, not convinced this is the culprit can't debug further
+        //   // think this is a result of object list mangling, I changed kafei which affects iron knuckle object offset
+        //)]
         IkanaCanyon = 0x10,
 
         [FileID(1171)]
@@ -179,14 +180,11 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1173)]
         [SceneInternalId(0x15)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.GuruGuru,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
-        [EnemizerSceneEnemyReplacementBlock(Actor.Gorman,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
-        [EnemizerSceneEnemyReplacementBlock(Actor.HoneyAndDarling,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
-        [EnemizerSceneEnemyReplacementBlock(Actor.Gorman,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
+        [ActorizerSceneCreditsActor(room: 1, Actor.RosaSisters, Actor.GateSoldier)] // guruguru mask
+        [ActorizerSceneCreditsActor(room: 2, Actor.Tijo, Actor.Japas, Actor.Evan, Actor.Gorman, Actor.CarpentersFromCutscene, Actor.RegularZora)] // 
+        [ActorizerSceneCreditsActor(room: 3, Actor.Tijo, Actor.Japas, Actor.Evan, Actor.Gorman, Actor.Toto, Actor.HoneyAndDarling, Actor.RosaSisters)] // 
+        [ActorizerSceneCreditsActor(room: 4, Actor.GuruGuru, Actor.RegularZora, Actor.CarpentersFromCutscene, Actor.SoldierMoonLeaveCutscene,
+            Actor.GaboraBlacksmith, Actor.Zubora)] // breman mask
         MilkBar = 0x12,
 
         [FileID(1175)]
@@ -197,11 +195,13 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RealBombchu,
         //    Actor.WarpDoor)]
         [EnemizerSceneBlockSensitive(Actor.RealBombchu, -1)] // chicken holder leads to a chest
-        [EnemizerSceneBlockSensitive(Actor.SpikedMine, -1)] // the underwater spiked mines surrounded a switch
+        [EnemizerSceneBlockSensitive(Actor.SpikedMine, -1)] // the underwater spiked mines surrounded a switch in east room
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Beamos,
             Actor.IkanaGravestone, Actor.Bumper, Actor.En_Ani)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SpikedMine,
+            Actor.Desbreko)] // lag
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CeilingSpawner,
-            Actor.Shabom)] // get's stuck in the ceiling where you cannot kill them
+            Actor.Shabom)] // get's stuck in the ceiling where you cannot kill them, TODO is this still true after ceiling to flying was dropped?
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DragonFly,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block the breakable floor under them
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Hiploop,
@@ -470,19 +470,30 @@ namespace MMR.Randomizer.GameObjects
             Actor.RegularIceBlock, // I dont want to block on all of them, but the big one is a problem for peahat grotto
             Actor.LikeLike)] // can grab you on grotto exit and softlock with only one heart, TODO make special code instead moving them?
         // these actors are only seen in the credits, we should block all large object actors from these spots to save generation time
+        // also ban pots, I want pots to have a higher chance to show up in regular TF not only in the credits
+        [ActorizerSceneCreditsActor(room: 7, Actor.HappyMaskSalesman)] // skullkid dialogue
+        // this is not actual credits music worthy, but invisible actors are still boring here
+        [ActorizerSceneCreditsActor(room: 8, Actor.SoldierMoonLeaveCutscene, Actor.CarpentersFromCutscene,
+            Actor.ViscenMoonLeaveCutscene, Actor. MutoMoonLeaveCutscene)] // moon leaves
+        [ActorizerSceneCreditsActor(room: 9, Actor.CuriosityShopMan, Actor.AnjuWeddingDress, Actor.Cremia, Actor.AnjuMotherWedding, Actor.AnjusGrandmaCredits, Actor.ViscenMoonLeaveCutscene, Actor.PostMan, Actor.MutoMoonLeaveCutscene, Actor.Tingle)] // wedding and postman running are both in this setup
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ViscenMoonLeaveCutscene,
-            Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+            Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.MutoMoonLeaveCutscene,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.AnjusGrandmaCredits,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.AnjuMotherWedding,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.AnjuWeddingDress,
+                        Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CuriosityShopMan,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CarpentersFromCutscene,
-                        Actor.HappyMaskSalesman, Actor.IronKnuckle, Actor.CutsceneZelda, Actor.ClayPot, Actor.RomaniYts, Actor.GoronElder)]
-        //*/
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SoldierMoonLeaveCutscene,
+                        Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PostMan,
+                        Actor.ClayPot, Actor.GoronElder)]
         TerminaField = 0x2A, // keikoku, c800 dyna size
 
         [FileID(1312)]
@@ -536,10 +547,7 @@ namespace MMR.Randomizer.GameObjects
         // we know nothing here, TODO recheck
         // 234, 162 was fine holy shit
         [DynaHeadroom(235, 200)]
-        [EnemizerSceneEnemyReplacementBlock(Actor.Cremia,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
-        [EnemizerSceneEnemyReplacementBlock(Actor.LargeWoodenCrate,
-            Actor.IronKnuckle, Actor.GuruGuru, Actor.RomaniYts, Actor.CutsceneZelda, Actor.Japas, Actor.Tijo, Actor.Evan)] // singing/audio actors can break credits
+        [ActorizerSceneCreditsActor(room:2, Actor.Cremia, Actor.LargeWoodenCrate)]
         RomaniRanch = 0x32, // F01, 0xF000 dyna size
 
         [FileID(1328)]
@@ -646,6 +654,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1351)]
         [SceneInternalId(0x42)]
         [ClearEnemyPuzzleRooms(0, 1)] // respawning enemies can break chick round-up
+        // flower pot is too far from the camera, right?
+        [ActorizerSceneCreditsActor(room: 1, Actor.Grog, Actor.FriendlyCucco, Actor.Treee)]
         CuccoShack = 0x3F,
 
         [FileID(1353)]
@@ -702,7 +712,8 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.Hiploop, // respawning bo can show up here, but I dont want to mark the whole room to not place respawning enemies
                                                            //Actor.Peahat, // big ground type blocks the bridge at night, can't separate the big one and the small ones
             Actor.BabaIsUnused, // blocks the bridges
-            Actor.Grog // still blocks the bridges
+            Actor.BedroomPostman,
+            Actor.Grog
             /* Actor.Wolfos */ )] // wolfos:iceblock
         [EnemizerSceneBlockSensitive(Actor.Hiploop, -1)]
         [EnemizerSceneBlockSensitive(Actor.ClayPot, -1)]
@@ -719,12 +730,15 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1369)]
         [SceneInternalId(0x49)]
         // 8 biobabas in the ceiling caused crash in room 8, at 10x8 and we went over by 7, so 72 should be safe
-        [DynaHeadroom(68, 68)]
+        //[DynaHeadroom(68, 68)]
+        // soaring from a deeper, into entrance, into first room can crash with only 30? think room calculations are in order
+        [DynaHeadroom(20, 20)]
         //3: clear the biobabas, 5 is gekko, 8 is wart
         [ClearEnemyPuzzleRooms(3, 5, 7)]
         [EnemizerSceneEnemyReplacementBlock(Actor.Skulltula,
             Actor.BigPoe)] // for some reason big poe in the first room can cause camera to lock, unknown reason
         [EnemizerSceneEnemyReplacementBlock(Actor.Dexihand,
+            Actor.Keese, Actor.BadBat, // weird
             Actor.WoodenBarrel, // the wall version is the pirates fortress planks, can block the pots
             Actor.Bumper)] // can block the water channel
         [EnemizerSceneEnemyReplacementBlock(Actor.SkullFish,
@@ -747,6 +761,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1403)]
         [SceneInternalId(0x4C)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.Evan,
+            Actor.HookshotWallAndPillar, Actor.LargeWoodenCrate, Actor.WoodenBarrel, Actor.TallGrass)] // boring
         ZoraHallRooms = 0x49,
 
         [FileID(1409)]
@@ -821,6 +837,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1444)]
         [SceneInternalId(0x59)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HookshotWallAndPillar,
+            Actor.WoodfallTempleWoodenFlower)] // can block the chests ABOVE IT on the terrace
         InvertedStoneTower = 0x56, // NOT TEMPLE
 
         [FileID(1446)]
@@ -872,6 +890,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Shabom)] // report of them not spawning or falling out of bounds and softlock
         [EnemizerSceneEnemyReplacementBlock(Actor.Wart,
             Actor.Hiploop)] // instant kill on water
+        [EnemizerSceneEnemyReplacementBlock(Actor.GaroMaster,
+            Actor.Hiploop)] // instant kill on water
         SecretShrine = 0x5D,
 
         [FileID(1466)]
@@ -886,6 +906,9 @@ namespace MMR.Randomizer.GameObjects
         )]
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Anju,
         //    Actor.AnjusGrandma, Actor.AnjusGrandmaCredits)] // this this was just cutscenes, not the same bug
+        [ActorizerSceneCreditsActor(Actor.DekuBaba)] // used for anju replacement in the intro, we dont want invisible actors there thats lame
+        [ActorizerSceneCreditsActor(Actor.Bombiwa)] // used for goro-link replacement in the intro, we dont want invisible actors there thats lame
+        [ActorizerSceneCreditsActor(room:5, Actor.RosaSisters)]
         [EnemizerSceneBlockSensitive(Actor.Gorman, -1)]
         [EnemizerSceneBlockSensitive(Actor.MushroomCloud, -1)] // specifically the one in the lavatory
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.RosaSisters,
@@ -905,6 +928,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1477)]
         [SceneInternalId(0x64)]
+        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper,
+        //    Actor.WoodfallTempleWoodenFlower)] // can block the whole thing
         WoodsOfMystery = 0x61,
 
         [FileID(1487)]
@@ -979,6 +1004,11 @@ namespace MMR.Randomizer.GameObjects
             Actor.GaroMaster)] // if spawning in sct partial, can fall through the floor and dissapear but leave their annoying music
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Postbox,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // Flying can block the roof leading to the chest
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.WallTalkSpot,
+            Actor.WoodenBarrel)] // this is also the wooden planks blocking pirates fortress, dyna, block jumping
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HitSpot,
+            Actor.WoodenBarrel)] // this is also the wooden planks blocking pirates fortress, dyna, block jumping
+        [ActorizerSceneCreditsActor(Actor.DekuBaba)] // used for blue baba replacement in the intro, we dont want invisible actors there thats lame
         [EnemizerSceneBlockSensitive(Actor.BombersYouChase, -1)] // chicken holder leads to a chest
         [EnemizerSceneBlockSensitive(Actor.BomberHideoutGuard, -1)] // leads to a whole area with like 4 things
         EastClockTown = 0x69, // ect
@@ -993,6 +1023,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.LikeLike)] // If you start with one heart this can be a softlock
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BombersYouChase,
             Actor.UnusedStoneTowerStoneElevator)]//, Actor.UnusedStoneTowerPlatform)]
+        [ActorizerSceneCreditsActor(Actor.CreditsBombShopMan, Actor.BombShopLady)]
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         WestClockTown = 0x6A, // wct
 
@@ -1028,6 +1059,8 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
             Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.RegularIceBlock,
             Actor.Bombiwa, Actor.LargeSnowball)] // can block climbing the ramp to the tower
+        [ActorizerSceneCreditsActor(room: 3, Actor.Carpenter, Actor.Dog, Actor.GateSoldier, Actor.Postbox, Actor.BuisnessScrub,
+                                            Actor.DekuBaba)] // used for seth replacement in the intro, we dont want invisible actors there thats lame
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]
         [EnemizerSceneBlockSensitive(Actor.Kafei, -1)]
         SouthClockTown = 0x6C,

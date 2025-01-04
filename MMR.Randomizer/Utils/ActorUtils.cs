@@ -48,7 +48,8 @@ namespace MMR.Randomizer.Utils
             // if we want to know the file ID of an actor, we need to look up the VROM addr from the overlay table
             // and match against a file in DMA, because nintendo removed the FID from the overlay table
             // all actors should have their FID coded in the enum now, this is depreciated but left as backup
-            return RomUtils.GetFIDFromVROM(GetOvlActorVROMStart(actorID));
+            //return RomUtils.GetFIDFromVROM(GetOvlActorVROMStart(actorID));
+            throw new System.Exception("lol where is my code");
         }
 
         public static int GetOvlActorVROMStart(int actorOvlTblIndex)

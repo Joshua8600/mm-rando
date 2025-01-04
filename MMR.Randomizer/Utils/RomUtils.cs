@@ -35,7 +35,7 @@ namespace MMR.Randomizer.Utils
             #if DEBUG
             string settingstring = $"{setting} + DEBUG BUILD\x00";
             #else
-            string settingstring = $"{setting} + Isghj's Actorizer Test 79.3\x00";
+            string settingstring = $"{setting} + Isghj's Actorizer Test 82.1\x00";
             #endif
             int f = GetFileIndexForWriting(veraddr);
             var file = RomData.MMFileList[f];
@@ -149,6 +149,10 @@ namespace MMR.Randomizer.Utils
         {
             int index = AddrToFile(rAddr);
             CheckCompressed(index);
+            if (RomData.MMFileList[index].IsReadOnly)
+            {
+                throw new Exception($"Cannot write to read-only file {index}");
+            }
             return index;
         }
 
@@ -322,8 +326,17 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-        public static byte[] BuildROM(OutputSettings settings)
+        public static byte[] BuildROM(OutputSettings settings, GameplaySettings settings2)
         {
+
+            // I want to move this AFTER vrom updates so I can see where the ACTUAL vrom to work with is
+            // currently tho, its broken, 
+            if (settings2.RandomizeEnemies)
+            {
+                Enemies.UpdateActorOverlayTable(); // last second before rom generation
+            }
+
+
             SetFilesToRemainDecompressed(settings);
 
             CompressMMFiles();
@@ -362,10 +375,15 @@ namespace MMR.Randomizer.Utils
 
                 ReadWriteUtils.Arr_Insert(RomData.MMFileList[i].Data, 0, fileLength, ROM, ROMAddr);
                 ROMAddr += fileLength;
+                if ((ROMAddr & 0xF) != 0)
+                {
+                    ROMAddr = (ROMAddr | 0xF) + 1;
+                }
             }
 
             // should this be moved up now that I split up the file updated values?
             SequenceUtils.UpdateBankInstrumentPointers(ROM);
+
 
             UpdateDMAFileTable(ROM);
             SignROM(ROM);
@@ -445,6 +463,7 @@ namespace MMR.Randomizer.Utils
 
         public static void ReadFileTable(BinaryReader ROM)
         {
+            int dmaId = 0;
             RomData.MMFileList = new List<MMFile>();
             ROM.BaseStream.Seek(FILE_TABLE, SeekOrigin.Begin);
             while (true)
@@ -461,7 +480,11 @@ namespace MMR.Randomizer.Utils
                 {
                     break;
                 }
-                RomData.MMFileList.Add(Current_File);
+                if (dmaId < 0x0603)
+                { 
+                    RomData.MMFileList.Add(Current_File);
+                }
+                dmaId += 1;
             }
             ExtractAll(ROM);
         }
