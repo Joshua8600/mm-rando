@@ -1044,6 +1044,7 @@ namespace MMR.Randomizer
             SwapIntroActors();
             SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
+            MoveCreditsPostmanPath();
             SplitSceneSnowballIntoTwoActorObjects();
             RearangeSecretShrineObjects();
             RandomizeGreatbayCoastSurfaceTypes();
@@ -4005,6 +4006,35 @@ namespace MMR.Randomizer
 
             // and change the object in just that map to match
             ranchScene.Maps[2].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
+        }
+
+        private static void MoveCreditsPostmanPath()
+        {
+            /// credits postman ignores his own path and does his own thing
+            /// our replacement actor will use the path that exists, but its way over in leever land where we never see it    
+
+            // postman is actually walking through the credits
+            //var terminafFieldCreditsRoom = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TerminaField.FileID()).Maps[9];
+            var terminaFiledCreditsRoomData = RomData.MMFileList[GameObjects.Scene.TerminaField.FileID()].Data;
+
+            List<(short x, short y, short z)> path = new List<(short x, short y, short z)>{
+                (2866,  52, -252),
+                (2558,  50,  308),
+                (2387,  14,  622),
+                (2153, -34, 1024),
+            };
+
+            // according to decomp, this path is in the scene file, where it's defined by the layer not room, at location 0x01B0F4
+            var pathOffset = 0x1B0F4;
+            // path point 1
+            for(int i = 0; i < path.Count; i++)
+            {
+                var pathPointLoc = pathOffset + 6 * (i);
+                var pathPoint = path[i];
+                ReadWriteUtils.Arr_WriteU16(terminaFiledCreditsRoomData, pathPointLoc + 0, (ushort) pathPoint.x);
+                ReadWriteUtils.Arr_WriteU16(terminaFiledCreditsRoomData, pathPointLoc + 4, (ushort) pathPoint.y);
+                ReadWriteUtils.Arr_WriteU16(terminaFiledCreditsRoomData, pathPointLoc + 8, (ushort) pathPoint.z);
+            }
         }
 
 
