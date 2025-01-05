@@ -342,7 +342,8 @@ namespace MMR.Randomizer
                     var category = reward.ItemCategory() ?? GameObjects.ItemCategory.None;
                     if ( ! ActorizerKnownJunkCategories.Contains(category))
                     {
-                        // we dont need to add the entries themselves they are already added to the junk list per-category, this is just for notebook itself
+                        // we dont need to add the entries themselves they are already added to the junk list per-category
+                        //   this is just for notebook itself
                         nonJunkCount++;
                     }
                 }
@@ -360,7 +361,7 @@ namespace MMR.Randomizer
                 {
                     AddNotebookEntires();
 
-                    var notebookLocationSearch = allSphereItems.Any(u => u.Location.Contains("Notebook")); // important items BEHIND notebook
+                    var notebookLocationSearch = allSphereItems.Any(u => u.Item.Contains("Notebook")); // important items BEHIND notebook
                     if (!notebookLocationSearch)
                     {
                         ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.MainInventory].Add(GameObjects.Item.ItemNotebook);
