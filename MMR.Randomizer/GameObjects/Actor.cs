@@ -3440,6 +3440,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [ActorInitVarOffset(0x2D30)]
         [ActorInstanceSize(0x208)]
+        //[] now that we have logic, we could randomize in gbt? is the flow required for everything?
         [FileID(296)]
         [ObjectListIndex(0x16A)]
         // 0xXX00 is respawn time, 0xFF gets turned into 0, which is the shortest value
@@ -3448,10 +3449,8 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x0C01, 0x1402, 0xFF03, 0xFF01, 0xFF00, 0x0A01, 0x0202, 0x801, 0xFF02, 0x0103, 0x0203)]
         //[GroundVariants(0x0005)]
         [ForbidFromScene(Scene.GreatBayTemple, Scene.InvertedStoneTowerTemple)] // necessary to climb
-        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // crash transitioning witch shop room
-        // all variants respawn until proven otherwise
-        //[RespawningVariants(0xFF03,0xFF01,0xFF00, 0xFF03, 0x0A01,   0x0C01,0x1402,0x0202,0x801,0xFF02)]
-        [RespawningAllVariants]
+        //[EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // crash transitioning witch shop room if you dont fix the actor
+        [RespawningAllVariants] // all variants respawn
         ChuChu = 0x14A, // En_Slime
 
         [EnemizerEnabled]
