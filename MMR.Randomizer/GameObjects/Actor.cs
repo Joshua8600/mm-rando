@@ -1387,12 +1387,12 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableGreatBayCoastPot7, Item.CollectableGreatBayCoastPot8, Item.CollectableGreatBayCoastPot9,
             Item.CollectableGreatBayCoastPot10, Item.CollectableGreatBayCoastPot11
         )]
-        ///*
-        // "Ocean Skulltula 2nd Room Upper Pot" is the giant clay jars you bonk to get a spider, not pots
+        // 0x5A0A should be a free pot without items in it in the entry
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x601E, Item.CollectableOceansideSpiderHouseEntrancePot1)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x621E, Item.CollectableOceansideSpiderHouseEntrancePot2)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x5C0E, Item.CollectableOceansideSpiderHouseEntrancePot3)]
-        // variant: 0x018A is free arrows, not a thing
+        // "Ocean Skulltula 2nd Room Upper Pot" is the giant clay jars you bonk to get a spider, not pots
+        // variant: 0x018A is free arrows, no item restrictions
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x4C0E, Item.CollectableOceansideSpiderHouseMainRoomPot1)] // on floor 11oclock from bottom of stairs
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0xB, Item.CollectibleOceanSpiderToken11)] // top of boxes on back wall next to spider webs
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x660E, Item.CollectableOceansideSpiderHouseMainRoomPot2)]
