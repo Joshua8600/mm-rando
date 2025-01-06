@@ -2774,32 +2774,60 @@ namespace MMR.Randomizer
 
             var woodsOfMysteryScene = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.WoodsOfMystery);
 
-            // randomly select a new object
-            var possibleCandidateObjects = ReplacementCandidateList.FindAll(act => act.GetGroundVariants().Count > 0 || act.GetFlyingVariants().Count > 0);
-            // TODO remove banned objects from the scene
-            var randomCandidate = possibleCandidateObjects[seedrng.Next(possibleCandidateObjects.Count)];
-            _syncedLog.AppendLine($"++ [{woodsOfMysteryScene.ToString()}] new extra object is for [{randomCandidate.Name}]");
-            var randomObject = randomCandidate.ObjectId;
-
+            var newActor = GameObjects.Actor.DekuBaba;
+            List<GameObjects.Actor> listOfShuffledGroundActors = null;
+            if ( ! ACTORSENABLED)
+            {
+                // without jump scare, this is all we can do in this setting
+                listOfShuffledGroundActors = new List<GameObjects.Actor> { GameObjects.Actor.Snapper };
+            }
+            else
+            {
+                listOfShuffledGroundActors = new List<GameObjects.Actor> {
+                      //GameObjects.Actor.Snapper, // for now, I dont want to replace them because this is too high of a chance
+                      GameObjects.Actor.SquareSign, GameObjects.Actor.TallGrass,
+                      GameObjects.Actor.MushroomCloud, GameObjects.Actor.DekuFlower
+                    };
+            }
 
             // expand the list for every room
             for (var roomId = 0; roomId < 9; roomId++)
             {
                 // add object to the object list for the room
                 var thisRoomMap = woodsOfMysteryScene.Maps[roomId];
-                thisRoomMap.Objects.Append(randomObject);
+                thisRoomMap.Objects = thisRoomMap.Objects.Append(newActor.ObjectIndex()).ToList();
 
                 // specify to the room object header that the object list is larger and load the extra object
-                var roomFileId = GameObjects.Scene.WoodsOfMystery.FileID() + roomId;
+                var roomFileId = GameObjects.Scene.WoodsOfMystery.FileID() + roomId + 1;
                 var roomData = RomData.MMFileList[roomFileId].Data;
                 // search the headers for the objectlist, change the byte for the value
                 for(int headerOffset = 0; headerOffset < 0x300; headerOffset += 0x8)
                 {
-                    if (roomData[0] == 0x14) throw new Exception("this woods of mystery room was supposed to have an object list");
+                    var headerByte = roomData[headerOffset];
+                    if (headerByte == 0x14) throw new Exception("this woods of mystery room was supposed to have an object list");
 
-                    if (roomData[0] == 0xB) // object list found
+                    if (headerByte == 0x0B) // object list found
                     {
-                        roomData[1]++; // increaese the count of the objects in the object list to be loaded into  memory
+                        // increaese the count of the objects in the object list to be loaded into  memory
+                        roomData[headerOffset + 1] = 6; 
+                        break;
+                    }
+                    if (headerOffset >= 0x2F8) throw new Exception("out of bounds");
+                }
+
+                /// search for actors we might randomly change into our new random enemy
+
+                // generate list of candidate slots
+                var actorsToRandomlyShuffle = thisRoomMap.Actors.FindAll(act => listOfShuffledGroundActors.Contains(act.ActorEnum));
+                for(int i  = 0; i < thisRoomMap.Actors.Count; i++)
+                {
+                    var actor = thisRoomMap.Actors[i];
+
+                    if(listOfShuffledGroundActors.Contains(actor.OldActorEnum) && seedrng.Next(100) < 30)
+                    {
+                        var oldName = actor.OldName;
+                        actor.ChangeActor(newActor, 0, modifyOld: true);
+                        actor.OldName = oldName + "(Changling)";
                     }
                 }
             }

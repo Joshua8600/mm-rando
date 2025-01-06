@@ -6352,7 +6352,7 @@ namespace MMR.Randomizer.GameObjects
         // 01 is laundry pool, but he only spawns at night, ignoring actor time spawn settings for a scene
         // 02 is the music-only one that spawns so you can hear him through the walls of the inn
         [GroundVariants(0x0, 0x1, 0x2)]
-        [VariantsWithRoomMax(max: 1, variant: 1)]
+        //[VariantsWithRoomMax(max: 1, variant: 0x1)] // only spawns at night
         [VariantsWithRoomMax(max: 0, variant: 0x2)]
         [VariantsWithRoomMax(max: 2, variant: 0x0)]
         [UnkillableAllVariants]
