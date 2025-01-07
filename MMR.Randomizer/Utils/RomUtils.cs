@@ -35,7 +35,7 @@ namespace MMR.Randomizer.Utils
             #if DEBUG
             string settingstring = $"{setting} + DEBUG BUILD\x00";
             #else
-            string settingstring = $"{setting} + Isghj's Actorizer Test 82.1\x00";
+            string settingstring = $"{setting} + Isghj's Actorizer Test 83.0\x00";
             #endif
             int f = GetFileIndexForWriting(veraddr);
             var file = RomData.MMFileList[f];
@@ -326,16 +326,8 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-        public static byte[] BuildROM(OutputSettings settings, GameplaySettings settings2)
+        public static byte[] BuildROM(OutputSettings settings)
         {
-
-            // I want to move this AFTER vrom updates so I can see where the ACTUAL vrom to work with is
-            // currently tho, its broken, 
-            if (settings2.RandomizeEnemies)
-            {
-                Enemies.UpdateActorOverlayTable(); // last second before rom generation
-            }
-
 
             SetFilesToRemainDecompressed(settings);
 

@@ -66,6 +66,10 @@ namespace MMR.Randomizer.Patch
                 {
                     original.Cmp_Addr = -1;
                     original.Cmp_End = -1;
+                }else
+                {
+                    original.Addr = address;
+                    original.End = address + original.Data.Length;
                 }
             }
         }
