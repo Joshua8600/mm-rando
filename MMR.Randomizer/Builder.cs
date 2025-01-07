@@ -6005,21 +6005,11 @@ namespace MMR.Randomizer
             }
         }
 
-        private void WriteBrokenGaroFreeHints()
+        private void CheckEnemizerFreeGaroHints()
         {
-            /* if (_randomized.Settings.FreeGaroHints) // actor should be decompressed if this is true
+            if (_randomized.Settings.FreeGaroHints && _randomized.Settings.RandomizeEnemies) // bandaid
             {
-                // not sure why my actorizer build has this issue but not release MMR
-                // the branch at the top of the asm, that checks the results of the switch flag, causes the function to end if switch is OFF
-                // this is opposite of vanilla, where the switch flag being zero keeps the code going
-                // all I did was change the jump location back to vanilla(ish, as it has been moved)
-
-                var encount3data = RomData.MMFileList[247].Data;
-                var jumpOffsetAddressByte = 0x173;
-                if (encount3data[jumpOffsetAddressByte] == 0x34) // the end of the function, which is wrong
-                {
-                    encount3data[jumpOffsetAddressByte] = 0x8; // the correctly offset
-                }
+                throw new Exception("Free garo hints and this version of Enemizer/Actorizer is broken, disable one");
             } // */
         }
 
@@ -6553,6 +6543,7 @@ namespace MMR.Randomizer
                 WriteItems(messageTable);
 
                 progressReporter.ReportProgress(65, "Reading Enemies ...");
+                CheckEnemizerFreeGaroHints();
                 ReadEnemies(outputSettings);
 
                 progressReporter.ReportProgress(66, "Writing cutscenes...");
@@ -6637,7 +6628,6 @@ namespace MMR.Randomizer
             WriteRemoveMinorMusic();
             WriteDisableFanfares();
 
-            WriteBrokenGaroFreeHints();
 
             if (outputSettings.GenerateCosmeticsPatch)
             {
@@ -6648,6 +6638,14 @@ namespace MMR.Randomizer
             }
 
             WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
+
+            // garo debugging
+            using (FileStream fileStream = new FileStream("fairy.bin", FileMode.Create))
+            using (BinaryWriter sw = new BinaryWriter(fileStream))
+            {
+                sw.Write(RomData.MMFileList[GameObjects.Actor.Fairy.FileListIndex()].Data);
+            }
+
 
             if (outputSettings.GenerateROM || outputSettings.OutputVC)
             {
