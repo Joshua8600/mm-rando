@@ -105,13 +105,31 @@ namespace MMR.Randomizer
             0xC00B, 0xC21E, 0xC40E, 0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF81E, 0xF60E, 0xF410, // secret shrine,
             0xFE0F, 0xFE0B, 0xFE0E, 0xFE03 // non-vanilla
         };
+        // params: 0x3 is type, 0,2,3 are field grass (1 is tall re-growing grass that requires object)
+        //  type 0: 0x7F00 is item (random) collectable from table,
+        //    0xC000 just disables item drop??
+        // the 0x10 param drops a bugs actor on the ground too
+        // type 2 grass drops items on 0xFC instead, and its not random from a table but guarenteed?
         static int[] tallGrassFieldObjectVariants = {
-            0x0, 0x800, // woods of mystery
-            
-            0x500,
-            0x0600, 0x700, 0xC00, 0xD00,
-            0x0E00, 0x0E10, 0x0010,
-            0x0610
+            0x0,    // termina field mixed drop table
+            0x0500, // empty dt
+            0x0600, // hearts and flexible dt
+            0x0700, // all hearts dt
+            0x0800, // quarter chance small rup dt
+            0x0C00, // half chance magic dt
+            0x0D00, // all magic dt
+            0x0E00, // sticks nuts flexible dt
+            0x0010, // above but with bugs
+            0x0610,
+            0x0E10,
+            // non-vanilla added for variety
+            0x0A10, // magic and arrows
+            0x0110, // mixed swamp bushes
+            0x0210, // mountain village drop table
+            0x0310, // unused drop table
+            0x0A10, // magic and arrows
+            0x0B10, // bombs
+            0x0F10, // almost full mixed 
         };
 
         public static void PrepareEnemyLists()
@@ -582,6 +600,12 @@ namespace MMR.Randomizer
                         targetActor.SortedVariants[(int)GameObjects.ActorType.Ground] = targetActor.Variants; // have to update the types for variant compatiblity later
                         return true;
                     }
+                    else
+                    {
+                        log.Append($" in scene [{scene.SceneEnum}][{mapIndex}]" +
+                                   $" actor was skipped over: [0x{targetActor.OldVariant.ToString("X4")}][{targetActor.ActorEnum}]\n");
+
+                    }
                 }
                 if (thisSceneData.Scene.SpecialObject == Scene.SceneSpecialObject.DungeonKeep
                  && targetActor.OldActorEnum == GameObjects.Actor.ClayPot)
@@ -604,6 +628,13 @@ namespace MMR.Randomizer
                         targetActor.SortedVariants[(int)GameObjects.ActorType.Ground] = targetActor.Variants; // have to update the types for variant compatiblity later
                         return true;
                     }
+                    else
+                    {
+                        log.Append($" in scene [{scene.SceneEnum}][{mapIndex}]" +
+                                   $" actor was skipped over: [0x{targetActor.OldVariant.ToString("X4")}][{targetActor.ActorEnum}]\n");
+
+                    }
+
                 }
 
                 return false;
@@ -5642,7 +5673,9 @@ namespace MMR.Randomizer
             {
                 var newFieldTallGrass = new Actor(GameObjects.Actor.TallGrass);
                 newFieldTallGrass.SetVariants(tallGrassFieldObjectVariants.ToList());
-                newFieldTallGrass.SortedVariants[(int)GameObjects.ActorType.Ground] = newFieldTallGrass.Variants;
+                newFieldTallGrass.SortedVariants[(int)GameObjects.ActorType.Ground - 1] = newFieldTallGrass.Variants;
+                // weirdly, the code checks if the bushes are underwater and applies water sway to them, this is intended by the forfathers
+                newFieldTallGrass.SortedVariants[(int)GameObjects.ActorType.WaterBottom - 1] = newFieldTallGrass.Variants;
                 // todo trim variants
                 sceneFreeActors.Add(newFieldTallGrass);
             }
