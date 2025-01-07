@@ -81,9 +81,9 @@ namespace MMR.Randomizer
         // outer list is item.category, inner list is items
         private static List<GameObjects.ItemCategory> ActorizerKnownJunkCategories { get; set; }
         private static List<List<GameObjects.Item>> ActorizerKnownJunkItems { get; set; }
-        private static Mutex EnemizerLogMutex = new Mutex();
+        private static Mutex _LogMutex = new Mutex();
         private static bool ACTORSENABLED = true; 
-        private static Random seedrng;
+        private static Random _seedRNG;
         private static Models.RandomizedResult _randomized;
         private static OutputSettings _outputSettings;
         private static CosmeticSettings _cosmeticSettings;
@@ -1554,7 +1554,7 @@ namespace MMR.Randomizer
                 // it was two torches, turn the other into a secret grotto, at least for now
                 var randomGrotto = new List<ushort> { 0x6033, 0x603B, 0x6018, 0x605C, 0x8000, 0xA000, 0x7000, 0xC000, 0xE000, 0xF000, 0xD000 };
                 var hiddenGrottos = new List<ushort> { 0x6233, 0x623B, 0x6218, 0x625C, 0x8200, 0xA200, 0x7200, 0xC200, 0xE200, 0xF200, 0xD200 };
-                laundryPoolScene.Maps[0].Actors[1].ChangeActor(GameObjects.Actor.GrottoHole, vars: randomGrotto[seedrng.Next(randomGrotto.Count)], modifyOld: true);
+                laundryPoolScene.Maps[0].Actors[1].ChangeActor(GameObjects.Actor.GrottoHole, vars: randomGrotto[_seedRNG.Next(randomGrotto.Count)], modifyOld: true);
                 laundryPoolScene.Maps[0].Actors[1].Rotation = new vec16(0x7F, 0x7F, 0x7F);
                 laundryPoolScene.Maps[0].Actors[1].Position = new vec16(-1502, 35, 555); // old: new vec16(-1872, -120, 229);
 
@@ -1567,18 +1567,18 @@ namespace MMR.Randomizer
 
                 // now that darmani ghost is gone, lets re=use the actor for secret grotto
                 var newGrotto = winterVillage.Maps[0].Actors[2];
-                newGrotto.ChangeActor(GameObjects.Actor.GrottoHole, vars: randomGrotto[seedrng.Next(randomGrotto.Count)] & 0xFCFF, modifyOld: true);
+                newGrotto.ChangeActor(GameObjects.Actor.GrottoHole, vars: randomGrotto[_seedRNG.Next(randomGrotto.Count)] & 0xFCFF, modifyOld: true);
                 newGrotto.Position = new vec16(504, 365, 800);
 
                 var terminafieldScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TerminaField.FileID());
                 var elf6grotto = terminafieldScene.Maps[0].Actors[2];
                 elf6grotto.Position = new vec16(-5539, -275, -701);
-                elf6grotto.ChangeActor(GameObjects.Actor.GrottoHole, vars: hiddenGrottos[seedrng.Next(hiddenGrottos.Count)], modifyOld: true);
+                elf6grotto.ChangeActor(GameObjects.Actor.GrottoHole, vars: hiddenGrottos[_seedRNG.Next(hiddenGrottos.Count)], modifyOld: true);
 
                 Scene dekuPalaceScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.DekuPalace.FileID());
                 ActorUtils.SetActorSpawnTimeFlags(dekuPalaceScene.Maps[2].Actors[25]); // set other torch to always spawn, you wont notice the night one missing
                 var freeTorch = dekuPalaceScene.Maps[2].Actors[26];
-                freeTorch.ChangeActor(GameObjects.Actor.GrottoHole, vars: hiddenGrottos[seedrng.Next(hiddenGrottos.Count)], modifyOld: true);
+                freeTorch.ChangeActor(GameObjects.Actor.GrottoHole, vars: hiddenGrottos[_seedRNG.Next(hiddenGrottos.Count)], modifyOld: true);
                 ActorUtils.SetActorSpawnTimeFlags(freeTorch);
                 freeTorch.Position = new vec16(24, -12, 675);
 
@@ -1588,16 +1588,16 @@ namespace MMR.Randomizer
                 newJpGrotto.Position = new vec16(1873, 1, 711);
 
                 var doorAnaData = RomData.MMFileList[GameObjects.Actor.GrottoHole.FileListIndex()].Data;
-                var firstPullLocation = seedrng.Next(sickEntrances.Count);
+                var firstPullLocation = _seedRNG.Next(sickEntrances.Count);
                 var entrance1 = sickEntrances[firstPullLocation];
                 sickEntrances.RemoveAt(firstPullLocation);
-                var entrance2 = sickEntrances[seedrng.Next(sickEntrances.Count)];
+                var entrance2 = sickEntrances[_seedRNG.Next(sickEntrances.Count)];
                 ReadWriteUtils.Arr_WriteU16(doorAnaData, 0x60A, entrance1); // E
                 ReadWriteUtils.Arr_WriteU16(doorAnaData, 0x60C, entrance2); // F
                 _syncedLog.AppendLine($"grotto list added address 1: [{entrance1.ToString("X4")}]");
                 _syncedLog.AppendLine($"grotto list added address 2: [{entrance2.ToString("X4")}]");
 
-                if (seedrng.Next() % 10 >= 5)
+                if (_seedRNG.Next() % 10 >= 5)
                 {
                     // I like secrets
                     var twinislandsScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TwinIslands.FileID());
@@ -2465,8 +2465,8 @@ namespace MMR.Randomizer
             ReadWriteUtils.Arr_WriteU16(grottoScene, 0x23A, 0x5080); // replace straight B with old straight A exit
 
             // lets change one of the JP entrances at random to some other place
-            var randomGrottoExitAddress = (seedrng.Next(2) == 1) ? (0x23A) : (0x23E); // the two exits in the grotto scene exit list
-            var randomSickEntrance = sickEntrances[seedrng.Next(sickEntrances.Count())];
+            var randomGrottoExitAddress = (_seedRNG.Next(2) == 1) ? (0x23A) : (0x23E); // the two exits in the grotto scene exit list
+            var randomSickEntrance = sickEntrances[_seedRNG.Next(sickEntrances.Count())];
             sickEntrances.Remove(randomSickEntrance);
             _syncedLog.AppendLine($"randomized jp_grotto exit address: [{randomSickEntrance.ToString("X4")}]");
 
@@ -2720,7 +2720,7 @@ namespace MMR.Randomizer
             var greatbayCoast = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.GreatBayCoast);
             List<Actor> replacementCandidates = ReplacementCandidateList.FindAll(act => act.GetWaterVariants().Count() > 0); // start with water only
 
-            if (seedrng.Next(100) < 40) // some chance of turning into water surface instead of bottom
+            if (_seedRNG.Next(100) < 40) // some chance of turning into water surface instead of bottom
             {
                 var replacementWaterTopCandidates = ReplacementCandidateList.FindAll(act => act.GetWaterTopVariants().Count() > 0);
                 replacementCandidates.AddRange(replacementWaterTopCandidates);
@@ -2729,7 +2729,7 @@ namespace MMR.Randomizer
                 var allIshi = greatbayCoast.Maps[0].Actors.FindAll(act => act.ActorEnum == GameObjects.Actor.IshiRock && act.OldVariant != 0x32);
                 // however, most of the ocean top replacements are either water or dyna, especially with actorizer,
                 // so we're only going to randomize and change half of them, or we risk putting 2-3 dyna actors on the surface and _nothing else_
-                allIshi = allIshi.OrderBy(x => seedrng.Next()).ToList(); 
+                allIshi = allIshi.OrderBy(x => _seedRNG.Next()).ToList(); 
 
                 for (int i = 0; i < allIshi.Count() / 2 ; i++)
                 {
@@ -2747,14 +2747,14 @@ namespace MMR.Randomizer
                 List<Actor> replacementWaterBottomCandidates = ReplacementCandidateList.FindAll(act => act.GetWaterBottomVariants().Count() > 0);
                 replacementCandidates.AddRange(replacementWaterBottomCandidates);
 
-                var randomIndex = seedrng.Next(replacementCandidates.Count());
+                var randomIndex = _seedRNG.Next(replacementCandidates.Count());
                 var randomGuayReplacement = replacementCandidates[randomIndex];
                 replacementCandidates.RemoveAt(randomIndex);
                 greatbayCoast.Maps[0].Objects[3] = randomGuayReplacement.ObjectId; // unused guay object
             }
 
             // 6 is also an unused object: skullfish
-            var randomSkullFishIndex = seedrng.Next(replacementCandidates.Count());
+            var randomSkullFishIndex = _seedRNG.Next(replacementCandidates.Count());
             var randomSkullFishReplacement = replacementCandidates[randomSkullFishIndex];
             replacementCandidates.RemoveAt(randomSkullFishIndex);
             greatbayCoast.Maps[0].Objects[6] = randomSkullFishReplacement.ObjectId; // skullfish
@@ -2762,7 +2762,7 @@ namespace MMR.Randomizer
             if ( ObjectIsCheckBlocked(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.Mikau) == null)
             {
                 /// we can use the mikau zora mask object too if rando isn't using it because mikau was randomized
-                var randomMikauMaskIndex = seedrng.Next(replacementCandidates.Count());
+                var randomMikauMaskIndex = _seedRNG.Next(replacementCandidates.Count());
                 var randomMikauMaskReplacement = replacementCandidates[randomMikauMaskIndex];
                 greatbayCoast.Maps[0].Objects[4] = randomMikauMaskReplacement.ObjectId; // cutscene mask object
             }
@@ -2823,7 +2823,7 @@ namespace MMR.Randomizer
                 {
                     var actor = thisRoomMap.Actors[i];
 
-                    if(listOfShuffledGroundActors.Contains(actor.OldActorEnum) && seedrng.Next(100) < 30)
+                    if(listOfShuffledGroundActors.Contains(actor.OldActorEnum) && _seedRNG.Next(100) < 30)
                     {
                         var oldName = actor.OldName;
                         actor.ChangeActor(newActor, 0, modifyOld: true);
@@ -3418,7 +3418,7 @@ namespace MMR.Randomizer
             ///   without affecting the original enemy placement, and gives us some variety
 
             SplitSpiderGrottoSkulltulaObject();
-            ChangeHotwaterGrottoDekuBabaIntoSomethingElse(seedrng);
+            ChangeHotwaterGrottoDekuBabaIntoSomethingElse(_seedRNG);
             RandomizeGrottoGossipStonesPerGrotto();
 
             var grottosScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.Grottos.FileID());
@@ -3426,7 +3426,7 @@ namespace MMR.Randomizer
             // dodongo grotto has a useless blue icicle object. switch to Bo object so we can get Bo actors from jp grotto
             var dodongoGrottoObjectList = grottosScene.Maps[7].Objects;
             dodongoGrottoObjectList[2] = GameObjects.Actor.Bo.ObjectIndex();
-            var randomActorChangeRoll = seedrng.Next(100);
+            var randomActorChangeRoll = _seedRNG.Next(100);
             if (randomActorChangeRoll < 25)
             {
                 var randomIndex = randomActorChangeRoll < 12 ? (0) : (1);
@@ -3486,7 +3486,7 @@ namespace MMR.Randomizer
 
             // 2:japas, 3:evan, 5:tijo, can't remove lulu or the concert is completely broken? meh
             var replacableBandObj = new int[] { 2, 3, 5, 4 };
-            var randomObjListIndex = replacableBandObj[seedrng.Next(replacableBandObj.Length)];
+            var randomObjListIndex = replacableBandObj[_seedRNG.Next(replacableBandObj.Length)];
             var zoraHallScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraHall.FileID());
             zoraHallScene.Maps[0].Objects[randomObjListIndex] = GameObjects.Actor.RegularZora.ObjectIndex();
 
@@ -3818,19 +3818,19 @@ namespace MMR.Randomizer
 
             // lobby
             if (ACTORSENABLED){
-                var randomIndex = seedrng.Next(possibleGroundActors.Count());
+                var randomIndex = _seedRNG.Next(possibleGroundActors.Count());
                 secretShrineScene.Maps[0].Objects[4] = possibleGroundActors[randomIndex].ObjectId; // wooden crate 
                 possibleGroundActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleGroundActors.Count());
+                randomIndex = _seedRNG.Next(possibleGroundActors.Count());
                 secretShrineScene.Maps[0].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // dinofos 
                 possibleGroundActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
                 secretShrineScene.Maps[0].Objects[6] = possibleFlyingActors[randomIndex].ObjectId; // water drip 
                 possibleFlyingActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
                 secretShrineScene.Maps[0].Objects[8] = possibleFlyingActors[randomIndex].ObjectId; // bombchu 
                 possibleFlyingActors.RemoveAt(randomIndex);
             }
@@ -3838,23 +3838,23 @@ namespace MMR.Randomizer
             // center room
             if (ACTORSENABLED)
             {
-                var randomIndex = seedrng.Next(possibleWaterActors.Count());
+                var randomIndex = _seedRNG.Next(possibleWaterActors.Count());
                 secretShrineScene.Maps[1].Objects[5] = possibleWaterActors[randomIndex].ObjectId; // deku baba 
                 possibleWaterActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleWaterBottomActors.Count());
+                randomIndex = _seedRNG.Next(possibleWaterBottomActors.Count());
                 secretShrineScene.Maps[1].Objects[6] = possibleWaterBottomActors[randomIndex].ObjectId; // dinofos 
                 possibleWaterBottomActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleWaterBottomActors.Count());
+                randomIndex = _seedRNG.Next(possibleWaterBottomActors.Count());
                 secretShrineScene.Maps[1].Objects[8] = possibleWaterBottomActors[randomIndex].ObjectId; // real bombchu
                 possibleWaterBottomActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
                 secretShrineScene.Maps[1].Objects[9] = possibleFlyingActors[randomIndex].ObjectId; // heart piece
                 possibleFlyingActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleCeilingActors.Count());
+                randomIndex = _seedRNG.Next(possibleCeilingActors.Count());
                 secretShrineScene.Maps[1].Objects[10] = possibleCeilingActors[randomIndex].ObjectId; // tall grass
                 possibleCeilingActors.RemoveAt(randomIndex);
 
@@ -3862,34 +3862,34 @@ namespace MMR.Randomizer
 
             // dinofos room
             {
-                var randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                var randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
                 secretShrineScene.Maps[2].Objects[6] = possibleFlyingActors[randomIndex].ObjectId; // deku baba
                 possibleFlyingActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleCeilingActors.Count());
+                randomIndex = _seedRNG.Next(possibleCeilingActors.Count());
                 secretShrineScene.Maps[2].Objects[7] = possibleCeilingActors[randomIndex].ObjectId; // skulltula
                 possibleCeilingActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleGroundActors.Count());
+                randomIndex = _seedRNG.Next(possibleGroundActors.Count());
                 secretShrineScene.Maps[2].Objects[10] = possibleGroundActors[randomIndex].ObjectId; // real bombchu
                 possibleGroundActors.RemoveAt(randomIndex);
             }
 
             // wizrobe room
             {
-                var randomIndex = seedrng.Next(possibleGroundActors.Count());
+                var randomIndex = _seedRNG.Next(possibleGroundActors.Count());
                 secretShrineScene.Maps[3].Objects[6] = possibleGroundActors[randomIndex].ObjectId; // blue warp
                 possibleGroundActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleGroundActors.Count());
+                randomIndex = _seedRNG.Next(possibleGroundActors.Count());
                 secretShrineScene.Maps[3].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // garo master
                 possibleGroundActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
                 secretShrineScene.Maps[3].Objects[8] = possibleFlyingActors[randomIndex].ObjectId; // garo master
                 possibleFlyingActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
                 secretShrineScene.Maps[3].Objects[4] = possibleFlyingActors[randomIndex].ObjectId; // wooden crate
                 possibleFlyingActors.RemoveAt(randomIndex);
 
@@ -3898,19 +3898,19 @@ namespace MMR.Randomizer
             // wart room
             if (ACTORSENABLED)
             {
-                var randomIndex = seedrng.Next(possibleGroundActors.Count());
+                var randomIndex = _seedRNG.Next(possibleGroundActors.Count());
                 secretShrineScene.Maps[4].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // eygore ???
                 possibleGroundActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
                 secretShrineScene.Maps[4].Objects[6] = possibleFlyingActors[randomIndex].ObjectId; // blue warp ?
                 possibleFlyingActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleCeilingActors.Count());
+                randomIndex = _seedRNG.Next(possibleCeilingActors.Count());
                 secretShrineScene.Maps[4].Objects[7] = possibleCeilingActors[randomIndex].ObjectId; // dinofos
                 possibleCeilingActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleCeilingActors.Count());
+                randomIndex = _seedRNG.Next(possibleCeilingActors.Count());
                 secretShrineScene.Maps[4].Objects[10] = possibleCeilingActors[randomIndex].ObjectId; // tall grass
                 possibleCeilingActors.RemoveAt(randomIndex);
             }
@@ -3919,11 +3919,11 @@ namespace MMR.Randomizer
             if (ACTORSENABLED)
             {
                 /// not as much point, its only him and some grass, not much else to put here
-                var randomIndex = seedrng.Next(possibleGroundActors.Count());
+                var randomIndex = _seedRNG.Next(possibleGroundActors.Count());
                 secretShrineScene.Maps[5].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // wizrobe
                 possibleGroundActors.RemoveAt(randomIndex);
 
-                randomIndex = seedrng.Next(possibleFlyingActors.Count());
+                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
                 secretShrineScene.Maps[5].Objects[8] = possibleFlyingActors[randomIndex].ObjectId; // blue warp ?
                 possibleFlyingActors.RemoveAt(randomIndex);
 
@@ -4725,7 +4725,7 @@ namespace MMR.Randomizer
                 if ((waterVariants != null && waterVariants.Variants.Contains(testActor.Variants[0])) && // chosen variant is water (swimming)
                     (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Variants.Contains(testActor.OldVariant))) // previous water surface 
                 {
-                    short randomHeight = (short)(10 + seedrng.Next(20));
+                    short randomHeight = (short)(10 + _seedRNG.Next(20));
                     testActor.Position.y -= randomHeight; // always lower flying enemies on ceiling placement, its usually way too high
                     log.AppendLine($" - lowered height of actor [{testActor.Name}] by [{randomHeight}] to lower below water surface");
                     UpdateStrayFairyHeight(testActor);
@@ -4737,7 +4737,7 @@ namespace MMR.Randomizer
                 if ((waterVariants != null && waterVariants.Variants.Contains(testActor.Variants[0])) && // chosen variant is water (swimming)
                     (oldWaterBottomVariants != null && oldWaterBottomVariants.Variants.Contains(testActor.OldVariant))) // previous water bottom 
                 {
-                    short randomHeight = (short)(10 + seedrng.Next(70));
+                    short randomHeight = (short)(10 + _seedRNG.Next(70));
                     testActor.Position.y += randomHeight; // always lower flying enemies on ceiling placement, its usually way too high
                     log.AppendLine($" - raised height of actor [{testActor.Name}] by [{randomHeight}] to above water bottom");
                     UpdateStrayFairyHeight(testActor);
@@ -4747,7 +4747,7 @@ namespace MMR.Randomizer
                 if ((flyingVariants != null && flyingVariants.Variants.Contains(testActor.Variants[0])) && // chosen variant is flying
                     (oldCeilingVariants != null && oldCeilingVariants.Variants.Contains(testActor.OldVariant))) // previous ceiling 
                 {
-                    short randomHeight = (short)(50 + (seedrng.Next() % 50));
+                    short randomHeight = (short)(50 + (_seedRNG.Next() % 50));
                     testActor.Position.y -= randomHeight; // always lower flying enemies on ceiling placement, its usually way too high
                     log.AppendLine($" - lowered height of actor [{testActor.Name}] by [{randomHeight}] from ceiling to fly");
                     UpdateStrayFairyHeight(testActor);
@@ -5383,7 +5383,7 @@ namespace MMR.Randomizer
                         // if the actor is in a kill all enemy room, reduce the chances of boring enemies from showing up here
                         if ((oldActor.MustNotRespawn
                             && !(thisSceneData.Scene.SceneEnum == GameObjects.Scene.WoodfallTemple && oldActor.Room == 9) // dark room exception
-                            && !containsFairyDroppingEnemy) && seedrng.Next(100) < 25)
+                            && !containsFairyDroppingEnemy) && _seedRNG.Next(100) < 25)
                         {
                             newEnemy.RemoveEasyEmemies();
                             if (newEnemy.Variants.Count == 0) // TODO refactor this into the overall flow
@@ -6172,13 +6172,13 @@ namespace MMR.Randomizer
             }
             void FlushLog()
             {
-                EnemizerLogMutex.WaitOne(); // with paralel, thread safety
+                _LogMutex.WaitOne(); // with paralel, thread safety
                 using (StreamWriter sw = new StreamWriter(_outputSettings.OutputROMFilename + "_EnemizerLog.txt", append: true))
                 {
                     sw.WriteLine(""); // spacer from last flush
                     sw.Write(thisSceneData.Log);
                 }
-                EnemizerLogMutex.ReleaseMutex();
+                _LogMutex.ReleaseMutex();
             }
 
             string GET_TIME(DateTime log)
@@ -7139,7 +7139,7 @@ namespace MMR.Randomizer
 
         public static void ReadActors(OutputSettings outputSettings, CosmeticSettings cosmeticSettings, Models.RandomizedResult randomized)
         {
-            seedrng = new Random(randomized.Seed);
+            _seedRNG = new Random(randomized.Seed);
             _randomized = randomized;
             _outputSettings = outputSettings;
             _cosmeticSettings = cosmeticSettings;
@@ -7156,7 +7156,7 @@ namespace MMR.Randomizer
             SceneUtils.GetMapHeaders();
             SceneUtils.GetActors();
 
-            EnemizerEarlyFixes(seedrng); // before we randomize ; moved up
+            EnemizerEarlyFixes(_seedRNG); // before we randomize ; moved up
         }
 
         public static void ShuffleEnemies()
