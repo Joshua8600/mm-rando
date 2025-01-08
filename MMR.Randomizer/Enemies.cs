@@ -342,7 +342,8 @@ namespace MMR.Randomizer
                     var category = reward.ItemCategory() ?? GameObjects.ItemCategory.None;
                     if ( ! ActorizerKnownJunkCategories.Contains(category))
                     {
-                        // we dont need to add the entries themselves they are already added to the junk list per-category, this is just for notebook itself
+                        // we dont need to add the entries themselves they are already added to the junk list per-category
+                        //   this is just for notebook itself
                         nonJunkCount++;
                     }
                 }
@@ -360,7 +361,7 @@ namespace MMR.Randomizer
                 {
                     AddNotebookEntires();
 
-                    var notebookLocationSearch = allSphereItems.Any(u => u.Location.Contains("Notebook")); // important items BEHIND notebook
+                    var notebookLocationSearch = allSphereItems.Any(u => u.Item.Contains("Notebook")); // important items BEHIND notebook
                     if (!notebookLocationSearch)
                     {
                         ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.MainInventory].Add(GameObjects.Item.ItemNotebook);
@@ -1045,9 +1046,11 @@ namespace MMR.Randomizer
             SwapIntroActors();
             SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
+            MoveCreditsPostmanPath();
             SplitSceneSnowballIntoTwoActorObjects();
             RearangeSecretShrineObjects();
             RandomizeGreatbayCoastSurfaceTypes();
+            IncreaseWoodsOfMysteryVariety();
 
             EnableAllCreditsCutScenes();
 
@@ -2765,6 +2768,73 @@ namespace MMR.Randomizer
             }
         }
 
+        private static void IncreaseWoodsOfMysteryVariety()
+        {
+            /// there is an extra object slot in each room, we can add a new object for more variety
+
+            var woodsOfMysteryScene = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.WoodsOfMystery);
+
+            var newActor = GameObjects.Actor.DekuBaba;
+            List<GameObjects.Actor> listOfShuffledGroundActors = null;
+            if ( ! ACTORSENABLED)
+            {
+                // without jump scare, this is all we can do in this setting
+                listOfShuffledGroundActors = new List<GameObjects.Actor> { GameObjects.Actor.Snapper };
+            }
+            else
+            {
+                listOfShuffledGroundActors = new List<GameObjects.Actor> {
+                      //GameObjects.Actor.Snapper, // for now, I dont want to replace them because this is too high of a chance
+                      GameObjects.Actor.SquareSign, GameObjects.Actor.TallGrass,
+                      GameObjects.Actor.MushroomCloud, GameObjects.Actor.DekuFlower
+                    };
+            }
+
+            // expand the list for every room
+            for (var roomId = 0; roomId < 9; roomId++)
+            {
+                // add object to the object list for the room
+                var thisRoomMap = woodsOfMysteryScene.Maps[roomId];
+                thisRoomMap.Objects = thisRoomMap.Objects.Append(newActor.ObjectIndex()).ToList();
+
+                // specify to the room object header that the object list is larger and load the extra object
+                var roomFileId = GameObjects.Scene.WoodsOfMystery.FileID() + roomId + 1;
+                var roomData = RomData.MMFileList[roomFileId].Data;
+                // search the headers for the objectlist, change the byte for the value
+                for(int headerOffset = 0; headerOffset < 0x300; headerOffset += 0x8)
+                {
+                    var headerByte = roomData[headerOffset];
+                    if (headerByte == 0x14) throw new Exception("this woods of mystery room was supposed to have an object list");
+
+                    if (headerByte == 0x0B) // object list found
+                    {
+                        // increaese the count of the objects in the object list to be loaded into  memory
+                        roomData[headerOffset + 1] = 6; 
+                        break;
+                    }
+                    if (headerOffset >= 0x2F8) throw new Exception("out of bounds");
+                }
+
+                /// search for actors we might randomly change into our new random enemy
+
+                // generate list of candidate slots
+                var actorsToRandomlyShuffle = thisRoomMap.Actors.FindAll(act => listOfShuffledGroundActors.Contains(act.ActorEnum));
+                for(int i  = 0; i < thisRoomMap.Actors.Count; i++)
+                {
+                    var actor = thisRoomMap.Actors[i];
+
+                    if(listOfShuffledGroundActors.Contains(actor.OldActorEnum) && seedrng.Next(100) < 30)
+                    {
+                        var oldName = actor.OldName;
+                        actor.ChangeActor(newActor, 0, modifyOld: true);
+                        actor.OldName = oldName + "(Changling)";
+                    }
+                }
+            }
+
+        }
+
+
 
         private static List<(GameObjects.Actor actor, ushort vars)> shallowWaterReplacements = new List<(GameObjects.Actor actor, ushort vars)>
         {
@@ -3968,6 +4038,35 @@ namespace MMR.Randomizer
             ranchScene.Maps[2].Objects[5] = GameObjects.Actor.DekuBaba.ObjectIndex();
         }
 
+        private static void MoveCreditsPostmanPath()
+        {
+            /// credits postman ignores his own path and does his own thing
+            /// our replacement actor will use the path that exists, but its way over in leever land where we never see it    
+
+            // postman is actually walking through the credits
+            //var terminafFieldCreditsRoom = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.TerminaField.FileID()).Maps[9];
+            var terminaFiledCreditsRoomData = RomData.MMFileList[GameObjects.Scene.TerminaField.FileID()].Data;
+
+            List<(short x, short y, short z)> path = new List<(short x, short y, short z)>{
+                (2866,  52, -252),
+                (2558,  50,  308),
+                (2387,  14,  622),
+                (2153, -34, 1024),
+            };
+
+            // according to decomp, this path is in the scene file, where it's defined by the layer not room, at location 0x01B0F4
+            var pathOffset = 0x1B0F4;
+            // path point 1
+            for(int i = 0; i < path.Count; i++)
+            {
+                var pathPointLoc = pathOffset + 6 * (i);
+                var pathPoint = path[i];
+                ReadWriteUtils.Arr_WriteU16(terminaFiledCreditsRoomData, pathPointLoc + 0, (ushort) pathPoint.x);
+                ReadWriteUtils.Arr_WriteU16(terminaFiledCreditsRoomData, pathPointLoc + 4, (ushort) pathPoint.y);
+                ReadWriteUtils.Arr_WriteU16(terminaFiledCreditsRoomData, pathPointLoc + 8, (ushort) pathPoint.z);
+            }
+        }
+
 
         private static void DistinguishLogicRequiredDekuFlowers()
         {
@@ -4934,6 +5033,8 @@ namespace MMR.Randomizer
                     return false;
                 }
 
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.RedBubble)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StoneTowerTemple, GameObjects.Actor.RealBombchu, GameObjects.Actor.ChuChu)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.RedBubble)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.SquareSign, GameObjects.Actor.IronKnuckle)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
@@ -6007,6 +6108,7 @@ namespace MMR.Randomizer
             // for now there should only be some chance of this happening in case the object budget is too close to call
             //if (thisSceneData.RNG.Next() % 10 > 2) // nvm seems fine
             {
+                // this is archaic, and should be replaced with the candidate replacement list randomized for type
                 List<int> freeObjList = new List<int>
                 {
                     GameObjects.Actor.ClayPot.ObjectIndex(), // flying clay pot for enemizer, actual clay pots for actorizer
@@ -7255,7 +7357,7 @@ namespace MMR.Randomizer
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
                     sw.Write(_syncedLog.ToString());
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 82.1\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 83.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

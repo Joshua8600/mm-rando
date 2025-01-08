@@ -239,6 +239,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1205)]
         [SceneInternalId(0x1A)]
+        [ActorizerSceneCreditsActor(Actor.ButlersSon)]
         BeforeThePortalToTermina = 0x17,
 
         [FileID(1208)]
@@ -690,6 +691,8 @@ namespace MMR.Randomizer.GameObjects
         //    Actor.UnusedStoneTowerPlatform, Actor.UnusedPirateElevator)]
         [EnemizerSceneEnemyReplacementBlock(Actor.TallGrass,
             Actor.ClocktowerGearsAndOrgan, Actor.RegularIceBlock)] // suspected too large and can block the owl
+        [EnemizerSceneEnemyReplacementBlock(Actor.DekuBabaWithered,
+            Actor.Hiploop)] // after moving the actors around, one of them just instantly explodes touching water, TODO move them to better spots to avoid instead
         [EnemizerSceneBlockSensitive(Actor.DragonFly, -1)]
         [EnemizerSceneBlockSensitive(Actor.En_Owl, -1)]
         SouthernSwamp = 0x42,

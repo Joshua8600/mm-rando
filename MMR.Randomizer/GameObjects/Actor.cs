@@ -720,11 +720,12 @@ namespace MMR.Randomizer.GameObjects
 
         Empty42 = 0x42,
 
-        //[EnemizerEnabled] //hardcoded values for his entrance spawn make the camera wonky, and his color darkening is wack, also hardware crash
+        [EnemizerEnabled] //hardcoded values for his entrance spawn make the camera wonky, and his color darkening is wack, also hardware crash
         [FileID(87)]
         [ActorInstanceSize(0x938 + (0x2A0 * 25))] // 0x938 // oversized because he spawns little bats and can easily overblow ram
         [ObjectListIndex(0x52)]
         [GroundVariants(0)] // can fly, but weirdly is very bad at changing height if you fight in a multi-level area
+        [VariantsWithRoomMax(max:0, variant:0)] // for now block, we can remove but do not place
         [OnlyOneActorPerRoom] // only fight her if you fight only one
         [RespawningAllVariants] // is NOT unkillable, but assume never have light arrows until the last second of a run, do not place where can block an item
         [ForbidFromScene(Scene.InvertedStoneTowerTemple)] // lets not randomize his normal spawn
@@ -732,6 +733,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesPlacementBlock(Scene.TerminaField, Scene.GreatBayCoast, Scene.ZoraCape, Scene.RoadToIkana,
             Scene.SouthernSwamp, Scene.WoodsOfMystery, Scene.Woodfall, Scene.TwinIslandsSpring, Scene.PathToSnowhead,
             Scene.Snowhead, Scene.GoronVillage, Scene.DekuShrine, Scene.StoneTower)]
+        [RemovalChance(25)]
         Gomess = 0x43, // En_Death 🤘
 
         [FileID(88)]
@@ -1387,12 +1389,12 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableGreatBayCoastPot7, Item.CollectableGreatBayCoastPot8, Item.CollectableGreatBayCoastPot9,
             Item.CollectableGreatBayCoastPot10, Item.CollectableGreatBayCoastPot11
         )]
-        ///*
-        // "Ocean Skulltula 2nd Room Upper Pot" is the giant clay jars you bonk to get a spider, not pots
+        // 0x5A0A should be a free pot without items in it in the entry
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x601E, Item.CollectableOceansideSpiderHouseEntrancePot1)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x621E, Item.CollectableOceansideSpiderHouseEntrancePot2)]
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x5C0E, Item.CollectableOceansideSpiderHouseEntrancePot3)]
-        // variant: 0x018A is free arrows, not a thing
+        // "Ocean Skulltula 2nd Room Upper Pot" is the giant clay jars you bonk to get a spider, not pots
+        // variant: 0x018A is free arrows, no item restrictions
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x4C0E, Item.CollectableOceansideSpiderHouseMainRoomPot1)] // on floor 11oclock from bottom of stairs
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0xB, Item.CollectibleOceanSpiderToken11)] // top of boxes on back wall next to spider webs
         [CheckRestricted(Scene.OceanSpiderHouse, variant: 0x660E, Item.CollectableOceansideSpiderHouseMainRoomPot2)]
@@ -3220,8 +3222,9 @@ namespace MMR.Randomizer.GameObjects
         // TODO if I get wall sideways working with dexihand, do it for baba too
         [WaterTopVariants(0x0002, // without a head to bite you
             0x0000)] // regular
-        // is there a watter bottom version by default?
+        // is there a water bottom version by default?
         [WaterBottomVariants(4)]
+        [VariantsWithRoomMax(max:4, variant: 0,2,4)]
         [CeilingVariants(0x0001)] // they're in the ceiling now
         [RespawningVariants(0x0001)] // doesn't respawn, but stray faries attach themselves to the lilypad
         //[ForbidFromScene(Scene.GreatBayTemple)] // need their lilipads to reach compass chest and fairy chest
@@ -3440,6 +3443,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [ActorInitVarOffset(0x2D30)]
         [ActorInstanceSize(0x208)]
+        //[] now that we have logic, we could randomize in gbt? is the flow required for everything?
         [FileID(296)]
         [ObjectListIndex(0x16A)]
         // 0xXX00 is respawn time, 0xFF gets turned into 0, which is the shortest value
@@ -3448,10 +3452,8 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x0C01, 0x1402, 0xFF03, 0xFF01, 0xFF00, 0x0A01, 0x0202, 0x801, 0xFF02, 0x0103, 0x0203)]
         //[GroundVariants(0x0005)]
         [ForbidFromScene(Scene.GreatBayTemple, Scene.InvertedStoneTowerTemple)] // necessary to climb
-        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // crash transitioning witch shop room
-        // all variants respawn until proven otherwise
-        //[RespawningVariants(0xFF03,0xFF01,0xFF00, 0xFF03, 0x0A01,   0x0C01,0x1402,0x0202,0x801,0xFF02)]
-        [RespawningAllVariants]
+        //[EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // crash transitioning witch shop room if you dont fix the actor
+        [RespawningAllVariants] // all variants respawn
         ChuChu = 0x14A, // En_Slime
 
         [EnemizerEnabled]
@@ -3590,14 +3592,16 @@ namespace MMR.Randomizer.GameObjects
             0x019F)] // 19F graveyard
         [WallVariants(0xFF9F, // bat tree
             0x029F)] // 
-        [DifficultVariants(0xFF34)]
+        [DifficultVariants(0xFF34, 0xFF03)]
         [VariantsWithRoomMax(max: 1, 0xFF34)] // swarm
+        [VariantsWithRoomMax(max: 2, 0xFF03, 0x0102, 0x0103)] // multiple
         [FlyingToGroundHeightAdjustment(150)]
         [EnemizerScenesPlacementBlock(Scene.IkanaGraveyard)] // only the same bats would trigger, new bats wont trigger dampe and it just confuses people
         //[ForbidFromScene(Scene.IkanaGraveyard)] // need bats for dampe day 2 check
         // switch flags are only for the graveyard, no other version uses it
         // hardcoded to use only in that scene too, so canno't use for anything else without modifying
         //[SwitchFlagsPlacement(size: 0xFF, shift: 8)]
+        [PlacementWeight(90)]
         BadBat = 0x15B, // En_Bat
 
         // can hold many different types of graves or stones containing.. nothing bit broke
@@ -4078,7 +4082,6 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled] // AI gets confused, backwalks forever, pathing?
         [ActorInitVarOffset(0x445C)]
         [FileID(350)]
-        [RemovalChance(50)] // miniboss
         [ObjectListIndex(0x18D)]
         // params: 7x >> 6 is switch, 0x3F is unk
         [PathingVariants(0x700, 0x940)]
@@ -4086,7 +4089,8 @@ namespace MMR.Randomizer.GameObjects
         [DifficultAllVariants]
         [OnlyOneActorPerRoom]
         [BlockingVariantsAll] // until we can fix his pathing, he will just sit there as a statue most of the time
-        [ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
+        //[ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
+        [RemovalChance(25)]
         [EnemizerScenesPlacementBlock(Scene.TerminaField)] // nothing wrong, just no place to put and huge object slows generation down
         [SwitchFlagsPlacement(size: 0x7F, shift: 6)]
         Eyegore = 0x184, // En_Egol
@@ -5098,7 +5102,7 @@ namespace MMR.Randomizer.GameObjects
         [CompanionActor(Flame, ourVariant: 0x300, variant: 0x3)]      // amy gets green flames
         // no scene exclusion necessary, get spawned by the poe sisters minigame but they aren't actors in the scene to be randomized
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // might block everything
-        [PlacementWeight(25)]
+        [PlacementWeight(35)]
         PoeSisters = 0x1E8, // En_Po_Sisters
 
         [EnemizerEnabled]
@@ -5538,7 +5542,7 @@ namespace MMR.Randomizer.GameObjects
                                                             // TODO how old is this? is this before I knew about the cutscene version?
             Scene.SouthernSwamp, Scene.StoneTower)] // they either dont spawn, or when they appear they lock your controls, bad
         [SwitchFlagsPlacement(size: 0xFF, shift: 8)]
-        [PlacementWeight(55)]
+        [PlacementWeight(50)]
         BigPoe = 0x208, // En_Bigpo
 
         // this is the "door" sign that you cut to find him final night, this is NOT the kanban he puts out saying hes gone away
@@ -6354,7 +6358,7 @@ namespace MMR.Randomizer.GameObjects
         // 01 is laundry pool, but he only spawns at night, ignoring actor time spawn settings for a scene
         // 02 is the music-only one that spawns so you can hear him through the walls of the inn
         [GroundVariants(0x0, 0x1, 0x2)]
-        [VariantsWithRoomMax(max: 1, variant: 1)]
+        //[VariantsWithRoomMax(max: 1, variant: 0x1)] // only spawns at night
         [VariantsWithRoomMax(max: 0, variant: 0x2)]
         [VariantsWithRoomMax(max: 2, variant: 0x0)]
         [UnkillableAllVariants]
