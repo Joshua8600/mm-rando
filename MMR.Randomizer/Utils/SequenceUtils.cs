@@ -36,6 +36,7 @@ namespace MMR.Randomizer.Utils
         public static int New_AudioBankTable = 0; // for mmfilelist
         public static int NewInstrumentSetAddress; // for bgm shuffle functions to work on
         public static int CurrentFreeBank = 0x29;
+        public const int MARK_REQUIRES_NEW_BANK = 0x28; // 28 used to be the only free bank, this is legacy supported
 
         public static MD5 md5lib; // used for zip
 
@@ -436,16 +437,36 @@ namespace MMR.Randomizer.Utils
 
                 var commentSplit = sequenceFilename.Split('_'); // everything before _ is a comment, readability, discard here
                 var fileNameInstrumentSet = commentSplit.Length > 1 ? commentSplit[commentSplit.Length - 1] : sequenceFilename;
-                song.Instrument = Convert.ToInt32(fileNameInstrumentSet, 16);
-
-                if (song.Instrument > 0x28) // mmrs instrument set too high
+                try
                 {
-                    throw new Exception($"MMRS file [{song.Name}]" +
-                        $" has a zseq named after an instrument set that does not exist: [{song.Instrument.ToString("X")}]" +
-                        $" zseq filename: [{sequenceFile.Name}]");
+                    song.Instrument = Convert.ToInt32(fileNameInstrumentSet, 16);
+                }
+                catch (FormatException e)
+                {
+                    song.Instrument = MARK_REQUIRES_NEW_BANK; // filename was not an intrument set at all, assume we need a new bank
                 }
 
-                claimedBankCount += ScanForMMRSSequenceInstrumentSet(song, sequenceFilename, sequence, zip);
+                var customBankIncluded = ScanForMMRSSequenceInstrumentSet(song, sequenceFilename, sequence, zip);
+
+                // now that we have bank expansion working without known issues, bank overwriting causes more glitches for us than it helps
+                if (song.Instrument > 0x28 || customBankIncluded == 1)
+                {
+                    song.Instrument = MARK_REQUIRES_NEW_BANK;
+                    foreach (var seq in song.SequenceBinaryList)
+                    {
+                        seq.InstrumentSet.BankSlot = song.Instrument;
+                    }
+                }
+                if (song.Instrument == MARK_REQUIRES_NEW_BANK && customBankIncluded == 0)
+                {
+                    #if DEBUG
+                    throw new Exception($"File with no bank has a bad sequence filename: {sequenceFilename}");
+                    #else
+                    continue; // currently, we do NOT throw errors for regular users
+                    #endif
+                }
+
+                claimedBankCount += customBankIncluded;
 
                 ScanForMMRSFormMask(song, sequenceFilename, sequence, zip); // TODO this probably doesn't have to run per-sequence               
 
@@ -1100,28 +1121,48 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        private static (int sequenceBankIndex, int bankListIndex) FindMatchingInstrumentSetDuplicate(SequenceInfo replacementSequence)
+        {
+            for(int b = 0; b < replacementSequence.SequenceBinaryList.Count(); b++)
+            {
+                var bank = replacementSequence.SequenceBinaryList[b].SequenceBinary;
+                if (bank != null)
+                {
+                    var searchResult = RomData.InstrumentSetList.FindIndex(match => match.BankBinary == bank);
+                    if (searchResult != -1)
+                    {
+                        return (b, searchResult);
+                    }
+                }
+            }
+
+            return (-1,-1);
+        }
+
         public static void AssignSequenceSlot(SequenceInfo slotSequence, SequenceInfo replacementSequence, List<SequenceInfo> remainingSequences, string debugString, StringBuilder log)
         {
             // if the song has a custom instrument set: lock the sequence, update inst set value, debug output
             if (replacementSequence.SequenceBinaryList != null && replacementSequence.SequenceBinaryList[0] != null && replacementSequence.SequenceBinaryList[0].InstrumentSet != null)
             {
-                if (replacementSequence.SequenceBinaryList[0].InstrumentSet.BankSlot == CurrentFreeBank)
+                (int sequenceBankIndex, int bankListIndex) duplicateBankSearch = FindMatchingInstrumentSetDuplicate(replacementSequence);
+                if (duplicateBankSearch.sequenceBankIndex != -1)
                 {
-                    CurrentFreeBank++;
-                }
-                replacementSequence.Instrument = replacementSequence.SequenceBinaryList[0].InstrumentSet.BankSlot; // update to the one we want to use
-                if (RomData.InstrumentSetList[replacementSequence.Instrument].Modified > 0)
-                {
-                    RomData.InstrumentSetList[replacementSequence.Instrument].Modified += 1;
+                    RomData.InstrumentSetList[duplicateBankSearch.bankListIndex].Modified += 1;
+                    replacementSequence.Instrument = duplicateBankSearch.bankListIndex;
                     log.AppendLine(" -- v -- Instrument set number " + replacementSequence.Instrument.ToString("X2") + " is being reused -- v --");
+                    replacementSequence.SequenceBinaryList = new List<SequenceBinaryData> {
+                        replacementSequence.SequenceBinaryList[duplicateBankSearch.sequenceBankIndex]
+                    };
                 }
-                else
+                else // no duplicate bank found, add new one
                 {
+                    replacementSequence.Instrument = CurrentFreeBank++; // update to the one we want to use
+                    replacementSequence.SequenceBinaryList[0].InstrumentSet.BankSlot = replacementSequence.Instrument;
                     RomData.InstrumentSetList[replacementSequence.Instrument] = replacementSequence.SequenceBinaryList[0].InstrumentSet;
                     RomData.InstrumentSetList[replacementSequence.Instrument].InstrumentSamples = replacementSequence.InstrumentSamples;
                     log.AppendLine(" -- v -- Instrument set number " + replacementSequence.Instrument.ToString("X2") + " has been claimed -- v --");
+                    replacementSequence.SequenceBinaryList = new List<SequenceBinaryData> { replacementSequence.SequenceBinaryList[0] }; // reduce to one for later
                 }
-                replacementSequence.SequenceBinaryList = new List<SequenceBinaryData> { replacementSequence.SequenceBinaryList[0] }; // lock the one we want
             }
 
             replacementSequence.Replaces = slotSequence.Replaces; // tells the rando later what song to put into slot_seq
@@ -1385,57 +1426,6 @@ namespace MMR.Randomizer.Utils
             }
         }
 
-
-
-        public static void ReassignSkulltulaHousesMusic(byte replacement_slot = 0x75)
-        {
-            // changes the skulltulla house BGM to a separate slot so it plays a new music that isn't generic cave music (overused)
-            // the BGM for a scene is specified by a single byte in the scene headers
-
-            // to modify the scene header, which is in the scene, we need the scene as a file
-            //  we can get this from the Romdata.SceneList but this only gets populated on enemizer
-            //  and we don't NEED to populate it since vanilla scenes are static, we can just hard code it here
-            //  at re-encode, we'll have fewer decoded files to re-encode too
-            int swamp_spider_house_fid = 1284; // taken from ultimate MM spreadsheet (US File list -> A column)
-
-            // scan the files for the header that contains scene music (0x15 first byte)
-            // 15xx0000 0000yyzz where zz is the sequence pointer byte
-            RomUtils.CheckCompressed(swamp_spider_house_fid);
-            for (int b = 0; b < 0x10 * 70; b += 8)
-            {
-                if (RomData.MMFileList[swamp_spider_house_fid].Data[b] == 0x15
-                    && RomData.MMFileList[swamp_spider_house_fid].Data[b + 0x7] == 0x3B)
-                {
-                    RomData.MMFileList[swamp_spider_house_fid].Data[b + 0x7] = replacement_slot;
-                    break;
-                }
-            }
-
-            int ocean_spider_house_fid = 1291; // taken from ultimate MM spreadsheet
-            RomUtils.CheckCompressed(ocean_spider_house_fid);
-            for (int b = 0; b < 0x10 * 70; b += 8)
-            {
-                if (RomData.MMFileList[ocean_spider_house_fid].Data[b] == 0x15
-                    && RomData.MMFileList[ocean_spider_house_fid].Data[b + 0x7] == 0x3B)
-                {
-                    RomData.MMFileList[ocean_spider_house_fid].Data[b + 0x7] = replacement_slot;
-                    break;
-                }
-            }
-
-
-            SequenceInfo new_music_slot = new SequenceInfo
-            {
-                Name = "mm-spiderhouse-replacement",
-                MM_seq = replacement_slot,
-                Replaces = replacement_slot,
-                Categories = new List<int> { 2 },
-                Instrument = 3
-            };
-
-            RomData.TargetSequences.Add(new_music_slot);
-
-        }
 
         public static void ReadInstrumentSetList()
         {

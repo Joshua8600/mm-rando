@@ -22,7 +22,7 @@ namespace MMR.Randomizer
                 {
                     randomized = randomizer.Randomize(progressReporter);
 
-                    if ((configuration.OutputSettings.GenerateSpoilerLog || configuration.OutputSettings.GenerateHTMLLog)
+                    if ((configuration.OutputSettings.GenerateSpoilerLog || configuration.OutputSettings.GenerateHTMLLog || configuration.OutputSettings.GenerateSpoilerLogJson || configuration.OutputSettings.GenerateSettingsJson)
                         && configuration.GameplaySettings.LogicMode != LogicMode.Vanilla)
                     {
                         SpoilerUtils.CreateSpoilerLog(randomized, configuration.GameplaySettings, configuration.OutputSettings);

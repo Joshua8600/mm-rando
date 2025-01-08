@@ -51,6 +51,15 @@ namespace MMR.Randomizer.Models.Settings
         [Description("Output a html spoiler log (Requires spoiler log to be checked).\n\n Similar to the regular spoiler log, but readable in browsers. The locations/items are hidden by default, and hovering over them will make them visible.")]
         public bool GenerateHTMLLog { get; set; } = true;
 
+        [JsonIgnore]
+        public bool GenerateSpoilerLogJson { get; set; }
+
+        [JsonIgnore]
+        public bool GenerateSettingsJson { get; set; }
+
+        [JsonIgnore]
+        public bool GenerateHashJson { get; set; }
+
         /// <summary>
         /// Generate patch file
         /// </summary>

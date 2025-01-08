@@ -333,6 +333,7 @@ namespace MMR.Randomizer.Utils
 
         public static void PrepareHintedJunkLocations(GameplaySettings settings, Random random)
         {
+            HintedJunkLocations = new List<Item>();
             if (settings.OverrideHintPriorities != null && settings.OverrideHintItemCaps != null)
             {
                 HintedJunkLocations = settings.OverrideHintPriorities.SelectMany((tier, i) =>
@@ -352,10 +353,6 @@ namespace MMR.Randomizer.Utils
                     }
                     return new List<Item>();
                 }).ToList();
-            }
-            else
-            {
-                HintedJunkLocations = new List<Item>();
             }
         }
 
@@ -412,6 +409,14 @@ namespace MMR.Randomizer.Utils
                 { Item.AreaGyorgsLair, new Item[] { Item.AreaGreatBayTempleAccess } },
                 { Item.AreaTwinmoldsLair, new Item[] { Item.AreaInvertedStoneTowerTempleAccess, Item.AreaStoneTowerTempleAccess } },
             };
+            var dungeonItems = new List<Item>();
+            dungeonItems.AddRange(BossKeys());
+            dungeonItems.AddRange(SmallKeys());
+            dungeonItems.AddRange(DungeonNavigation());
+            if (settings.StrayFairyMode.HasFlag(StrayFairyMode.KeepWithinArea | StrayFairyMode.KeepWithinTemples) || (startingRemains.Length > 1 && settings.StrayFairyMode.HasFlag(StrayFairyMode.KeepWithinTemples)))
+            {
+                dungeonItems.AddRange(DungeonStrayFairies());
+            }
             IEnumerable<Item> filter(IEnumerable<Item> items)
             {
                 return items
@@ -445,9 +450,20 @@ namespace MMR.Randomizer.Utils
                                 BlitzJunkLocations.Add(location);
                                 debugItemObjects.Add(io);
                                 updated = true;
-                                if (!io.ItemOverride.HasValue && io.NewLocation == io.Item && io.Item.CanBeStartedWith() && !result.Contains(io.Item))
+                                if (!io.ItemOverride.HasValue)
                                 {
-                                    result.Add(io.Item); // player starts with any non-randomized blitzed item
+                                    if (!io.NewLocation.HasValue)
+                                    {
+                                        if (dungeonItems.Contains(io.Item))
+                                        {
+                                            io.NewLocation = io.Item; // randomized dungeon items that are blitzed will be placed in their vanilla location
+                                        }
+                                    }
+
+                                    if (io.NewLocation == io.Item && io.Item.CanBeStartedWith() && !result.Contains(io.Item))
+                                    {
+                                        result.Add(io.Item); // player starts with any non-randomized blitzed item
+                                    }
                                 }
                             }
                             else
