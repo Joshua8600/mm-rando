@@ -112,7 +112,6 @@ namespace MMR.Randomizer.Models.Rom
             this.ActorEnum = this.OldActorEnum = (GameObjects.Actor) injected.ActorId;
             this.BlockedScenes = this.ActorEnum.BlockedScenes();
 
-            // for now injected actors can only be of type ground
             this.SortedVariants = new List<List<int>>()
             {
                 injected.waterVariants,

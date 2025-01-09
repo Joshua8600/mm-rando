@@ -321,6 +321,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)]
         [DifficultAllVariants]
         [VariantsWithRoomMax(max: 2, variant: 0)]
+        [EnemizerScenesPlacementBlock(Scene.ClockTowerInterior)] // cutscene softlock on hms
         //[ForbidFromScene(Scene.SecretShrine)] // issue: spawn is too high, needs to be lowered
         Dinofos = 0x19, // En_Dinofos
 
@@ -6597,6 +6598,7 @@ namespace MMR.Randomizer.GameObjects
             0xFE15, // town archery sign
             0xFE18  // bank poster
         )]
+        [RemovalChance(50)]
         [UnkillableAllVariants]
         WallTalkSpot = 0x261, // En_Talk
 
@@ -6684,7 +6686,7 @@ namespace MMR.Randomizer.GameObjects
         [CeilingVariants(0xFC00)]
         [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
         [OnlyOneActorPerRoom]
-        [RemovalChance(90), PlacementWeight(35)] // TODO
+        [RemovalChance(5), PlacementWeight(35)] // TODO
         HitSpot = 0x265, // En_Hit_Tag // hittag
 
         [ActorizerEnabled]
@@ -7416,7 +7418,7 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(size: 0x3F, shift:2)] // 0x1FC
         [OnlyOneActorPerRoom] // as they give items or money, limit to one
         [UnkillableAllVariants]
-        [RemovalChance(90), PlacementWeight(23)] // free stuff, make it more rare
+        [RemovalChance(5), PlacementWeight(23)] // free stuff, make it more rare
         En_Invisible_Ruppe = 0x2AF, // En_Invisible_Ruppe
         
         [FileID(647)]
