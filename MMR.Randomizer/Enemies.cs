@@ -1072,6 +1072,7 @@ namespace MMR.Randomizer
             SplitPirateSewerMines();
             SplitSnowheadTempleBo();
             BlockBabyGoronIfNoSFXRando();
+            SwapShopActorsIfRandomized();
             FixArmosSpawnPos();
             RandomizeTheSongMonkey();
             MoveTheISTTTunnelTransitionBack();
@@ -3636,7 +3637,7 @@ namespace MMR.Randomizer
 
         }
 
-        public static void BlockBabyGoronIfNoSFXRando()
+        private static void BlockBabyGoronIfNoSFXRando()
         {
             /// the baby crying is very annoying and loud, do not allow
 
@@ -3645,6 +3646,53 @@ namespace MMR.Randomizer
                 var bab = ReplacementCandidateList.Find(act => act.ActorEnum == GameObjects.Actor.GoronKid);
                 ReplacementCandidateList.Remove(bab);
             }
+        }
+
+        private static void SwapShopActorsIfRandomized()
+        {
+            /// the smaller shop actor (3 items for sale) can have one of three separate objects:
+            ///   zora for zora shop, goron for goron shop, and the old man in the bomb shop
+            /// actor rando wont randomize them without their objects and their actors both being in the same place,
+            ///   changing the scene object to match is good enough
+
+
+            if (!VanillaEnemyList.Contains(GameObjects.Actor.ShopSeller)) return;
+
+            // even if the object is left alone, I have to move him
+            var bombShopScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.BombShop.FileID());
+            var isBombShopObjectRestricted = ObjectIsCheckBlocked(GameObjects.Scene.ZoraHallRooms, GameObjects.Actor.ShopSeller);
+            if (isBombShopObjectRestricted == null)
+            {
+                //bombShopScene.Maps[0].Objects[0] = GameObjects.Actor.ShopSeller.ObjectIndex(); // main object
+                var bombshopMan = bombShopScene.Maps[0].Actors[0];
+                bombshopMan.Position = new vec16(198, -30, -15); // his vanilla position is behind the rocked on the left, cannot see his replacement actor at all
+                bombShopScene.Maps[0].Objects[1] = SMALLEST_OBJ; // chu
+                bombShopScene.Maps[0].Objects[2] = SMALLEST_OBJ; // bomb
+                bombShopScene.Maps[0].Objects[4] = SMALLEST_OBJ; // bombbag
+            }
+
+
+            var zoraShopScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraHallRooms.FileID());
+            var isZoraShopObjectRestricted = ObjectIsCheckBlocked(GameObjects.Scene.ZoraHallRooms, GameObjects.Actor.ShopSeller);
+            if (isZoraShopObjectRestricted == null)
+            {
+                zoraShopScene.Maps[4].Objects[1] = GameObjects.Actor.ShopSeller.ObjectIndex(); // main object
+                // unused shop objects, shrink to give us more space
+                zoraShopScene.Maps[4].Objects[2] = SMALLEST_OBJ; // arrows
+                zoraShopScene.Maps[4].Objects[3] = SMALLEST_OBJ; // potions
+                zoraShopScene.Maps[4].Objects[5] = SMALLEST_OBJ; // shield
+            }
+
+            var goronShopScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GoronShop.FileID());
+            var isGoronShopObjectRestricted = ObjectIsCheckBlocked(GameObjects.Scene.GoronShop, GameObjects.Actor.ShopSeller);
+            if (isGoronShopObjectRestricted == null)
+            {
+                goronShopScene.Maps[0].Objects[1] = GameObjects.Actor.ShopSeller.ObjectIndex();
+                goronShopScene.Maps[0].Objects[2] = SMALLEST_OBJ; // arrows
+                goronShopScene.Maps[0].Objects[3] = SMALLEST_OBJ; // potion
+                goronShopScene.Maps[0].Objects[4] = SMALLEST_OBJ; // bombs
+            }
+
         }
 
         public static void FixArmosSpawnPos()

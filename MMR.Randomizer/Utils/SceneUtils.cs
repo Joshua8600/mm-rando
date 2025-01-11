@@ -246,7 +246,7 @@ namespace MMR.Randomizer.Utils
                     {
                         byte DoorCount = sceneFile[ptr + 1];
                         int DoorAddr = (int)ReadWriteUtils.Arr_ReadU32(sceneFile, ptr + 4) & 0xFFFFFF;
-                        //RomData.SceneList[i].Maps[j].ActorAddr = ActorAddr;
+                        //RomData.SceneList[i].Maps[j].AddressOfActorList = AddressOfActorList;
                         RomData.SceneList[i].Doors = ReadSceneDoors(sceneFile, DoorAddr, DoorCount, i);
                     }
                     else if (cmd == 0x14) // final header command, no more headers
@@ -464,8 +464,8 @@ namespace MMR.Randomizer.Utils
 
         private static void UpdateMap(Map map)
         {
-            WriteMapActors(RomData.MMFileList[map.File].Data, map.ActorAddr, map.Actors);
-            WriteMapObjects(RomData.MMFileList[map.File].Data, map.ObjAddr, map.Objects);
+            WriteMapActors(RomData.MMFileList[map.File].Data, map.AddressOfActorList, map.Actors);
+            WriteMapObjects(RomData.MMFileList[map.File].Data, map.AddressOfObjList, map.Objects);
         }
 
         public static void UpdateScene(Scene scene)
@@ -494,15 +494,15 @@ namespace MMR.Randomizer.Utils
                         if (cmd == 0x01)
                         {
                             byte ActorCount = RomData.MMFileList[f].Data[k + 1];
-                            int ActorAddr = (int)ReadWriteUtils.Arr_ReadU32(RomData.MMFileList[f].Data, k + 4) & 0xFFFFFF;
-                            RomData.SceneList[i].Maps[j].ActorAddr = ActorAddr;
-                            RomData.SceneList[i].Maps[j].Actors = ReadMapActors(RomData.MMFileList[f].Data, ActorAddr, ActorCount, i, j);
+                            int AddressOfActorList = (int)ReadWriteUtils.Arr_ReadU32(RomData.MMFileList[f].Data, k + 4) & 0xFFFFFF;
+                            RomData.SceneList[i].Maps[j].AddressOfActorList = AddressOfActorList;
+                            RomData.SceneList[i].Maps[j].Actors = ReadMapActors(RomData.MMFileList[f].Data, AddressOfActorList, ActorCount, i, j);
                         }
                         if (cmd == 0x0B)
                         {
                             byte ObjectCount = RomData.MMFileList[f].Data[k + 1];
                             int ObjectAddr = (int)ReadWriteUtils.Arr_ReadU32(RomData.MMFileList[f].Data, k + 4) & 0xFFFFFF;
-                            RomData.SceneList[i].Maps[j].ObjAddr = ObjectAddr;
+                            RomData.SceneList[i].Maps[j].AddressOfObjList = ObjectAddr;
                             RomData.SceneList[i].Maps[j].Objects = ReadMapObjects(RomData.MMFileList[f].Data, ObjectAddr, ObjectCount);
                         }
                         if (cmd == 0x14)
