@@ -656,18 +656,10 @@ namespace MMR.Randomizer.Utils
 
             // to pointerize milk bar we have to change the obj_sound actor in themilkbar
             ConvertSequenceSlotToPointer(seqSlotIndex: 0x56, substituteSlotIndex:0x1F, "mm-milk-bar-pointer"); // house
-            if (_results.Settings.RandomizeEnemies)
-            {
-                var milkbarScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MilkBar.FileID());
-                milkbarScene.Maps[0].Actors[17].Variants[0] = 0x13C; // from 0x156, the pointer, to 3C the actual milkbar song
-            }
-            else
-            {
-                // except we can't do this in enemizer we can't know for certain anyone is playing with both
-                RomUtils.CheckCompressed(GameObjects.Scene.MilkBar.FileID() + 1);
-                var milkbarData = RomData.MMFileList[GameObjects.Scene.MilkBar.FileID() + 1].Data;
-                milkbarData[0x193] = 0x3C; // obj_sound (actor 17) parameter from 0x156 to 0x13C (where 56 is milkbar ptr, 3C is actual milkbar slot)
-            }
+            var milkBarRoomFid = GameObjects.Scene.MilkBar.FileID() + 1; // room 1 of the scene
+            RomUtils.CheckCompressed(milkBarRoomFid);
+            var milkbarRoomData = RomData.MMFileList[milkBarRoomFid].Data;
+            milkbarRoomData[0x193] = 0x3C; // obj_sound (actor 17) parameter from 0x156 to 0x13C (where 56 is milkbar ptr, 3C is actual milkbar slot)
 
             // if combat music is disabled, that slot should be usable
             if (cosmeticSettings.DisableCombatMusic == true) // I think this is what zoey has us using currently??
