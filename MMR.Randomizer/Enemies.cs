@@ -5210,8 +5210,8 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.RedBubble)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.StoneTowerTemple, GameObjects.Actor.RealBombchu, GameObjects.Actor.ChuChu)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.CutsceneZelda)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.RealBombchu, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
@@ -6074,10 +6074,24 @@ namespace MMR.Randomizer
                         var randomCompanion = eligibleCompanions[thisSceneData.RNG.Next(eligibleCompanions.Count)];
                         // first move on top, then adjust
                         randomCompanion.Position.x = mainActor.Position.x;
-                        randomCompanion.Position.y = (short)(actorsWithCompanions[i].Position.y + companion.RelativePosition.y);
+                        randomCompanion.Position.y = (short)(mainActor.Position.y + companion.RelativePosition.y);
                         randomCompanion.Position.z = mainActor.Position.z;
 
                         // todo: use x and z, with actor rotation, to figure out where to move the actors to in the event of "tupe: in front"
+
+                        if (companion.RelativePosition.x == 50) // inFrontType
+                        {
+                            //(rotation & 0x1FF) << 7)
+                            ushort mainActorRawYaw = (ushort)((mainActor.Rotation.y) >> 7 & 0x1FF);
+                            double mainActorYaw = (float)(mainActorRawYaw * (Math.PI / 180));
+                            double cosYaw = Math.Cos(mainActorYaw);
+                            double sinYaw = Math.Sin(mainActorYaw);
+
+                            randomCompanion.Position.x += (short)(companion.RelativePosition.x * sinYaw);
+                            randomCompanion.Position.z += (short)(companion.RelativePosition.z * cosYaw);
+
+                            randomCompanion.ChangeYRotation((mainActorRawYaw + 180) % 360); // inverse of the other actor rotation for now
+                        }
 
                         // error: some rooms change actors layouts, we need to match the spawn flags for moved actors to match
                         randomCompanion.Rotation.x &= ~0x7F; // clear old spawn flags
@@ -6413,11 +6427,6 @@ namespace MMR.Randomizer
                     WriteOutput($" re-generate candidates time: [{GET_TIME(bogoStartTime)}ms][{GET_TIME(thisSceneData.StartTime)}ms]", bogoLog);
                 }
                 if (loopsCount >= 500) // inf loop catch
-                {
-                    // this shouldn't happen, un-ravel our weights
-
-                }
-                if (loopsCount >= 900) // inf loop catch
                 {
                     var error = " No enemy combo could be found to fill this scene: " + scene.SceneEnum.ToString() + " w sid:" + scene.Number.ToString("X2");
                     WriteOutput(error);

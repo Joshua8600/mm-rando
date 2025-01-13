@@ -2757,6 +2757,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1, variant: 2, 7, 9)]
         [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)] // rock circle like oot
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.OnTop, ourVariant: -1, variant: 0, 1, 2, 3, 4, 5)]
         [ForbidFromScene(Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.SwampSpiderHouse,
             Scene.MilkRoad, Scene.RomaniRanch, Scene.CuccoShack, Scene.DoggyRacetrack,
             Scene.PathToMountainVillage, Scene.ZoraCape, Scene.GreatBayCoast, Scene.MountainVillageSpring, // Scene.MountainVillage,
@@ -3549,6 +3550,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
             variant: 2, 9)]
         [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
+        [AlignedCompanionActor(BeanSeller, CompanionAlignment.InFront, ourVariant: -1, variant: 0)]
         [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         CutsceneZelda = 0x0152, // Dm_Zl
 
@@ -4528,7 +4530,7 @@ namespace MMR.Randomizer.GameObjects
             variant: 2, 9)]
         [AlignedCompanionActor(Butterfly, CompanionAlignment.Above, ourVariant: -1,
             variant: 0, 1, 2)]
-        [AlignedCompanionActor(GiantBeee, CompanionAlignment.Above, ourVariant: 0x2,
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.OnTop, ourVariant: 0x2,
             variant: 0, 1, 2, 3, 4, 5)]
         [EnemizerScenesPlacementBlock(Scene.TerminaField)] // TF has object size issues, this is the largest object, this is here just to speed up
         HappyMaskSalesman = 0x1B5, // En_Osn
@@ -5909,6 +5911,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.OnTop, ourVariant: -1, variant: 0, 1, 2, 3, 4, 5)]
         [ForbidFromScene(Scene.SouthClockTown, Scene.MilkRoad, Scene.WestClockTown,
              Scene.Woodfall, Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.MountainVillage, Scene.MountainVillageSpring, Scene.Snowhead,
              Scene.GreatBayCoast, Scene.ZoraCape, Scene.IkanaCanyon, Scene.StoneTower, Scene.InvertedStoneTower)]
@@ -6331,6 +6334,11 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.BombShop)]//, Scene.GoronShrine)]
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
             variant: 2, 9)]
+        // the gorons fear the bees
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.Above, ourVariant: 1,
+            variant: 0, 1, 2, 3, 4, 5)]
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.Above, ourVariant: 2,
+            variant: 0, 1, 2, 3, 4, 5)]
         GoronSGoro = 0x242, // En_S_Goro
 
         [ActorizerEnabled]
