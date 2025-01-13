@@ -1618,11 +1618,12 @@ namespace MMR.Randomizer
                 ActorUtils.SetActorSpawnTimeFlags(newJpGrotto);
                 newJpGrotto.Position = new vec16(1873, 1, 711);
 
+                var randomizedEntrances = sickEntrances.ToList();
                 var doorAnaData = RomData.MMFileList[GameObjects.Actor.GrottoHole.FileListIndex()].Data;
-                var firstPullLocation = _seedRNG.Next(sickEntrances.Count);
-                var entrance1 = sickEntrances[firstPullLocation];
-                sickEntrances.RemoveAt(firstPullLocation);
-                var entrance2 = sickEntrances[_seedRNG.Next(sickEntrances.Count)];
+                var firstPullLocation = _seedRNG.Next(randomizedEntrances.Count);
+                var entrance1 = randomizedEntrances[firstPullLocation];
+                randomizedEntrances.RemoveAt(firstPullLocation);
+                var entrance2 = randomizedEntrances[_seedRNG.Next(randomizedEntrances.Count)];
                 ReadWriteUtils.Arr_WriteU16(doorAnaData, 0x60A, entrance1); // E
                 ReadWriteUtils.Arr_WriteU16(doorAnaData, 0x60C, entrance2); // F
                 _syncedLog.AppendLine($"grotto list added address 1: [{entrance1.ToString("X4")}]");
@@ -2498,7 +2499,6 @@ namespace MMR.Randomizer
             // lets change one of the JP entrances at random to some other place
             var randomGrottoExitAddress = (_seedRNG.Next(2) == 1) ? (0x23A) : (0x23E); // the two exits in the grotto scene exit list
             var randomSickEntrance = sickEntrances[_seedRNG.Next(sickEntrances.Count())];
-            sickEntrances.Remove(randomSickEntrance);
             _syncedLog.AppendLine($"randomized jp_grotto exit address: [{randomSickEntrance.ToString("X4")}]");
 
             ReadWriteUtils.Arr_WriteU16(grottoScene, randomGrottoExitAddress, randomSickEntrance);
@@ -5098,7 +5098,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.HookshotWallAndPillar)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBaba, GameObjects.Actor.SkullKidPainting)) continue;
+                if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBaba, GameObjects.Actor.IronKnuckle)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.Carpenter)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.SwimmingZora, GameObjects.Actor.LabFish)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;

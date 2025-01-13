@@ -1531,7 +1531,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, 0xFF03, 0xFF02, 0xFF01)]
         [VariantsWithRoomMax(max: 1, 0x0103, 0x0102, 0x0101)]
         // this bug was from april, I might have fixed objects in swamp and this is fine again, TODO test
-        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // can crash the rcp
+        //[EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // can crash the rcp
         [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         IronKnuckle = 0x84, // En_Ik
 
