@@ -952,6 +952,8 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x68)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoGoron,
             Actor.PatrollingPirate)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ShopSeller,
+            Actor.HallucinationScrub)] // missing
         BombShop = 0x65,
 
         [FileID(1504)]

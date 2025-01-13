@@ -1057,6 +1057,8 @@ namespace MMR.Randomizer
             RepositionClockTownActors();
             ExpandGoronShineObjects();
             RandomlySwapOutZoraBandMember();
+            SwapPiratesFortressBgBreakwall();
+            AddExtraObjectToPiratesInterior();
             ExpandGoronRaceObjects();
             SplitOceanSpiderhouseSpiderObject();
             FixDekuPalaceReceptionGuards();
@@ -1070,12 +1072,12 @@ namespace MMR.Randomizer
             SplitPirateSewerMines();
             SplitSnowheadTempleBo();
             BlockBabyGoronIfNoSFXRando();
+            SwapShopActorsIfRandomized();
             FixArmosSpawnPos();
             RandomizeTheSongMonkey();
             MoveTheISTTTunnelTransitionBack();
             FixSwordSchoolPotRandomization();
             SwapIntroActors();
-            SwapPiratesFortressBgBreakwall();
             SwapCreditsCremia();
             MoveCreditsPostmanPath();
             SplitSceneSnowballIntoTwoActorObjects();
@@ -3628,7 +3630,7 @@ namespace MMR.Randomizer
 
         }
 
-        public static void BlockBabyGoronIfNoSFXRando()
+        private static void BlockBabyGoronIfNoSFXRando()
         {
             /// the baby crying is very annoying and loud, do not allow
 
@@ -3637,6 +3639,53 @@ namespace MMR.Randomizer
                 var bab = ReplacementCandidateList.Find(act => act.ActorEnum == GameObjects.Actor.GoronKid);
                 ReplacementCandidateList.Remove(bab);
             }
+        }
+
+        private static void SwapShopActorsIfRandomized()
+        {
+            /// the smaller shop actor (3 items for sale) can have one of three separate objects:
+            ///   zora for zora shop, goron for goron shop, and the old man in the bomb shop
+            /// actor rando wont randomize them without their objects and their actors both being in the same place,
+            ///   changing the scene object to match is good enough
+
+
+            if (!VanillaEnemyList.Contains(GameObjects.Actor.ShopSeller)) return;
+
+            // even if the object is left alone, I have to move him
+            var bombShopScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.BombShop.FileID());
+            var isBombShopObjectRestricted = ObjectIsCheckBlocked(GameObjects.Scene.ZoraHallRooms, GameObjects.Actor.ShopSeller);
+            if (isBombShopObjectRestricted == null)
+            {
+                //bombShopScene.Maps[0].Objects[0] = GameObjects.Actor.ShopSeller.ObjectIndex(); // main object
+                var bombshopMan = bombShopScene.Maps[0].Actors[0];
+                bombshopMan.Position = new vec16(198, -30, -15); // his vanilla position is behind the rocked on the left, cannot see his replacement actor at all
+                bombShopScene.Maps[0].Objects[1] = SMALLEST_OBJ; // chu
+                bombShopScene.Maps[0].Objects[2] = SMALLEST_OBJ; // bomb
+                bombShopScene.Maps[0].Objects[4] = SMALLEST_OBJ; // bombbag
+            }
+
+
+            var zoraShopScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraHallRooms.FileID());
+            var isZoraShopObjectRestricted = ObjectIsCheckBlocked(GameObjects.Scene.ZoraHallRooms, GameObjects.Actor.ShopSeller);
+            if (isZoraShopObjectRestricted == null)
+            {
+                zoraShopScene.Maps[4].Objects[1] = GameObjects.Actor.ShopSeller.ObjectIndex(); // main object
+                // unused shop objects, shrink to give us more space
+                zoraShopScene.Maps[4].Objects[2] = SMALLEST_OBJ; // arrows
+                zoraShopScene.Maps[4].Objects[3] = SMALLEST_OBJ; // potions
+                zoraShopScene.Maps[4].Objects[5] = SMALLEST_OBJ; // shield
+            }
+
+            var goronShopScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GoronShop.FileID());
+            var isGoronShopObjectRestricted = ObjectIsCheckBlocked(GameObjects.Scene.GoronShop, GameObjects.Actor.ShopSeller);
+            if (isGoronShopObjectRestricted == null)
+            {
+                goronShopScene.Maps[0].Objects[1] = GameObjects.Actor.ShopSeller.ObjectIndex();
+                goronShopScene.Maps[0].Objects[2] = SMALLEST_OBJ; // arrows
+                goronShopScene.Maps[0].Objects[3] = SMALLEST_OBJ; // potion
+                goronShopScene.Maps[0].Objects[4] = SMALLEST_OBJ; // bombs
+            }
+
         }
 
         public static void FixArmosSpawnPos()
@@ -4024,7 +4073,7 @@ namespace MMR.Randomizer
         private static void SwapPiratesFortressBgBreakwall()
         {
             /// BgBreakwall is an amalgamash actor that can use 10 different objects, its crazy
-            /// in pirates fortress center square its used to make multiple un-breakable crates
+            /// in pirates fortress center courtyard, its used to make multiple un-breakable crates
             /// because of the multi-object behavior its easier to change the type here to match the crate,
             /// esp since we can't remove the breakwall object its used for doors here
 
@@ -4039,10 +4088,92 @@ namespace MMR.Randomizer
                     var actor = map.Actors[a];
                     if (actor.ActorEnum == GameObjects.Actor.Bg_Breakwall)
                     {
-                        actor.ChangeActor(GameObjects.Actor.LargeWoodenCrate, vars: 0x7F3F, modifyOld: true);
+                        actor.ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
                         actor.OldName = "BgBreakwall";
                     }
                 }
+                // every scene setup has double largebox object, which I assume was meant for bgbreakwall, we can change the second one
+                map.Objects[8] = GameObjects.Actor.Bombiwa.ObjectIndex();
+            }
+        }
+
+
+        private static void AddExtraObjectToPiratesInterior()
+        {
+            /// With enemizer/actorizer pirates interior is actually kinda dry and boring
+            /// the scene has 11 objects, we can add another object to the scene to give actorizer some more free-object actors it can place
+            /// also the scene has an unused object (that doesn't get used in enemizer now) we can swap out for something random
+
+            List<GameObjects.Actor> listOfReplacementCandidates = new List<GameObjects.Actor> {
+                    GameObjects.Actor.PatrollingPirate,  GameObjects.Actor.LargeWoodenCrate,
+                    GameObjects.Actor.Bombiwa,
+                    //GameObjects.Actor.Bg_Breakwall, // we change all of the breakwalls into Bombiwa above, because hard to replace with auto detect
+            };
+            List<GameObjects.Actor> listOfShuffledGroundActors = new List<GameObjects.Actor>();
+            foreach (var candidate in listOfReplacementCandidates)
+            {
+                if (VanillaEnemyList.Contains(candidate))
+                    listOfShuffledGroundActors.Add(candidate);
+            }
+
+            if (listOfShuffledGroundActors.Count == 0) return; // nothing to change out, leave early
+
+            // because we have two objects, I want one to be default flying or wall
+            //   so we have an extra object for hitspots to become something, and I want both of them
+            GameObjects.Actor groundActor  = GameObjects.Actor.DekuBaba; // both share a variant so I dont have to keep a tuple
+            GameObjects.Actor flyingActor  = GameObjects.Actor.Keese;
+            var piratesFortressInteriorScene = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.PiratesFortress);
+
+            void RandomlyShufflePirateFortressActors(List<Actor> actorsToRandomlyShuffle)
+            {
+                for (int i = 0; i < actorsToRandomlyShuffle.Count; i++)
+                {
+                    var actor = actorsToRandomlyShuffle[i];
+                    if (_seedRNG.Next(100) < 40)
+                    {
+                        var oldName = actor.OldName;
+                        var newActor = (_seedRNG.Next(100) < 35) ? (flyingActor) : (groundActor);
+
+                        actor.ChangeActor(newActor, vars: 0x0000, modifyOld: true);
+                        actor.OldName = oldName + "(Changling)";
+                    }
+                }
+            }
+
+            // generate list of candidate slots
+            var mainRoomMap = piratesFortressInteriorScene.Maps[0];
+            var mainRoomActorsToShuffle = mainRoomMap.Actors.FindAll(act => listOfShuffledGroundActors.Contains(act.ActorEnum));
+            RandomlyShufflePirateFortressActors(mainRoomActorsToShuffle);
+
+            // have to update the scene data to load a larger object list in the game
+            var pirateRoomData = RomData.MMFileList[GameObjects.Scene.PiratesFortress.FileID() + 1].Data;
+            pirateRoomData[0x31] = 12;
+
+            mainRoomMap.Objects.Add(groundActor.ObjectIndex());
+            mainRoomMap.Objects[3] = flyingActor.ObjectIndex(); // kaizoku, the pirate captain, unused out here
+            // todo we can probably do the heart object too
+
+            if (ACTORSENABLED)
+            {
+                // because people care about seeing funny actors in intro and credits,
+                //   I should randomize the actors and objects in the other scenes too
+
+                var creditsRoomMap = piratesFortressInteriorScene.Maps[1];
+                creditsRoomMap.Objects.Add(groundActor.ObjectIndex());
+                creditsRoomMap.Objects[9] = flyingActor.ObjectIndex(); // heart piece, if its there at all rando doesnt use it
+                pirateRoomData[0x449] = 12; // I don't know which object list is which, but it doesnt matter we increase all of them
+
+                var creditsRoomActorsToShuffle = creditsRoomMap.Actors.FindAll(act => listOfShuffledGroundActors.Contains(act.ActorEnum));
+                RandomlyShufflePirateFortressActors(creditsRoomActorsToShuffle);
+
+                // the moon isnt there in the intro lol
+                var introRoomMap = piratesFortressInteriorScene.Maps[2];
+                introRoomMap.Objects.Add(groundActor.ObjectIndex());
+                introRoomMap.Objects[9] = flyingActor.ObjectIndex(); // heart piece, if its there at all rando doesnt use it
+                pirateRoomData[0x659] = 12;
+
+                var introRoomActorsToShuffle = introRoomMap.Actors.FindAll(act => listOfShuffledGroundActors.Contains(act.ActorEnum));
+                RandomlyShufflePirateFortressActors(introRoomActorsToShuffle);
             }
         }
 
@@ -5079,8 +5210,8 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.RedBubble)) continue;
-                if (TestHardSetObject(GameObjects.Scene.StoneTowerTemple, GameObjects.Actor.RealBombchu, GameObjects.Actor.ChuChu)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.RedBubble)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.StoneTowerTemple, GameObjects.Actor.RealBombchu, GameObjects.Actor.ChuChu)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
@@ -5091,12 +5222,12 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.HookshotWallAndPillar)) continue;
-                if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBaba, GameObjects.Actor.IronKnuckle)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBaba, GameObjects.Actor.IronKnuckle)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.RoadToSouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.Carpenter)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.SwimmingZora, GameObjects.Actor.LabFish)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.DekuPalace, GameObjects.Actor.Torch, GameObjects.Actor.BeanSeller)) continue;
 
-                if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.IronKnuckle)) continue;
+                if (TestHardSetObject(GameObjects.Scene.SPOT00, GameObjects.Actor.Evan, GameObjects.Actor.IronKnuckle)) continue;
                 #endif
                 #endregion
 
@@ -5974,7 +6105,6 @@ namespace MMR.Randomizer
         {
             SplitSceneLikeLikesIntoTwoActorObjects(thisSceneData);
             AddAniObjectIfTerminaFieldTree(thisSceneData);
-            AddExtraObjectToPiratesInterior(thisSceneData);
             RemoveScarecrowFromTradingPostIfSOTRandomized(thisSceneData);
         }
 
@@ -6038,66 +6168,6 @@ namespace MMR.Randomizer
 
                 // for now we just bypass rando and set it manually
                 thisSceneData.Scene.Maps[0].Objects[6] = newObject;
-            }
-        }
-
-        private static void AddExtraObjectToPiratesInterior(SceneEnemizerData thisSceneData)
-        {
-            /// With enemizer/actorizer pirates interior is actually kinda dry and boring
-            /// the scene has 11 objects, we can add another object to the scene to give enemizer some more free-object actors it can place
-            /// also the scene has an unused object (that doesn't get used in enemizer now) we can swap out for something random
-
-            // todo: change one rarely seen actor to a different actor and attach object to it instead
-
-            if (thisSceneData.Scene.SceneEnum != GameObjects.Scene.PiratesFortress) return;
-
-            // for now there should only be some chance of this happening in case the object budget is too close to call
-            //if (thisSceneData.RNG.Next() % 10 > 2) // nvm seems fine
-            {
-                // this is archaic, and should be replaced with the candidate replacement list randomized for type
-                List<int> freeObjList = new List<int>
-                {
-                    GameObjects.Actor.ClayPot.ObjectIndex(), // flying clay pot for enemizer, actual clay pots for actorizer
-                    GameObjects.Actor.IronKnuckle.ObjectIndex(),
-                    GameObjects.Actor.LikeLike.ObjectIndex(),
-                    GameObjects.Actor.DeathArmos.ObjectIndex(),
-                    GameObjects.Actor.Guay.ObjectIndex(),
-                    GameObjects.Actor.Nejiron.ObjectIndex(),
-                    GameObjects.Actor.ReDead.ObjectIndex(),
-                    GameObjects.Actor.RedBubble.ObjectIndex(), // both bubble types
-                    GameObjects.Actor.PatrollingPirate.ObjectIndex(), // thats right, have a chance of putting some of them back in
-                    GameObjects.Actor.DekuPatrolGuard.ObjectIndex(),
-                };
-
-                if (ACTORSENABLED)
-                {
-                    freeObjList.AddRange(
-                        new List<int>{
-                            GameObjects.Actor.Postbox.ObjectIndex(),
-                            GameObjects.Actor.BeanSeller.ObjectIndex(),
-                            GameObjects.Actor.Scarecrow.ObjectIndex(),
-                            GameObjects.Actor.FriendlyCucco.ObjectIndex(),
-                            GameObjects.Actor.HappyMaskSalesman.ObjectIndex(),
-                            GameObjects.Actor.ImposterFrog.ObjectIndex(),
-                            GameObjects.Actor.BombFlower.ObjectIndex()
-                        }
-                    ); ; ;
-                }
-
-                var newObject1 = freeObjList[thisSceneData.RNG.Next() % (freeObjList.Count - 1)];
-                freeObjList.Remove(newObject1);
-                var newObject2 = freeObjList[thisSceneData.RNG.Next() % (freeObjList.Count - 1)];
-                Debug.WriteLine($"+ extra object for pirates fortress interior is [0x{newObject1.ToString("X")}]");
-                Debug.WriteLine($"+ kaizoku object replacemnet for pirates fortress interior is [0x{newObject2.ToString("X")}]");
-
-                thisSceneData.Scene.Maps[0].Objects.Add(newObject1);
-
-                // have to update the scene data to load a larger object list in the game
-                var pirateSceneData = RomData.MMFileList[GameObjects.Scene.PiratesFortress.FileID() + 1].Data;
-                pirateSceneData[0x31] = 12;
-
-                // for some dumb reason the kaizoku (pirate leutenant you fight in the inteior) is here too, we can change this to something useful since it never gets used
-                thisSceneData.Scene.Maps[0].Objects[3] = newObject2;
             }
         }
 

@@ -6628,7 +6628,6 @@ namespace MMR.Randomizer
             WriteRemoveMinorMusic();
             WriteDisableFanfares();
 
-
             if (outputSettings.GenerateCosmeticsPatch)
             {
                 var directory = Path.GetDirectoryName(outputSettings.OutputROMFilename);
@@ -6638,14 +6637,6 @@ namespace MMR.Randomizer
             }
 
             WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
-
-            // garo debugging
-            using (FileStream fileStream = new FileStream("fairy.bin", FileMode.Create))
-            using (BinaryWriter sw = new BinaryWriter(fileStream))
-            {
-                sw.Write(RomData.MMFileList[GameObjects.Actor.Fairy.FileListIndex()].Data);
-            }
-
 
             if (outputSettings.GenerateROM || outputSettings.OutputVC)
             {

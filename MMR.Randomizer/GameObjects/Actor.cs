@@ -3298,9 +3298,9 @@ namespace MMR.Randomizer.GameObjects
         Empty133 = 0x133,
         Empty134 = 0x134,
 
-        //[ActorizerEnabled] // wont spawn because the required item objects are likely missing
+        [ActorizerEnabled]
         [FileID(276)]
-        [ObjectListIndex(0xD0)]
+        [ObjectListIndex(0x12C)] // D0 is zo, zora, A1 for goron, 12C for bomb shop owner
         [CheckRestricted(Scene.BombShop, variant: ActorConst.ANY_VARIANT, // 02,
             Item.ShopItemBombsBomb10, Item.ShopItemBombsBombchu10, Item.ItemBombBag, Item.UpgradeBigBombBag)]
         [CheckRestricted(Scene.ZoraHallRooms, variant: ActorConst.ANY_VARIANT, // 0x3E0,
@@ -3311,6 +3311,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x3E0, // zora shop
             0x3E1, // goron shop
             0x2)] // bomb shop
+        [VariantsWithRoomMax(max:0, variant: 0x3E0, 0x3E1, 0x2)] // wont spawn because the required item objects are likely missing
         [UnkillableAllVariants]
         ShopSeller = 0x135, // En_Sob1
 
