@@ -594,6 +594,8 @@ namespace MMR.Randomizer.Utils
             //  but if the player does find this music in-game, it still plays sufficiently random music
             //ConvertSequenceSlotToPointer(0x29, 0x0B); // point zelda(SOTime get cs) at healed
 
+            // TODO add caves/shops if the player has that music feature that keeps bgm going in those areas zoey added
+
             // with shortened cutscenes, we pointerize more slots that the player would not hear
             // if using a patch, _randomized is not set, lookup a shortened cutscene byte instead
             // =========================================================

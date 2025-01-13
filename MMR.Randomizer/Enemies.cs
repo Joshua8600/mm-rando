@@ -2265,31 +2265,24 @@ namespace MMR.Randomizer
         {
             Scene southernswampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwamp.FileID());
 
-            // because this room is already borderline lag fest, turn one into a lilypad
-            // actor 7 is the furthest back in the cave, unreachable
-            //var newLilyPad = southernswampScene.Maps[0].Actors[6];
-            //newLilyPad.ChangeActor(GameObjects.Actor.Lilypad, vars: 0, modifyOld: true);
-            //newLilyPad.Position = new vec16(561, 0, 790); // placement: toward back wall behind tourist center
-            // because of dyna limits, going to stop changing this to lily and instead leave as actor but still move
             var movedToFlower = southernswampScene.Maps[0].Actors[6];
             movedToFlower.Position = new vec16(2781, 57, 2390);
-            movedToFlower.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 45, flags: movedToFlower.Rotation.y);
+            movedToFlower.ChangeYRotation(45);
 
             var movedToTree = southernswampScene.Maps[0].Actors[4];
             movedToTree.Position = new vec16(2020, 22, 300); // placement: to the right as you approach witches, next to tree
             // rotation normal to wall behind it, turn to the right 90deg
-            movedToTree.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 270, flags: movedToTree.Rotation.y);
+            movedToTree.ChangeYRotation(270);
 
             // this actor normally faces the big oct, have them face away from the wall
             var nearSoaringStone = southernswampScene.Maps[0].Actors[44];
-            nearSoaringStone.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 90, flags: nearSoaringStone.Rotation.y);
-
+            nearSoaringStone.ChangeYRotation(90);
 
             // witch area babas
             var movedToGrass = southernswampScene.Maps[2].Actors[2];
             movedToGrass.Position = new vec16(2910, 14, -1075); // placement: between the bushes along the wall
             // rotation normal to wall behind it, turn to the left 90deg
-            movedToGrass.Rotation.y = ActorUtils.MergeRotationAndFlags(rotation: 90, flags: movedToGrass.Rotation.y);
+            movedToGrass.ChangeYRotation(90);
 
             var movedToWaterFall = southernswampScene.Maps[2].Actors[3];
             movedToWaterFall.Position = new vec16(4240, -2, -1270); // placement: near waterfall
@@ -7271,7 +7264,7 @@ namespace MMR.Randomizer
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
                     sw.Write(_syncedLog.ToString());
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 83.0\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 84.0\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
