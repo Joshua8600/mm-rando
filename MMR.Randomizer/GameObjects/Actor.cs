@@ -1049,15 +1049,18 @@ namespace MMR.Randomizer.GameObjects
             0x1B, // mountain village spring
             0x1C, // woods of mystery
             0x1D, // southern swamp
-            0x233, // path to snowhead
-            0xFF, // coast cow
-            0x37, // coast main grotto
+            0x1E, // road to southern swamp
             0x213, // path to snowhead
             0x3B, // moutain spring
+            0x219, // twin islands spring
+            0x233, // path to snowhead
+            0xFF, // coast cow
             0x37, // coast regular grotto
-            0x15, 0x216, // cape
+            0x15, 0x95, // cape (15 isnt vanilla why does it show up in rando? zoey?)
             0x16, 0x216, // road to ikana
+            // 0x238: secret grotto only accessible during title screen
             0x0218, 0x2B8, // graveyard
+            // 0x34: ikana canyon secret grotto that cannot be accessed its only available during a cutscene
             0x14, 0x54, 0xB4, // ikana canyon
             0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden

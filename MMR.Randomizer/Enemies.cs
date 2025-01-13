@@ -4832,6 +4832,28 @@ namespace MMR.Randomizer
 
                 }
             }
+            if (thisSceneData.Scene.SceneEnum == GameObjects.Scene.Grottos)
+            {
+                // grotto have an extra list of switch flags:
+                // the grotto door actor passes through the item/flag for the en_torch to use
+                //  regular actor rando cannot detect this because the en_torch has no params, and gets its info through special grotto data
+                var listOfGrottoVariants = GameObjects.Actor.GrottoHole.GetAttribute<GroundVariantsAttribute>().Variants;
+                // we only want item/chest grottos, those are all type 0 (of param space 0xF000)
+                listOfGrottoVariants.RemoveAll(variant => (variant & 0xF000) > 0);
+                // 0x300 are adjacent grottos like deku playground
+                listOfGrottoVariants.RemoveAll(variant => (variant & 0x0300) >= 0x300);
+                listOfGrottoVariants.Remove(0); // one of the gossip stone grottos
+                listOfGrottoVariants.Remove(0xFF); // cow grottos
+                thisSceneData.Log.Append(" GROTTOS have switch flags from grotto entrances: \n[");
+                foreach (var variant in listOfGrottoVariants)
+                {
+                    var switchFlag = variant & 0x1F;
+                    claimedSwitchFlags.Add(switchFlag);
+                    thisSceneData.Log.Append($"{variant.ToString("X4")}({switchFlag}),");
+
+                }
+                thisSceneData.Log.Append("]\n");
+            }
             for (int doorNumber = 0; doorNumber < thisSceneData.Scene.Doors.Count; ++doorNumber)
             {
                 var sceneDoor = thisSceneData.Scene.Doors[doorNumber];
