@@ -140,7 +140,7 @@ namespace MMR.Randomizer
                                 && (act.IsEnemyRandomized() || (ACTORSENABLED && act.IsActorRandomized()))) // both
                             .ToList();
 
-            /* var EnemiesOnly = Enum.GetValues(typeof(GameObjects.Actor)).Cast<GameObjects.Actor>()
+            var EnemiesOnly = Enum.GetValues(typeof(GameObjects.Actor)).Cast<GameObjects.Actor>()
                             .Where(act => act.ObjectIndex() > 3
                                 && (act.IsEnemyRandomized()))
                             .ToList(); //*/
@@ -1023,7 +1023,7 @@ namespace MMR.Randomizer
 
         #endregion
 
-        private static void EnemizerEarlyFixes(Random rng)
+        private static void EnemizerEarlyFixes()
         {
             /// Changes before randomization
 
@@ -1031,7 +1031,7 @@ namespace MMR.Randomizer
             FixSpecificTektiteTypes();
             EnableDampeHouseWallMaster();
             EnableTwinIslandsSpringSkullfish();
-            FixSouthernSwampDekuBaba(rng);
+            FixSouthernSwampDekuBaba();
             FixRoadToSouthernSwampBadBat();
             NudgeFlyingEnemiesForTingle();
             FixScarecrowTalk();
@@ -1067,7 +1067,7 @@ namespace MMR.Randomizer
             FixInjuredKoume();
             RandomizePinnacleRockSigns();
             RandomizeDekuPalaceBombiwaSigns();
-            SwapGreatFairies(rng);
+            SwapGreatFairies();
             ModifyFireflyKeeseForPerching();
             SplitPirateSewerMines();
             SplitSnowheadTempleBo();
@@ -1919,7 +1919,6 @@ namespace MMR.Randomizer
             {
                 // two and a thing? 
             }
-
         }
 
         private static void MovePostmanIfRandomized(Scene terminaField)
@@ -2108,8 +2107,6 @@ namespace MMR.Randomizer
                 }
                 SceneUtils.UpdateScene(ikanaGraveyardScene);
 
-                
-
                 RotateSignActors();
 
                 // both gorman and postman start behind the door if they are randomized, which puts then out of sight and if likelike can grab you through the door
@@ -2263,7 +2260,7 @@ namespace MMR.Randomizer
         ///   why? beacuse they are positioned in the elbow and its visually jarring when they spawn/despawn on room swap
         ///   its already noticable in vanilla, but with mixed enemy rando it can cause whole new enemies to pop in and out
         /// </summary>
-        public static void FixSouthernSwampDekuBaba(Random rng)
+        public static void FixSouthernSwampDekuBaba()
         {
             Scene southernswampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwamp.FileID());
 
@@ -2568,17 +2565,6 @@ namespace MMR.Randomizer
 
         public static void FixThornTraps()
         {
-            // this is incomplete, fixing thorn traps will likely take rewriting code not just removing
-
-            /// in thorn traps init code it checks if a path has only 2 nodes, if it has more or less than 2 it dies
-
-            // let's just remove that jal
-            var location = 0x3A8;// 234 * 4;
-            RomUtils.CheckCompressed(GameObjects.Actor.ThornTrap.FileListIndex());
-            var thornData = RomData.MMFileList[GameObjects.Actor.ThornTrap.FileListIndex()].Data;
-
-            ReadWriteUtils.Arr_WriteU32(thornData, location, 0x00000000);
-            ReadWriteUtils.Arr_WriteU32(thornData, 0x378, 0x00000000);
         }
 
         public static void FixSeth2()
@@ -2860,8 +2846,6 @@ namespace MMR.Randomizer
 
         }
 
-
-
         private static List<(GameObjects.Actor actor, ushort vars)> shallowWaterReplacements = new List<(GameObjects.Actor actor, ushort vars)>
         {
             (GameObjects.Actor.LikeLike, 0x2),   // water bottom type
@@ -2933,7 +2917,6 @@ namespace MMR.Randomizer
                 }
             }
 
-
             // west butterfly/comb grotto (middle right stone)
             var westGrotto = grottosScene.Maps[0];
             westGrotto.Objects[3] = GameObjects.Actor.Leever.ObjectIndex(); // unused deku baba object here, we can override
@@ -2973,10 +2956,9 @@ namespace MMR.Randomizer
             ChangeGossipHintType(northGrotto.Actors[2], 4); // middel left
             ChangeGossipHintType(westGrotto.Actors[11], 5); // middle right
             ChangeGossipHintType(eastGrotto.Actors[8], 6); // far right
-
         }
 
-        private static void SwapGreatFairies(Random rng)
+        private static void SwapGreatFairies()
         {
             /// actorizer is currently a little silly in that, if an actor/enemy is replaced, we replace the objects in other rooms of the same scene
             ///   which normally prevents us randomizing only one fairy since all fairy fountains are in the same scene they would all get dinged
@@ -2990,7 +2972,7 @@ namespace MMR.Randomizer
                 vec16 pos1, vec16 pos2, vec16 pos3)
             {
                 // shallow bath water means we have options for what to replace with, pick one
-                int randomValue = rng.Next(shallowWaterReplacements.Count);
+                int randomValue = _seedRNG.Next(shallowWaterReplacements.Count);
                 var coinTossResultActor = shallowWaterReplacements[randomValue];
 
                 var map = greatfairyFountainScene.Maps[mapIndex];
@@ -2999,7 +2981,6 @@ namespace MMR.Randomizer
                 dyYosei.OldName = fairyName;
                 dyYosei.Position = pos1;
                 dyYosei.Rotation.y = ActorUtils.MergeRotationAndFlags(90, flags: dyYosei.Rotation.y); // turn to face right
-
 
                 var elfgroup = map.Actors[actorIndex2]; // placed to the right
                 elfgroup.ChangeActor(coinTossResultActor.actor, vars: coinTossResultActor.vars, modifyOld: true);
@@ -5211,7 +5192,7 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.CutsceneZelda)) continue;
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.RealBombchu, GameObjects.Actor.BeanSeller)) continue;
+                if (TestHardSetObject(GameObjects.Scene.BombShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
@@ -7283,8 +7264,16 @@ namespace MMR.Randomizer
             SceneUtils.GetMapHeaders();
             SceneUtils.GetActors();
 
-            EnemizerEarlyFixes(_seedRNG); // before we randomize ; moved up
+            #if DEBUG
+            var shop = RomData.SceneList.Find(s => s.SceneEnum == GameObjects.Scene.BombShop);
+            var clock = shop.Maps[0].Actors[4];
+            watchActor = clock;
+            #endif
+
+            EnemizerEarlyFixes(); // before we randomize ; moved up
         }
+
+        private static Actor watchActor = null;
 
         public static void ShuffleEnemies()
         {
