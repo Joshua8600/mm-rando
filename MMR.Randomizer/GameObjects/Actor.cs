@@ -4814,8 +4814,6 @@ namespace MMR.Randomizer.GameObjects
         SoaringEffects = 0x1CE, // En_Test7
 
         [ActorizerEnabled]
-        // this actor CRASHES if you hit it with a light arrow
-        // more specifically it spawns Demo_Effect which crashes trying to draw its curv skeleton, reason unknown
         [FileID(424)]
         [ObjectListIndex(0x1B3)]
         [DynaAttributes(12, 8)]
@@ -4824,7 +4822,9 @@ namespace MMR.Randomizer.GameObjects
             0x2601, // ISTT
             0x600, 0xF00, 0x301, 0x401, // STT
             0x101, 0x201)]
-        [WaterBottomVariants(0x1)] // dont normally show up down there but its fine
+        //[WaterBottomVariants(0x1)] // dont normally show up down there but its fine
+        // this actor CRASHES if you hit it with a light arrow
+        // more specifically it spawns Demo_Effect which crashes trying to draw its curv skeleton, reason unknown
         [VariantsWithRoomMax(max: 0, variant: 0x300, 0x2A01, 0x2901, // ikana castle
             0x2601, // ISTT
             0x600, 0xF00, 0x301, 0x401, // STT

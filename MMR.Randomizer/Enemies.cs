@@ -140,7 +140,7 @@ namespace MMR.Randomizer
                                 && (act.IsEnemyRandomized() || (ACTORSENABLED && act.IsActorRandomized()))) // both
                             .ToList();
 
-            var EnemiesOnly = Enum.GetValues(typeof(GameObjects.Actor)).Cast<GameObjects.Actor>()
+            var EnemiesOnly = VanillaEnemyList
                             .Where(act => act.ObjectIndex() > 3
                                 && (act.IsEnemyRandomized()))
                             .ToList(); //*/
