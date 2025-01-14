@@ -704,16 +704,19 @@ namespace MMR.Randomizer
                         var matchingStandaloneActor = FreeCandidateList.Find(act => act.ActorEnum == mapActor.OldActorEnum);
                         if (matchingStandaloneActor != null)
                         {
+
+
                             var sceneRestrictions = mapActor.OldActorEnum.GetAttribute<ForbidFromSceneAttribute>();
                             if (sceneRestrictions != null && sceneRestrictions.ScenesExcluded.Contains(thisSceneData.Scene.SceneEnum))
                                 continue; // not valid to consider this actor
 
                             var itemRestriction = ObjectIsCheckBlocked(scene.SceneEnum, mapActor.ActorEnum, mapActor.OldVariant);
                             var chanceOfRandomization = (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic) ? (90) : (60);
+                            var randomRoll = thisSceneData.RNG.Next(100);
                             // if common scoopable actor, some are allowed but not all, for now lets make it random
                             if (itemRestriction != null && (commonScoopableActors.Contains(mapActor.OldActorEnum)
                                 && itemRestriction.ToString().Contains("BottleCatch")
-                                && thisSceneData.RNG.Next(100) < chanceOfRandomization))
+                                && randomRoll < chanceOfRandomization))
                             {
                                 #if DEBUG
                                 var itemText = $"[{ itemRestriction.ToString() }]";
@@ -743,6 +746,13 @@ namespace MMR.Randomizer
                             {
                                 log.AppendLine($" in scene [{scene.SceneEnum}][{mapIndex}] standalone was skipped over: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}]");
                                 continue; // non valid
+                            }
+
+                            var replacementChance = matchingStandaloneActor.GetRemovalChance();
+                            if (randomRoll > replacementChance)
+                            {
+                                log.AppendLine($" in scene [{scene.SceneEnum}][{mapIndex}] standalone was randomly ignored: [0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}]");
+                                continue; // blocked by roll
                             }
 
                             FixActorLastSecond(mapActor, matchingStandaloneActor.ActorEnum, mapIndex, actorIndex);

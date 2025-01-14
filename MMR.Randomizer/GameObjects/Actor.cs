@@ -4094,7 +4094,7 @@ namespace MMR.Randomizer.GameObjects
         [CreditsBlockedAllVariants] // inivible until player gets close, so invible for credits
         [OnlyOneActorPerRoom]
         [VariantsWithRoomMax(max: 0, variant: 0)] // cutscene variant is hardcoded
-        [PlacementWeight(50)]
+        [PlacementWeight(40)]
         //[ForbidFromScene(Scene.StoneTowerTemple)]
         GaroMaster = 0x182, // En_Jso2
 
@@ -4132,7 +4132,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [BlockingVariantsAll] // until we can fix his pathing, he will just sit there as a statue most of the time
         //[ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
-        [RemovalChance(25)]
+        [RemovalChance(45)]
         [EnemizerScenesPlacementBlock(Scene.TerminaField)] // nothing wrong, just no place to put and huge object slows generation down
         [SwitchFlagsPlacement(size: 0x7F, shift: 6)]
         Eyegore = 0x184, // En_Egol
