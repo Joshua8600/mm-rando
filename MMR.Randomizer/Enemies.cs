@@ -1027,64 +1027,73 @@ namespace MMR.Randomizer
         {
             /// Changes before randomization
 
-            FixSpecificLikeLikeTypes();
-            FixSpecificTektiteTypes();
-            EnableDampeHouseWallMaster();
-            EnableTwinIslandsSpringSkullfish();
+
+            //DisableActorSpawnCutsceneData();
+
+            FixInjuredKoume();
+            BlockBabyGoronIfNoSFXRando();
+            MoveTheISTTTunnelTransitionBack();
+
+            // reposition actors
             FixSouthernSwampDekuBaba();
             FixRoadToSouthernSwampBadBat();
             NudgeFlyingEnemiesForTingle();
-            FixScarecrowTalk();
+            FixSpawnLocations(); // catch all
+
+            // modify actor to work
             EnablePoFusenAnywhere();
-
-            FixSpawnLocations();
-            DistinguishLogicRequiredDekuFlowers();
-            //DisableActorSpawnCutsceneData();
-
-            AddGrottoVariety();
-            ExtendGrottoDirectIndexByte();
-            FixJPGrottos();
-
+            FixScarecrowTalk();
+            FixArmosSpawnPos();
             ShortenChickenPatience();
+            ModifyFireflyKeeseForPerching();
             //FixSeth2();
             AllowGuruGuruOutside();
-            RemoveSTTUnusedPoe();
+            RepositionClockTownActors();
             FixSilverIshi();
             FixBabaAndDragonflyShadows();
             FixCuccoChicks();
-            FixWoodfallTempleGekkoMiniboss();
             //FixStreamSfxVolume();
-            RepositionClockTownActors();
-            ExpandGoronShineObjects();
-            RandomlySwapOutZoraBandMember();
-            SwapPiratesFortressBgBreakwall();
-            AddExtraObjectToPiratesInterior();
-            ExpandGoronRaceObjects();
-            SplitOceanSpiderhouseSpiderObject();
-            FixDekuPalaceReceptionGuards();
             FixBomberKidsGameFinishWarp();
+
+            // change actors for actorizer to work
+            FixSpecificLikeLikeTypes();
+            EnableTwinIslandsSpringSkullfish();
+            FixSpecificTektiteTypes();
+            EnableDampeHouseWallMaster();
+            FixWoodfallTempleGekkoMiniboss();
             ModifyAllGraveyardBatsToFly();
-            FixInjuredKoume();
-            RandomizePinnacleRockSigns();
-            RandomizeDekuPalaceBombiwaSigns();
-            SwapGreatFairies();
-            ModifyFireflyKeeseForPerching();
             SplitPirateSewerMines();
             SplitSnowheadTempleBo();
-            BlockBabyGoronIfNoSFXRando();
-            SwapShopActorsIfRandomized();
-            FixArmosSpawnPos();
+            SwapGreatFairies();
             RandomizeTheSongMonkey();
-            MoveTheISTTTunnelTransitionBack();
+            DistinguishLogicRequiredDekuFlowers();
+            ExtendGrottoDirectIndexByte();
+            FixJPGrottos();
+
+            // scene/object list modified for variety or compatiblity
+            RemoveSTTUnusedPoe();
+            RandomlySwapOutZoraBandMember();
+            SplitOceanSpiderhouseSpiderObject();
+            FixDekuPalaceReceptionGuards();
             FixSwordSchoolPotRandomization();
+            ExpandGoronShineObjects();
+            ExpandGoronRaceObjects();
+            RandomizeDekuPalaceBombiwaSigns();
+            RandomizePinnacleRockSigns();
+            AddGrottoVariety();
+            SplitSceneSnowballIntoTwoActorObjects();
+            RearangeSecretShrineObjects();
+            IncreaseWoodsOfMysteryVariety();
+            RandomizeGreatbayCoastSurfaceTypes();
+            AddCoastFlavor();
+            SwapPiratesFortressBgBreakwall();
+            AddExtraObjectToPiratesInterior();
+            SwapShopActorsIfRandomized();
+
+            // credits
             SwapIntroActors();
             SwapCreditsCremia();
             MoveCreditsPostmanPath();
-            SplitSceneSnowballIntoTwoActorObjects();
-            RearangeSecretShrineObjects();
-            RandomizeGreatbayCoastSurfaceTypes();
-            IncreaseWoodsOfMysteryVariety();
-
             EnableAllCreditsCutScenes();
 
             Shinanigans();
@@ -1364,8 +1373,6 @@ namespace MMR.Randomizer
                 var roadToSwampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.RoadToSouthernSwamp.FileID());
                 var roadToSwampMushroom = roadToSwampScene.Maps[0].Actors[43];
                 roadToSwampMushroom.Position = new vec16(366,-182,2200);
-
-                AddCoastFlavor();
 
                 // in spring there are two torches on top of each other, which is weird, move the other one to face the first one
                 //var mountainVillageSpring = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.MountainVillageSpring.FileID());
@@ -2727,7 +2734,7 @@ namespace MMR.Randomizer
             /// however, there are two(sometimes three) unused objects in this scene we can swap out for more object variety for them
             /// note: this does not change cleared greatbay at all, mostly because it gets ignored by players 99% of the time and im lazy
 
-            if (!ACTORSENABLED) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.IshiRock)) return;
 
             var greatbayCoast = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.GreatBayCoast);
             List<Actor> replacementCandidates = ReplacementCandidateList.FindAll(act => act.GetWaterVariants().Count() > 0); // start with water only
@@ -2754,7 +2761,7 @@ namespace MMR.Randomizer
 
                 greatbayCoast.Maps[0].Objects[3] = GameObjects.Actor.Octarok.ObjectIndex(); // unused guay object
             }
-            else // we want them to stay as water bottom, but lets at least change one of the unused objects to something we can use for more variety
+            else // we want them to stay as water bottom, but let's at least change one of the unused objects to something we can use for more variety
             {
                 List<Actor> replacementWaterBottomCandidates = ReplacementCandidateList.FindAll(act => act.GetWaterBottomVariants().Count() > 0);
                 replacementCandidates.AddRange(replacementWaterBottomCandidates);
@@ -2788,7 +2795,7 @@ namespace MMR.Randomizer
 
             var newActor = GameObjects.Actor.DekuBaba;
             List<GameObjects.Actor> listOfShuffledGroundActors = null;
-            if ( ! ACTORSENABLED)
+            if ( !VanillaEnemyList.Contains(GameObjects.Actor.NaturalPatchOfGrass)) // actors enabled
             {
                 // without jump scare, this is all we can do in this setting
                 listOfShuffledGroundActors = new List<GameObjects.Actor> { GameObjects.Actor.Snapper };
@@ -2964,7 +2971,7 @@ namespace MMR.Randomizer
             ///   which normally prevents us randomizing only one fairy since all fairy fountains are in the same scene they would all get dinged
             /// in order to randomize just one great fairy we need to do it piecemeal
 
-            if (!ACTORSENABLED) return;
+            if (!ACTORSENABLED) return; // note: because of this function, great bay fairy is not in the vanillaenemylist
 
             var greatfairyFountainScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.FairyFountain.FileID());
 
@@ -3677,7 +3684,7 @@ namespace MMR.Randomizer
             // this->actor.home.pos.z -= 9.0f * Math_CosS(this->actor.shape.rot.y);
             // this->actor.world.pos.x = this->actor.home.pos.x;
             // this->actor.world.pos.z = this->actor.home.pos.z;
-            // and it makes no sense, removing
+            /// and it makes no sense, breaks strayfairies because they need to be at the same spot, removing
 
             RomUtils.CheckCompressed(GameObjects.Actor.Armos.FileListIndex());
             var armosData = RomData.MMFileList[GameObjects.Actor.Armos.FileListIndex()].Data;
@@ -4058,7 +4065,7 @@ namespace MMR.Randomizer
             /// because of the multi-object behavior its easier to change the type here to match the crate,
             /// esp since we can't remove the breakwall object its used for doors here
 
-            if (!ACTORSENABLED) return;
+            if ( ! VanillaEnemyList.Contains(GameObjects.Actor.LargeWoodenCrate)) return;
 
             var piratesFortressScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.PiratesFortress.FileID());
             for (int m = 0; m < piratesFortressScene.Maps.Count; m++)
@@ -4786,7 +4793,7 @@ namespace MMR.Randomizer
             }
 
 
-            if (ACTORSENABLED == true)
+            if (ACTORSENABLED)
             {
                 var sceneSearch = scenesToForce.Where(tuple => tuple.sceneName == thisSceneData.Scene.SceneEnum).ToArray();
                 if (sceneSearch.Count() > 0)
