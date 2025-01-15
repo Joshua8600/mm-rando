@@ -540,6 +540,8 @@ namespace MMR.Randomizer.GameObjects
                         Actor.Hiploop)] // water explosion
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ClayPot,
                         Actor.DekuKing)] // if close to scarecrow can hardlock clock skip
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Scarecrow,
+                        Actor.WoodfallTempleWoodenFlower)] // so large it can block the door
         TradingPost = 0x31,
 
         // the only "small" dyna poly scene... but why

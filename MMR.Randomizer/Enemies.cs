@@ -154,8 +154,8 @@ namespace MMR.Randomizer
             // list of replacement actors we can use to replace with
             // for now they are the same, in the future players will control how they load
             ReplacementCandidateList = new List<Actor>();
-            //foreach (var actor in EnemiesOnly) // for use with enemies only
-            foreach (var actor in VanillaEnemyList)
+            foreach (var actor in EnemiesOnly) // for use with enemies only
+            //foreach (var actor in VanillaEnemyList)
             {
                 if (actor.NoPlacableVariants() == false)
                 {
