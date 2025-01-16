@@ -700,7 +700,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInstanceSize(0x1A0)]
         [ActorInitVarOffset(0x1A0)]
         [FileID(86)]
-        [ObjectListIndex(0x61)]
+        [ObjectListIndex(0x61)] // requires a texture found in field_keep
         // weirdly this is NOT dynapoly actor
         [CheckRestricted(Scene.TerminaField, variant: GameObjects.ActorConst.ANY_VARIANT, Item.CollectableTerminaFieldTreeItem1)]
         // bush: 0xFF0B, small tree: 0xFF02
@@ -718,6 +718,12 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0xA)] // UGLY is also BG
         [UnkillableAllVariants]
         [BlockingVariantsAll]
+        // cannot put in dungeons, requires field keep
+        [EnemizerScenesPlacementBlock(Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.IkanaCastle, Scene.PiratesFortress, Scene.PiratesFortressRooms, Scene.PiratesFortressExterior, Scene.PoeHut, Scene.MarineLab, Scene.GoronRacetrack,
+          Scene.DekuTrial, Scene.GoronTrial, Scene.ZoraTrial, Scene.LinkTrial, Scene.SecretShrine,
+          Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
+          Scene.BeneathTheWell, Scene.AstralObservatory, Scene.TreasureChestShop, Scene.BeneathGraveyard
+        )]
         Treee = 0x41, // En_Wood2
 
         Empty42 = 0x42,
@@ -2186,10 +2192,16 @@ namespace MMR.Randomizer.GameObjects
 
         [ActorizerEnabled] // works but a bit lame
         [FileID(159)]
-        [ObjectListIndex(0x1BA)]
+        [ObjectListIndex(0x1BA)] // stupid actor requires all of its textures are in field keep, its a dual object for this tiny thing
         [GroundVariants(0)]
         [PlacementWeight(30)]
         [UnkillableAllVariants]
+        // cannot place in dungeons
+        [EnemizerScenesPlacementBlock(Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.IkanaCastle, Scene.PiratesFortress, Scene.PiratesFortressRooms, Scene.PiratesFortressExterior, Scene.PoeHut, Scene.MarineLab, Scene.GoronRacetrack,
+          Scene.DekuTrial, Scene.GoronTrial, Scene.ZoraTrial, Scene.LinkTrial, Scene.SecretShrine,
+          Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
+          Scene.BeneathTheWell, Scene.AstralObservatory, Scene.TreasureChestShop, Scene.BeneathGraveyard
+        )]
         OrangeGraveyardFlower = 0xB1, // Obj_Hana
 
         [ActorizerEnabled]
