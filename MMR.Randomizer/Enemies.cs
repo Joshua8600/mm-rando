@@ -154,8 +154,8 @@ namespace MMR.Randomizer
             // list of replacement actors we can use to replace with
             // for now they are the same, in the future players will control how they load
             ReplacementCandidateList = new List<Actor>();
-            foreach (var actor in EnemiesOnly) // for use with enemies only
-            //foreach (var actor in VanillaEnemyList)
+            //foreach (var actor in EnemiesOnly) // for use with enemies only
+            foreach (var actor in VanillaEnemyList)
             {
                 if (actor.NoPlacableVariants() == false)
                 {
@@ -5209,12 +5209,12 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.CutsceneZelda)) continue;
-                if (TestHardSetObject(GameObjects.Scene.BombShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue;
+                if (TestHardSetObject(GameObjects.Scene.BombShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue; // still broken
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
-                //if (TestHardSetObject(GameObjects.Scene.PiratesFortressRooms, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.DekuPatrolGuard)) continue;
+                if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.MagicSlab)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
@@ -6957,6 +6957,7 @@ namespace MMR.Randomizer
                                 // injectedActor.overlayBin = overlayData; // we dont save bin if its a previous file
                             }
 
+                            // wait isnt this bad? we dont compress the actor again? is this just a work around?
                             RomData.MMFileList[newFID].IsCompressed = false;
 
                         } // foreach bin entry

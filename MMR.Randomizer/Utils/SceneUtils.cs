@@ -77,6 +77,7 @@ namespace MMR.Randomizer.Utils
         public static void ReadExternalSceneFiles()
         {
             /// read new binary scenes from files in MMR/scenes
+            // scene injection
 
             // for now, the only metadata we have is fileid, just return instead of parsing more data
             int ParseMetaFile(string metaFile)
@@ -149,11 +150,12 @@ namespace MMR.Randomizer.Utils
                             {
                                 throw new Exception($"BROKEN SCENE FILE [{filename}] had file id [{fileId}]");
                             }
-
-                            // inject ZZZ
-                            RomData.MMFileList[fileId].Data = overlayData;
-                            RomData.MMFileList[fileId].WasEdited = true;
-                            RomData.MMFileList[fileId].IsCompressed = false;
+                            var file = RomData.MMFileList[fileId];
+                            file.Data = overlayData;
+                            file.WasEdited = true;
+                            file.IsCompressed = true;
+                            // this could cause issues later with vrom overlapping, right now its not an issue?
+                            file.End = file.Addr + file.Data.Length;
 
                         } // foreach bin entry
 
