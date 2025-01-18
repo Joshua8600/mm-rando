@@ -356,6 +356,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneBlockSensitive(Actor.ZoraEgg, -1)]
         [EnemizerSceneBlockSensitive(Actor.WoodenBarrel, -1)] // in the cage room, can block the ability to hit the switch to leave
         [EnemizerSceneBlockSensitive(Actor.PatrollingPirate, -1)] // large ice block could block the hookshot room
+        [EnemizerSceneBlockSensitive(Actor.SpikedMine, -1)] // really large ice block can block the whole tunnel
         PiratesFortressRooms = 0x20, // tag: Sewer
 
         // tag: archery
