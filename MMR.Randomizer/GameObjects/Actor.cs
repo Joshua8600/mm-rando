@@ -1251,9 +1251,14 @@ namespace MMR.Randomizer.GameObjects
         [PlacementWeight(95)]
         LikeLike = 0x6C,
 
-        //[EnemizerEnabled] // we dont actually want this detected automatically, this will be added per-likelike manually
+        [EnemizerEnabled] // we dont actually want this detected automatically, this will be added per-likelike manually
         [ObjectListIndex(0xB3)] // this is really the shield, we're using it as the second likelike object
-        LikeLikeShield = 0x28E, // 28E is a dummy actor ID, we only use it because it will never conflict with enemizer
+        [ActorInitVarOffset(0x2330)] // same as likelike for enemizer
+        [ActorInstanceSize(0x3C4)] // same as likelike for enemizer
+        [FileID(112)] // same as likelike for enemizer
+        [GroundVariants(0)]
+        [VariantsWithRoomMax(max:0, variant:0)]
+        LikeLikeShieldDummy = 0x2B2, // 2B2 is a dummy actor ID, its outside of the actor list, we only use it because it will never conflict with enemizer
 
         Empty6D = 0x6D,
         Empty6E = 0x6E,

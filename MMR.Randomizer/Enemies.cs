@@ -1067,6 +1067,7 @@ namespace MMR.Randomizer
 
             // change actors for actorizer to work
             FixSpecificLikeLikeTypes();
+            SplitLikeLikesIntoTwoActorObjects();
             EnableTwinIslandsSpringSkullfish();
             FixSpecificTektiteTypes();
             EnableDampeHouseWallMaster();
@@ -3646,6 +3647,40 @@ namespace MMR.Randomizer
 
         }
 
+        private static void SplitLikeLikesIntoTwoActorObjects()
+        {
+            /// Special case: likelikes need to be split into two objects because ground and water share one object 
+            /// the dual replacement is a problem as there are almost no enemies that fit this requirement
+
+            // TODO check if this actor is randomized, currently they are always randomized
+
+            void ReplaceAllLikelikes(List<Actor> likes)
+            {
+                for (int i = 0; i < likes.Count; ++i)
+                {
+                    var like = likes[i];
+                    // update object for all of the second likelikes, so they will use the second object
+                    if (like.ActorId == (int)GameObjects.Actor.LikeLike
+                        && GameObjects.Actor.LikeLike.IsGroundVariant(like.OldVariant))
+                    {
+                        like.ChangeActor(GameObjects.Actor.LikeLikeShieldDummy, vars:0, modifyOld:true);
+                        like.OldName = "LikeLike(Sand)";
+                        //newLikeLike.OldObjectId = newLikeLike.ObjectId = GameObjects.Actor.LikeLikeShield.ObjectIndex();
+                    }
+                }
+
+            }
+
+            var coastScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.GreatBayCoast.FileID());
+            ReplaceAllLikelikes(coastScene.Maps[0].Actors);
+            ReplaceAllLikelikes(coastScene.Maps[1].Actors);
+            var capeScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraCape.FileID());
+            ReplaceAllLikelikes(capeScene.Maps[0].Actors);
+            ReplaceAllLikelikes(capeScene.Maps[1].Actors);
+
+        }
+
+
         private static void BlockBabyGoronIfNoSFXRando()
         {
             /// the baby crying is very annoying and loud, do not allow
@@ -5233,8 +5268,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.DragonFly)) continue;
-                if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.Tijo, GameObjects.Actor.GiantBeee)) continue;
-                if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.Japas, GameObjects.Actor.MagicSlab)) continue;
+                if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.LikeLike, GameObjects.Actor.MagicSlab)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.Japas, GameObjects.Actor.MagicSlab)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
@@ -6135,33 +6170,8 @@ namespace MMR.Randomizer
 
         private static void HandleUniqueSceneSpecialObjectBehaviors(SceneEnemizerData thisSceneData)
         {
-            SplitSceneLikeLikesIntoTwoActorObjects(thisSceneData);
             AddAniObjectIfTerminaFieldTree(thisSceneData);
             RemoveScarecrowFromTradingPostIfSOTRandomized(thisSceneData);
-        }
-
-        private static void SplitSceneLikeLikesIntoTwoActorObjects(SceneEnemizerData thisSceneData)
-        {
-            /// Special case: likelikes need to be split into two objects because ground and water share one object 
-            /// but no other enemies work as dual replacement, so we want to split into two actor groups for replacement
-
-            if ((thisSceneData.Scene.File == GameObjects.Scene.ZoraCape.FileID() || thisSceneData.Scene.File == GameObjects.Scene.GreatBayCoast.FileID())
-                && thisSceneData.Objects.Contains(GameObjects.Actor.LikeLike.ObjectIndex()))
-            {
-                // add shield object to list of objects we can swap out
-                thisSceneData.Objects.Add(GameObjects.Actor.LikeLikeShield.ObjectIndex());
-                // generate a candidate list for the second likelike
-                for (int i = 0; i < thisSceneData.Actors.Count; ++i)
-                {
-                    // update object for all of the second likelikes, so they will use the second object
-                    if (thisSceneData.Actors[i].ActorId == (int)GameObjects.Actor.LikeLike
-                        && GameObjects.Actor.LikeLike.IsGroundVariant(thisSceneData.Actors[i].OldVariant))
-                    {
-                        var newLikeLike = thisSceneData.Actors[i];
-                        newLikeLike.OldObjectId = newLikeLike.ObjectId = GameObjects.Actor.LikeLikeShield.ObjectIndex();
-                    }
-                }
-            }
         }
 
         private static void AddAniObjectIfTerminaFieldTree(SceneEnemizerData thisSceneData)
@@ -6501,6 +6511,7 @@ namespace MMR.Randomizer
                     List<Actor> subMatches = chosenCandidatesForThisObject.FindAll(act => act.ObjectId == chosenObject);
 
                     #if DEBUG
+                    var original_object = VanillaEnemyList.Find(act => act.ObjectIndex() == thisSceneData.ChosenReplacementObjects[objectIndex].OldV);
                     var object_actor = VanillaEnemyList.Find(act => act.ObjectIndex() == chosenObject);
                     #endif
                     Debug.Assert(subMatches.Count > 0);
