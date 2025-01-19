@@ -1532,6 +1532,17 @@ namespace MMR.Randomizer
             ActorUtils.SetActorSpawnTimeFlags(extraBeachLeever1);
             extraBeachLeever1.ChangeActor(GameObjects.Actor.Leever, vars: 0xFF, modifyOld: true);
             //extraBeachLeever1.OldName = "Leaver";
+
+            // a lot of the likelikes are night only, this can make greatbay coast north rocky area too boring during the day
+            // 21-24 are night likes
+            for(int i = 21; i < 25; i++)
+            {
+                var nightlike = greatbaycoastScene.Maps[0].Actors[i];
+                if (_seedRNG.Next(100) < 65)
+                {
+                    ActorUtils.SetActorDaySpawnFlags(nightlike);
+                }
+            }
         }
 
 
@@ -5204,6 +5215,14 @@ namespace MMR.Randomizer
             }
         }
 
+        private static void SetZerothAndFourthDayFlagsForAllActors(SceneEnemizerData thisSceneData)
+        {
+            for (int i = 0; i < thisSceneData.Actors.Count; i++){
+                var act = thisSceneData.Actors[i];
+
+                ActorUtils.SetActorSpawnTimeFor04Day(act);
+            }
+        }
 
         public static void ShuffleObjects(SceneEnemizerData thisSceneData)
         {
@@ -6622,6 +6641,7 @@ namespace MMR.Randomizer
             FixSnowballActorSpawns(thisSceneData);
             FixNewGrottoZRotation(thisSceneData);
             EnsureOnlyOneKankyo(thisSceneData);
+            SetZerothAndFourthDayFlagsForAllActors(thisSceneData);
             // the following modify Variant which can confuse typing system
             FixPathingVars(thisSceneData); // any patrolling types need their vars fixed
             FixKickoutEnemyVars(thisSceneData); // and same with the two actors that have kickout addresses

@@ -184,8 +184,8 @@ namespace MMR.Randomizer.Utils
 
         public static void SetActorSpawnTimeFlags(Actor actor, ushort flags = 0x3FF)
         {
-            // the spawn flags, determining when an actor spawns day/night for days 0-4 (zeroth day and fourth day are mostly unused except for glitches)
-            // each gets two bits, so 0x12 0x3456 0x789A in order of flags parameter, where 0x123 are saved to x rotation and the rest to z
+            /// the spawn flags, determining when an actor spawns day/night for days 0-4 (zeroth day and fourth day are mostly unused except for glitches)
+            /// each gets two bits, so 0x12 0x3456 0x789A in order of flags parameter, where 0x123 are saved to x rotation, 0x456, 0x789A to z rotation
 
             int upperBits = flags >> 7;
             int lowerBits = flags & 0x7F;
@@ -201,6 +201,31 @@ namespace MMR.Randomizer.Utils
             actor.Rotation.z = (short)zrot;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void SetActorSpawnTimeFor04Day(Actor actor)
+        {
+            /// some actors dont spawn on zeroth or fourth day because the devs didn't think about it
+            ///  but beacuse our players often reach these areas this place can be boring, lets bring the actors back
+
+            var day1Flags = (actor.Rotation.x & 0x1) >> 2; // day 1 day
+            day1Flags |= (actor.Rotation.x & 0x40) >> 6;   // day 1 night
+
+            actor.Rotation.x |= (short)(day1Flags << 1);    // set the day 1 bits over day 0
+
+            var day3Flags = (actor.Rotation.z & 0xC) >> 2;  // day 3 day and night
+            actor.Rotation.z |= (short)(day3Flags);         // set the day 3 bits over day 4
+        }
+
+        public static void SetActorDaySpawnFlags(Actor actor)
+        {
+            /// some actors dont spawn at night, this forces day spawns
+            var nightFlags = (actor.Rotation.x & 0x2) << 7; // get night flags
+            nightFlags |= (actor.Rotation.z & 0x55);
+
+            var dayFlags = nightFlags << 1;
+            actor.Rotation.x |= (short)(dayFlags >> 7);
+            actor.Rotation.z |= (short)(dayFlags & 0x7F);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void FlattenPitchRoll(Actor actor)
