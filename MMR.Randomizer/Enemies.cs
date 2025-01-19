@@ -3512,13 +3512,31 @@ namespace MMR.Randomizer
             var replacableBandObj = new int[] { 2, 3, 5, 4 };
             var randomObjListIndex = replacableBandObj[_seedRNG.Next(replacableBandObj.Length)];
             var zoraHallScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraHall.FileID());
+            var previousObject = zoraHallScene.Maps[0].Objects[randomObjListIndex];
             zoraHallScene.Maps[0].Objects[randomObjListIndex] = GameObjects.Actor.RegularZora.ObjectIndex();
 
+            // we should also swap out the actor with the object to a zora too
+            foreach(var actor in zoraHallScene.Maps[0].Actors)
+            {
+                if(actor.ObjectId == previousObject)
+                {
+                    actor.ChangeActor(GameObjects.Actor.RegularZora, vars: 0xFC08, modifyOld: true);
+                    actor.OldName = "ZoraBandStandIn";
+                }
+            }
+
             // because of this change, the whole string of watchers are all active before the dungeon too,
-            //   move some down below so its not so crouded
+            //   move some down below so its not so crowded
             zoraHallScene.Maps[0].Actors[29].Position = new vec16(376, 2, 676); // down by the water
             zoraHallScene.Maps[0].Actors[27].Position = new vec16(-448, 2, -408); // behind the water fall near lulu
             zoraHallScene.Maps[0].Actors[28].Position = new vec16(-1002, 179, 1089); // near front door
+
+            // TODO we really need to break the zora into multiple types, pathing, perching and standing? thats crazy
+
+            // beacuse the zora band members are randomized, lulu can show up right on top of the regular zora guy,
+            var cordinationZora = zoraHallScene.Maps[0].Actors[21];
+            cordinationZora.Position = new vec16(-223, 46, -312); // moved to the left, toward the left speaker
+            ActorUtils.FlattenPitchRoll(cordinationZora); // not sure why this guy has a scew??
         }
 
         public static void ExpandGoronRaceObjects()
@@ -5214,7 +5232,9 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
-                if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.MagicSlab)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.DragonFly)) continue;
+                if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.Tijo, GameObjects.Actor.GiantBeee)) continue;
+                if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.Japas, GameObjects.Actor.MagicSlab)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;

@@ -3659,15 +3659,19 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled] // this works fine but shows up waay too often
         // there are actaually 3 others, but they are three separate objects, so hard to program
         [FileID(314)]
-        [ObjectListIndex(0x173)]
+        [ObjectListIndex(0x173)] // type zero
+        //[ObjectListIndex(0x174)] // type 1
+        //[ObjectListIndex(0x175)] // type 2
         [DynaAttributes(18, 12)] // this is multiple object, this one is triforce
         // spreadsheet thinks 0x206 could be it
         [GroundVariants(0)]
-        [WaterBottomVariants(0)]
-        [VariantsWithRoomMax(max: 5, variant: 0)]
+        //[GroundVariants(2)]
+        //[WaterBottomVariants(2)]
+        [VariantsWithRoomMax(max: 5, variant: 0, 1, 2)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        [PlacementWeight(80)]
+        [PlacementWeight(40)]
+        // TODO put some companions in front of it
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         // might be used for mikau grave, but also beta actors that teach songs...??
         MagicSlab = 0x15C, // En_Sekihi
@@ -4718,7 +4722,9 @@ namespace MMR.Randomizer.GameObjects
         //[ForbidFromScene(Scene.TouristCenter)]
         [UnkillableAllVariants]
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
-        [PlacementWeight(50)]
+        // todo: check if picto is important in logic
+        [ForbidFromScene(Scene.TouristCenter)] // cannot remove because we don't know if the boat ride is important
+        [PlacementWeight(25)]
         SwampTouristGuide = 0x1C5, // En_Shn, // tingle daddy
 
         Empty1C6 = 0x1C6,
@@ -6105,7 +6111,7 @@ namespace MMR.Randomizer.GameObjects
         [CreditsBlockedVariants(0x1, 0xF, 0x0)] // the credits version is fine in milkbar but not the rest I think
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
-        [ForbidFromScene(Scene.ZoraHallRooms)]
+        //[ForbidFromScene(Scene.ZoraHall)]
         [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
         [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
         [OnlyOneActorPerRoom]
@@ -6310,14 +6316,17 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.ZoraHallRooms, variant: ActorConst.ANY_VARIANT, Item.HeartPieceEvan)]
         // 0xF is type (1,2 and else) the 0xFEXX param does NOTHING wtf
         [GroundVariants(
-            //0xFE01, // zora hall one, concert after the thing, does not spawn regularlly
-            //0xFE02//, // cutscene version (mikau's healing)
+            0xFE01, 
+            0xFE02,//, // cutscene version (mikau's healing)
             0xFE0F // both in a cutscene scene and in the milkbar cutscene
         )]
         [WaterBottomVariants(0xFE02, // dark cutscene version, perfect for dark water bottom shinanigans
             0xF)] // also, do not put regular variant as water our typing system is dumb, doesnt know which is which
         [CreditsBlockedVariants(0xFE0F)] // music playing TODO I dont know if music playing from these actors actually breaks credits like miniboss does
-        [VariantsWithRoomMax(max: 0, variant: 0xFE0F)] // reduced to zero until I can fix his shit
+        [VariantsWithRoomMax(max: 0, variant:
+            0xFE01, // zora hall one, concert after the thing, time locked to after the clear
+            0xFE0F // reduced to zero until I can fix his shit
+        )] 
         [UnkillableAllVariants]
         [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: 0xFE0F, variant: 0x13, 0x14, 0x15)]
         [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: 0xFE0F, variant: 0x1E0, 1, 2, 9)]
