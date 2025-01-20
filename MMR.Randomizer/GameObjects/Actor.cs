@@ -5725,18 +5725,22 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(490)]
         [ObjectListIndex(0x1F8)]
-        // his actor isnt here, gets spanwed by snowball, this is just for refernece
+        // actorizer doesnt see this, he is spawned by snowball, this is just for refernece
+        // currently, actorizer adds a second snowball object so all snowball actors can stay behind, including him
+        // his object is never randomized
         [CheckRestricted(Scene.TwinIslands, variant: ActorConst.ANY_VARIANT, Item.SongLullabyIntro)]
-        // 1 is standing in the hall during spring
-        [GroundVariants(1)]
+        // cutscene version is not reachable, in hardcode it checks for spot00 and layer7
+        [GroundVariants(1)] // spring time not trapped at all
+        [PathingVariants(0)] // trapped in ice version
+        [PathingTypeVarsPlacement(mask: 0x3F, shift:10)] // 0xFC00
         [OnlyOneActorPerRoom]
         [ForbidFromScene(Scene.GoronShrine)] // remove and it crashes, dont know why (suspected missing object actor that needs it)
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
             variant: 2, 9)]
-        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
+        [PlacementWeight(80)]
         GoronElder = 0x213, // En_Jg
 
         //[ActorizerEnabled]
