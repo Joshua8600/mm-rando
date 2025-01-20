@@ -154,8 +154,8 @@ namespace MMR.Randomizer
             // list of replacement actors we can use to replace with
             // for now they are the same, in the future players will control how they load
             ReplacementCandidateList = new List<Actor>();
-            //foreach (var actor in EnemiesOnly) // for use with enemies only
-            foreach (var actor in VanillaEnemyList)
+            foreach (var actor in EnemiesOnly) // for use with enemies only
+            //foreach (var actor in VanillaEnemyList)
             {
                 if (actor.NoPlacableVariants() == false)
                 {
@@ -3713,19 +3713,20 @@ namespace MMR.Randomizer
 
             if (!VanillaEnemyList.Contains(GameObjects.Actor.ShopSeller)) return;
 
-            // even if the object is left alone, I have to move him
-            var bombShopScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.BombShop.FileID());
-            var isBombShopObjectRestricted = ObjectIsCheckBlocked(GameObjects.Scene.ZoraHallRooms, GameObjects.Actor.ShopSeller);
-            if (isBombShopObjectRestricted == null)
             {
-                //bombShopScene.Maps[0].Objects[0] = GameObjects.Actor.ShopSeller.ObjectIndex(); // main object
-                var bombshopMan = bombShopScene.Maps[0].Actors[0];
-                bombshopMan.Position = new vec16(198, -30, -15); // his vanilla position is behind the rocked on the left, cannot see his replacement actor at all
-                bombShopScene.Maps[0].Objects[1] = SMALLEST_OBJ; // chu
-                bombShopScene.Maps[0].Objects[2] = SMALLEST_OBJ; // bomb
-                bombShopScene.Maps[0].Objects[4] = SMALLEST_OBJ; // bombbag
+                // even if the object is left alone, I have to move him
+                var bombShopScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.BombShop.FileID());
+                var isBombShopObjectRestricted = ObjectIsCheckBlocked(GameObjects.Scene.BombShop, GameObjects.Actor.ShopSeller);
+                if (isBombShopObjectRestricted == null)
+                {
+                    //bombShopScene.Maps[0].Objects[0] = GameObjects.Actor.ShopSeller.ObjectIndex(); // main object
+                    var bombshopMan = bombShopScene.Maps[0].Actors[0];
+                    bombshopMan.Position = new vec16(198, -30, -15); // his vanilla position is behind the rocked on the left, cannot see his replacement actor at all
+                    bombShopScene.Maps[0].Objects[1] = SMALLEST_OBJ; // chu
+                    bombShopScene.Maps[0].Objects[2] = SMALLEST_OBJ; // bomb
+                    bombShopScene.Maps[0].Objects[4] = SMALLEST_OBJ; // bombbag
+                }
             }
-
 
             var zoraShopScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.ZoraHallRooms.FileID());
             var isZoraShopObjectRestricted = ObjectIsCheckBlocked(GameObjects.Scene.ZoraHallRooms, GameObjects.Actor.ShopSeller);
@@ -4769,12 +4770,12 @@ namespace MMR.Randomizer
             /// people are complaining that in high sanity they need at least one place where they can get drops of some kind
 
             (GameObjects.Scene sceneName, int count)[] scenesToForce = new (GameObjects.Scene sceneName, int count)[]{
-                (GameObjects.Scene.TerminaField,3),
-                (GameObjects.Scene.GreatBayCoast,2),
+                (GameObjects.Scene.TerminaField,5),
+                (GameObjects.Scene.GreatBayCoast,3),
                 (GameObjects.Scene.IkanaGraveyard, 1),
-                (GameObjects.Scene.ZoraCape,1),
+                (GameObjects.Scene.ZoraCape,2),
                 (GameObjects.Scene.RoadToIkana,1),
-                (GameObjects.Scene.RoadToSouthernSwamp,1),
+                (GameObjects.Scene.RoadToSouthernSwamp,2),
                 (GameObjects.Scene.IkanaCanyon,1),
             };
 
@@ -5256,6 +5257,7 @@ namespace MMR.Randomizer
                         if (cullCheck == null) // was weight excluded, need to re-add to test
                         {
                             var newActor = ReplacementCandidateList.Find(act => act.ActorEnum == replacement);
+                            Debug.Assert(newActor != null); // cannot find actor, enemizer?
 
                             thisSceneData.AcceptableCandidates.Add(newActor);
                             thisSceneData.CandidatesPerObject[objectIndex].Add(newActor);
@@ -5280,14 +5282,14 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.CutsceneZelda)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.CutsceneZelda)) continue;
                 if (TestHardSetObject(GameObjects.Scene.BombShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue; // still broken
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; ///ZZZZ
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.DragonFly)) continue;
-                if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.LikeLike, GameObjects.Actor.MagicSlab)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.LikeLike, GameObjects.Actor.MagicSlab)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.Japas, GameObjects.Actor.MagicSlab)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;

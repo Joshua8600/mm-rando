@@ -226,6 +226,7 @@ namespace MMR.Randomizer.GameObjects
         [FlyingVariants(2, 7, 9)]
         //[VariantsWithRoomMax(max: 1, variant: 4)] // don't create too many fairy fountains
         [VariantsWithRoomMax(max: 2, variant: 7)] // maybe limit the secret menu fairies
+        [VariantsWithRoomMax(max: 3, variant: 2,9)] // too many can mess with stuff
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.BeneathTheWell)] // dont remove from well
         Fairy = 0x10, // En_Elf
@@ -6640,6 +6641,7 @@ namespace MMR.Randomizer.GameObjects
         // in vanilla they are 344 below water, in code they are raised to -180
         //[WaterTopVariants(0,1)] // these are not actually at the water surface, but 344 below
         [WaterVariants(0,1)]
+        // because they auto adjust to water surface, they could be considered water bottom
         [UnkillableAllVariants]
         [EnemizerScenesPlacementBlock(Scene.MarineLab)] // clips through the top grate
         [PlacementWeight(75)]
