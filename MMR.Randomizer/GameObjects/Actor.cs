@@ -861,19 +861,22 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerEnabled]
         [FileID(95)]
         [ObjectListIndex(0x1)] // gameplay_keep obj 1
-        [CheckRestricted(Scene.TerminaField, ActorConst.ANY_VARIANT, Item.CollectableTerminaFieldButterflyFairy1)] // TODO which is it?
+        [CheckRestricted(Scene.TerminaField, variant: 0x2324,
+            Item.CollectableTerminaFieldButterflyFairy1,
+            Item.HeartPiecePeahat // leave as a visible aid for finding the grotto
+        )]
         // TODO finish separating them
         //[CheckRestricted(Scene.Grottos, 0x5323, Item.BottleCatchBug)] // north gossip grotto // replaced by high availability scoop
         //[CheckRestricted(Scene.Grottos, 0x2323, Item.BottleCatchBug)] // west gossip grotto
         //[CheckRestricted(Scene.Grottos, 0x6322, Item.BottleCatchFish)] // regular grotto, TODO do we want to force a fish in a unique place instead?
-        [CheckRestricted(Scene.Grottos, 0x2324, Item.CollectableGrottosOceanGossipStonesButterflyFairy1)]
-        [CheckRestricted(Scene.Grottos, 0x4324, Item.CollectableGrottosMagicBeanSellerSGrottoButterflyFairy1)]
+        [CheckRestricted(Scene.Grottos, variant: 0x2324, Item.CollectableGrottosOceanGossipStonesButterflyFairy1)]
+        [CheckRestricted(Scene.Grottos, variant: 0x4324, Item.CollectableGrottosMagicBeanSellerSGrottoButterflyFairy1)]
         [CheckRestricted(Scene.Grottos, variant: 0x3324,
             Item.CollectableGrottosCowGrottoButterflyFairy1, Item.CollectableGrottosCowGrottoButterflyFairy2
             )]
-        [CheckRestricted(Scene.MountainVillageSpring, 0x4324,
+        [CheckRestricted(Scene.MountainVillageSpring, variant: 0x4324,
             Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy1)]
-        [CheckRestricted(Scene.MountainVillageSpring, 0x5324,
+        [CheckRestricted(Scene.MountainVillageSpring, variant: 0x5324,
             Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy2)]
         [CheckRestricted(Scene.GreatBayCoast, variant: 0x2324, Item.CollectableGreatBayCoastButterflyFairy1)]
         // beatles on the floor
@@ -998,8 +1001,8 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.TerminaField, // too many here, and we want the hints
             Scene.NorthClockTown, // so many checks
             Scene.LaundryPool, Scene.MountainVillage)] // old joke
-        //[CheckRestricted(Scene.TerminaField, variant: ActorConst.ANY_VARIANT,
-        //    check: Item.)]
+        [CheckRestricted(Scene.TerminaField, variant: 0x1F,
+            check: Item.HeartPiecePeahat)]
         [CheckRestricted(Scene.RoadToSouthernSwamp, variant: ActorConst.ANY_VARIANT,
             check: Item.ChestToSwampGrotto)]
         [CheckRestricted(Scene.SouthernSwamp, variant: ActorConst.ANY_VARIANT,
@@ -2224,8 +2227,10 @@ namespace MMR.Randomizer.GameObjects
 
         [ActorizerEnabled]
         [FileID(161)]
-        //[ObjectListIndex(0x1)] // while the actor uses gamplaykeep, its just a spawner, and it spawns field stuff
-        [ObjectListIndex(0x2)]
+        [ObjectListIndex(0x2)] // while the actor uses gamplaykeep, its just a spawner, and it spawns field stuff
+        [CheckRestricted(Scene.TerminaField, variant: 0x1F02, Item.MaskKamaro, Item.NotebookMeetKamaro, Item.NotebookPromiseKamaro)]
+        [CheckRestricted(Scene.RoadToIkana, variant: 0x1F02, Item.MaskKamaro, Item.NotebookMeetKamaro, Item.NotebookPromiseKamaro)]
+        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x402, Item.ChestGraveyardGrotto)]
         // 801, opening scene grass, 0x1FXX are ranch and TF
         // 0402 is ikana graveyard rock circle
         // params: 0x3 is type, 0 is bush ring, 1 is bush scattered, 2 is rock circle
@@ -2235,7 +2240,6 @@ namespace MMR.Randomizer.GameObjects
         //  for rocks, we dont have access to 1 or 8 flag, so 0xF0 is used for item collectable, which is fine the table 10 isnt that useful
         //  0x100 disables drops? that seems to be all its used for? wtf
         //  so for both bushes and rocks, 0x1F00 is for item drop
-        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x402, Item.ChestGraveyardGrotto)]
         [GroundVariants(0x801, // lost woods
             0x1F02, // TF, road to ikana
             0x1F00, // unused romani ranch grass
@@ -2269,7 +2273,6 @@ namespace MMR.Randomizer.GameObjects
             variant: 0x8200, 0xA200, // secret japanese grottos, hidden
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [AlignedCompanionActor(Shot_Sun, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x41)] // fairies love grass
-        [ForbidFromScene(Scene.RoadToIkana)] // its right on top of shirou which gets confusing if two actors are on top of each other, visually it makes sense to leave this as a land mark
         [UnkillableAllVariants]
         GrassRockCluster = 0xB3, // Obj_Mure2
 

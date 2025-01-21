@@ -525,6 +525,21 @@ namespace MMR.Randomizer
 
             // this should no longer be required now that we build the list of lists first
             //PrepareJunkOrganizeLists(addedJunkItems); // sets ActorizerKnownJunkItems
+            /*
+            var biggerRup = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.PurpleRupees)
+                .Select(itemObj => itemObj.Item).ToList();
+            var heartPieces = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.PiecesOfHeart)
+                .Select(itemObj => itemObj.Item).ToList();
+            var recoveryHearts = _randomized.ItemList.FindAll(itemObj => itemObj.Item.ItemCategory() == GameObjects.ItemCategory.RecoveryHearts)
+                .Select(itemObj => itemObj.Item).ToList();
+            var allJunk = ActorizerKnownJunkItems.SelectMany(i => i).ToList();
+            allJunk.AddRange(biggerRup);
+            allJunk.AddRange(heartPieces);
+            allJunk.AddRange(recoveryHearts);
+            var stringList = allJunk.Select(item => item.ToString()).ToList();
+            var s = string.Join(", ", stringList.Select(s => $"\"{s}\""));
+            int i = 0;
+            // */
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
