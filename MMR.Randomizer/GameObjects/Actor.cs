@@ -1799,7 +1799,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0, variant: 0x807F, 0x8004, 0x8002, 0x8003)] // gives a "secret found" jingle
         [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)] // regular unhidden grottos
-        [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
+        [AlignedCompanionActor(TreasureChest, CompanionAlignment.OnTop, ourVariant: -1, variant:
             0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
             0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
         [UnkillableAllVariants] // not enemy actor group, no fairy no clear room
@@ -6327,7 +6327,7 @@ namespace MMR.Randomizer.GameObjects
         // 0xF is type (1,2 and else) the 0xFEXX param does NOTHING wtf
         [GroundVariants(
             0xFE01, 
-            0xFE02,//, // cutscene version (mikau's healing)
+            // 0xFE02,//, // cutscene version (mikau's healing)
             0xFE0F // both in a cutscene scene and in the milkbar cutscene
         )]
         [WaterBottomVariants(0xFE02, // dark cutscene version, perfect for dark water bottom shinanigans
