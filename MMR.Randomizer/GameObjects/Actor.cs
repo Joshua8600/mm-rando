@@ -5838,7 +5838,6 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
         GBTSeaSaw = 0x21B, // Bg_Dblue_Balance
 
-        // lol
         [ActorizerEnabled]
         [FileID(499)]
         [ObjectListIndex(0x184)]
