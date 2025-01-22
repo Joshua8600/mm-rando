@@ -87,15 +87,25 @@ namespace MMR.Randomizer.GameObjects
         [WaterBottomVariants(0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579,
             0x561E, 0x5C79, 0x5991, 0x5B58, //0x5A1E,
             0xBA1E, // switch activated
-            0x0AFB, 0x099C)] // two free, the rest are gold invisible
+            0x0AFB, 0x099C // two free, the rest are gold invisible
+        )]
         [VariantsWithRoomMax(max: 1, variant: 0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579,
             0x561E, 0x5C79, 0x5991, 0x5B58, 0x5A1E,
             0x50CA, 0x50A1,
-            0x0AFB, 0x099C)] // brown, harder to see in perpheral vision, not invisible
+            0x0AFB, 0x099C // brown, harder to see in perpheral vision, not invisible
+        )]
         [VariantsWithRoomMax(max: 0,
             0x5080 // road to ikana
-            )]
+        )]
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [AlignedCompanionActor(Bombiwa, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x807F, 0x8004, 0x8002, 
+            0xE,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106,
+            0x101, 0x100,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x8003
+        )]
         [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         /*[AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x0, 0x2000, 0x3000, 0x4000, // stone grottos
@@ -1114,6 +1124,14 @@ namespace MMR.Randomizer.GameObjects
             variant: 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)] // everyone loves a good hidden grotto under a... a cardboard box?
         [AlignedCompanionActor(UnusedStoneTowerStoneElevator, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0)] // everyone loves a good hidden grotto under a... a cardboard box?
+        [AlignedCompanionActor(Bombiwa, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x807F, 0x8004, 0x8002,
+            0xE,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106,
+            0x101, 0x100,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x8003
+        )]
         [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
         //[ForbidFromScene(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead,
         //    Scene.TerminaField)]
@@ -1626,7 +1644,7 @@ namespace MMR.Randomizer.GameObjects
         // all restricted because they add colliders which limits our BGcheck options for other things
         [VariantsWithRoomMax(max: 1, variant: 0xFF10, 0xFF20, 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         //[VariantsWithRoomMax(max: 1, variant: 0xFFC8, 0xFF96, 0xFF78)]
-        [PlacementWeight(100)]
+        [PlacementWeight(30)]
         RegularIceBlock = 0x8E, // Obj_Ice_Poly
 
         [EnemizerEnabled]
@@ -1800,11 +1818,8 @@ namespace MMR.Randomizer.GameObjects
             0x0114, 0x0115, 0x0116, 0x0117, 0x0118 // hotspring water
         )] 
         [VariantsWithRoomMax(max: 0, variant: 0x807F, 0x8004, 0x8002, 0x8003)] // gives a "secret found" jingle
-        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
-            variant: 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)] // regular unhidden grottos
-        [AlignedCompanionActor(TreasureChest, CompanionAlignment.OnTop, ourVariant: -1, variant:
-            0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
-            0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
+        //[AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
+        //    variant: 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)] // regular unhidden grottos
         [UnkillableAllVariants] // not enemy actor group, no fairy no clear room
         //[ForbidFromScene(Scene.Grottos)] //Scene.ZoraCape, Scene.GreatBayCoast
         //[EnemizerScenesPlacementBlock(// Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.SouthernSwampClear 
@@ -3410,6 +3425,7 @@ namespace MMR.Randomizer.GameObjects
         // uses a weekeventreg instead
         [SwitchFlagsPlacement(size: 0x7F, shift: 8)] // this SETS but does not read, is it passing info to a door?
         [UnkillableAllVariants]
+        [CreditsBlockedAllVariants] // too big
         [EnemizerScenesPlacementBlock(Scene.WoodsOfMystery)]
         WoodfallTempleWoodenFlower = 0x13D, // Bg_Numa_Hana
 
@@ -3564,7 +3580,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x14B)]
         [WaterBottomVariants(0)]
         [UnkillableAllVariants]
-        [CreditsBlockedAllVariants] // singing audio can break credits
+        //[CreditsBlockedAllVariants] // singing audio can break credits
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // her new actor plays flute, this can break frog choir if close enough
         [PlacementWeight(90)]
@@ -4150,16 +4166,17 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x445C)]
         [FileID(350)]
         [ObjectListIndex(0x18D)]
-        // params: 7x >> 6 is switch, 0x3F is unk
+        // params: 7x >> 6 is switch,
         [PathingVariants(0x700, 0x940)]
         [PathingTypeVarsPlacement(mask: 0x3F, shift: 0)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 6)]
         [DifficultAllVariants]
         [OnlyOneActorPerRoom]
         [BlockingVariantsAll] // until we can fix his pathing, he will just sit there as a statue most of the time
-        //[ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
+        // current issue: the door behind him locks waiting for a switch flag, have to modify all of the doors to fix
+        [ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
         [RemovalChance(45)]
         [EnemizerScenesPlacementBlock(Scene.TerminaField)] // nothing wrong, just no place to put and huge object slows generation down
-        [SwitchFlagsPlacement(size: 0x7F, shift: 6)]
         Eyegore = 0x184, // En_Egol
 
         [EnemizerEnabled]

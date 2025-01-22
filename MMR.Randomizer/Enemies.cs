@@ -1161,6 +1161,15 @@ namespace MMR.Randomizer
 
             FixKafeiPlacements();
             MoveActorsIfRandomized();
+
+            // if eyegore in the temples is removed, the door behind will not open
+            var isttScene = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.InvertedStoneTowerTemple);
+            var egol = isttScene.Maps[1].Actors[3];
+            if (egol.ActorEnum != GameObjects.Actor.Eyegore)
+            {
+
+            }
+
         }
 
         #region Static Enemizer Changes and Fixes
@@ -5296,7 +5305,8 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronElder)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.TreasureChest)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.Bombiwa)) continue;
                 if (TestHardSetObject(GameObjects.Scene.BombShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue; // still broken
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; /// what was this again? hotspring?

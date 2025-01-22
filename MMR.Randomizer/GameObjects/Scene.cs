@@ -143,9 +143,10 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1520)]
         [SceneInternalId(0x08)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HappyMaskSalesman,
-            Actor.ImposterFrog, Actor.ClayPot, Actor.SmallWoodenBox, // falls off camera
+            Actor.ImposterFrog, Actor.ClayPot, Actor.SmallWoodenBox, Actor.BadBat, // falls off camera
             Actor.IkanaGravestone // crashes on n64 because there is no floor below it to matrix rotate to
         )]
+        [ActorizerSceneCreditsActor(Actor.HappyMaskSalesman)] // issue: this removes zelda
         SPOT00 = 0x0E, // cutscene map
 
         // Unused = 0x0F,
