@@ -2356,14 +2356,34 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled] // warp addresses are offsets, dangerous until we can hard code
         [FileID(167)]
         [ObjectListIndex(0x271)]
-        //[WaterBottomVariants(0x11, 0x422, 0x833, 0xC44)] // think this would be funny
+        [CheckRestricted(
+            Item.CollectableTheMoonLinkTrialEntrancePot1, Item.CollectableTheMoonLinkTrialEntrancePot2,
+            Item.CollectableTheMoonLinkTrialEntrancePot3, Item.CollectableTheMoonLinkTrialEntrancePot4,
+            Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy1, Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy2,
+            Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy3, Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy4,
+            Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy5,
+            Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy1, Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy2,
+            Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy3, Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy4,
+            Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy5,
+            Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy1, Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy2,
+            Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy3, Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy4,
+            Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy5,
+            Item.CollectableTheMoonLinkTrialGossipStoneRoom1GossipFairy1, Item.CollectableTheMoonLinkTrialGossipStoneRoom2GossipFairy1,
+            Item.CollectableTheMoonLinkTrialIronKnuckleBattleGossipFairy1, Item.CollectableTheMoonLinkTrialIronKnuckleBattleGossipFairy2,
+            Item.CollectableTheMoonLinkTrialPieceOfHeartRoomGossipFairy1,
+            Item.HeartPieceDekuTrial, Item.HeartPieceGoronTrial, Item.HeartPieceZoraTrial, Item.HeartPieceLinkTrial,
+            Item.CollectableTheMoonLinkTrialEntrancePot1,Item.CollectableTheMoonLinkTrialEntrancePot2,
+            Item.CollectableTheMoonLinkTrialEntrancePot3,Item.CollectableTheMoonLinkTrialEntrancePot4,
+            Item.ChestLinkTrialBombchu10
+        )]
+        //[WaterBottomVariants(0x11, 0x422, 0x833, 0xC44)] // think this would be funny if they werent pathing..
         [PathingVariants(0x11, 0x422, 0x833, 0xC44)]
         [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
         [VariantsWithRoomMax(max: 1, variant: 0x11, 0x422, 0x833, 0xC44)]
         [PathingKickoutAddrVarsPlacement(mask: 0x3F0, shift: 4)]
         [UnkillableAllVariants]
-        [ForbidFromScene(Scene.TheMoon)]
-        [PlacementWeight(5)]
+        //[ForbidFromScene(Scene.TheMoon)] // all items behind them finished
+        [PlacementWeight(70)]
         MoonChild = 0xBF, // En_Js
 
         EmptyC0 = 0xC0,
