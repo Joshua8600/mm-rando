@@ -181,14 +181,20 @@ namespace MMR.Randomizer.GameObjects
         Dodongo = 0xB, // En_Dodongo
 
         [EnemizerEnabled]
-        [ActorInitVarOffset(0x1D60)]
         [FileID(50)]
         [ObjectListIndex(0xB)]
-        // params type: 0 is fire, 2 is normal, 3 is perched, 4 is ice
+        // params type: 0 is fire, 2 is normal, 3 is perched, 4 is ice (1 is not defined, detected as ELSE and assigned to perching)
         // 0x8000 is invisible
-        // type 2 can be perching? I saw 2 and 8002 in a grotto sittin in the air
-        [FlyingVariants(0x0, 0x2, 0x04, 0x8000, 0x8002, 0x8004)] // which ones are fire and ice?
-        [PerchingVariants(0x8103, 0x103)] // 0x100 is not a valid vanilla value, 0x7FFF is type, but the game uses 0xF range, so I modded
+        // in vanilla, 0x8003 is used beneath graveyard on pot and walls
+        //  the well uses 0x0 and 0x4, both flying
+        //  zero and four used in other places
+        //  so none of vanilla placements use invisible fire/ice, or even invisible flying
+        // while others can start perching, only PERCH can return to perch after being disturbed
+        [FlyingVariants(
+            0x0, 0x8000, // fire
+            0x04, 0x8004 // ice
+        )] 
+        //[PerchingVariants(0x2, 0x8002)] // doesnt exist in vanilla, see the fixed mmra actor
         [WallVariants(0x8003, 0x3)] // will take off and attack within 120 units distance (xz)
         [DifficultVariants(0x8000, 0x4, 0x8004, 0x8002)]
         [FlyingToGroundHeightAdjustment(150)]
@@ -6507,7 +6513,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [CreditsBlockedAllVariants] // invisible
         [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
-        [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.SouthernSwamp, Scene.SouthernSwampClear)] // the scene has lens reversed, so you can see him render without lens, but if you use lens he disspears
+        [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.SouthernSwampClear)] // the scene has lens reversed, so you can see him render without lens, but if you use lens he disspears
         Shiro = 0x24A, // En_Stone_heishi
 
         [FileID(546)]

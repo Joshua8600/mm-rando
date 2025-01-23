@@ -52,11 +52,14 @@ namespace MMR.Randomizer
         // init vars are located somewhere in .data, we want to know where exactly because its hard coded in overlay table
         public uint initVarsLocation = 0;
 
+        // TODO make this match regular actors??
         public List<int> groundVariants = new List<int>();
         public List<int> flyingVariants = new List<int>();
         public List<int> waterVariants = new List<int>();
         public List<int> waterTopVariants = new List<int>();
         public List<int> waterBottomVariants = new List<int>();
+        public List<int> perchingVariants = new List<int>();
+        public List<int> wallVariants = new List<int>();
         public List<int> respawningVariants = new List<int>();
         // variants with max
         public List<VariantsWithRoomMax> limitedVariants = new List<VariantsWithRoomMax>();
@@ -1114,6 +1117,7 @@ namespace MMR.Randomizer
             SwapPiratesFortressBgBreakwall();
             AddExtraObjectToPiratesInterior();
             SwapShopActorsIfRandomized();
+            FixSouthernSwampLensBehavior();
 
             // credits
             SwapIntroActors();
@@ -1810,6 +1814,7 @@ namespace MMR.Randomizer
             bigpoData[0x3A14] |= 0x80; // set the 0x80000000 actor flag to enabled red dot on the minimap
 
             //LightShinanigans();
+
 
             //PrintActorValues();
         }
@@ -3777,6 +3782,15 @@ namespace MMR.Randomizer
 
         }
 
+        public static void FixSouthernSwampLensBehavior()
+        {
+            /// The southern swamp has inverted lens behavior, meaning lens items are invisible until you use lens to see them
+            // except, is there a reason for this? seems like an after thought of using lens to find mushrooms but they switched to masks
+            var poisonSwampRoom0Data = RomData.MMFileList[GameObjects.Scene.SouthernSwamp.FileID() + 1].Data;
+            poisonSwampRoom0Data[0xE] = 0x10; // was 11 in vanilla, the 1 changes lens behavior
+            // weirdly, its only the first room, the other rooms have regular lens behavior
+        }
+
         public static void FixArmosSpawnPos()
         {
             /// for some reason armos changes its home and world position based on y rotation in init
@@ -5309,7 +5323,7 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.TreasureChest)) continue;
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.Bombiwa)) continue;
+                if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.Keese)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.SkulltulaDummy, GameObjects.Actor.GBTFreezableWaterfall)) continue; // still broken
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; /// what was this again? hotspring?
@@ -6781,6 +6795,23 @@ namespace MMR.Randomizer
                     newInjectedActor.waterBottomVariants = newWaterVariantsShort;
                     continue;
                 }
+                if (command == "perching_variants")
+                {
+                    var newPerchingVariants = valueStr.Split(",").ToList();
+                    var newPerchingVariantsShort = newPerchingVariants.Select(variant => Convert.ToInt32(variant.Trim(), 16)).ToList();
+
+                    newInjectedActor.perchingVariants = newPerchingVariantsShort;
+                    continue;
+                }
+                if (command == "wall_variants")
+                {
+                    var newWallVariants = valueStr.Split(",").ToList();
+                    var newWallVariantsShort = newWallVariants.Select(variant => Convert.ToInt32(variant.Trim(), 16)).ToList();
+
+                    newInjectedActor.wallVariants = newWallVariantsShort;
+                    continue;
+                }
+
                 if (command == "variant_with_max")
                 {
                     var newLimitedVariant = valueStr.Split(",").ToList();

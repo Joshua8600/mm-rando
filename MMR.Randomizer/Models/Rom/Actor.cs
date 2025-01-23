@@ -119,8 +119,8 @@ namespace MMR.Randomizer.Models.Rom
                 injected.waterBottomVariants,
                 injected.groundVariants,
                 injected.flyingVariants,
-                new List<int>(),
-                new List<int>(),
+                injected.wallVariants,
+                injected.perchingVariants,
                 new List<int>(),
                 new List<int>(),
             };
@@ -342,11 +342,13 @@ namespace MMR.Randomizer.Models.Rom
             this.OnlyOnePerRoom = injectedActor.onlyOnePerRoom;
 
             // should we add or replace variants? for now we add
-            this.Variants.AddRange(injectedActor.groundVariants);
-            this.Variants.AddRange(injectedActor.flyingVariants);
             this.Variants.AddRange(injectedActor.waterVariants);
             this.Variants.AddRange(injectedActor.waterBottomVariants);
             this.Variants.AddRange(injectedActor.waterTopVariants);
+            this.Variants.AddRange(injectedActor.groundVariants);
+            this.Variants.AddRange(injectedActor.flyingVariants);
+            this.Variants.AddRange(injectedActor.wallVariants);
+            this.Variants.AddRange(injectedActor.perchingVariants);
             this.Variants = this.Variants.Distinct().ToList(); // if variant copies with limits we can double dip, also bloats loops
 
             if (this.RespawningVariants == null)
@@ -371,13 +373,13 @@ namespace MMR.Randomizer.Models.Rom
             }
 
             this.VariantsWithRoomMax.AddRange(injectedActor.limitedVariants);
-            AddToSpecificSubtype(ActorType.Ground, injectedActor.groundVariants);
-            //var groundVariantEntry = this.SortedVariants[(int)ActorType.Ground - 1];
-            //groundVariantEntry.AddRange(injectedActor.groundVariants.Except(groundVariantEntry));
-            AddToSpecificSubtype(ActorType.Flying, injectedActor.flyingVariants);
             AddToSpecificSubtype(ActorType.Water, injectedActor.waterVariants);
             AddToSpecificSubtype(ActorType.WaterTop, injectedActor.waterTopVariants);
             AddToSpecificSubtype(ActorType.WaterBottom, injectedActor.waterBottomVariants);
+            AddToSpecificSubtype(ActorType.Ground, injectedActor.groundVariants);
+            AddToSpecificSubtype(ActorType.Flying, injectedActor.flyingVariants);
+            AddToSpecificSubtype(ActorType.Wall, injectedActor.wallVariants);
+            AddToSpecificSubtype(ActorType.Perching, injectedActor.perchingVariants);
         }
 
         // TODO: I forgot this exists, should be renamed and other code agressively use this
