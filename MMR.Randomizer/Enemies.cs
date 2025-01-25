@@ -5323,7 +5323,7 @@ namespace MMR.Randomizer
                 }
 
                 if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.TreasureChest)) continue;
-                if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.Keese)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.Keese)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.SkulltulaDummy, GameObjects.Actor.GBTFreezableWaterfall)) continue; // still broken
                 //if (TestHardSetObject(GameObjects.Scene.ClockTowerInterior, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.Shabom)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; /// what was this again? hotspring?
@@ -6321,9 +6321,9 @@ namespace MMR.Randomizer
                      && thisSceneData.RNG.Next(100) > actorPlacementWeight ) // under is pass, over is failure
                 {
                     thisSceneData.AcceptableCandidates.Remove(actor);
-                    #if DEBUG
-                    thisSceneData.Log.AppendLine($" (-) actor rng weight trimmed from scene placement: [{actor.Name}]");
-                    #endif
+                    //#if DEBUG
+                    //thisSceneData.Log.AppendLine($" (-) actor rng weight trimmed from scene placement: [{actor.Name}]");
+                    //#endif
                 }
             }
 

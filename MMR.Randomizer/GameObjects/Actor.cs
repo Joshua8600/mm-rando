@@ -1663,11 +1663,12 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // Slowing enemies
         Freezard = 0x8F, // En_Fz
 
-        // damn it, another multi-object actor
+        // multi-object actor the tall grass is one object, the rest is field keep
         [ActorizerEnabled]
         [ActorInstanceSize(0x19C)]
         [FileID(135)]
-        [ObjectListIndex(0xF8)] // type 0 (0x3) is FIELD_KEEP, handled in code because we dont have working code for multi-object
+        [ObjectListIndex(0xF8)] // type 0 (vars: 0x3) is FIELD_KEEP, handled in code because we dont have working code for multi-object
+        [CheckRestricted(Scene.SouthernSwamp, variant: ActorConst.ANY_VARIANT, Item.CollectableSouthernSwampPoisonedCentralSwampGrass1)]
         [CheckRestricted(Scene.SouthernSwampClear, variant: ActorConst.ANY_VARIANT, Item.CollectableSouthernSwampClearCentralSwampGrass1, Item.CollectableSouthernSwampClearCentralSwampGrass2)]
         [CheckRestricted(Scene.MilkRoad, variant: ActorConst.ANY_VARIANT, Item.CollectableMilkRoadGrass1, Item.CollectableMilkRoadGrass2, Item.CollectableMilkRoadGrass3)]
         [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT,
