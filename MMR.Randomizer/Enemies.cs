@@ -352,29 +352,47 @@ namespace MMR.Randomizer
                 ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.NotebookEntries].AddRange(notebookEntries);
             }
 
-            if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic)
+            //if (_randomized.Settings.LogicMode == Models.LogicMode.NoLogic)
             {
                 var entryRewards = _randomized.ItemList.FindAll(i =>  i.NewLocation.ToString().Contains("Notebook"));
+                List<ItemObject> junkEntries = new List<ItemObject>();
+                //List<ItemObject> notJunkDebug = new List<ItemObject>();
                 var nonJunkCount = 0;
                 for (int i = 0; i < entryRewards.Count(); i++)
                 {
                     var reward = entryRewards[i].Item;
                     var category = reward.ItemCategory() ?? GameObjects.ItemCategory.None;
-                    if ( ! ActorizerKnownJunkCategories.Contains(category))
+                    if ( category == GameObjects.ItemCategory.NotebookEntries || ! ActorizerKnownJunkCategories.Contains(category))
                     {
                         // we dont need to add the entries themselves they are already added to the junk list per-category
                         //   this is just for notebook itself
                         nonJunkCount++;
+                        //notJunkDebug.Add(entryRewards[i]);
+
+                    }
+                    else
+                    {
+                        junkEntries.Add(entryRewards[i]);
                     }
                 }
-                if (nonJunkCount > 0) // notebook leads to something and is not junk
+                if (nonJunkCount == 0) // notebook leads to something and is not junk
                 {
                     ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.MainInventory].Add(GameObjects.Item.ItemNotebook);
                     ActorizerKnownJunkCategories.Add(GameObjects.ItemCategory.NotebookEntries);
                 }
+                else // not all, add only the valid junk entries
+                {
+                    foreach (var entry in junkEntries)
+                    {
+                        if (entry.NewLocation != null)
+                            ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.NotebookEntries].Add((GameObjects.Item)entry.Item);
+                    }
+                }
             }
-            else // any logic
+            /* else // any logic
             {
+              // this is flawed: ignores that not-junk, that is also not-important, could not show up in the spheres
+
                 // check if any notebook entries are in the list of important items
                 var notebookEntryImportantSearch = allSphereItems.Any(u => u.Item.Contains("Notebook:"));
                 if (!notebookEntryImportantSearch)
@@ -388,7 +406,7 @@ namespace MMR.Randomizer
                         ActorizerKnownJunkCategories.Add(GameObjects.ItemCategory.NotebookEntries);
                     }
                 }
-            }
+            } // */
 
         }
 
