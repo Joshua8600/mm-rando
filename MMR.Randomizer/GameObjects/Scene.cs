@@ -650,6 +650,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1349)]
         [SceneInternalId(0x41)]
         [EnemizerSceneEnemyReplacementBlock(Actor.ClayPot,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, // can fly above and block the chest
             Actor.RegularIceBlock)] // the big one can reach through the ceiling into the chest, blocking the chest
         [EnemizerSceneEnemyReplacementBlock(Actor.SquareSign,
             Actor.ClocktowerGearsAndOrgan, // can block dogs in race

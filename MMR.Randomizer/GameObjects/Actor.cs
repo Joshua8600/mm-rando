@@ -943,7 +943,7 @@ namespace MMR.Randomizer.GameObjects
             0xFF2B // ocean spiderhouse
             )]
         [PathingVariants(0xEF, 0x7F, 4, 0x55B, 0x637, 0x113, 0x91F, 0x909, 0xB0C, 0xC0F)]
-        [GroundVariants(0xFF53, 0xFF53, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B)] // pathing type with path disabled, why is this so rare?
+        [GroundVariants(0xFF53, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B)] // pathing type with path disabled, why is this so rare?
         [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)]
         [VariantsWithRoomMax(max: 1,
             0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F,
@@ -954,6 +954,40 @@ namespace MMR.Randomizer.GameObjects
         [RespawningVariants(0xFF53, 0xFF07, 0xFF56, 0xFF62, 0xFF76, 0xFF03,
             0xFF3F, 0xFF3B, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B, 0xFF0F, 0xFFFC)] // mark all ceiling types as respawning to avoid being placed on kill skulltula to get skull token enemies
         [ForbidFromScene(Scene.SwampSpiderHouse, Scene.OceanSpiderHouse)] // dont remove old spiders, the new ones might not be gettable
+        [AlignedCompanionActor(Bombiwa, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x807F, 0x8004, 0x8002,
+            0xE,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106,
+            0x101, 0x100,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x8003
+        )]
+        [AlignedCompanionActor(IshiRock, CompanionAlignment.InFront, ourVariant: 0xFF61, variant: 0xFF00, 0xFF70, 0xFFA0, 0xFFB0, 
+            0x00A0, 0x0040, 0x1F0, // mountain spring
+            0x60, 0x80, // twin islands spring
+            0x32, // cape
+            0x1F2, 0xA1)]
+        [AlignedCompanionActor(IshiRock, CompanionAlignment.InFront, ourVariant: 0xFF6D, variant: 0xFF00, 0xFF70, 0xFFA0, 0xFFB0, 
+            0x00A0, 0x0040, 0x1F0, // mountain spring
+            0x60, 0x80, // twin islands spring
+            0x32, // cape
+            0x1F2, 0xA1)]
+        [AlignedCompanionActor(IshiRock, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0xFF00, 0xFF70, 0xFFA0, 0xFFB0, 
+            0x00A0, 0x0040, 0x1F0, // mountain spring
+            0x60, 0x80, // twin islands spring
+            0x32, // cape
+            0x1F2, 0xA1)]
+        [AlignedCompanionActor(BronzeBoulder, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0xFF)]
+        [AlignedCompanionActor(BronzeBoulder, CompanionAlignment.InFront, ourVariant: 0xFF61, variant: 0xFF)]
+        [AlignedCompanionActor(BronzeBoulder, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0xFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF53, variant: 0xFFFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF5D, variant: 0xFFFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF61, variant: 0xFFFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF6D, variant: 0xFFFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0xFFFF)]
+        [AlignedCompanionActor(En_Ani, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0)]
+        [AlignedCompanionActor(En_Ani, CompanionAlignment.InFront, ourVariant: 0xFF5D, variant: 0)]
+        [AlignedCompanionActor(En_Ani, CompanionAlignment.InFront, ourVariant: 0xFF61, variant: 0)]
         [TreasureFlagsPlacement(mask: 0x3F, shift: 2)] // for some reason it collides with path sometimes, TODO figure this out
         GoldSkulltula = 0x50, // En_Sw "Skullwalltulla"
 
