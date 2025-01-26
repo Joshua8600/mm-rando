@@ -5106,9 +5106,9 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.GoronVillage, variant: 0x230E, Item.CollectableGoronVillageWinterLargeSnowball5)]
         [CheckRestricted(Scene.GoronVillage, variant: 0x250E, Item.CollectableGoronVillageWinterLargeSnowball6)] //
         [CheckRestricted(Scene.MountainVillage, variant: 0x2802, Item.CollectableMountainVillageWinterLargeSnowball1)] // day 3
-        [CheckRestricted(Scene.MountainVillage, variant: 0x2C0E, Item.CollectableMountainVillageWinterLargeSnowball2)] // day 2
+        [CheckRestricted(Scene.MountainVillage, variant: 0x2902, Item.CollectableMountainVillageWinterLargeSnowball2)] // day 2
         [CheckRestricted(Scene.MountainVillage, variant: 0x2A0E, Item.CollectableMountainVillageWinterLargeSnowball3)] // day 1
-        [CheckRestricted(Scene.MountainVillage, variant: 0x2902, Item.CollectableMountainVillageWinterLargeSnowball4)] // day 2 #2
+        [CheckRestricted(Scene.MountainVillage, variant: 0x2C0E, Item.CollectableMountainVillageWinterLargeSnowball4)] // day 2 #2
         [CheckRestricted(Scene.MountainVillage, variant: 0xC0E, Item.SongLullabyIntro)] // day 2 #2
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x600E, Item.CollectablePathToSnowheadLargeSnowball1)]
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x610E, Item.CollectablePathToSnowheadLargeSnowball2)]
@@ -6525,7 +6525,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 2, variant: 0x0)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        [CreditsBlockedAllVariants]
+        //[CreditsBlockedAllVariants]
         [OnlyOneActorPerRoom] // if two of them are near to each other, and player appears near his nearby music can break
         //[ForbidFromScene(Scene.StockPotInn, Scene.LaundryPool, Scene.MilkBar)] // think him being in milkbar is a credits thing
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // his music can break Frog Choir
