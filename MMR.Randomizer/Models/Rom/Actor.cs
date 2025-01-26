@@ -560,6 +560,16 @@ namespace MMR.Randomizer.Models.Rom
             return this.SortedVariants[(int)ActorType.Ceiling - 1];
         }
 
+        public List<int> GetWallVariants()
+        {
+            return this.SortedVariants[(int)ActorType.Wall - 1];
+        }
+
+        public List<int> GetPathingVariants()
+        {
+            return this.SortedVariants[(int)ActorType.Pathing - 1];
+        }
+
 
         // todo remove this as it should be built at enum->actor time
         public List<int> UnkillableVariants()

@@ -196,7 +196,10 @@ namespace MMR.Randomizer.GameObjects
         )] 
         //[PerchingVariants(0x2, 0x8002)] // doesnt exist in vanilla, see the fixed mmra actor
         [WallVariants(0x8003, 0x3)] // will take off and attack within 120 units distance (xz)
-        [DifficultVariants(0x8000, 0x4, 0x8004, 0x8002)]
+        [DifficultVariants(0x8000, 0x4, 0x8004, 0x8002,
+            0x300, 0x304, 0x602 // non vanilla, added in mmra
+        )]
+        [VariantsWithRoomMax(max:3, variant:0, 0x8000, 0x4, 0x8004, 0x2, 0x8002)]
         [FlyingToGroundHeightAdjustment(150)]
         Keese = 0xC, // En_Firefly
 

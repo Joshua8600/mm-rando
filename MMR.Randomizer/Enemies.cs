@@ -4969,17 +4969,17 @@ namespace MMR.Randomizer
             {
                 var testActor = thisSceneData.Actors[actorIndex];
 
-                var flyingVariants = testActor.ActorEnum.GetAttribute<FlyingVariantsAttribute>();
-                var oldGroundVariants = testActor.OldActorEnum.GetAttribute<GroundVariantsAttribute>();
-                var oldWaterSurfaceVariants = testActor.OldActorEnum.GetAttribute<WaterTopVariantsAttribute>();
-                var oldPathVariants = testActor.OldActorEnum.GetAttribute<PathingVariantsAttribute>();
+                var flyingVariants = testActor.GetFlyingVariants();
+                var oldGroundVariants = testActor.GetGroundVariants();
+                var oldWaterSurfaceVariants = testActor.GetWaterTopVariants();
+                var oldPathVariants = testActor.GetPathingVariants();
                 // if previous spawn was ground and the replacement actor has an attribute, adjust height
                 // bug: type for bee in mountain spring is FLYING, should be ground, todo fix
-                if ((flyingVariants != null && flyingVariants.Variants.Contains(testActor.Variants[0])) && // chosen variant is flying
-                    ((oldGroundVariants != null && oldGroundVariants.Variants.Contains(testActor.OldVariant)) // previous ground
-                     || (oldPathVariants != null && oldPathVariants.Variants.Contains(testActor.OldVariant)) // previous pathing(ground)
-                     || (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Variants.Contains(testActor.OldVariant)) // water surface too
-                     || (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Variants.Contains(testActor.OldVariant)) // water surface too
+                if ((flyingVariants != null && flyingVariants.Contains(testActor.Variants[0])) && // chosen variant is flying
+                    ((oldGroundVariants != null && oldGroundVariants.Contains(testActor.OldVariant)) // previous ground
+                     || (oldPathVariants != null && oldPathVariants.Contains(testActor.OldVariant)) // previous pathing(ground)
+                     || (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Contains(testActor.OldVariant)) // water surface too
+                     || (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Contains(testActor.OldVariant)) // water surface too
                      || testActor.OldActorEnum == GameObjects.Actor.ClayPot // dungeon pots dont show up as ground types, need to be a special spot here
                      || testActor.OldActorEnum == GameObjects.Actor.TallGrass // field tall grass dont show up as ground types, need to be a special spot here
                       || testActor.OldActorEnum == GameObjects.Actor.BlueBubble)) // our new actor can fly
@@ -4997,9 +4997,9 @@ namespace MMR.Randomizer
                 }
 
                 // lower swimming off the surface
-                var waterVariants = testActor.ActorEnum.GetAttribute<WaterVariantsAttribute>();
-                if ((waterVariants != null && waterVariants.Variants.Contains(testActor.Variants[0])) && // chosen variant is water (swimming)
-                    (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Variants.Contains(testActor.OldVariant))) // previous water surface 
+                var waterVariants = testActor.GetWaterVariants();
+                if ((waterVariants != null && waterVariants.Contains(testActor.Variants[0])) && // chosen variant is water (swimming)
+                    (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Contains(testActor.OldVariant))) // previous water surface 
                 {
                     short randomHeight = (short)(10 + _seedRNG.Next(20));
                     testActor.Position.y -= randomHeight; // always lower flying enemies on ceiling placement, its usually way too high
@@ -5009,9 +5009,9 @@ namespace MMR.Randomizer
 
                 // raise swimming off the floor
                 //var waterVariants = testActor.ActorEnum.GetAttribute<WaterVariantsAttribute>();
-                var oldWaterBottomVariants = testActor.OldActorEnum.GetAttribute<WaterBottomVariantsAttribute>();
-                if ((waterVariants != null && waterVariants.Variants.Contains(testActor.Variants[0])) && // chosen variant is water (swimming)
-                    (oldWaterBottomVariants != null && oldWaterBottomVariants.Variants.Contains(testActor.OldVariant))) // previous water bottom 
+                var oldWaterBottomVariants = testActor.GetWaterBottomVariants();
+                if ((waterVariants != null && waterVariants.Contains(testActor.Variants[0])) && // chosen variant is water (swimming)
+                    (oldWaterBottomVariants != null && oldWaterBottomVariants.Contains(testActor.OldVariant))) // previous water bottom 
                 {
                     short randomHeight = (short)(10 + _seedRNG.Next(70));
                     testActor.Position.y += randomHeight; // always lower flying enemies on ceiling placement, its usually way too high
@@ -5019,9 +5019,9 @@ namespace MMR.Randomizer
                     UpdateStrayFairyHeight(testActor);
                 }
 
-                var oldCeilingVariants = testActor.OldActorEnum.GetAttribute<CeilingVariantsAttribute>();
-                if ((flyingVariants != null && flyingVariants.Variants.Contains(testActor.Variants[0])) && // chosen variant is flying
-                    (oldCeilingVariants != null && oldCeilingVariants.Variants.Contains(testActor.OldVariant))) // previous ceiling 
+                var oldCeilingVariants = testActor.GetCeilingVariants();
+                if ((flyingVariants != null && flyingVariants.Contains(testActor.Variants[0])) && // chosen variant is flying
+                    (oldCeilingVariants != null && oldCeilingVariants.Contains(testActor.OldVariant))) // previous ceiling 
                 {
                     short randomHeight = (short)(50 + (_seedRNG.Next() % 50));
                     testActor.Position.y -= randomHeight; // always lower flying enemies on ceiling placement, its usually way too high
@@ -5035,16 +5035,16 @@ namespace MMR.Randomizer
                     testActor.Position.y += 100;
                 }
 
-                var wallVariants = testActor.OldActorEnum.GetAttribute<WallVariantsAttribute>();
+                var wallVariants = testActor.GetWallVariants();
                 // for now I want this manually just for dexihand: rotate forward a touch because its on a wall
                 if (testActor.ActorEnum == GameObjects.Actor.Dexihand && testActor.OldActorEnum != GameObjects.Actor.Dexihand
-                    && wallVariants != null && wallVariants.Variants.Contains(testActor.OldVariant))
+                    && wallVariants != null && wallVariants.Contains(testActor.OldVariant))
                 {
                     testActor.Rotation.x = ActorUtils.MergeRotationAndFlags(60, flags: testActor.Rotation.x); // pitch rotation down a bit
                 }
                 // special case: monkey spawns with an extra height offset from the floor, not at the location of the visible model
                 if (testActor.ActorEnum == GameObjects.Actor.Monkey && testActor.Variants[0] == 0x02FF
-                    && wallVariants != null && wallVariants.Variants.Contains(testActor.OldVariant))
+                    && wallVariants != null && wallVariants.Contains(testActor.OldVariant))
                 {
                     testActor.Position.y -= 90; // too high annoyingly
                 }
@@ -5340,7 +5340,7 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.MajorDotourAtWedding)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Keese)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.DekuBaba, GameObjects.Actor.MajorDotourAtWedding)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.SkulltulaDummy, GameObjects.Actor.GBTFreezableWaterfall)) continue; // still broken
                 //if(TestHardSetObject(GameObjects.Scene.WestClockTown, GameObjects.Actor.CreditsBombShopMan, GameObjects.Actor.RedBubble)) continue;
