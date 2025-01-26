@@ -700,7 +700,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Hiploop)] // after moving the actors around, one of them just instantly explodes touching water, TODO move them to better spots to avoid instead
         [EnemizerSceneBlockSensitive(Actor.DragonFly, -1)]
         [EnemizerSceneBlockSensitive(Actor.En_Owl, -1)]
-        SouthernSwamp = 0x42,
+        [EnemizerSceneBlockSensitive(Actor.BigOcto, -1)]
+        SouthernSwamp = 0x42, // poisoned
 
         [FileID(1362)]
         [SceneInternalId(0x46)]
