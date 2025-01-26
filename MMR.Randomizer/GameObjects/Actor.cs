@@ -6969,7 +6969,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(582)]
         [ObjectListIndex(0x241)]
-        [CheckRestricted(Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
+        [CheckRestricted(Scene.MayorsResidence, variant: 0x0, Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
         [GroundVariants(0)]
         [VariantsWithRoomMax(0,0)] // talking to him without the rest of his group is crash
         [OnlyOneActorPerRoom]
@@ -7405,10 +7405,15 @@ namespace MMR.Randomizer.GameObjects
         [FileID(627)]
         [ObjectListIndex(0x269)]
         MoonWarpBeam = 0x29C, // En_Fall2
-        
+
+        [ActorizerEnabled]
         [FileID(628)]
         [ObjectListIndex(0xD)]
-        MadamAromaCutscene = 0x29D, // Dm_Al
+        [GroundVariants(0)]
+        [VariantsWithRoomMax(max:0, variant:0)] // tposer
+        [UnkillableAllVariants]
+        //[PlacementWeight(10)]
+        MadamAromaEndingCutscene = 0x29D, // Dm_Al
 
         // Dm_Gm is a complete duplicate of this according to darkeye
         [FileID(629)]
@@ -7442,9 +7447,13 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         DressMannequin = 0x2A1, // En_Drs
 
-        //todo
+        [ActorizerEnabled]
         [FileID(633)]
         [ObjectListIndex(0x241)]
+        [GroundVariants(0)]
+        //[VariantsWithRoomMax(max:2, variant:0)] // boring
+        [UnkillableAllVariants]
+        [PlacementWeight(5)] // boring tposer, but unique
         MajorDotourAtWedding = 0x2A2, // En_Ending_Hero
         
         [FileID(634)]

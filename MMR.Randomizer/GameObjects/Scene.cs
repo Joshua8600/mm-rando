@@ -479,7 +479,9 @@ namespace MMR.Randomizer.GameObjects
         // this is not actual credits music worthy, but invisible actors are still boring here
         [ActorizerSceneCreditsActor(room: 8, Actor.SoldierMoonLeaveCutscene, Actor.CarpentersFromCutscene,
             Actor.ViscenMoonLeaveCutscene, Actor. MutoMoonLeaveCutscene)] // moon leaves
-        [ActorizerSceneCreditsActor(room: 9, Actor.CuriosityShopMan, Actor.AnjuWeddingDress, Actor.Cremia, Actor.AnjuMotherWedding, Actor.AnjusGrandmaCredits, Actor.ViscenMoonLeaveCutscene, Actor.PostMan, Actor.MutoMoonLeaveCutscene, Actor.Tingle)] // wedding and postman running are both in this setup
+        [ActorizerSceneCreditsActor(room: 9, Actor.CuriosityShopMan, Actor.AnjuWeddingDress, Actor.Cremia, Actor.AnjuMotherWedding, Actor.AnjusGrandmaCredits,
+            Actor.MajorDotourAtWedding, Actor.MadamAromaEndingCutscene,
+            Actor.ViscenMoonLeaveCutscene, Actor.PostMan, Actor.MutoMoonLeaveCutscene, Actor.Tingle)] // wedding and postman running are both in this setup
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ViscenMoonLeaveCutscene,
             Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.MutoMoonLeaveCutscene,
