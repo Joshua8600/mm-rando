@@ -6063,7 +6063,7 @@ namespace MMR.Randomizer.GameObjects
         // 5 is creep trying to break into lulus room
         // 6 is sitting waiting for the rehersal
         // FC08 is the guitar tuner, FC07 is the picture buyer
-        // 09 is lights are off guy
+        //   09 is lights are off guy, cannot be randomized because we need him for lights check
         // 0x12 is missing, checks for a flag makes snese
         // 0x13/14/15 is jamming at the jazz session cutscene
         // 0x140A is near the entrance

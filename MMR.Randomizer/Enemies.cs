@@ -3594,7 +3594,6 @@ namespace MMR.Randomizer
             // beacuse the zora band members are randomized, lulu can show up right on top of the regular zora guy,
             var cordinationZora = zoraHallScene.Maps[0].Actors[21];
             cordinationZora.Position = new vec16(-223, 46, -312); // moved to the left, toward the left speaker
-            ActorUtils.FlattenPitchRoll(cordinationZora); // not sure why this guy has a scew??
         }
 
         public static void ExpandGoronRaceObjects()
