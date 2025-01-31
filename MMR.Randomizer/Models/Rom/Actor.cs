@@ -29,7 +29,7 @@ namespace MMR.Randomizer.Models.Rom
         [System.Diagnostics.DebuggerDisplay("{ObjectId.ToString(\"X3\")}")]
         public int ObjectId; // in-game object list index
         public int OldObjectId; // in-game object list index
-        public int ActorIdFlags; // we just want to keep them when re-writing, but I'm not sure they even matter
+        public int ActorIdFlags; // contain rotation ignoring flags, that convert xyz rotation for parameter use instead
         public List<int> Variants { get; private set; }
         //public List<int> Variants = new List<int> { 0 };
         public List<List<int>> SortedVariants = null;

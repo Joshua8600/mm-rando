@@ -265,39 +265,43 @@ namespace MMR.Randomizer.Utils
         
         public static void SetActorSwitchFlags(Actor actor, short switchFlags)
         {
+
+            var flagsAttr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
+            if (flagsAttr == null)
+            {
+                throw new System.Exception("There be no switches here");
+            }
+
+            // reminder: the actor init rotation cancel flags are NOT IN ORDER
+            // Y X Z
+
             // the flags are stored as actual rotation
             if (actor.ActorEnum.GetAttribute<SwitchFlagsPlacementXRotAttribute>() != null)
             {
                 // wait what the fuck, have these been wrong this whole time??
                 //actor.Rotation.x = (short)MergeRotationAndFlags(switchFlags, flags: actor.Rotation.x);
-                actor.Rotation.x = switchFlags;
+                actor.ChangeXRotation(switchFlags);
+                actor.ActorIdFlags |= 0x4000; // dont convert x rotation, it's a parameter
                 return;
             }
             if (actor.ActorEnum.GetAttribute<SwitchFlagsPlacementZRotAttribute>() != null)
             {
                 //actor.Rotation.z = (short)MergeRotationAndFlags(switchFlags, flags: actor.Rotation.z);
-                actor.Rotation.z = switchFlags;
+                actor.ChangeZRotation(switchFlags);
+                actor.ActorIdFlags |= 0x2000; // dont convert z rotation, it's a parameter
                 return;
             }
+            // else: regular switch flags in vars
 
-            var flagsAttr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
-            if (flagsAttr != null)
-            {
-                // clear the old switchflags from our newly chosen Variant
-                var deleteMask = flagsAttr.Size << flagsAttr.Shift;
-                var newVarsWithoutSwitchflags = actor.Variants[0] & ~deleteMask;
+            // clear the old switchflags from our newly chosen Variant
+            var deleteMask = flagsAttr.Size << flagsAttr.Shift;
+            var newVarsWithoutSwitchflags = actor.Variants[0] & ~deleteMask;
 
-                // shift the switchflags into the new location
-                var newSwitchflags = switchFlags << flagsAttr.Shift;
+            // shift the switchflags into the new location
+            var newSwitchflags = switchFlags << flagsAttr.Shift;
 
-                // set variant from cleaned old variant ORed against the new switchflags
-                actor.Variants[0] = newVarsWithoutSwitchflags | newSwitchflags;
-            }
-            else
-            {
-                throw new System.Exception("There be no switches here");
-            }
-
+            // set variant from cleaned old variant ORed against the new switchflags
+            actor.Variants[0] = newVarsWithoutSwitchflags | newSwitchflags;
         }
 
         public static short GetActorTreasureFlags(Actor actor, short variant)

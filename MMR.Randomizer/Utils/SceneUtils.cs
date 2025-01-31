@@ -327,7 +327,7 @@ namespace MMR.Randomizer.Utils
 
                 Actor a = new Actor();
                 ushort an = ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16));
-                a.ActorIdFlags = an & 0xF000; // unused
+                a.ActorIdFlags = an & 0xF000;
                 a.ActorId = an & 0x0FFF;
                 a.ActorEnum = (GameObjects.Actor)a.ActorId;
                 a.OldActorEnum = a.ActorEnum;
