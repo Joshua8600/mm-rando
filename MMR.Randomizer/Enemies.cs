@@ -5188,6 +5188,25 @@ namespace MMR.Randomizer
 
                 // change all new actors with switch flags to some flag not yet used
 
+                // check for all actors that listen for flag sends
+                List<(Actor act, int flag)> recievesList = new List<(Actor act, int flag)> { };
+                for (int actorIndex = 0; actorIndex < actorsWithSwitchFlags.Count; actorIndex++) {
+                    var actor = actorsWithSwitchFlags[actorIndex];
+                    var attr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
+                    // have to have attribute by here, its not null, I'm not checking for cosmic radiation damage
+                    if (attr.flagType == SwitchTrigger.Receives || attr.flagType == SwitchTrigger.SendsAndRecieves)
+                    {
+                        var newSwitch = usableSwitches[0];
+
+                        ActorUtils.SetActorSwitchFlags(actor, (short)newSwitch);
+                        usableSwitches.RemoveAt(0);
+                        log.AppendLine($" ++ i[{actorIndex}][{actor.ActorEnum}] had recieve flag modified to [{newSwitch}] ++");
+
+                        recievesList.Add((actor, newSwitch));
+                        actorsWithSwitchFlags.Remove(actor);
+                    }
+                }
+                // finally, all of the rest
                 for (int actorIndex = 0; actorIndex < actorsWithSwitchFlags.Count; actorIndex++)
                 {
                     var actor = actorsWithSwitchFlags[actorIndex];
@@ -5199,12 +5218,24 @@ namespace MMR.Randomizer
                         CreateUsableSwitchesList();
                     }
 
-                    var thisRoomHiddenChestFlag = switchChestFlags[actor.Room];
-                    if (thisRoomHiddenChestFlag != -1 && (switchFlagsAttr.flagType == SwitchTrigger.Sends || switchFlagsAttr.flagType == SwitchTrigger.SendsAndRecieves))
-                    {
-                        ActorUtils.SetActorSwitchFlags(actor, (short)thisRoomHiddenChestFlag);
-                        log.AppendLine($" ++ Chest trigger actor set: [{actor.ActorEnum}]r[{actor.Room}]v[{actor.Variants[0].ToString("X4")}], at spawn [{actor.RoomActorIndex}] ++");
-                        continue;
+                    if ((switchFlagsAttr.flagType == SwitchTrigger.Sends || switchFlagsAttr.flagType == SwitchTrigger.SendsAndRecieves)) {
+                        var thisRoomHiddenChestFlag = switchChestFlags[actor.Room];
+                        if (thisRoomHiddenChestFlag != -1) 
+                        {
+                            // if there is a chest we want all switches to activate,
+                            // because its rare and we dont want the player to miss it because only one switch activates it
+                            ActorUtils.SetActorSwitchFlags(actor, (short)thisRoomHiddenChestFlag);
+                            log.AppendLine($" ++ Chest trigger actor set: [{actor.ActorEnum}]r[{actor.Room}]v[{actor.Variants[0].ToString("X4")}], at spawn [{actor.RoomActorIndex}] ++");
+                            continue;
+                        }
+                        else if (recievesList.Count() > 0) // other receive flag actors exist, yes I know this should be merged, but chest is important
+                        {
+                            var randomRecieveSwitchFlagActor = recievesList[thisSceneData.RNG.Next(recievesList.Count())];
+                            ActorUtils.SetActorSwitchFlags(actor, (short) randomRecieveSwitchFlagActor.flag);
+                            log.AppendLine($" ++ Send trigger actor set: [{actor.ActorEnum}]r[{actor.Room}]v[{actor.Variants[0].ToString("X4")}], at spawn [{actor.RoomActorIndex}] ++");
+                            log.AppendLine($"   ++ to target actor : [{randomRecieveSwitchFlagActor.act.ActorEnum}]r[{randomRecieveSwitchFlagActor.act.Room}]v[{randomRecieveSwitchFlagActor.act.Variants[0].ToString("X4")}], at spawn [{randomRecieveSwitchFlagActor.act.RoomActorIndex}] ++");
+                            continue;
+                        }
                     }
 
                     if (usableSwitches.Contains(switchFlags)) // not detected in vanilla, leave as is and claim
@@ -5217,7 +5248,7 @@ namespace MMR.Randomizer
                         
                         ActorUtils.SetActorSwitchFlags(actor, (short) newSwitch);
                         usableSwitches.RemoveAt(0);
-                        log.AppendLine($" + i[{actorIndex}][{actor.ActorEnum}] had switch flags modified to [{newSwitch}] +");
+                        log.AppendLine($" + i[{actorIndex}][{actor.ActorEnum}] had switch flags modified to [{newSwitch}] to avoid conflicts with others +");
                     }
                 }
             }
@@ -6699,20 +6730,6 @@ namespace MMR.Randomizer
             {
                 // if you want to force an object here, use ChosenReplacementObjectsPerMap
 
-                // debug for switch chest actorivation
-                var target = thisSceneData.Scene.Maps[0].Actors[1];
-                var target2 = thisSceneData.Scene.Maps[0].Actors[3];
-                // not changing position they are fine
-                target.ChangeActor(GameObjects.Actor.ElegyStatueSwitch, vars: 0xFE00); // 33 shift 1 is 66
-                target.Rotation.y = 0x007F; // remove cutscene (zero rotation, -1 cutscene)
-                target2.ChangeActor(GameObjects.Actor.TreasureChest, vars: 0x3888); // unk if the item and flag are valid
-                target2.ChangeZRotation(0x7F); // we want this to match
-                target2.ActorIdFlags |= 0x2000;
-                thisSceneData.ChosenReplacementObjectsPerMap[0][2] = GameObjects.Actor.ElegyStatueSwitch.ObjectIndex();
-                thisSceneData.ChosenReplacementObjectsPerMap[0][3] = GameObjects.Actor.TreasureChest.ObjectIndex();
-                thisSceneData.ChosenReplacementObjectsPerMap[0][4] = GameObjects.Actor.ElegyStatueSwitch.ObjectIndex();
-                //thisSceneData.ChosenReplacementObjects[0].ChosenV = GameObjects.Actor.ElegyStatueSwitch.ObjectIndex();
-                //thisSceneData.ChosenReplacementObjects.Add(new ValueSwap((int)GameObjects.Actor.BlueBubble, (int)GameObjects.Actor.TreasureChest));
                 //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot
                 //var target = thisSceneData.Scene.Maps[0].Actors[23];
                 // 23 to 25
