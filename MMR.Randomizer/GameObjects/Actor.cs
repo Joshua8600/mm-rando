@@ -5304,6 +5304,8 @@ namespace MMR.Randomizer.GameObjects
         // type is >> 7, so 0x1F0 1 is collectible, 2 is chest, 3 is switch, think we want switch flag since those are much more open
         [GroundVariants(0x110)] // checks for switch flag
         [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // technically correct, the vanilla game never uses this actor
+        [UnkillableAllVariants]
+        [CreditsBlockedAllVariants]
         Obj_Dowsing = 0x1EC, // Obj_Dowsing
 
         // wind in ISTT and water current in PFInterior

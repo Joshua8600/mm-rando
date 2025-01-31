@@ -4349,6 +4349,17 @@ namespace MMR.Randomizer
                 ReadWriteUtils.Arr_WriteU16(terminaFiledCreditsRoomData, pathPointLoc + 4, (ushort) pathPoint.y);
                 ReadWriteUtils.Arr_WriteU16(terminaFiledCreditsRoomData, pathPointLoc + 8, (ushort) pathPoint.z);
             }
+
+            // TODO move it closer to the camera if the actor has bad culling
+
+            // when we randomized HMS things got complicated for the camera because there replacement doesnt move and doesnt respond to the cutscene
+            // I found an unused actor I think
+            var terminaFieldScene = RomData.SceneList.Find(s => s.SceneEnum == GameObjects.Scene.TerminaField);
+            var newHMS = terminaFieldScene.Maps[7].Actors[13];
+            newHMS.ChangeActor(GameObjects.Actor.HappyMaskSalesman, vars: 3, modifyOld: true);
+            newHMS.OldName = "HappyMaskSalesmanClone";
+            newHMS.Position = new vec16(643, -165, 2855); // moved to where HMS stands when talking about saying farewell
+            newHMS.ChangeYRotation(45);
         }
 
 
@@ -5386,7 +5397,7 @@ namespace MMR.Randomizer
                 }
 
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.TreasureChest)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.ElegyStatueSwitch)) continue;
+                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.SkulltulaDummy, GameObjects.Actor.GBTFreezableWaterfall)) continue; // still broken
                 //if(TestHardSetObject(GameObjects.Scene.WestClockTown, GameObjects.Actor.CreditsBombShopMan, GameObjects.Actor.RedBubble)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; /// what was this again? hotspring?
