@@ -6519,17 +6519,25 @@ namespace MMR.Randomizer.GameObjects
         [BlockingVariantsAll]
         StoneTowerBlock = 0x245, // Bg_F40_Block
 
-        // todo switches
         [ActorizerEnabled]
         [FileID(541)]
         [ObjectListIndex(0x222)]
         [DynaAttributes(12, 12)]
         [SwitchFlagsPlacement(SwitchTrigger.Sends, size: 0x7F, shift: 9)] // FE00
-        // we dont want to remove vanilla, use 0 as variant
-        // wasnt there a big one? TODO
+        // we dont want to remove vanilla, use 0 as variant, vanilla is always populated by switch values
         [GroundVariants(0)]
         [VariantsWithRoomMax(max: 6, variant: 0)] // limit because of dyna (untested)
         [UnkillableAllVariants]
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [AlignedCompanionActor(Bombiwa, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x807F, 0x8004, 0x8002,
+            0xE,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106,
+            0x101, 0x100,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x8003
+        )]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [ForbidFromScene(Scene.StoneTower, Scene.InvertedStoneTower)]
         [PlacementWeight(40)]
         ElegyStatueSwitch = 0x246, // Bg_F40_Switch
