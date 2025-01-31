@@ -5121,7 +5121,7 @@ namespace MMR.Randomizer
             var usableSwitches = new List<int>();
             void CreateUsableSwitchesList()
             {
-                usableSwitches.AddRange(Enumerable.Range(1, 0x7E)); // 0x7F is popular non-valid value
+                usableSwitches.AddRange(Enumerable.Range(1, 0x7E)); // 0x7F is popular non-valid value and should probably be avoided
                 usableSwitches.RemoveAll(sflag => claimedSwitchFlags.Contains(sflag));
                 usableSwitches.Reverse(); // we want to start at 0x7F and decend, under the assumption that they always used lower values
             }
@@ -5130,126 +5130,121 @@ namespace MMR.Randomizer
 
             // generate switch flag actors
             var actorsWithSwitchFlags = thisSceneData.Actors.ToList();
-            for(int i = thisSceneData.Actors.Count - 1; i >= 0; i--) // reverse should let us use remoteat which should be faster
+            var actorsWithSendFlags = new List<Actor>();
+            for (int i = thisSceneData.Actors.Count - 1; i >= 0; i--) // reverse should let us use remoteat which should be faster
             {
                 var actor = thisSceneData.Actors[i];
-                var switchFlags = ActorUtils.GetActorSwitchFlags(actor, (short)actor.Variants[0]);
-                if (switchFlags == -1)
+                var attr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
+                if (attr == null)
                 {
                     actorsWithSwitchFlags.RemoveAt(i);
+                } else if (attr.flagType == SwitchTrigger.Sends || attr.flagType == SwitchTrigger.SendsAndRecieves)
+                {
+                    actorsWithSendFlags.Add(actor);
                 }
             }
 
+            if (actorsWithSwitchFlags.Count == 0) return; // nothing to do here now
+
             // if there is both new chests and a new switching actor
-            var switchingActors = new List<GameObjects.Actor> // too lazy to add a rarely used attribute for just this
-            {
-                GameObjects.Actor.ElegyStatueSwitch,
-                GameObjects.Actor.SunSwitch,
-                GameObjects.Actor.GoronLinkPoundSwitch,
-                GameObjects.Actor.ObjSwitch
-            };
-            var newSwitchActors = thisSceneData.Actors.FindAll(a => switchingActors.Contains(a.ActorEnum));
             var newChestActors = thisSceneData.Actors.FindAll(a => a.ActorEnum == GameObjects.Actor.TreasureChest);
-            int[] switchChestFlags = new int[thisSceneData.Scene.Maps.Count];
+            int[] switchChestFlags = new int[thisSceneData.Scene.Maps.Count]; // no point saving the chest with the flag for now, just an int array is fine
             for (var i = 0; i < switchChestFlags.Length; i++) { switchChestFlags[i] = -1; }
-            if (newSwitchActors.Count > 0 && newChestActors.Count > 0) // pretest
+            if (newChestActors.Count > 0)
             {
                 for (int roomNum = 0; roomNum < thisSceneData.Scene.Maps.Count; roomNum++)
                 {
                     var roomChests = newChestActors.FindAll(a => a.Room == roomNum);
-                    var roomSwitches = newSwitchActors.FindAll(a => a.Room == roomNum);
+                    var roomSwitches = actorsWithSendFlags.FindAll(a => a.Room == roomNum);
                     if (roomChests.Count > 0 && roomSwitches.Count > 0)
                     {
                         var randomChest = roomChests.Random(thisSceneData.RNG);
                         // change switch type to appear on switch
                         randomChest.Variants[0] &= 0x0FFF; // changing type to switch to activate
-                        //randomChest.Variants[0] |= 0x3000; // this is wrong, zoey changed the types
                         // zoey changed the upper byte to XX YY size and behavior
-                        randomChest.Variants[0] |= 0xB000; // 0x2 should large gold, 0x3 is set on switch flag
+                        randomChest.Variants[0] |= 0xB000; // 0x2 should large gold, 0x3 is set on switch flag [10 11]
 
                         // in case this actor's last slot only spawned at night or something stupid, set it to always spawn
                         ActorUtils.SetActorSpawnTimeFlags(randomChest);
-                        var newSwitchChestFlag = usableSwitches[thisSceneData.RNG.Next(usableSwitches.Count)]; // grab a usable switch flag
-                        switchChestFlags[randomChest.Room] = newSwitchChestFlag;
-                        //switchChestFlag = usableSwitches.Find(u => u == 0x66); // why static?
-                        ActorUtils.SetActorSwitchFlags(randomChest, (short) newSwitchChestFlag);
+                        // chest has full switch flag range because it uses the full zrot, the sending trigger actor may not
+                        // but so far, all sending actors I've found have 0x7F range anyway
+                        var newSwitchChestFlag = usableSwitches[thisSceneData.RNG.Next(usableSwitches.Count)];
                         usableSwitches.Remove(newSwitchChestFlag);
+                        switchChestFlags[randomChest.Room] = newSwitchChestFlag;
+                        ActorUtils.SetActorSwitchFlags(randomChest, (short) newSwitchChestFlag);
                         log.AppendLine($" +++ WE FOUND SWITCH CHEST in room [{roomNum}], chest actor spot [{randomChest.RoomActorIndex}] +++");
-                        log.AppendLine($" +++ had switch flags modified to [{newSwitchChestFlag}][{randomChest.Rotation.z.ToString("X4")}] +++");
-                        actorsWithSwitchFlags.Remove(randomChest);
+                        log.AppendLine($"   had switch flags modified to [{newSwitchChestFlag}][{randomChest.Rotation.z.ToString("X4")}]");
+                        actorsWithSwitchFlags.Remove(randomChest); // dont double dip, this actor is set
                         randomChest.ActorIdFlags |= 0x2000; // do not convert z rotation, we need it for chests
                         randomChest.Rotation.y |= 0x7F; // set cutscene value to -1 to allow the chest to appear without a working cutscene
-
                     }
                 }
             }
 
-            { // else; assign to unused switch per area
+            // check for all actors that listen for flag sends
+            List<(Actor act, int flag)> recievesList = new List<(Actor act, int flag)> { };
+            for (int actorIndex = 0; actorIndex < actorsWithSwitchFlags.Count; actorIndex++) {
+                var actor = actorsWithSwitchFlags[actorIndex];
+                var attr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
+                var thisRoomHiddenChestFlag = switchChestFlags[actor.Room];
+                if (thisRoomHiddenChestFlag != -1) { continue; } // chest takes priority
 
-                // change all new actors with switch flags to some flag not yet used
-
-                // check for all actors that listen for flag sends
-                List<(Actor act, int flag)> recievesList = new List<(Actor act, int flag)> { };
-                for (int actorIndex = 0; actorIndex < actorsWithSwitchFlags.Count; actorIndex++) {
-                    var actor = actorsWithSwitchFlags[actorIndex];
-                    var attr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
                     // have to have attribute by here, its not null, I'm not checking for cosmic radiation damage
-                    if (attr.flagType == SwitchTrigger.Receives || attr.flagType == SwitchTrigger.SendsAndRecieves)
+                if (attr.flagType == SwitchTrigger.Receives || attr.flagType == SwitchTrigger.SendsAndRecieves)
+                {
+                    var newSwitch = usableSwitches[0];
+
+                    ActorUtils.SetActorSwitchFlags(actor, (short)newSwitch);
+                    usableSwitches.RemoveAt(0);
+                    log.AppendLine($" ++ i[{actorIndex}][{actor.ActorEnum}] had recieve flag modified to [{newSwitch}] ++");
+
+                    recievesList.Add((actor, newSwitch));
+                    actorsWithSwitchFlags.Remove(actor);
+                }
+            }
+            // finally, all of the rest
+            for (int actorIndex = 0; actorIndex < actorsWithSwitchFlags.Count; actorIndex++)
+            {
+                var actor = actorsWithSwitchFlags[actorIndex];
+                var switchFlagsAttr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
+                var switchFlags = ActorUtils.GetActorSwitchFlags(actor, (short)actor.Variants[0]);
+
+                if (usableSwitches.Count == 0) // we ran out, recreate list
+                {
+                    CreateUsableSwitchesList();
+                }
+
+                if (switchFlagsAttr.flagType == SwitchTrigger.Sends || switchFlagsAttr.flagType == SwitchTrigger.SendsAndRecieves) {
+                    var thisRoomHiddenChestFlag = switchChestFlags[actor.Room];
+                    if (thisRoomHiddenChestFlag != -1) 
                     {
-                        var newSwitch = usableSwitches[0];
-
-                        ActorUtils.SetActorSwitchFlags(actor, (short)newSwitch);
-                        usableSwitches.RemoveAt(0);
-                        log.AppendLine($" ++ i[{actorIndex}][{actor.ActorEnum}] had recieve flag modified to [{newSwitch}] ++");
-
-                        recievesList.Add((actor, newSwitch));
-                        actorsWithSwitchFlags.Remove(actor);
+                        // if there is a chest we want all switches to activate,
+                        // because its rare and we dont want the player to miss it because only one switch activates it
+                        ActorUtils.SetActorSwitchFlags(actor, (short)thisRoomHiddenChestFlag);
+                        log.AppendLine($" ++ Chest trigger actor set: [{actor.ActorEnum}]r[{actor.Room}]v[{actor.Variants[0].ToString("X4")}], at spawn [{actor.RoomActorIndex}] ++");
+                        continue;
+                    }
+                    else if (recievesList.Count() > 0) // other receive flag actors exist, yes I know this should be merged, but chest is important
+                    {
+                        var randomRecieveSwitchFlagActor = recievesList[thisSceneData.RNG.Next(recievesList.Count())];
+                        ActorUtils.SetActorSwitchFlags(actor, (short) randomRecieveSwitchFlagActor.flag);
+                        log.AppendLine($" ++ Send trigger actor set: [{actor.ActorEnum}]r[{actor.Room}]v[{actor.Variants[0].ToString("X4")}], at spawn [{actor.RoomActorIndex}] ++");
+                        log.AppendLine($"   ++ to target actor : [{randomRecieveSwitchFlagActor.act.ActorEnum}]r[{randomRecieveSwitchFlagActor.act.Room}]v[{randomRecieveSwitchFlagActor.act.Variants[0].ToString("X4")}], at spawn [{randomRecieveSwitchFlagActor.act.RoomActorIndex}] ++");
+                        continue;
                     }
                 }
-                // finally, all of the rest
-                for (int actorIndex = 0; actorIndex < actorsWithSwitchFlags.Count; actorIndex++)
+
+                if (usableSwitches.Contains(switchFlags)) // not detected in vanilla, leave as is and claim
                 {
-                    var actor = actorsWithSwitchFlags[actorIndex];
-                    var switchFlagsAttr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
-                    var switchFlags = ActorUtils.GetActorSwitchFlags(actor, (short)actor.Variants[0]);
-
-                    if (usableSwitches.Count == 0) // we ran out, recreate list
-                    {
-                        CreateUsableSwitchesList();
-                    }
-
-                    if ((switchFlagsAttr.flagType == SwitchTrigger.Sends || switchFlagsAttr.flagType == SwitchTrigger.SendsAndRecieves)) {
-                        var thisRoomHiddenChestFlag = switchChestFlags[actor.Room];
-                        if (thisRoomHiddenChestFlag != -1) 
-                        {
-                            // if there is a chest we want all switches to activate,
-                            // because its rare and we dont want the player to miss it because only one switch activates it
-                            ActorUtils.SetActorSwitchFlags(actor, (short)thisRoomHiddenChestFlag);
-                            log.AppendLine($" ++ Chest trigger actor set: [{actor.ActorEnum}]r[{actor.Room}]v[{actor.Variants[0].ToString("X4")}], at spawn [{actor.RoomActorIndex}] ++");
-                            continue;
-                        }
-                        else if (recievesList.Count() > 0) // other receive flag actors exist, yes I know this should be merged, but chest is important
-                        {
-                            var randomRecieveSwitchFlagActor = recievesList[thisSceneData.RNG.Next(recievesList.Count())];
-                            ActorUtils.SetActorSwitchFlags(actor, (short) randomRecieveSwitchFlagActor.flag);
-                            log.AppendLine($" ++ Send trigger actor set: [{actor.ActorEnum}]r[{actor.Room}]v[{actor.Variants[0].ToString("X4")}], at spawn [{actor.RoomActorIndex}] ++");
-                            log.AppendLine($"   ++ to target actor : [{randomRecieveSwitchFlagActor.act.ActorEnum}]r[{randomRecieveSwitchFlagActor.act.Room}]v[{randomRecieveSwitchFlagActor.act.Variants[0].ToString("X4")}], at spawn [{randomRecieveSwitchFlagActor.act.RoomActorIndex}] ++");
-                            continue;
-                        }
-                    }
-
-                    if (usableSwitches.Contains(switchFlags)) // not detected in vanilla, leave as is and claim
-                    {
-                        usableSwitches.Remove(switchFlags);
-                    }
-                    else // we have switch flag and we have a collision, we need to change it
-                    {
-                        var newSwitch = usableSwitches[0];
-                        
-                        ActorUtils.SetActorSwitchFlags(actor, (short) newSwitch);
-                        usableSwitches.RemoveAt(0);
-                        log.AppendLine($" + i[{actorIndex}][{actor.ActorEnum}] had switch flags modified to [{newSwitch}] to avoid conflicts with others +");
-                    }
+                    usableSwitches.Remove(switchFlags);
+                    log.AppendLine($" = i[{actorIndex}][{actor.ActorEnum}] had switch flags which were not detect as used, and claimed switch [{switchFlags}]=");
+                }
+                else // we have switch flag and we have a collision, we need to change it
+                {
+                    var newSwitch = usableSwitches[0];
+                    ActorUtils.SetActorSwitchFlags(actor, (short) newSwitch);
+                    usableSwitches.RemoveAt(0);
+                    log.AppendLine($" + i[{actorIndex}][{actor.ActorEnum}] had switch flags modified to [{newSwitch}] to avoid conflicts with others +");
                 }
             }
         }
@@ -5390,8 +5385,8 @@ namespace MMR.Randomizer
                     return false;
                 }
 
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.TreasureChest)) continue;
-                if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.ElegyStatueSwitch)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.TreasureChest)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.ChuChu, GameObjects.Actor.ElegyStatueSwitch)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.SkulltulaDummy, GameObjects.Actor.GBTFreezableWaterfall)) continue; // still broken
                 //if(TestHardSetObject(GameObjects.Scene.WestClockTown, GameObjects.Actor.CreditsBombShopMan, GameObjects.Actor.RedBubble)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.LikeLike, GameObjects.Actor.ReDead)) continue; /// what was this again? hotspring?
@@ -5401,8 +5396,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.LikeLike, GameObjects.Actor.MagicSlab)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.Japas, GameObjects.Actor.MagicSlab)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Bombiwa, GameObjects.Actor.BeanSeller)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
+                if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.SunSwitch)) continue;
+                if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.TreasureChest)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.HookshotWallAndPillar)) continue;
                 if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.DekuBaba, GameObjects.Actor.GoronElder)) continue;
@@ -6728,7 +6723,7 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             if (scene.SceneEnum == GameObjects.Scene.ClockTowerInterior) // force specific actor/variant for debugging
             {
-                // if you want to force an object here, use ChosenReplacementObjectsPerMap
+                // if you want to force object here, use ChosenReplacementObjectsPerMap
 
                 //thisSceneData.Actors[35].ChangeActor(GameObjects.Actor.En_Invisible_Ruppe, vars: 0x01D0); // hitspot
                 //var target = thisSceneData.Scene.Maps[0].Actors[23];
