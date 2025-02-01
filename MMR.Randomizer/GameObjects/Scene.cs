@@ -864,6 +864,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
             Actor.RegularIceBlock, Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.Bombiwa, Actor.PushableBlock, 
             Actor.LostWoodsCutsceneTrees, Actor.Treee)] // tall blocks door
+        [EnemizerSceneEnemyReplacementBlock(Actor.Bo,
+            Actor.GBTFreezableWaterfall)] // on all of them, can block the whole tunnel
         MountainVillageSpring = 0x57,
 
         [FileID(1449)]
