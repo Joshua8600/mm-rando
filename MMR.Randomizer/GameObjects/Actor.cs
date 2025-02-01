@@ -2539,7 +2539,7 @@ namespace MMR.Randomizer.GameObjects
         // TODO  snowhead is missing from this list and above
         [GroundVariants(0x3200, 0x2D00, 0x0F00, 0x1E00,
             1, 0x2800, 0x11D)]
-        [WaterBottomVariants(1)]
+        [WaterBottomVariants(0x11)] // non vanilla, but 0xFE param space is unused, so we can mark this
         [VariantsWithRoomMax(max: 5, variant: 1)]
         // below ground is kinda boring..., we want above ground placement only
         [VariantsWithRoomMax(max: 0, variant: 0x11D, 0x0F00, 0x2800, 0x2D00, 0x3200, 0x1E00)]
