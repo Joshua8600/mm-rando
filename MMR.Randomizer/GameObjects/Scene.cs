@@ -179,7 +179,7 @@ namespace MMR.Randomizer.GameObjects
             22, // vars: 0x14EA bottom of ladder
             23, // vars: 0x18EA bridge to chest room
             17)] // vars: 0xEA top of ladder -> bridge
-        PiratesFortress = 0x11,
+        PiratesFortress = 0x11, // Pirates fortress interior, the center yard, not the rooms
 
         [FileID(1173)]
         [SceneInternalId(0x15)]
@@ -500,7 +500,9 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SoldierMoonLeaveCutscene,
                         Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PostMan,
-                        Actor.ClayPot, Actor.GoronElder)]
+                        Actor.ClayPot, Actor.GoronElder, // not visible in credits because too far away and doesnt draw
+                        Actor.MadShrub
+        )]
         TerminaField = 0x2A, // keikoku, c800 dyna size
 
         [FileID(1312)]

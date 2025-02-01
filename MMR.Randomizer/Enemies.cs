@@ -6241,6 +6241,7 @@ namespace MMR.Randomizer
                 var mainActor = actorsWithCompanions[i];
                 var mainActorEnum = (GameObjects.Actor)mainActor.ActorId;
                 var companions = mainActorEnum.GetAttributes<AlignedCompanionActorAttribute>().ToList();
+                var scenePlacementRestrictions = thisSceneData.Scene.SceneEnum.GetBlockedReplacementActors(mainActor.ActorEnum);
                 foreach (var companion in companions)
                 {
                     var companionEnum = companion.Companion;
@@ -6248,10 +6249,12 @@ namespace MMR.Randomizer
                     // scan for companions that can be moved
                     // for now, assume all previously used companions must be left untouched, no shuffling
                     var eligibleCompanions = thisSceneData.Actors.FindAll(act =>
-                                                               act.ActorId == (int) companionEnum               // correct actor
-                                                            && mainActor.Room == act.Room                       // both in the same room
-                                                            && act.previouslyMovedCompanion == false            // not already used
-                                                            && companion.Variants.Contains(act.Variants[0]));   // correct variant
+                           act.ActorId == (int) companionEnum                    // correct actor
+                        && mainActor.Room == act.Room                            // both in the same room
+                        && act.previouslyMovedCompanion == false                 // not already used
+                        && companion.Variants.Contains(act.Variants[0])          // acceptable variant
+                        && ! scenePlacementRestrictions.Contains(companionEnum)  // the companion wasnt blocked from being put in this location
+                    ); 
 
                     if (mainActor.Blockable == false)
                     {
