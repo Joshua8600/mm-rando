@@ -3487,6 +3487,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x162)]
         UnusedStoneTowerSmoke = 0x13B, // Obj_Funen
 
+        // deku palace moving platform, all of them require paths
         [FileID(280)]
         [ObjectListIndex(0x163)]
         [SwitchFlagsPlacementXRot]
@@ -5631,12 +5632,13 @@ namespace MMR.Randomizer.GameObjects
             Item.NotebookMeetAnju)]
         // 8001 is pathing to laundrypool, also sitting on bed in ranch day 3
         [GroundVariants(2, // inn
-            0x80FF, 0x0FF // other inn examples
+            0x80FF,
+            0x0FF // other inn examples
             )]
         [PathingVariants(0x8001)] // really a pathing variant (walking through east/south to go see the laundry pool
         [PathingTypeVarsPlacement(mask: 0xFF, shift: 0)]
         [VariantsWithRoomMax(max: 0, variant: 0x8001, 0x80FF)] // too hard coded to do anything with
-        [VariantsWithRoomMax(max: 0, variant: 2)] // too hard coded to do anything with
+        [VariantsWithRoomMax(max: 0, variant: 2, 0xFF)] // too hard coded to do anything with
         // dont remove from laundrypool, its the only way to see link mask in the wild, and its a trip
         [ForbidFromScene(Scene.LaundryPool/*, Scene.StockPotInn */)]
         [UnkillableAllVariants]

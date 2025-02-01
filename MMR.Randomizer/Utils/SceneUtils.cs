@@ -111,13 +111,6 @@ namespace MMR.Randomizer.Utils
 
             foreach (string filePath in GenerateExternalSceneFileList("scenes"))
             {
-                /*
-                if (filePath.Contains("SafeBoat.mmra")
-                    || filePath.Contains("Dinofos"))
-                {
-                    //throw new Exception("SafeBoat.mmra no longer works in actorizer 1.16, \n remove the file from MMR/actors and start a new seed.");
-                    continue;
-                } // */
 
                 try
                 {
