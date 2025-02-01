@@ -861,7 +861,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // until I change the combs to be wall or flying only this is weird
         [EnemizerSceneEnemyReplacementBlock(Actor.BronzeBoulder,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
-            Actor.RegularIceBlock, Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.Bombiwa, Actor.PushableBlock, Actor.Bg_Heavy_Block,
+            Actor.RegularIceBlock, Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.Bombiwa, Actor.PushableBlock, 
             Actor.LostWoodsCutsceneTrees, Actor.Treee)] // tall blocks door
         MountainVillageSpring = 0x57,
 

@@ -870,12 +870,12 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.DekuPalace, Scene.BeneathTheWell, Scene.BeneathGraveyard, Scene.RoadToIkana, Scene.StoneTower)]
         UnusedStoneTowerStoneElevator = 0x4D, // Bg_F40_Flift
 
-        //[ActorizerEnabled] // TODO
         // Has no File, burried in [code] file
         [ActorInstanceSize(0)] // unknown, never seen though
         [ObjectListIndex(0x1)]
         //[GroundVariants]
-        Bg_Heavy_Block = 0x4E, // Bg_Heavy_Block
+        //Bg_Heavy_Block = 0x4E, // Bg_Heavy_Block
+        Empty4E = 0x4E, // aparently this is not a real thing?
 
         [EnemizerEnabled]
         [FileID(95)]
@@ -3944,12 +3944,19 @@ namespace MMR.Randomizer.GameObjects
 
         Empty16B = 0x16B,
 
-        // what TODO
+        // completely unused actor
+        [ActorizerEnabled]
         [FileID(328)]
         [ObjectListIndex(0x17E)]
         [DynaAttributes(4, 8)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
-        TerminaFieldSpikedFence = 0x16C, // Bg_Keikoku_Saku
+        // only params are the switch flags, not even sure what they do
+        [GroundVariants(0)]
+        // water bottom
+        [SwitchFlagsPlacement(SwitchTrigger.DoNotUse, size: 0x7F, shift: 0)]
+        [BlockingVariantsAll] // wide
+        [PlacementWeight(5)] // just a fence, boring
+        [UnkillableAllVariants]
+        UnusedSpikeFence = 0x16C, // Bg_Keikoku_Saku
 
         // too big to go most places, doesn't have texture on backend so thats weird
         [FileID(329)]
