@@ -68,7 +68,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.Lilypad,
             Actor.Desbreko)] // heavy lag
         [EnemizerSceneEnemyReplacementBlock(Actor.DekuBaba,
-            Actor.Dodongo)] // can clip into the boat ride and knock link off
+            Actor.GaroMaster, Actor.Dodongo)] // can clip into the boat ride and knock link off
         SouthernSwampClear = 0x06,
 
         [FileID(1151)]
@@ -96,6 +96,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneBlockSensitive(Actor.Snapper, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
         [EnemizerSceneBlockSensitive(Actor.Leever, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
         [EnemizerSceneBlockSensitive(Actor.Armos, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
+        [EnemizerSceneBlockSensitive(Actor.LargeWoodenCrate, -1)] // standing next to the buisness scrub
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Wolfos,  Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper, Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Leever,  Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
@@ -110,6 +111,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DekuBabaWithered, // grottos are common, this can get silly
             Actor.Peahat, Actor.Beamos, Actor.LikeLike, Actor.Freezard, //, Actor.BomberHideoutGuard // annoying
             Actor.Seagulls, // with new height adjust its basically invisible
+            Actor.Dexihand, // breaks no hit rando, hopefully this is temporary
             Actor.Hiploop// water causes instant death
                          //Actor.Bumper, Actor.UnusedStoneTowerStoneElevator, Actor.UnusedStoneTowerPlatform, Actor.RegularIceBlock,
             /*Actor.ClocktowerGearsAndOrgan /*, Actor.PatrollingPirate */ )]
@@ -123,7 +125,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // they can extend so far they can block the door leading out
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoldSkulltula,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can get the player locked behind them near the grotto stones
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SkulltulaDummy,
             Actor.GBTFreezableWaterfall, Actor.CursedSpiderMan)] // both can block the chest under the skulltula in lens cave
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.TallGrass,
             Actor.Dodongo)] // if the dodongo spawns in one spawn location, he nudges the player as they fall into the grotto back into the exit
@@ -143,9 +145,10 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1520)]
         [SceneInternalId(0x08)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HappyMaskSalesman,
-            Actor.ImposterFrog, Actor.ClayPot, Actor.SmallWoodenBox, // falls off camera
+            Actor.ImposterFrog, Actor.ClayPot, Actor.SmallWoodenBox, Actor.BadBat, // falls off camera
             Actor.IkanaGravestone // crashes on n64 because there is no floor below it to matrix rotate to
         )]
+        [ActorizerSceneCreditsActor(Actor.HappyMaskSalesman)] // issue: this removes zelda
         SPOT00 = 0x0E, // cutscene map
 
         // Unused = 0x0F,
@@ -176,7 +179,7 @@ namespace MMR.Randomizer.GameObjects
             22, // vars: 0x14EA bottom of ladder
             23, // vars: 0x18EA bridge to chest room
             17)] // vars: 0xEA top of ladder -> bridge
-        PiratesFortress = 0x11,
+        PiratesFortress = 0x11, // Pirates fortress interior, the center yard, not the rooms
 
         [FileID(1173)]
         [SceneInternalId(0x15)]
@@ -356,6 +359,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneBlockSensitive(Actor.ZoraEgg, -1)]
         [EnemizerSceneBlockSensitive(Actor.WoodenBarrel, -1)] // in the cage room, can block the ability to hit the switch to leave
         [EnemizerSceneBlockSensitive(Actor.PatrollingPirate, -1)] // large ice block could block the hookshot room
+        [EnemizerSceneBlockSensitive(Actor.SpikedMine, -1)] // really large ice block can block the whole tunnel
         PiratesFortressRooms = 0x20, // tag: Sewer
 
         // tag: archery
@@ -476,7 +480,9 @@ namespace MMR.Randomizer.GameObjects
         // this is not actual credits music worthy, but invisible actors are still boring here
         [ActorizerSceneCreditsActor(room: 8, Actor.SoldierMoonLeaveCutscene, Actor.CarpentersFromCutscene,
             Actor.ViscenMoonLeaveCutscene, Actor. MutoMoonLeaveCutscene)] // moon leaves
-        [ActorizerSceneCreditsActor(room: 9, Actor.CuriosityShopMan, Actor.AnjuWeddingDress, Actor.Cremia, Actor.AnjuMotherWedding, Actor.AnjusGrandmaCredits, Actor.ViscenMoonLeaveCutscene, Actor.PostMan, Actor.MutoMoonLeaveCutscene, Actor.Tingle)] // wedding and postman running are both in this setup
+        [ActorizerSceneCreditsActor(room: 9, Actor.CuriosityShopMan, Actor.AnjuWeddingDress, Actor.Cremia, Actor.AnjuMotherWedding, Actor.AnjusGrandmaCredits,
+            Actor.MajorDotourAtWedding, Actor.MadamAromaEndingCutscene,
+            Actor.ViscenMoonLeaveCutscene, Actor.PostMan, Actor.MutoMoonLeaveCutscene, Actor.Tingle)] // wedding and postman running are both in this setup
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ViscenMoonLeaveCutscene,
             Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.MutoMoonLeaveCutscene,
@@ -494,7 +500,9 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SoldierMoonLeaveCutscene,
                         Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PostMan,
-                        Actor.ClayPot, Actor.GoronElder)]
+                        Actor.ClayPot, Actor.GoronElder, // not visible in credits because too far away and doesnt draw
+                        Actor.MadShrub
+        )]
         TerminaField = 0x2A, // keikoku, c800 dyna size
 
         [FileID(1312)]
@@ -540,6 +548,8 @@ namespace MMR.Randomizer.GameObjects
                         Actor.Hiploop)] // water explosion
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ClayPot,
                         Actor.DekuKing)] // if close to scarecrow can hardlock clock skip
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Scarecrow,
+                        Actor.WoodfallTempleWoodenFlower)] // so large it can block the door
         TradingPost = 0x31,
 
         // the only "small" dyna poly scene... but why
@@ -645,6 +655,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1349)]
         [SceneInternalId(0x41)]
         [EnemizerSceneEnemyReplacementBlock(Actor.ClayPot,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, // can fly above and block the chest
             Actor.RegularIceBlock)] // the big one can reach through the ceiling into the chest, blocking the chest
         [EnemizerSceneEnemyReplacementBlock(Actor.SquareSign,
             Actor.ClocktowerGearsAndOrgan, // can block dogs in race
@@ -695,7 +706,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Hiploop)] // after moving the actors around, one of them just instantly explodes touching water, TODO move them to better spots to avoid instead
         [EnemizerSceneBlockSensitive(Actor.DragonFly, -1)]
         [EnemizerSceneBlockSensitive(Actor.En_Owl, -1)]
-        SouthernSwamp = 0x42,
+        [EnemizerSceneBlockSensitive(Actor.BigOcto, -1)]
+        SouthernSwamp = 0x42, // poisoned
 
         [FileID(1362)]
         [SceneInternalId(0x46)]
@@ -772,6 +784,7 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x4D)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
             Actor.GibdoWell, Actor.GibdoWell)] // can stunlock at the door, doesnt stay down long enough
+        [EnemizerSceneBlockSensitive(Actor.SquareSign, -1)] // long can block the small snowball, wide can block the door
         GoronVillage = 0x4A,
 
         [FileID(1412)]
@@ -851,8 +864,10 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // until I change the combs to be wall or flying only this is weird
         [EnemizerSceneEnemyReplacementBlock(Actor.BronzeBoulder,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
-            Actor.RegularIceBlock, Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.Bombiwa, Actor.PushableBlock, Actor.Bg_Heavy_Block,
+            Actor.RegularIceBlock, Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.Bombiwa, Actor.PushableBlock, 
             Actor.LostWoodsCutsceneTrees, Actor.Treee)] // tall blocks door
+        [EnemizerSceneEnemyReplacementBlock(Actor.Bo,
+            Actor.GBTFreezableWaterfall)] // on all of them, can block the whole tunnel
         MountainVillageSpring = 0x57,
 
         [FileID(1449)]
@@ -952,6 +967,8 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x68)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoGoron,
             Actor.PatrollingPirate)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ShopSeller,
+            Actor.HallucinationScrub)] // missing
         BombShop = 0x65,
 
         [FileID(1504)]

@@ -35,7 +35,7 @@ namespace MMR.Randomizer.Utils
             #if DEBUG
             string settingstring = $"{setting} + DEBUG BUILD\x00";
             #else
-            string settingstring = $"{setting} + Isghj's Actorizer Test 83.0\x00";
+            string settingstring = $"{setting} + Isghj's Actorizer Test 86.0\x00";
             #endif
             int f = GetFileIndexForWriting(veraddr);
             var file = RomData.MMFileList[f];
@@ -248,6 +248,10 @@ namespace MMR.Randomizer.Utils
             Parallel.ForEach(sortedCompressibleFiles.AsParallel().AsOrdered(), file =>
             {
                 //var yazTime = DateTime.Now;
+#if DEBUG
+                var decompressed_size = file.End - file.Addr;
+                var compressed_size = file.Cmp_End - file.Cmp_Addr;
+#endif
                 file.Data = Yaz.EncodeAndCopy(file.Data);
                 file.WasEdited = false;
                 //Debug.WriteLine($" size: [{file.Data.Length}] time to complete compression : [{(DateTime.Now).Subtract(yazTime).TotalMilliseconds} (ms)]");
@@ -364,6 +368,12 @@ namespace MMR.Randomizer.Utils
                     ROM = newROM;
                     Debug.WriteLine("*** Expanding rom to size 0x" + ROM.Length.ToString("X2") + "***");
                 }
+
+                #if DEBUG
+                var decompressed_size = file.End - file.Addr;
+                var compressed_size = file.Cmp_End - file.Cmp_Addr;
+                #endif
+
 
                 ReadWriteUtils.Arr_Insert(RomData.MMFileList[i].Data, 0, fileLength, ROM, ROMAddr);
                 ROMAddr += fileLength;

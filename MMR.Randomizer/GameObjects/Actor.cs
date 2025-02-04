@@ -87,15 +87,26 @@ namespace MMR.Randomizer.GameObjects
         [WaterBottomVariants(0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579,
             0x561E, 0x5C79, 0x5991, 0x5B58, //0x5A1E,
             0xBA1E, // switch activated
-            0x0AFB, 0x099C)] // two free, the rest are gold invisible
+            0x0AFB, 0x099C // two free, the rest are gold invisible
+        )]
         [VariantsWithRoomMax(max: 1, variant: 0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579,
             0x561E, 0x5C79, 0x5991, 0x5B58, 0x5A1E,
             0x50CA, 0x50A1,
-            0x0AFB, 0x099C)] // brown, harder to see in perpheral vision, not invisible
+            0x0AFB, 0x099C // brown, harder to see in perpheral vision, not invisible
+        )]
         [VariantsWithRoomMax(max: 0,
             0x5080 // road to ikana
-            )]
+        )]
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [AlignedCompanionActor(Bombiwa, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x807F, 0x8004, 0x8002, 
+            0xE,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106,
+            0x101, 0x100,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x8003
+        )]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         /*[AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0x0, 0x2000, 0x3000, 0x4000, // stone grottos
             0x7000, 0xC000, 0xE000, 0xF000, 0xD000, // regular grottos
@@ -112,11 +123,11 @@ namespace MMR.Randomizer.GameObjects
             Scene.TerminaField, Scene.PiratesFortressRooms, Scene.PiratesFortress, Scene.PiratesFortressExterior, Scene.TwinIslandsSpring,
             Scene.SouthClockTown, Scene.EastClockTown, Scene.RoadToIkana, // DO NOT RANDOMIZE: itemizer changes params, can fuck with replacement actor
             Scene.Woodfall)]
-        [SwitchFlagsPlacementZRot]
+        [SwitchFlagsPlacement(size:0x7F, shift:0), SwitchFlagsPlacementZRot]
         [TreasureFlagsPlacement(mask: 0x1F, shift: 0)]
         //[EnemizerScenesPlacementBlock(Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.SouthernSwampClear, // asummed dyna crash
         //    Scene.StoneTower)]
-        [PlacementWeight(50)]
+        [PlacementWeight(45)]
         TreasureChest = 0x6, // En_Box
 
         // TODO dumb ass you forgot to finish this actor
@@ -153,7 +164,7 @@ namespace MMR.Randomizer.GameObjects
         [DifficultAllVariants]
         [RespawningVariants(variant: 0x0081)] // if they fly away after melt they might not come down (bug), so not killable
         [CreditsBlockedVariants(variant: 0x0001)] // inivible until player gets close, so invible for credits
-        [SwitchFlagsPlacement(size: 0xFF, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0xFF, shift: 8)] // used for what?
         //[EnemizerScenesPlacementBlock(Scene.TerminaField)] // temporary, melting them can unmelt the north ice block, but why
         WallMaster = 0xA, // En_Wallmas
 
@@ -170,16 +181,25 @@ namespace MMR.Randomizer.GameObjects
         Dodongo = 0xB, // En_Dodongo
 
         [EnemizerEnabled]
-        [ActorInitVarOffset(0x1D60)]
         [FileID(50)]
         [ObjectListIndex(0xB)]
-        // params type: 0 is fire, 2 is normal, 3 is perched, 4 is ice
+        // params type: 0 is fire, 2 is normal, 3 is perched, 4 is ice (1 is not defined, detected as ELSE and assigned to perching)
         // 0x8000 is invisible
-        // type 2 can be perching? I saw 2 and 8002 in a grotto sittin in the air
-        [FlyingVariants(0x0, 0x2, 0x04, 0x8000, 0x8002, 0x8004)] // which ones are fire and ice?
-        [PerchingVariants(0x8103, 0x103)] // 0x100 is not a valid vanilla value, 0x7FFF is type, but the game uses 0xF range, so I modded
+        // in vanilla, 0x8003 is used beneath graveyard on pot and walls
+        //  the well uses 0x0 and 0x4, both flying
+        //  zero and four used in other places
+        //  so none of vanilla placements use invisible fire/ice, or even invisible flying
+        // while others can start perching, only PERCH can return to perch after being disturbed
+        [FlyingVariants(
+            0x0, 0x8000, // fire
+            0x04, 0x8004 // ice
+        )] 
+        //[PerchingVariants(0x2, 0x8002)] // doesnt exist in vanilla, see the fixed mmra actor
         [WallVariants(0x8003, 0x3)] // will take off and attack within 120 units distance (xz)
-        [DifficultVariants(0x8000, 0x4, 0x8004, 0x8002)]
+        [DifficultVariants(0x8000, 0x4, 0x8004, 0x8002,
+            0x300, 0x304, 0x602 // non vanilla, added in mmra
+        )]
+        [VariantsWithRoomMax(max:3, variant:0, 0x8000, 0x4, 0x8004, 0x2, 0x8002)]
         [FlyingToGroundHeightAdjustment(150)]
         Keese = 0xC, // En_Firefly
 
@@ -225,6 +245,7 @@ namespace MMR.Randomizer.GameObjects
         [FlyingVariants(2, 7, 9)]
         //[VariantsWithRoomMax(max: 1, variant: 4)] // don't create too many fairy fountains
         [VariantsWithRoomMax(max: 2, variant: 7)] // maybe limit the secret menu fairies
+        [VariantsWithRoomMax(max: 3, variant: 2,9)] // too many can mess with stuff
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.BeneathTheWell)] // dont remove from well
         Fairy = 0x10, // En_Elf
@@ -321,6 +342,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)]
         [DifficultAllVariants]
         [VariantsWithRoomMax(max: 2, variant: 0)]
+        [EnemizerScenesPlacementBlock(Scene.ClockTowerInterior)] // cutscene softlock on hms
         //[ForbidFromScene(Scene.SecretShrine)] // issue: spawn is too high, needs to be lowered
         Dinofos = 0x19, // En_Dinofos
 
@@ -339,7 +361,7 @@ namespace MMR.Randomizer.GameObjects
         // empty actor, does nothing
         [FileID(60)]
         [ObjectListIndex(0x19)]
-        En_Zl1 = 0x1B, // En_Zl1
+        Unused_En_Zl1 = 0x1B, // En_Zl1
 
         // ??? cutscene actors?
         [FileID(61)]
@@ -447,7 +469,7 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.OceanSpiderHouse)] // shared object with goldskulltula, cannot change without modification
         //[EnemizerScenesPlacementBlock(Scene.TerminaField, Scene.GreatBayCoast, Scene.ZoraCape, Scene.Snowhead, // in the air, bit weird
         //    Scene.MountainVillageSpring, Scene.TwinIslandsSpring)] // not a problem, just weird seeing them fly like that
-        [SwitchFlagsPlacement(size: 0x3F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.DoNotUse, size: 0x3F, shift: 0)] // stops killing
         Skulltula = 0x24, // En_St
 
         // In order to split the skullwalltula and skulltula in the spider gossip stone grotto into two objects,
@@ -582,7 +604,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.PostOffice)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
+        [SwitchFlagsPlacement(SwitchTrigger.DoNotUse, size: 0x7F, shift: 9)] // used for what? this actor does many things
         Bg_Breakwall = 0x36, // Bg_Breakwall
 
         Empty37 = 0x37,
@@ -698,7 +720,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInstanceSize(0x1A0)]
         [ActorInitVarOffset(0x1A0)]
         [FileID(86)]
-        [ObjectListIndex(0x61)]
+        [ObjectListIndex(0x61)] // requires a texture found in field_keep
         // weirdly this is NOT dynapoly actor
         [CheckRestricted(Scene.TerminaField, variant: GameObjects.ActorConst.ANY_VARIANT, Item.CollectableTerminaFieldTreeItem1)]
         // bush: 0xFF0B, small tree: 0xFF02
@@ -716,6 +738,12 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0xA)] // UGLY is also BG
         [UnkillableAllVariants]
         [BlockingVariantsAll]
+        // cannot put in dungeons, requires field keep
+        [EnemizerScenesPlacementBlock(Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.IkanaCastle, Scene.PiratesFortress, Scene.PiratesFortressRooms, Scene.PiratesFortressExterior, Scene.PoeHut, Scene.MarineLab, Scene.GoronRacetrack,
+          Scene.DekuTrial, Scene.GoronTrial, Scene.ZoraTrial, Scene.LinkTrial, Scene.SecretShrine,
+          Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
+          Scene.BeneathTheWell, Scene.AstralObservatory, Scene.TreasureChestShop, Scene.BeneathGraveyard
+        )]
         Treee = 0x41, // En_Wood2
 
         Empty42 = 0x42,
@@ -810,9 +838,10 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x7F07, 0x7F05, 0x7F06, 0x7F03, 0x7F04, 0x8005, 0x8006, 0x8007, 0x8003, 0xFFFE)]
         //[WaterBottomVariants(0x7F07, 0x7F05, 0x7F06, 0x7F03, 0x7F04, 0x8005, 0x8006, 0x8007, 0x8003, 0xFFFE)] // you idiot this means you can put water enemies there
         [DifficultAllVariants]
+        [BlockingVariants(0x7F04)] // the ice
         [VariantsWithRoomMax(max: 3, variant: 0x7F07, 0x7F05, 0x7F06, 0x7F02, 0x8005, 0x8006, 0x8007, 0x7F04)]
         [VariantsWithRoomMax(max: 1, variant: 0x7F03, 0x8003, 0xFFFE)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)] // 0xFF00 is read, but only 0x7F of that gets set on death, never checked
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 8)] // 0xFF00 is read, but only 0x7F of that gets set on death, never checked
         [ForbidFromScene(Scene.IkanaCanyon, Scene.BeneathTheWell)] // gibdo locations, but share the same object so gets detected
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // slows us down too much
         ReDead = 0x4C, // En_Rd
@@ -821,7 +850,6 @@ namespace MMR.Randomizer.GameObjects
         [FileID(94)]
         [ObjectListIndex(0x5C)]
         [DynaAttributes(12, 8)]
-        [SwitchFlagsPlacement(size: 0x7E, shift: 9)]
         //[GroundVariants(0)] // params are ignored, uses params as a variable for setting
         [FlyingVariants(0)]
         [VariantsWithRoomMax(max: 3, variant: 0)] // too much Bg is crash
@@ -842,29 +870,32 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.DekuPalace, Scene.BeneathTheWell, Scene.BeneathGraveyard, Scene.RoadToIkana, Scene.StoneTower)]
         UnusedStoneTowerStoneElevator = 0x4D, // Bg_F40_Flift
 
-        //[ActorizerEnabled] // TODO
         // Has no File, burried in [code] file
         [ActorInstanceSize(0)] // unknown, never seen though
         [ObjectListIndex(0x1)]
         //[GroundVariants]
-        Bg_Heavy_Block = 0x4E, // Bg_Heavy_Block
+        //Bg_Heavy_Block = 0x4E, // Bg_Heavy_Block
+        Empty4E = 0x4E, // aparently this is not a real thing?
 
         [EnemizerEnabled]
         [FileID(95)]
         [ObjectListIndex(0x1)] // gameplay_keep obj 1
-        [CheckRestricted(Scene.TerminaField, ActorConst.ANY_VARIANT, Item.CollectableTerminaFieldButterflyFairy1)] // TODO which is it?
+        [CheckRestricted(Scene.TerminaField, variant: 0x2324,
+            Item.CollectableTerminaFieldButterflyFairy1,
+            Item.HeartPiecePeahat // leave as a visible aid for finding the grotto
+        )]
         // TODO finish separating them
         //[CheckRestricted(Scene.Grottos, 0x5323, Item.BottleCatchBug)] // north gossip grotto // replaced by high availability scoop
         //[CheckRestricted(Scene.Grottos, 0x2323, Item.BottleCatchBug)] // west gossip grotto
         //[CheckRestricted(Scene.Grottos, 0x6322, Item.BottleCatchFish)] // regular grotto, TODO do we want to force a fish in a unique place instead?
-        [CheckRestricted(Scene.Grottos, 0x2324, Item.CollectableGrottosOceanGossipStonesButterflyFairy1)]
-        [CheckRestricted(Scene.Grottos, 0x4324, Item.CollectableGrottosMagicBeanSellerSGrottoButterflyFairy1)]
+        [CheckRestricted(Scene.Grottos, variant: 0x2324, Item.CollectableGrottosOceanGossipStonesButterflyFairy1)]
+        [CheckRestricted(Scene.Grottos, variant: 0x4324, Item.CollectableGrottosMagicBeanSellerSGrottoButterflyFairy1)]
         [CheckRestricted(Scene.Grottos, variant: 0x3324,
             Item.CollectableGrottosCowGrottoButterflyFairy1, Item.CollectableGrottosCowGrottoButterflyFairy2
             )]
-        [CheckRestricted(Scene.MountainVillageSpring, 0x4324,
+        [CheckRestricted(Scene.MountainVillageSpring, variant: 0x4324,
             Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy1)]
-        [CheckRestricted(Scene.MountainVillageSpring, 0x5324,
+        [CheckRestricted(Scene.MountainVillageSpring, variant: 0x5324,
             Item.CollectableMountainVillageWinterMountainVillageSpringButterflyFairy2)]
         [CheckRestricted(Scene.GreatBayCoast, variant: 0x2324, Item.CollectableGreatBayCoastButterflyFairy1)]
         // beatles on the floor
@@ -914,7 +945,7 @@ namespace MMR.Randomizer.GameObjects
             0xFF2B // ocean spiderhouse
             )]
         [PathingVariants(0xEF, 0x7F, 4, 0x55B, 0x637, 0x113, 0x91F, 0x909, 0xB0C, 0xC0F)]
-        [GroundVariants(0xFF53, 0xFF53, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B)] // pathing type with path disabled, why is this so rare?
+        [GroundVariants(0xFF53, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B)] // pathing type with path disabled, why is this so rare?
         [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)]
         [VariantsWithRoomMax(max: 1,
             0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F,
@@ -925,6 +956,40 @@ namespace MMR.Randomizer.GameObjects
         [RespawningVariants(0xFF53, 0xFF07, 0xFF56, 0xFF62, 0xFF76, 0xFF03,
             0xFF3F, 0xFF3B, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B, 0xFF0F, 0xFFFC)] // mark all ceiling types as respawning to avoid being placed on kill skulltula to get skull token enemies
         [ForbidFromScene(Scene.SwampSpiderHouse, Scene.OceanSpiderHouse)] // dont remove old spiders, the new ones might not be gettable
+        [AlignedCompanionActor(Bombiwa, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x807F, 0x8004, 0x8002,
+            0xE,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106,
+            0x101, 0x100,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x8003
+        )]
+        [AlignedCompanionActor(IshiRock, CompanionAlignment.InFront, ourVariant: 0xFF61, variant: 0xFF00, 0xFF70, 0xFFA0, 0xFFB0, 
+            0x00A0, 0x0040, 0x1F0, // mountain spring
+            0x60, 0x80, // twin islands spring
+            0x32, // cape
+            0x1F2, 0xA1)]
+        [AlignedCompanionActor(IshiRock, CompanionAlignment.InFront, ourVariant: 0xFF6D, variant: 0xFF00, 0xFF70, 0xFFA0, 0xFFB0, 
+            0x00A0, 0x0040, 0x1F0, // mountain spring
+            0x60, 0x80, // twin islands spring
+            0x32, // cape
+            0x1F2, 0xA1)]
+        [AlignedCompanionActor(IshiRock, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0xFF00, 0xFF70, 0xFFA0, 0xFFB0, 
+            0x00A0, 0x0040, 0x1F0, // mountain spring
+            0x60, 0x80, // twin islands spring
+            0x32, // cape
+            0x1F2, 0xA1)]
+        [AlignedCompanionActor(BronzeBoulder, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0xFF)]
+        [AlignedCompanionActor(BronzeBoulder, CompanionAlignment.InFront, ourVariant: 0xFF61, variant: 0xFF)]
+        [AlignedCompanionActor(BronzeBoulder, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0xFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF53, variant: 0xFFFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF5D, variant: 0xFFFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF61, variant: 0xFFFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF6D, variant: 0xFFFF)]
+        [AlignedCompanionActor(Scientist, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0xFFFF)]
+        [AlignedCompanionActor(En_Ani, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0)]
+        [AlignedCompanionActor(En_Ani, CompanionAlignment.InFront, ourVariant: 0xFF5D, variant: 0)]
+        [AlignedCompanionActor(En_Ani, CompanionAlignment.InFront, ourVariant: 0xFF61, variant: 0)]
         [TreasureFlagsPlacement(mask: 0x3F, shift: 2)] // for some reason it collides with path sometimes, TODO figure this out
         GoldSkulltula = 0x50, // En_Sw "Skullwalltulla"
 
@@ -989,8 +1054,8 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.TerminaField, // too many here, and we want the hints
             Scene.NorthClockTown, // so many checks
             Scene.LaundryPool, Scene.MountainVillage)] // old joke
-        //[CheckRestricted(Scene.TerminaField, variant: ActorConst.ANY_VARIANT,
-        //    check: Item.)]
+        [CheckRestricted(Scene.TerminaField, variant: 0x1F,
+            check: Item.HeartPiecePeahat)]
         [CheckRestricted(Scene.RoadToSouthernSwamp, variant: ActorConst.ANY_VARIANT,
             check: Item.ChestToSwampGrotto)]
         [CheckRestricted(Scene.SouthernSwamp, variant: ActorConst.ANY_VARIANT,
@@ -1047,15 +1112,18 @@ namespace MMR.Randomizer.GameObjects
             0x1B, // mountain village spring
             0x1C, // woods of mystery
             0x1D, // southern swamp
-            0x233, // path to snowhead
-            0xFF, // coast cow
-            0x37, // coast main grotto
+            0x1E, // road to southern swamp
             0x213, // path to snowhead
             0x3B, // moutain spring
+            0x219, // twin islands spring
+            0x233, // path to snowhead
+            0xFF, // coast cow
             0x37, // coast regular grotto
-            0x15, 0x216, // cape
+            0x15, 0x95, // cape (15 isnt vanilla why does it show up in rando? zoey?)
             0x16, 0x216, // road to ikana
+            // 0x238: secret grotto only accessible during title screen
             0x0218, 0x2B8, // graveyard
+            // 0x34: ikana canyon secret grotto that cannot be accessed its only available during a cutscene
             0x14, 0x54, 0xB4, // ikana canyon
             0xF200, // secret secret
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
@@ -1099,10 +1167,18 @@ namespace MMR.Randomizer.GameObjects
             variant: 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)] // everyone loves a good hidden grotto under a... a cardboard box?
         [AlignedCompanionActor(UnusedStoneTowerStoneElevator, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0)] // everyone loves a good hidden grotto under a... a cardboard box?
+        [AlignedCompanionActor(Bombiwa, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x807F, 0x8004, 0x8002,
+            0xE,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106,
+            0x101, 0x100,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x8003
+        )]
         [BlockingVariantsAll] // might turn this off again, but at can cause issues, esp in deku palace and races
         //[ForbidFromScene(Scene.RoadToIkana, Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.PathToSnowhead,
         //    Scene.TerminaField)]
-        [RemovalChance(40)]
+        [RemovalChance(10)]
         GrottoHole = 0x55, // Door_Ana
 
         Empty56 = 0x56,
@@ -1134,7 +1210,7 @@ namespace MMR.Randomizer.GameObjects
         // needs limits because it can overload the dyna
         [VariantsWithRoomMax(max: 5, variant: 0, 1)]
         [FlyingToGroundHeightAdjustment(150)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         [UnkillableAllVariants]
         MajoraBalloonSewer = 0x5F, // En_Encount2
 
@@ -1240,9 +1316,14 @@ namespace MMR.Randomizer.GameObjects
         [PlacementWeight(95)]
         LikeLike = 0x6C,
 
-        //[EnemizerEnabled] // we dont actually want this detected automatically, this will be added per-likelike manually
+        [EnemizerEnabled] // we dont actually want this detected automatically, this will be added per-likelike manually
         [ObjectListIndex(0xB3)] // this is really the shield, we're using it as the second likelike object
-        LikeLikeShield = 0x28E, // 28E is a dummy actor ID, we only use it because it will never conflict with enemizer
+        [ActorInitVarOffset(0x2330)] // same as likelike for enemizer
+        [ActorInstanceSize(0x3C4)] // same as likelike for enemizer
+        [FileID(112)] // same as likelike for enemizer
+        [GroundVariants(0)]
+        [VariantsWithRoomMax(max:0, variant:0)]
+        LikeLikeShieldDummy = 0x2B2, // 2B2 is a dummy actor ID, its outside of the actor list, we only use it because it will never conflict with enemizer
 
         Empty6D = 0x6D,
         Empty6E = 0x6E,
@@ -1277,12 +1358,23 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         OOTFishing = 0x79, // En_Fishing
 
-        // TODO
+        // this is the really big one, the one that takes zora/goron to push
+        [ActorizerEnabled]
         [FileID(115)]
-        [ObjectListIndex(0003)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        [ObjectListIndex(3)]
+        // man there are too many checks to list, do this later to re-enable
+        [CheckRestricted(Scene.SnowheadTemple, variant: ActorConst.ANY_VARIANT,
+            Item.CollectibleStrayFairySnowhead10, Item.CollectibleStrayFairySnowhead11)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 8)] // not sure what this does, detects you have already pushed one one location to another?
+        [GroundVariants(
+            0x1F1, 0x1F4, // snowhead, really big at entrance?
+            0x3F0, 0x3F3 // snowhead pushblockroom
+        )]
+        [WaterBottomVariants(0x85, 0x107)] // pirates fortress sewer underwater maze
+        [BlockingVariantsAll] // untested, assumed mid size
         [UnkillableAllVariants]
-        [PlacementWeight(30)]
+        [ForbidFromScene(Scene.SnowheadTemple)]
+        [PlacementWeight(30), RemovalChance(30)]
         PushableBlock = 0x7A, // Obj_Oshihiki
 
         [FileID(116)]
@@ -1525,7 +1617,9 @@ namespace MMR.Randomizer.GameObjects
         [CreditsBlockedVariants(0x0103, 0x0102, 0x0101)] // start combat music which breaks the cutscene
         [VariantsWithRoomMax(max: 1, 0xFF03, 0xFF02, 0xFF01)]
         [VariantsWithRoomMax(max: 1, 0x0103, 0x0102, 0x0101)]
-        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // can crash the scheduler, no I dont know why
+        // this bug was from april, I might have fixed objects in swamp and this is fine again, TODO test
+        //[EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.SouthernSwampClear)] // can crash the rcp
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         IronKnuckle = 0x84, // En_Ik
 
         Empty85 = 0x85,
@@ -1557,8 +1651,11 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         DekuPalaceChamberGuard = 0x8A, // En_Dns
 
+        // this is hard to add because of all of the rotations being used as parameters
         [FileID(130)]
         [ObjectListIndex(0001)]
+        // could be a funny send
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size:0x7F, shift: 8)]
         ProximityTatlTalkingSpot = 0x8B, // Elf_Msg
 
         [EnemizerEnabled]
@@ -1604,7 +1701,7 @@ namespace MMR.Randomizer.GameObjects
         // all restricted because they add colliders which limits our BGcheck options for other things
         [VariantsWithRoomMax(max: 1, variant: 0xFF10, 0xFF20, 0xFF44, 0xFF64, 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         //[VariantsWithRoomMax(max: 1, variant: 0xFFC8, 0xFF96, 0xFF78)]
-        [PlacementWeight(100)]
+        [PlacementWeight(30)]
         RegularIceBlock = 0x8E, // Obj_Ice_Poly
 
         [EnemizerEnabled]
@@ -1616,11 +1713,12 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // Slowing enemies
         Freezard = 0x8F, // En_Fz
 
-        // damn it, another multi-object actor
+        // multi-object actor the tall grass is one object, the rest is field keep
         [ActorizerEnabled]
         [ActorInstanceSize(0x19C)]
         [FileID(135)]
-        [ObjectListIndex(0xF8)] // type 0 (0x3) is FIELD_KEEP, handled in code because we dont have working code for multi-object
+        [ObjectListIndex(0xF8)] // type 0 (vars: 0x3) is FIELD_KEEP, handled in code because we dont have working code for multi-object
+        [CheckRestricted(Scene.SouthernSwamp, variant: ActorConst.ANY_VARIANT, Item.CollectableSouthernSwampPoisonedCentralSwampGrass1)]
         [CheckRestricted(Scene.SouthernSwampClear, variant: ActorConst.ANY_VARIANT, Item.CollectableSouthernSwampClearCentralSwampGrass1, Item.CollectableSouthernSwampClearCentralSwampGrass2)]
         [CheckRestricted(Scene.MilkRoad, variant: ActorConst.ANY_VARIANT, Item.CollectableMilkRoadGrass1, Item.CollectableMilkRoadGrass2, Item.CollectableMilkRoadGrass3)]
         [CheckRestricted(Scene.IkanaGraveyard, variant: ActorConst.ANY_VARIANT,
@@ -1778,18 +1876,15 @@ namespace MMR.Randomizer.GameObjects
             0x0114, 0x0115, 0x0116, 0x0117, 0x0118 // hotspring water
         )] 
         [VariantsWithRoomMax(max: 0, variant: 0x807F, 0x8004, 0x8002, 0x8003)] // gives a "secret found" jingle
-        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
-            variant: 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)] // regular unhidden grottos
-        [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
-            0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
-            0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
+        //[AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: -1,
+        //    variant: 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)] // regular unhidden grottos
         [UnkillableAllVariants] // not enemy actor group, no fairy no clear room
         //[ForbidFromScene(Scene.Grottos)] //Scene.ZoraCape, Scene.GreatBayCoast
         //[EnemizerScenesPlacementBlock(// Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.SouthernSwampClear 
         //    /* Scene.Woodfall, Scene.DekuShrine */)] // blocking enemies
         [BlockingVariantsAll] // especially the hotwater rocks
         [PlacementWeight(90)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         Bombiwa = 0x92, // Obj_Bombiwa
 
         // multiple different kinds of switches:
@@ -1811,7 +1906,7 @@ namespace MMR.Randomizer.GameObjects
         )]
         [WaterBottomVariants(0x0, 0x1, 0x13, 0x14)]
         [UnkillableAllVariants]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.Sends, size: 0x7F, shift: 8)]
         //[VariantsWithRoomMax(max:0, variant: 0x2, 0x902, 0x1D82)] // wall types, currently they are the only actor that can be put on free wall spots that break (itemizer overwiting vars)
         [EnemizerScenesPlacementBlock( Scene.SecretShrine, // crystal switches crash rsp if placed in clay pots (0x7CX4)
             Scene.StoneTowerTemple)] // still unknown illegal instruction crash in stone tower mirror room, same variant works fine in other places
@@ -1846,7 +1941,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.SouthernSwampClear, // asummed dyna crash
         //    Scene.StoneTower)]
         [UnkillableAllVariants]
-        [PlacementWeight(30)]
+        [PlacementWeight(20)]
         HookshotWallAndPillar = 0x96, // Obj_Hsblock
 
         // ??
@@ -1868,6 +1963,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0xF1)]
         [FileID(143)]
         [CheckRestricted(Scene.MayorsResidence, variant: ActorConst.ANY_VARIANT, Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
+        // added in external: 5 is happy celebrating, 6 is sad recovery position
         [GroundVariants(
             0, // in mayor meeting
             1, // 1 scoffing at poster,
@@ -1881,6 +1977,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0, variant: 0)] // mayor meeting, probably has issues without being with the rest of the actors
         [VariantsWithRoomMax(max: 2, variant: 1, 2, 5, 6)]
         //[AlignedCompanionActor(VariousWorldSounds2, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x0090)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: 6, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [UnkillableAllVariants]
         [PlacementWeight(60)] // boring
         Carpenter = 0x9C, // En_Daiku
@@ -1934,6 +2031,7 @@ namespace MMR.Randomizer.GameObjects
         [PlacementWeight(50)] // doesn't do anything right now, so really boring
         CutscenePirate = 0x9F, // En_Ge1
 
+        // ??
         [FileID(147)]
         [ObjectListIndex(0001)]
         Obj_Blockstop = 0xA0, // Obj_Blockstop
@@ -1996,7 +2094,8 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)]
         [WaterBottomVariants(0)] // testing
         [UnkillableAllVariants]
-        [ForbidFromScene(Scene.Grottos)]
+        [ForbidFromScene(Scene.Grottos)] // do not remove original, its too much of a pain to list all checks his bean might be needed for
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [PlacementWeight(80)]
         BeanSeller = 0xA5, // En_Ms
 
@@ -2004,10 +2103,11 @@ namespace MMR.Randomizer.GameObjects
         [FileID(152)]
         [ObjectListIndex(0xF5)]
         [CheckRestricted(Item.MaskBunnyHood, Item.NotebookMeetGrog, Item.NotebookGrogsThanks)]
-        [GroundVariants(0xFE01)] // vanilla, his actor doesnt use these though, might be garbage or might be used by some other actor
-        [VariantsWithRoomMax(max: 1, variant: 0xFE01)]
+        [GroundVariants(0xFE01)] // vanilla, his actor doesnt use params at all tho, might be garbage or might be used by some other actor
+        [VariantsWithRoomMax(max: 3, variant: 0xFE01)]
         [UnkillableAllVariants]
-        [ForbidFromScene(Scene.CuccoShack)]
+        //[ForbidFromScene(Scene.CuccoShack)] // logic should work here..
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         Grog = 0xA6, // En_Hs
 
         [ActorizerEnabled]
@@ -2082,7 +2182,8 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
-        [PlacementWeight(80)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
+        [PlacementWeight(60)] // not that interesting
         //[ForbidFromScene(Scene.MarineLab)]
         Scientist = 0xAE, // En_Mk
 
@@ -2101,11 +2202,12 @@ namespace MMR.Randomizer.GameObjects
         //[FlyingVariants()] // if we could make sure flying is never used alone, putting some falling feathers could be cool
         // variant 1
         //[GroundVariants(0xF080)] // instant talks to you with monkey dialgoue but talking doesnt end: softlock
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)] // already flown away
         [ForbidFromScene(Scene.SouthernSwamp)] // since we want the hint
         [VariantsWithRoomMax(max: 1, variant: 0xF180)] // only want to waste one slot on the hint owl
         [VariantsWithRoomMax(max: 0, variant: 0x2102, 0x1102, 0x0102)] // these are pathing, do not place
         [VariantsWithRoomMax(max: 10, variant: 0xF000)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [UnkillableAllVariants]
         [PlacementWeight(70)]
         En_Owl = 0xAF, // En_Owl
@@ -2168,15 +2270,21 @@ namespace MMR.Randomizer.GameObjects
             variant: 0x3F5F)]
         [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: 1,
             variant: 0x6033, 0x603B, 0x6018, 0x605C, 0x8000, 0xA000, 0x7000, 0xC000, 0xE000, 0xF000, 0xD000)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 9)] // unknown, assumed breaking
         IshiRock = 0xB0, // En_Ishi
 
         [ActorizerEnabled] // works but a bit lame
         [FileID(159)]
-        [ObjectListIndex(0x1BA)]
+        [ObjectListIndex(0x1BA)] // stupid actor requires all of its textures are in field keep, its a dual object for this tiny thing
         [GroundVariants(0)]
         [PlacementWeight(30)]
         [UnkillableAllVariants]
+        // cannot place in dungeons
+        [EnemizerScenesPlacementBlock(Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, Scene.IkanaCastle, Scene.PiratesFortress, Scene.PiratesFortressRooms, Scene.PiratesFortressExterior, Scene.PoeHut, Scene.MarineLab, Scene.GoronRacetrack,
+          Scene.DekuTrial, Scene.GoronTrial, Scene.ZoraTrial, Scene.LinkTrial, Scene.SecretShrine,
+          Scene.WoodfallTemple, Scene.SnowheadTemple, Scene.GreatBayTemple, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple,
+          Scene.BeneathTheWell, Scene.AstralObservatory, Scene.TreasureChestShop, Scene.BeneathGraveyard
+        )]
         OrangeGraveyardFlower = 0xB1, // Obj_Hana
 
         [ActorizerEnabled]
@@ -2186,14 +2294,17 @@ namespace MMR.Randomizer.GameObjects
         // we're NOT going to be includeing the flipping switches, in part because they are invisble and you wouldn't know they are there anyway
         // (they use the scene wall as their shape/texture)
         [WallVariants(0xB00, 0x1200, 0x1130)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.SendsAndRecieves, size: 0x7F, shift: 8)]
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.StoneTower, Scene.StoneTowerTemple, Scene.InvertedStoneTowerTemple, Scene.SecretShrine)]
         SunSwitch = 0xB2, // Obj_Lightswitch
 
         [ActorizerEnabled]
         [FileID(161)]
-        [ObjectListIndex(0x1)] // while the actor uses gamplaykeep, its just a spawner, and it spawns field stuff
+        [ObjectListIndex(0x2)] // while the actor uses gamplaykeep, its just a spawner, and it spawns field stuff
+        [CheckRestricted(Scene.TerminaField, variant: 0x1F02, Item.MaskKamaro, Item.NotebookMeetKamaro, Item.NotebookPromiseKamaro)]
+        [CheckRestricted(Scene.RoadToIkana, variant: 0x1F02, Item.MaskKamaro, Item.NotebookMeetKamaro, Item.NotebookPromiseKamaro)]
+        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x402, Item.ChestGraveyardGrotto)]
         // 801, opening scene grass, 0x1FXX are ranch and TF
         // 0402 is ikana graveyard rock circle
         // params: 0x3 is type, 0 is bush ring, 1 is bush scattered, 2 is rock circle
@@ -2203,7 +2314,6 @@ namespace MMR.Randomizer.GameObjects
         //  for rocks, we dont have access to 1 or 8 flag, so 0xF0 is used for item collectable, which is fine the table 10 isnt that useful
         //  0x100 disables drops? that seems to be all its used for? wtf
         //  so for both bushes and rocks, 0x1F00 is for item drop
-        [CheckRestricted(Scene.IkanaGraveyard, variant: 0x402, Item.ChestGraveyardGrotto)]
         [GroundVariants(0x801, // lost woods
             0x1F02, // TF, road to ikana
             0x1F00, // unused romani ranch grass
@@ -2213,16 +2323,30 @@ namespace MMR.Randomizer.GameObjects
             0x702, 0xC02, 0x802, 0x902, // non-vanilla rocks with health, magic, small money, and big money
             0x100, 0xB00, 0xF00, 0x101, 0xB01, 0xF01 // non vanilla grass ring and cluster, added for variety
             )]
-        [WaterBottomVariants(0x0402)] // some rocks on the bottom is silly and safe
-        [AlignedCompanionActor(Shiro, CompanionAlignment.OnTop, ourVariant: -1,
-            variant: 0)] // shiro likes his rock friends
+        [WaterBottomVariants(
+            // weirly, bushes are made to be put underwater with the sway mechanic being coded for it
+            // but lots of bushes are lag, dont do that here
+            0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02 // some rocks on the bottom is silly and safe
+        )] 
         [AlignedCompanionActor(BugsFishButterfly, CompanionAlignment.Above, ourVariant: -1,
             variant: 0x2324, 0x4324)] // butterflies over the bushes
-        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: 0402,
+        // because I'm too lazy to add multiple variants as a list of parameters, we have duplicate for each of our parameters
+        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: 0x0402,
+            variant: 0x8200, 0xA200, // secret japanese grottos, hidden
+            0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
+        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: 0x0802,
+            variant: 0x8200, 0xA200, // secret japanese grottos, hidden
+            0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
+        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: 0x0702,
+            variant: 0x8200, 0xA200, // secret japanese grottos, hidden
+            0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
+        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: 0x0C02,
+            variant: 0x8200, 0xA200, // secret japanese grottos, hidden
+            0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
+        [AlignedCompanionActor(GrottoHole, CompanionAlignment.OnTop, ourVariant: 0x1F02,
             variant: 0x8200, 0xA200, // secret japanese grottos, hidden
             0x6233, 0x623B, 0x6218, 0x625C)] // grottos that might hold checks, also hidden
         [AlignedCompanionActor(Shot_Sun, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x41)] // fairies love grass
-        [ForbidFromScene(Scene.RoadToIkana)] // its right on top of shirou which gets confusing if two actors are on top of each other, visually it makes sense to leave this as a land mark
         [UnkillableAllVariants]
         GrassRockCluster = 0xB3, // Obj_Mure2
 
@@ -2233,7 +2357,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x140)]
         [CheckRestricted(Item.MundaneItemHoneyAndDarlingPurpleRupee, Item.HeartPieceHoneyAndDarling)]
         [GroundVariants(0)]
-        [VariantsWithRoomMax(0, 0)] // crash on spawn without its platform
+        [VariantsWithRoomMax(0, 0)] // crash on spawn without its platform, but we have the credits version so its fine
         [UnkillableAllVariants]
         [RemovalChance(95)]
         HoneyAndDarling = 0xB5, // En_Fu
@@ -2242,7 +2366,7 @@ namespace MMR.Randomizer.GameObjects
         EmptyB7 = 0xB7,
 
         // unused water vortex from water temple
-        //[ActorizerEnabled] // we have a modified fix one now, adjusts height to water
+        //[ActorizerEnabled] // we have a modified fix one now, adjusts height to water and fixes the audio
         [FileID(163)]
         [WaterTopVariants(0)]
         [ObjectListIndex(0x106)]
@@ -2279,9 +2403,10 @@ namespace MMR.Randomizer.GameObjects
         //[WallVariants(1)] // facing the wrong way and no bonk, so not that interesting
         [VariantsWithRoomMax(max: 3, variant: 0)]
         //[EnemizerScenesPlacementBlock(Scene.RomaniRanch, Scene.Woodfall, Scene.DekuShrine)] // standing variant has really large collider
-        [EnemizerScenesPlacementBlock(Scene.TerminaField)] // now that we can recycle objects, this scene will always have too many of him, its obnoxious
+        //[EnemizerScenesPlacementBlock(Scene.TerminaField)] // now that we can recycle objects, this scene will always have too many of him, its obnoxious
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [UnkillableAllVariants]
-        [PlacementWeight(75)]
+        [PlacementWeight(50)]
         En_Ani = 0xBD, // En_Ani
 
         EmptyBE = 0xBE,
@@ -2289,14 +2414,34 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled] // warp addresses are offsets, dangerous until we can hard code
         [FileID(167)]
         [ObjectListIndex(0x271)]
-        [WaterBottomVariants(0x11, 0x422, 0x833, 0xC44)] // think this would be funny
+        [CheckRestricted(
+            Item.CollectableTheMoonLinkTrialEntrancePot1, Item.CollectableTheMoonLinkTrialEntrancePot2,
+            Item.CollectableTheMoonLinkTrialEntrancePot3, Item.CollectableTheMoonLinkTrialEntrancePot4,
+            Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy1, Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy2,
+            Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy3, Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy4,
+            Item.CollectableTheMoonDekuTrialDekuTrialGossipFairy5,
+            Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy1, Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy2,
+            Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy3, Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy4,
+            Item.CollectableTheMoonGoronTrialGoronTrialGossipFairy5,
+            Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy1, Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy2,
+            Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy3, Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy4,
+            Item.CollectableTheMoonZoraTrialZoraTrialGossipFairy5,
+            Item.CollectableTheMoonLinkTrialGossipStoneRoom1GossipFairy1, Item.CollectableTheMoonLinkTrialGossipStoneRoom2GossipFairy1,
+            Item.CollectableTheMoonLinkTrialIronKnuckleBattleGossipFairy1, Item.CollectableTheMoonLinkTrialIronKnuckleBattleGossipFairy2,
+            Item.CollectableTheMoonLinkTrialPieceOfHeartRoomGossipFairy1,
+            Item.HeartPieceDekuTrial, Item.HeartPieceGoronTrial, Item.HeartPieceZoraTrial, Item.HeartPieceLinkTrial,
+            Item.CollectableTheMoonLinkTrialEntrancePot1,Item.CollectableTheMoonLinkTrialEntrancePot2,
+            Item.CollectableTheMoonLinkTrialEntrancePot3,Item.CollectableTheMoonLinkTrialEntrancePot4,
+            Item.ChestLinkTrialBombchu10
+        )]
+        //[WaterBottomVariants(0x11, 0x422, 0x833, 0xC44)] // think this would be funny if they werent pathing..
         [PathingVariants(0x11, 0x422, 0x833, 0xC44)]
         [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
         [VariantsWithRoomMax(max: 1, variant: 0x11, 0x422, 0x833, 0xC44)]
         [PathingKickoutAddrVarsPlacement(mask: 0x3F0, shift: 4)]
         [UnkillableAllVariants]
-        [ForbidFromScene(Scene.TheMoon)]
-        [PlacementWeight(5)]
+        //[ForbidFromScene(Scene.TheMoon)] // all items behind them finished
+        [PlacementWeight(70)]
         MoonChild = 0xBF, // En_Js
 
         EmptyC0 = 0xC0,
@@ -2315,9 +2460,12 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         TitleLogo = 0xC5, // En_Mag
 
+        //[ActorizerEnabled] // hard to add because of all of the xyz rotations being used as parameters
         [FileID(170)]
         [ObjectListIndex(0x1)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        //[WallVariants()]
+        [SwitchFlagsPlacement(SwitchTrigger.Sends,  size: 0x7F, shift: 8)] // really it just there to hear you say something
+        [UnkillableAllVariants]
         Elf_Msg2 = 0xC6, // Elf_Msg2
 
         // unused floating/flying stone
@@ -2340,8 +2488,8 @@ namespace MMR.Randomizer.GameObjects
             Scene.StockPotInn, Scene.TradingPost, Scene.MayorsResidence, Scene.MilkBar,
             Scene.BeneathTheWell//,
             /* Scene.IkanaGraveyard, Scene.StoneTower */)] // dyna crash
-        //[SwitchFlagsPlacement(size: 0xFF, shift: 0)]
-        [PlacementWeight(70)]
+        //[SwitchFlagsPlacement(size: 0xFF, shift: 0)] // removed and unused in our updated and fixed version
+        [PlacementWeight(50)]
         UnusedStoneTowerPlatform = 0xC7, // Bg_F40_Swlift
 
         EmptyC8 = 0xC8,
@@ -2391,7 +2539,7 @@ namespace MMR.Randomizer.GameObjects
         // TODO  snowhead is missing from this list and above
         [GroundVariants(0x3200, 0x2D00, 0x0F00, 0x1E00,
             1, 0x2800, 0x11D)]
-        [WaterBottomVariants(1)]
+        [WaterBottomVariants(0x11)] // non vanilla, but 0xFE param space is unused, so we can mark this
         [VariantsWithRoomMax(max: 5, variant: 1)]
         // below ground is kinda boring..., we want above ground placement only
         [VariantsWithRoomMax(max: 0, variant: 0x11D, 0x0F00, 0x2800, 0x2D00, 0x3200, 0x1E00)]
@@ -2413,7 +2561,7 @@ namespace MMR.Randomizer.GameObjects
         // 0x85, 0x107
         [FileID(173)]
         [ObjectListIndex(0x1)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // this actor can have switch flags on zrotation, but not used in vanilla
+        //[SwitchFlagsPlacement(size: 0x7F, shift: 0)] // this actor can have switch flags on zrotation, but not used in vanilla
         [TreasureFlagsPlacement(mask: 0x1F, shift: 2)]
         PushableBlockSwitchFlagsHandler = 0xCB, // Obj_Makeoshihiki
 
@@ -2688,7 +2836,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x28F0)]
         [FileID(224)]
         [ObjectListIndex(0x143)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 5)]
+        [SwitchFlagsPlacement(SwitchTrigger.DoNotUse, size: 0x7F, shift: 5)] // has triggered fairy
         //params: 0x0FE0 is switch flags (?) 0xF000 is sizetype, 0x001F is dialogue to use (params + 0x20D3 to get textId)
         // first row: all moon mask hints, which are free but since they are mask hints they are often worthless (0x1000 someetimes added)
         // second row: overworld variants: center, south north west east order
@@ -2726,7 +2874,8 @@ namespace MMR.Randomizer.GameObjects
             0x3425, 0x3946, 0x3967, 0xFF, 0x3986, 0x3995, 0x3955)]
         [UnkillableAllVariants]
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1, variant: 2, 7, 9)]
-        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.Above, ourVariant: -1, variant: 0x0402)] // rock circle like oot
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)] // rock circle like oot
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.OnTop, ourVariant: -1, variant: 0, 1, 2, 3, 4, 5)]
         [ForbidFromScene(Scene.TerminaField, Scene.RoadToSouthernSwamp, Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.SwampSpiderHouse,
             Scene.MilkRoad, Scene.RomaniRanch, Scene.CuccoShack, Scene.DoggyRacetrack,
             Scene.PathToMountainVillage, Scene.ZoraCape, Scene.GreatBayCoast, Scene.MountainVillageSpring, // Scene.MountainVillage,
@@ -2836,7 +2985,7 @@ namespace MMR.Randomizer.GameObjects
         // parameters unknown
         [WaterBottomVariants(0)]
         [GroundVariants(0xFF)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         [BlockingVariantsAll]
         [PlacementWeight(65)] // bit boring
         BronzeBoulder = 0xFC, // Obj_Hamishi
@@ -2878,7 +3027,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0x000, 0x100, 0x200, 0x300, 0x400, 0x500, 0x600, 0x700)]
         [BlockingVariantsAll]
         [UnkillableAllVariants]
-        [PlacementWeight(50)] // boring: its just a block
+        [PlacementWeight(30)] // boring: its just a block
         PuzzleBlock = 0x102, // Obj_Pzlblock
 
         //[ActorizerEnabled] // doesnt spawn without 2 node path, if you remove the code to allow for more:crash
@@ -2974,6 +3123,7 @@ namespace MMR.Randomizer.GameObjects
         [DynaAttributes(12, 8)]
         [EnemizerScenesPlacementBlock(Scene.PinnacleRock//, // super annoying warping the player all the way back
             /*Scene.StoneTower, Scene.SouthernSwamp, Scene.SouthernSwampClear */)] // dyna crash possible
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [PlacementWeight(50)]
         Mimi = 0x111, // En_Bu
 
@@ -3173,7 +3323,7 @@ namespace MMR.Randomizer.GameObjects
         //[GroundVariants(0x7E00, 0x7D00, 0x7C00)] // work but too low mostly hidden by ground
         [VariantsWithRoomMax(max: 1, 0x7E01, 0x7D01, 0x7C01)]
         [UnkillableAllVariants]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.Sends, size: 0x7F, shift: 8)] // death, but would be funny
         SpiderWeb = 0x125, // Bg_Spdweb
 
         Empty126 = 0x126,
@@ -3267,9 +3417,9 @@ namespace MMR.Randomizer.GameObjects
         Empty133 = 0x133,
         Empty134 = 0x134,
 
-        //[ActorizerEnabled] // wont spawn because the required item objects are likely missing
+        [ActorizerEnabled]
         [FileID(276)]
-        [ObjectListIndex(0xD0)]
+        [ObjectListIndex(0x12C)] // D0 is zo, zora, A1 for goron, 12C for bomb shop owner
         [CheckRestricted(Scene.BombShop, variant: ActorConst.ANY_VARIANT, // 02,
             Item.ShopItemBombsBomb10, Item.ShopItemBombsBombchu10, Item.ItemBombBag, Item.UpgradeBigBombBag)]
         [CheckRestricted(Scene.ZoraHallRooms, variant: ActorConst.ANY_VARIANT, // 0x3E0,
@@ -3280,6 +3430,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x3E0, // zora shop
             0x3E1, // goron shop
             0x2)] // bomb shop
+        [VariantsWithRoomMax(max:0, variant: 0x3E0, 0x3E1, 0x2)] // wont spawn because the required item objects are likely missing
         [UnkillableAllVariants]
         ShopSeller = 0x135, // En_Sob1
 
@@ -3328,7 +3479,7 @@ namespace MMR.Randomizer.GameObjects
         [DynaAttributes(12, 8)]
         [WaterTopVariants(0xF81, 0xF82, 0xF83, 0xF84, 0xF85, 0xF86, 0xF87)]
         [VariantsWithRoomMax(max: 2, variant: 0xF81, 0xF82, 0xF83, 0xF84, 0xF85, 0xF86, 0xF87)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         [ForbidFromScene(Scene.WoodfallTemple)]
         Raft = 0x13A, // En_Raf carniverous raft, woodfall temple
 
@@ -3336,6 +3487,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x162)]
         UnusedStoneTowerSmoke = 0x13B, // Obj_Funen
 
+        // deku palace moving platform, all of them require paths
         [FileID(280)]
         [ObjectListIndex(0x163)]
         [SwitchFlagsPlacementXRot]
@@ -3354,8 +3506,9 @@ namespace MMR.Randomizer.GameObjects
         [BlockingVariantsAll]
         [ForbidFromScene(Scene.WoodfallTemple)]
         // uses a weekeventreg instead
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)] // this SETS but does not read, is it passing info to a door?
+        [SwitchFlagsPlacement(SwitchTrigger.Sends, size: 0x7F, shift: 8)] // this SETS but does not read, is it passing info to a door?
         [UnkillableAllVariants]
+        [CreditsBlockedAllVariants] // too big
         [EnemizerScenesPlacementBlock(Scene.WoodsOfMystery)]
         WoodfallTempleWoodenFlower = 0x13D, // Bg_Numa_Hana
 
@@ -3399,9 +3552,10 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
+        [PlacementWeight(60)]
         PushableBlockOnIce = 0x142, // Obj_Skateblock
 
-        // assuming this is the block ice arrows spawns
+        // assuming this is the block ice arrows spawns, as RegularIceblock is the one spawned on actors
         [FileID(288)]
         [ObjectListIndex(0x167)]
         [DynaAttributes(12, 8)]
@@ -3510,11 +3664,15 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x14B)]
         [WaterBottomVariants(0)]
         [UnkillableAllVariants]
-        [CreditsBlockedAllVariants] // singing audio can break credits
+        //[CreditsBlockedAllVariants] // singing audio can break credits
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // her new actor plays flute, this can break frog choir if close enough
         [PlacementWeight(90)]
+        [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
+            variant: 2, 9)]
         [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
+        [AlignedCompanionActor(BeanSeller, CompanionAlignment.InFront, ourVariant: -1, variant: 0)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         CutsceneZelda = 0x0152, // Dm_Zl
 
         [FileID(305)]
@@ -3536,6 +3694,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(TreasureChest, CompanionAlignment.InFront, ourVariant: -1, variant:
             0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
             0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [CreditsBlockedAllVariants] // invisible until on top of them
         [EnemizerScenesPlacementBlock(Scene.DekuShrine)] // slowing enemies
         Nejiron = 0x155, // Rolling exploding rock in Ikana
@@ -3609,15 +3768,19 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled] // this works fine but shows up waay too often
         // there are actaually 3 others, but they are three separate objects, so hard to program
         [FileID(314)]
-        [ObjectListIndex(0x173)]
+        [ObjectListIndex(0x173)] // type zero
+        //[ObjectListIndex(0x174)] // type 1
+        //[ObjectListIndex(0x175)] // type 2
         [DynaAttributes(18, 12)] // this is multiple object, this one is triforce
         // spreadsheet thinks 0x206 could be it
         [GroundVariants(0)]
-        [WaterBottomVariants(0)]
-        [VariantsWithRoomMax(max: 5, variant: 0)]
+        //[GroundVariants(2)]
+        //[WaterBottomVariants(2)]
+        [VariantsWithRoomMax(max: 5, variant: 0, 1, 2)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        [PlacementWeight(80)]
+        [PlacementWeight(40)]
+        // TODO put some companions in front of it
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         // might be used for mikau grave, but also beta actors that teach songs...??
         MagicSlab = 0x15C, // En_Sekihi
@@ -3632,7 +3795,7 @@ namespace MMR.Randomizer.GameObjects
                         0x017F, // sht miniboss
                         0x027F  // istt
             )]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         [DifficultAllVariants]
         [VariantsWithRoomMax(max: 0, variant: 0x007F, 0x017F, 0x027F)] // wont work without their blocks
         Wizrobe = 0x15D, // En_Wiz
@@ -3672,7 +3835,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         // possible second switch at 0x3F8
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Receives, size: 0x7F, shift: 0)]
         [TreasureFlagsPlacement(mask: 0x1F, shift: 8)] // 0x3FC
         [PlacementWeight(35)]
         CircleOfFire = 0x162, // Obj_Fireshield // tag: FireRing
@@ -3775,20 +3938,30 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
-        [PlacementWeight(60)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
+        [PlacementWeight(55)]
         DekuKing = 0x16A, // En_Dnq
 
         Empty16B = 0x16B,
+
+        // completely unused actor
+        [ActorizerEnabled]
         [FileID(328)]
         [ObjectListIndex(0x17E)]
         [DynaAttributes(4, 8)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
-        TerminaFieldSpikedFence = 0x16C, // Bg_Keikoku_Saku
+        // only params are the switch flags, not even sure what they do
+        [GroundVariants(0)]
+        // water bottom
+        [SwitchFlagsPlacement(SwitchTrigger.DoNotUse, size: 0x7F, shift: 0)]
+        [BlockingVariantsAll] // wide
+        [PlacementWeight(5)] // just a fence, boring
+        [UnkillableAllVariants]
+        UnusedSpikeFence = 0x16C, // Bg_Keikoku_Saku
 
         // too big to go most places, doesn't have texture on backend so thats weird
         [FileID(329)]
         [ObjectListIndex(0x12A)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         BigBoulder = 0x16D, // Obj_Hugebombiwa
 
         // empty actor, does nothing
@@ -3895,7 +4068,7 @@ namespace MMR.Randomizer.GameObjects
         [FlyingToGroundHeightAdjustment(150)]
         //[ForbidFromScene(Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.TwinIslandsSpring, Scene.NorthClockTown, Scene.MilkRoad, Scene.GreatBayCoast, Scene.IkanaCanyon)]
         //[EnemizerScenesPlacementBlock(Scene.RoadToSouthernSwamp, Scene.TwinIslands, Scene.TwinIslandsSpring, Scene.NorthClockTown, Scene.MilkRoad, Scene.GreatBayCoast, Scene.IkanaCanyon)]
-        [PlacementWeight(85)]
+        [PlacementWeight(75)]
         Tingle = 0x176, // En_Bal
 
         [ActorizerEnabled]
@@ -3905,6 +4078,8 @@ namespace MMR.Randomizer.GameObjects
         //[OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.WestClockTown)] // his object is shared with at least two other actors, cannot remove without removing them too
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
+        [PlacementWeight(90)]
         Banker = 0x177, // En_Ginko_Man
 
         [ActorizerEnabled]
@@ -3914,6 +4089,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [BlockingVariantsAll]
         [UnkillableAllVariants]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [PlacementWeight(55)]
         PirateTelescope = 0x178, // En_Warp_Uzu
 
@@ -4052,7 +4228,7 @@ namespace MMR.Randomizer.GameObjects
         [CreditsBlockedAllVariants] // inivible until player gets close, so invible for credits
         [OnlyOneActorPerRoom]
         [VariantsWithRoomMax(max: 0, variant: 0)] // cutscene variant is hardcoded
-        [PlacementWeight(50)]
+        [PlacementWeight(40)]
         //[ForbidFromScene(Scene.StoneTowerTemple)]
         GaroMaster = 0x182, // En_Jso2
 
@@ -4083,16 +4259,17 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x445C)]
         [FileID(350)]
         [ObjectListIndex(0x18D)]
-        // params: 7x >> 6 is switch, 0x3F is unk
+        // params: 7x >> 6 is switch,
         [PathingVariants(0x700, 0x940)]
         [PathingTypeVarsPlacement(mask: 0x3F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Sends, size: 0x7F, shift: 6)] // death but mini boss kill is great
         [DifficultAllVariants]
         [OnlyOneActorPerRoom]
         [BlockingVariantsAll] // until we can fix his pathing, he will just sit there as a statue most of the time
-        //[ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
-        [RemovalChance(25)]
+        // current issue: the door behind him locks waiting for a switch flag, have to modify all of the doors to fix
+        [ForbidFromScene(Scene.InvertedStoneTowerTemple, Scene.StoneTowerTemple)]
+        [RemovalChance(45)]
         [EnemizerScenesPlacementBlock(Scene.TerminaField)] // nothing wrong, just no place to put and huge object slows generation down
-        [SwitchFlagsPlacement(size: 0x7F, shift: 6)]
         Eyegore = 0x184, // En_Egol
 
         [EnemizerEnabled]
@@ -4173,7 +4350,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(359)]
         [ObjectListIndex(0x190)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.DoNotUse, size: 0x7F, shift: 8)]
         SnowHeadCentralPillar = 0x18F, // Bg_Hakugin_Post
 
         // these are trees and the ground as part of the opening cutscene
@@ -4390,7 +4567,7 @@ namespace MMR.Randomizer.GameObjects
         [WaterTopVariants(7)] // but if you put them in water they work for water surface, with a weak swimming animation
         // testing
         //[GroundVariants(0xFF)] // 0xFF is special flag-less condition
-        [SwitchFlagsPlacement(size: 0xFF, shift: 0)] // technically its all of params, but maybe in the future we want a byte for something else
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0xFF, shift: 0)] // technically its all of params, but maybe in the future we want a byte for something else
         [VariantsWithRoomMax(max: 2, variant: 0, 1, 6)]
         [VariantsWithRoomMax(max: 5, variant: 7)]
         //[ForbidFromScene(Scene.SouthernSwamp, Scene.DekuPalace)]
@@ -4437,7 +4614,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(397)]
         [ObjectListIndex(0x1)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 9)]
         StrayFairy = 0x1B0, // En_Elforg
 
         [ActorizerEnabled] // don't give actual items, sadly, just jape you into thinking they are items
@@ -4488,7 +4665,7 @@ namespace MMR.Randomizer.GameObjects
             variant: 2, 9)]
         [AlignedCompanionActor(Butterfly, CompanionAlignment.Above, ourVariant: -1,
             variant: 0, 1, 2)]
-        [AlignedCompanionActor(GiantBeee, CompanionAlignment.Above, ourVariant: 0x2,
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.OnTop, ourVariant: 0x2,
             variant: 0, 1, 2, 3, 4, 5)]
         [EnemizerScenesPlacementBlock(Scene.TerminaField)] // TF has object size issues, this is the largest object, this is here just to speed up
         HappyMaskSalesman = 0x1B5, // En_Osn
@@ -4578,7 +4755,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x7F)] // is closer to the ground, ground replacements work best
         [WallVariants(0x100)] // non vanilla, want to see if I can have more wall variety
         [VariantsWithRoomMax(max: 0, variant: 0x7F)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         CuttableIvyWall = 0x1BE, // Bg_Dkjail_Ivy
@@ -4664,7 +4841,9 @@ namespace MMR.Randomizer.GameObjects
         //[ForbidFromScene(Scene.TouristCenter)]
         [UnkillableAllVariants]
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
-        [PlacementWeight(50)]
+        // todo: check if picto is important in logic
+        [ForbidFromScene(Scene.TouristCenter)] // cannot remove because we don't know if the boat ride is important
+        [PlacementWeight(25)]
         SwampTouristGuide = 0x1C5, // En_Shn, // tingle daddy
 
         Empty1C6 = 0x1C6,
@@ -4675,7 +4854,8 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x7F, 0x307F, 0x207F, 0x107F)]
         [BlockingVariantsAll]
         [UnkillableAllVariants]
-        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         GateSoldier = 0x1C7,
 
         // this is both the hanging iceccyle in termina field and the ones in the temple 
@@ -4771,8 +4951,6 @@ namespace MMR.Randomizer.GameObjects
         SoaringEffects = 0x1CE, // En_Test7
 
         [ActorizerEnabled]
-        // this actor CRASHES if you hit it with a light arrow
-        // more specifically it spawns Demo_Effect which crashes trying to draw its curv skeleton, reason unknown
         [FileID(424)]
         [ObjectListIndex(0x1B3)]
         [DynaAttributes(12, 8)]
@@ -4781,13 +4959,15 @@ namespace MMR.Randomizer.GameObjects
             0x2601, // ISTT
             0x600, 0xF00, 0x301, 0x401, // STT
             0x101, 0x201)]
-        [WaterBottomVariants(0x1)] // dont normally show up down there but its fine
+        //[WaterBottomVariants(0x1)] // dont normally show up down there but its fine
+        // this actor CRASHES if you hit it with a light arrow
+        // more specifically it spawns Demo_Effect which crashes trying to draw its curv skeleton, reason unknown
         [VariantsWithRoomMax(max: 0, variant: 0x300, 0x2A01, 0x2901, // ikana castle
             0x2601, // ISTT
             0x600, 0xF00, 0x301, 0x401, // STT
             0x101, 0x201
         )]
-        [SwitchFlagsPlacement(size: 0xF00, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0xF00, shift: 8)]
         [UnkillableAllVariants] // I think...?
         [BlockingVariantsAll]
         [RemovalChance(5)/*PlacementChance(30)*/]
@@ -4883,12 +5063,12 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(432)]
         [ObjectListIndex(0x1)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 8)]
         Elf_Msg4 = 0x1D7, // Elf_Msg4
 
         [FileID(433)]
         [ObjectListIndex(0x1)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 8)]
         Elf_Msg5 = 0x1D8, // Elf_Msg5
 
         // HP from labfish, Bomb from garo master boss
@@ -4910,7 +5090,7 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.BeneathTheWell, Scene.IkanaCanyon)]
         [EnemizerScenesPlacementBlock(Scene.DekuShrine, Scene.Grottos,
             Scene.GoronRacetrack, Scene.GoronRacetrack)] // slows down player too much in a race setting
-        [SwitchFlagsPlacement(size: 0xFF, shift: 4)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0xFF, shift: 4)]
         [BlockingVariantsAll]
         GibdoWell = 0x1DA, // En_Talk_Gibud
 
@@ -4957,9 +5137,9 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.GoronVillage, variant: 0x230E, Item.CollectableGoronVillageWinterLargeSnowball5)]
         [CheckRestricted(Scene.GoronVillage, variant: 0x250E, Item.CollectableGoronVillageWinterLargeSnowball6)] //
         [CheckRestricted(Scene.MountainVillage, variant: 0x2802, Item.CollectableMountainVillageWinterLargeSnowball1)] // day 3
-        [CheckRestricted(Scene.MountainVillage, variant: 0x2C0E, Item.CollectableMountainVillageWinterLargeSnowball2)] // day 2
+        [CheckRestricted(Scene.MountainVillage, variant: 0x2902, Item.CollectableMountainVillageWinterLargeSnowball2)] // day 2
         [CheckRestricted(Scene.MountainVillage, variant: 0x2A0E, Item.CollectableMountainVillageWinterLargeSnowball3)] // day 1
-        [CheckRestricted(Scene.MountainVillage, variant: 0x2902, Item.CollectableMountainVillageWinterLargeSnowball4)] // day 2 #2
+        [CheckRestricted(Scene.MountainVillage, variant: 0x2C0E, Item.CollectableMountainVillageWinterLargeSnowball4)] // day 2 #2
         [CheckRestricted(Scene.MountainVillage, variant: 0xC0E, Item.SongLullabyIntro)] // day 2 #2
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x600E, Item.CollectablePathToSnowheadLargeSnowball1)]
         [CheckRestricted(Scene.PathToSnowhead, variant: 0x610E, Item.CollectablePathToSnowheadLargeSnowball2)]
@@ -4978,7 +5158,7 @@ namespace MMR.Randomizer.GameObjects
         )]
         [FileID(437)]
         [ObjectListIndex(0xEF)]
-        [SwitchFlagsPlacement(size: 0x3F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x3F, shift: 0)]
         //ground variants
         [GroundVariants(
             0x0012, 0x7F3F, 0xFF00, 0x0, // path to mountain (small)
@@ -5008,7 +5188,7 @@ namespace MMR.Randomizer.GameObjects
             Item.HeartPiecePoeHut)]
         [GroundVariants(0x0)]
         [VariantsWithRoomMax(max: 0, variant: 0x0)]
-        [SwitchFlagsPlacement(size: 0xFF, shift: 3)] // 0x7F8
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0xFF, shift: 3)] // 0x7F8
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.IkanaCanyon, Scene.SecretShrine)]
         SpiritHouseOwner = 0x1DE, // En_Gb2
@@ -5057,15 +5237,15 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(445)]
         [ObjectListIndex(0x1C7)]
-        [PlacementWeight(65)]
         // params, 0x10 pulls extra cutscenes, 0x7 is height I think (code only checks for == 0 or == 1), but 2,3,4 are seen in snowhead
         [GroundVariants(0x0, 0x10, 0x11, 0x12, 0x13, 0x14)] // we dont want to pull them, so not using vanilla params
         [WaterBottomVariants(0x0, 0x10, 0x11, 0x12, 0x13, 0x14)] // because its silly
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)] // 0x7F00
+        [SwitchFlagsPlacement(SwitchTrigger.SendsAndRecieves, size: 0x7F, shift: 8)] // 0x7F00
         [ForbidFromScene(Scene.SnowheadTemple, Scene.PiratesFortressExterior, Scene.StoneTowerTemple)]
         [DynaAttributes(24, 17)]
         [BlockingVariantsAll]
         [UnkillableAllVariants]
+        [PlacementWeight(65)]
         GoronLinkPoundSwitch = 0x1E4, // Bg_Hakugin_Switch
 
         Empty1E5 = 0x1E5,
@@ -5132,6 +5312,8 @@ namespace MMR.Randomizer.GameObjects
         // type is >> 7, so 0x1F0 1 is collectible, 2 is chest, 3 is switch, think we want switch flag since those are much more open
         [GroundVariants(0x110)] // checks for switch flag
         [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // technically correct, the vanilla game never uses this actor
+        [UnkillableAllVariants]
+        [CreditsBlockedAllVariants]
         Obj_Dowsing = 0x1EC, // Obj_Dowsing
 
         // wind in ISTT and water current in PFInterior
@@ -5215,7 +5397,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(460)]
         [ObjectListIndex(0x1CD)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 8)] // burn
         Obj_Spidertent = 0x1F4, // Obj_Spidertent
 
         [ActorizerEnabled]
@@ -5231,7 +5413,7 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0x0, 0x1000, 0x1200, 0x1300, 0x1500, 0x1700)]
         [VariantsWithRoomMax(max: 0, variant: 0x0, 0x1400, 0x1600, 0x1500, 0x1C00, 0x1A00, 0x1E00, 0x2000)]
         [UnkillableAllVariants]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 9)] // collected
         [EnemizerScenesPlacementBlock(Scene.PinnacleRock)] // now that we have signs randomized, its almost garenteeded to happen
         ZoraEgg = 0x1F5, // En_Zoraegg
 
@@ -5457,12 +5639,13 @@ namespace MMR.Randomizer.GameObjects
             Item.NotebookMeetAnju)]
         // 8001 is pathing to laundrypool, also sitting on bed in ranch day 3
         [GroundVariants(2, // inn
-            0x80FF, 0x0FF // other inn examples
+            0x80FF,
+            0x0FF // other inn examples
             )]
         [PathingVariants(0x8001)] // really a pathing variant (walking through east/south to go see the laundry pool
         [PathingTypeVarsPlacement(mask: 0xFF, shift: 0)]
         [VariantsWithRoomMax(max: 0, variant: 0x8001, 0x80FF)] // too hard coded to do anything with
-        [VariantsWithRoomMax(max: 0, variant: 2)] // too hard coded to do anything with
+        [VariantsWithRoomMax(max: 0, variant: 2, 0xFF)] // too hard coded to do anything with
         // dont remove from laundrypool, its the only way to see link mask in the wild, and its a trip
         [ForbidFromScene(Scene.LaundryPool/*, Scene.StockPotInn */)]
         [UnkillableAllVariants]
@@ -5494,7 +5677,7 @@ namespace MMR.Randomizer.GameObjects
         [WaterBottomVariants(0x2001)]
         [VariantsWithRoomMax(max: 0, variant: 0x2001)] // placement gets conflicated TODO figure out
         [UnkillableAllVariants]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 3)] // 0x3F8
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 3)] // 0x3F8
         Seahorse = 0x205, // En_Ot
 
         // this is spawned by another actor apparently, dont use this
@@ -5541,7 +5724,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.SwampSpiderHouse, Scene.OceanSpiderHouse, // annoying
                                                             // TODO how old is this? is this before I knew about the cutscene version?
             Scene.SouthernSwamp, Scene.StoneTower)] // they either dont spawn, or when they appear they lock your controls, bad
-        [SwitchFlagsPlacement(size: 0xFF, shift: 8)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0xFF, shift: 8)]
         [PlacementWeight(50)]
         BigPoe = 0x208, // En_Bigpo
 
@@ -5652,24 +5835,28 @@ namespace MMR.Randomizer.GameObjects
         // kinda want to try randomizing, but I need to check against ALL checks in the graveyard, kinda hard to do
         [FileID(489)]
         [ObjectListIndex(0x142)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         StalChildrenCircle = 0x212, // En_Rail_Skb
 
         [ActorizerEnabled]
         [FileID(490)]
         [ObjectListIndex(0x1F8)]
-        // his actor isnt here, gets spanwed by snowball, this is just for refernece
+        // actorizer doesnt see this, he is spawned by snowball, this is just for refernece
+        // currently, actorizer adds a second snowball object so all snowball actors can stay behind, including him
+        // his object is never randomized
         [CheckRestricted(Scene.TwinIslands, variant: ActorConst.ANY_VARIANT, Item.SongLullabyIntro)]
-        // 1 is standing in the hall during spring
-        [GroundVariants(1)]
+        // cutscene version is not reachable, in hardcode it checks for spot00 and layer7
+        [GroundVariants(1)] // spring time not trapped at all
+        [PathingVariants(0)] // trapped in ice version
+        [PathingTypeVarsPlacement(mask: 0x3F, shift:10)] // 0xFC00
         [OnlyOneActorPerRoom]
         [ForbidFromScene(Scene.GoronShrine)] // remove and it crashes, dont know why (suspected missing object actor that needs it)
         [UnkillableAllVariants]
         [BlockingVariantsAll]
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
             variant: 2, 9)]
-        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
         [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
+        [PlacementWeight(80)]
         GoronElder = 0x213, // En_Jg
 
         //[ActorizerEnabled]
@@ -5718,6 +5905,7 @@ namespace MMR.Randomizer.GameObjects
         [PlacementWeight(45)] // new actor, for now lets leave high
         MilkbarChairs = 0x217, // Bg_Mbar_Chair
 
+        //.. this had to be a separate block? for hte falling mechanic?
         [FileID(495)]
         [ObjectListIndex(0x3)]
         StoneTowerRotatingRoomPushBlock = 0x218, // Bg_Ikana_Block
@@ -5743,15 +5931,14 @@ namespace MMR.Randomizer.GameObjects
         // todo
         [FileID(498)]
         [ObjectListIndex(0x184)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // direction? isnt this based on the water?
         GBTSeaSaw = 0x21B, // Bg_Dblue_Balance
 
-        // lol
         [ActorizerEnabled]
         [FileID(499)]
         [ObjectListIndex(0x184)]
         [CeilingVariants(0x3)] // the one in greatbay temple above the door, just going to use one
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.SendsAndRecieves, size: 0x7F, shift: 0)]
         [ForbidFromScene(Scene.GreatBayTemple)]
         [UnkillableAllVariants]
         GBTFreezableWaterfall = 0x21C, // Bg_Dblue_Waterfall
@@ -5868,6 +6055,8 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.OnTop, ourVariant: -1, variant: 0, 1, 2, 3, 4, 5)]
         [ForbidFromScene(Scene.SouthClockTown, Scene.MilkRoad, Scene.WestClockTown,
              Scene.Woodfall, Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.MountainVillage, Scene.MountainVillageSpring, Scene.Snowhead,
              Scene.GreatBayCoast, Scene.ZoraCape, Scene.IkanaCanyon, Scene.StoneTower, Scene.InvertedStoneTower)]
@@ -5907,7 +6096,7 @@ namespace MMR.Randomizer.GameObjects
         // 5 is creep trying to break into lulus room
         // 6 is sitting waiting for the rehersal
         // FC08 is the guitar tuner, FC07 is the picture buyer
-        // 09 is lights are off guy
+        //   09 is lights are off guy, cannot be randomized because we need him for lights check
         // 0x12 is missing, checks for a flag makes snese
         // 0x13/14/15 is jamming at the jazz session cutscene
         // 0x140A is near the entrance
@@ -5941,6 +6130,7 @@ namespace MMR.Randomizer.GameObjects
         //[EnemizerScenesPlacementBlock(//Scene.SouthernSwampClear,// known dyna issues
         //    Scene.StoneTower, Scene.StoneTowerTemple, Scene.SouthernSwamp)] // assumed issues
         [UnkillableAllVariants]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [BlockingVariantsAll]
         UglyTree = 0x229, // Obj_Tree
 
@@ -5961,8 +6151,10 @@ namespace MMR.Randomizer.GameObjects
         //[OnlyOneActorPerRoom] // probably dyna crash to be worried about
         UnusedPirateElevator = 0x22A, // Obj_Y2lift
 
+        // the gate in sewers heartpiece room, that blocks going backwards
         [FileID(514)]
         [ObjectListIndex(0x20E)]
+        [SwitchFlagsPlacement(SwitchTrigger.Receives, size:0x7F, shift:0)]
         PiratesFortressSlidingGate = 0x22B, // Obj_Y2shutter
 
         // REQUIRES path, because if the player gets on it starts following path
@@ -6003,10 +6195,9 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 0, variant: 0x80, 0x81, 0x91)] // do not place these
         [AlignedCompanionActor(GoldSkulltula, CompanionAlignment.OnTop, ourVariant: -1, variant:
             0xFF53, 0xFF53, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B)]
-        //[SwitchFlagsPlacement] // only has switch flags for wall breaking variants, what a pain
         [UnkillableAllVariants]
         // switch flags
-        //[SwitchFlagsPlacement(size: 0x7F, shift: 0)] // this is only for half of the barrels, lets hand pick these and hope for the best
+        //[SwitchFlagsPlacement] // only has switch flags for wall breaking variants, what a pain
         [TreasureFlagsPlacement(0x7F, shift: 8)]
         [ForbidFromScene(Scene.PiratesFortressExterior, // needed for a glitch I think
             Scene.GreatBayTemple)] // TODO find out if I can remove without ruining everything
@@ -6048,7 +6239,7 @@ namespace MMR.Randomizer.GameObjects
         [CreditsBlockedVariants(0x1, 0xF, 0x0)] // the credits version is fine in milkbar but not the rest I think
         [AlignedCompanionActor(CircleOfFire, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x3F5F)] // FIRE AND DARKNESS
         [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: 0, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
-        [ForbidFromScene(Scene.ZoraHallRooms)]
+        //[ForbidFromScene(Scene.ZoraHall)]
         [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
         [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
         [OnlyOneActorPerRoom]
@@ -6080,7 +6271,7 @@ namespace MMR.Randomizer.GameObjects
         [PerchingVariants(0x050B, 0x3FFF)] // sitting in mayors office
         [VariantsWithRoomMax(max: 0, variant: 0x050B, 0x3FFF)] // we dont want a sitting npc to be placed places, just replace, also talking to is softlock, and we cannot modify because rando needs this actor for things
         [UnkillableAllVariants]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // triggering the gorman check?
         [PlacementWeight(90)]
         Toto = 0x234, // En_Toto // manager zora band member
 
@@ -6193,7 +6384,7 @@ namespace MMR.Randomizer.GameObjects
             0x7F)]
         [OnlyOneActorPerRoom] // dont waste too many spots
         [UnkillableAllVariants]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         [PlacementWeight(60)] // dont waste too many spots
         MushroomCloud = 0x23B, // Obj_Kinoko
 
@@ -6253,14 +6444,17 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.ZoraHallRooms, variant: ActorConst.ANY_VARIANT, Item.HeartPieceEvan)]
         // 0xF is type (1,2 and else) the 0xFEXX param does NOTHING wtf
         [GroundVariants(
-            //0xFE01, // zora hall one, concert after the thing, does not spawn regularlly
-            //0xFE02//, // cutscene version (mikau's healing)
+            0xFE01, 
+            // 0xFE02,//, // cutscene version (mikau's healing)
             0xFE0F // both in a cutscene scene and in the milkbar cutscene
         )]
         [WaterBottomVariants(0xFE02, // dark cutscene version, perfect for dark water bottom shinanigans
             0xF)] // also, do not put regular variant as water our typing system is dumb, doesnt know which is which
         [CreditsBlockedVariants(0xFE0F)] // music playing TODO I dont know if music playing from these actors actually breaks credits like miniboss does
-        [VariantsWithRoomMax(max: 0, variant: 0xFE0F)] // reduced to zero until I can fix his shit
+        [VariantsWithRoomMax(max: 0, variant:
+            0xFE01, // zora hall one, concert after the thing, time locked to after the clear
+            0xFE0F // reduced to zero until I can fix his shit
+        )] 
         [UnkillableAllVariants]
         [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: 0xFE0F, variant: 0x13, 0x14, 0x15)]
         [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: 0xFE0F, variant: 0x1E0, 1, 2, 9)]
@@ -6289,6 +6483,11 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.BombShop)]//, Scene.GoronShrine)]
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
             variant: 2, 9)]
+        // the gorons fear the bees
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.Above, ourVariant: 1,
+            variant: 0, 1, 2, 3, 4, 5)]
+        [AlignedCompanionActor(GiantBeee, CompanionAlignment.Above, ourVariant: 2,
+            variant: 0, 1, 2, 3, 4, 5)]
         GoronSGoro = 0x242, // En_S_Goro
 
         [ActorizerEnabled]
@@ -6323,22 +6522,32 @@ namespace MMR.Randomizer.GameObjects
         Jugglers = 0x244, // En_Ja
 
         /// ?? TODO
+        // assumed pathing-> air type
         [FileID(540)]
         [ObjectListIndex(0x5C)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 9)] // activated by the switch?
         [BlockingVariantsAll]
         StoneTowerBlock = 0x245, // Bg_F40_Block
 
-        // todo switches
         [ActorizerEnabled]
         [FileID(541)]
         [ObjectListIndex(0x222)]
         [DynaAttributes(12, 12)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
-        // we dont want to remove vanilla, use 0 as variant
+        [SwitchFlagsPlacement(SwitchTrigger.Sends, size: 0x7F, shift: 9)] // FE00
+        // we dont want to remove vanilla, use 0 as variant, vanilla is always populated by switch values
         [GroundVariants(0)]
-        [VariantsWithRoomMax(max: 3, variant: 0)] // limit because of dyna (untested)
+        [VariantsWithRoomMax(max: 6, variant: 0)] // limit because of dyna (untested)
         [UnkillableAllVariants]
+        [AlignedCompanionActor(RegularIceBlock, CompanionAlignment.OnTop, ourVariant: -1, variant: 0xFF78, 0xFF96, 0xFFC8, 0xFFFF)]
+        [AlignedCompanionActor(Bombiwa, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x807F, 0x8004, 0x8002,
+            0xE,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x0102, 0x103, 0x104, 0x105, 0x106,
+            0x101, 0x100,
+            0x0114, 0x0115, 0x0116, 0x0117, 0x0118,
+            0x8003
+        )]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [ForbidFromScene(Scene.StoneTower, Scene.InvertedStoneTower)]
         [PlacementWeight(40)]
         ElegyStatueSwitch = 0x246, // Bg_F40_Switch
@@ -6363,12 +6572,13 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 2, variant: 0x0)]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
-        [CreditsBlockedAllVariants]
+        //[CreditsBlockedAllVariants]
         [OnlyOneActorPerRoom] // if two of them are near to each other, and player appears near his nearby music can break
         //[ForbidFromScene(Scene.StockPotInn, Scene.LaundryPool, Scene.MilkBar)] // think him being in milkbar is a credits thing
         [EnemizerScenesPlacementBlock(Scene.MountainVillageSpring)] // his music can break Frog Choir
         [AlignedCompanionActor(RegularZora, CompanionAlignment.InFront, ourVariant: -1, variant: 0x13, 0x14, 0x15)]
         [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [RemovalChance(95), PlacementWeight(55)]
         GuruGuru = 0x248, // En_GuruGuru
 
@@ -6384,7 +6594,8 @@ namespace MMR.Randomizer.GameObjects
         [VariantsWithRoomMax(max: 1, variant: 0)]
         [UnkillableAllVariants]
         [CreditsBlockedAllVariants] // invisible
-        [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.SouthernSwamp, Scene.SouthernSwampClear)] // the scene has lens reversed, so you can see him render without lens, but if you use lens he disspears
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
+        [EnemizerScenesPlacementBlock(Scene.Woodfall, Scene.SouthernSwampClear)] // the scene has lens reversed, so you can see him render without lens, but if you use lens he disspears
         Shiro = 0x24A, // En_Stone_heishi
 
         [FileID(546)]
@@ -6459,6 +6670,7 @@ namespace MMR.Randomizer.GameObjects
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         [AlignedCompanionActor(GoronSGoro, CompanionAlignment.InFront, ourVariant: -1, variant: 0x1E0, 1, 2, 9)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [RemovalChance(90), PlacementWeight(80)]
         //[ForbidFromScene(Scene.ZoraCape)]
         Lulu = 0x252, // Ee_Zov
@@ -6482,10 +6694,11 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x203)]
         [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
         STTBombableFloor = 0x255, // Bg_Ikana_Bombwall
-        
+
+        // TODO ceiling type?
         [FileID(557)]
         [ObjectListIndex(0x203)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // turn on and off the light?
         STTLargeLightRay = 0x256, // Bg_Ikana_Ray
         
         [FileID(558)]
@@ -6494,7 +6707,7 @@ namespace MMR.Randomizer.GameObjects
         
         [FileID(559)]
         [ObjectListIndex(0x1E0)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)] // break
         Bg_Haka_Bombwall = 0x258, // Bg_Haka_Bombwall
         
         [FileID(560)]
@@ -6535,7 +6748,7 @@ namespace MMR.Randomizer.GameObjects
             //Scene.GreatBayCoast,
             //Scene.SouthernSwamp)] // dyna crash suspect, even if not in the second room
         [ForbidFromScene(Scene.IkanaCanyon, Scene.RoadToIkana)] // do not remove original
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(size: 0x7F, shift: 0)] // spawned by ghost?
         [PlacementWeight(50)] // boring
         IkanaCanyonHookshotStump = 0x25E, // Obj_HsStump
 
@@ -6545,11 +6758,12 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0x594)]
         [VariantsWithRoomMax(max:0, variant:0x594)] // we dont place vanilla in the world because the flower is separate, looks silly
         [PathingTypeVarsPlacement(mask:0x7F, shift:0)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         [CompanionActor(DekuFlower, ourVariant: -1, variant: 0x17F)]
         [CompanionActor(GrassRockCluster, ourVariant: -1, variant: 0x801)]
         [CompanionActor(Butterfly, ourVariant: -1, variant: 1, 2)]
         [CompanionActor(Fairy, ourVariant: -1, variant: 2, 7, 9)]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [RespawningAllVariants] // unkillable I think? even if it wasn't, requiring sonata to kill
         [BlockingVariantsAll]
         SleepingScrub = 0x25F, // En_Hidden_Nuts
@@ -6557,10 +6771,12 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(567)]
         [ObjectListIndex(0xD0)]
-        //[WaterTopVariants(0,1)] // these are not actually at the water surface, but 10ft below
+        // in vanilla they are 344 below water, in code they are raised to -180
+        //[WaterTopVariants(0,1)] // these are not actually at the water surface, but 344 below
         [WaterVariants(0,1)]
+        // because they auto adjust to water surface, they could be considered water bottom
         [UnkillableAllVariants]
-        [EnemizerScenesPlacementBlock(Scene.MarineLab)]
+        [EnemizerScenesPlacementBlock(Scene.MarineLab)] // clips through the top grate
         [PlacementWeight(75)]
         SwimmingZora = 0x260, // En_Zow
 
@@ -6598,6 +6814,7 @@ namespace MMR.Randomizer.GameObjects
             0xFE15, // town archery sign
             0xFE18  // bank poster
         )]
+        [RemovalChance(50)]
         [UnkillableAllVariants]
         WallTalkSpot = 0x261, // En_Talk
 
@@ -6683,9 +6900,9 @@ namespace MMR.Randomizer.GameObjects
             // esp if my debugging is wrong
         )]
         [CeilingVariants(0xFC00)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 9)]
         [OnlyOneActorPerRoom]
-        [RemovalChance(90), PlacementWeight(35)] // TODO
+        [RemovalChance(5), PlacementWeight(35)] // TODO
         HitSpot = 0x265, // En_Hit_Tag // hittag
 
         [ActorizerEnabled]
@@ -6782,7 +6999,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x1B6)]
         [CheckRestricted(Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
         [GroundVariants(0, 0x1)]
-        [VariantsWithRoomMax(max:0, variant:0, 0x1)]
+        [VariantsWithRoomMax(max:0, variant:0, 0x1)] // boring copy of the other guards, and I think one of them crashes without the captain
         [UnkillableAllVariants]
         MayorsResitenceGuard = 0x26D, // En_Heishi
 
@@ -6800,7 +7017,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(582)]
         [ObjectListIndex(0x241)]
-        [CheckRestricted(Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
+        [CheckRestricted(Scene.MayorsResidence, variant: 0x0, Item.HeartPieceNotebookMayor, Item.NotebookMeetMayorDotour, Item.NotebookDotoursThanks)]
         [GroundVariants(0)]
         [VariantsWithRoomMax(0,0)] // talking to him without the rest of his group is crash
         [OnlyOneActorPerRoom]
@@ -6831,11 +7048,21 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x246)]
         Eff_Lastday = 0x272, // Eff_Lastday
 
-        // todo randomize
+        [ActorizerEnabled]
         [FileID(586)]
         [ObjectListIndex(0x203)]
         [DynaAttributes(22,16)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 8)]
+        [GroundVariants( 0x550A, // taaaalll
+            0x6602)] // stone tower temple (vanilla)
+        [WaterBottomVariants(0x7702)]
+        [VariantsWithRoomMax(max: 10, variant: 0x6602)]
+        [VariantsWithRoomMax(max: 3, variant: 0x7702)]
+        [VariantsWithRoomMax(max: 1, variant: 0x550A)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 8)]
+        [ForbidFromScene(Scene.StoneTowerTemple)]
+        [BlockingVariantsAll]
+        [UnkillableAllVariants]
+        [PlacementWeight(50)]
         PunchableStoneTowerPillars = 0x273, // Bg_Ikana_Dharma
 
         [ActorizerEnabled]
@@ -7077,7 +7304,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(604)]
         [ObjectListIndex(0x236)]
         [DynaAttributes(8,9)]
-        [SwitchFlagsPlacement(size: 0x7F, shift: 9)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 9)]
         IkanaCastleKegCieling = 0x285, // Bg_Ikninside
 
         // assumed to be the stage lights in the Mikau healing thing
@@ -7131,7 +7358,8 @@ namespace MMR.Randomizer.GameObjects
         [FileID(611)]
         [ObjectListIndex(0x264)]
         Keaton = 0x28C, // En_Kitan
-        
+
+        // huh? are these both the ceiling?
         [FileID(612)]
         [ObjectListIndex(0x267)]
         [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
@@ -7236,10 +7464,15 @@ namespace MMR.Randomizer.GameObjects
         [FileID(627)]
         [ObjectListIndex(0x269)]
         MoonWarpBeam = 0x29C, // En_Fall2
-        
+
+        [ActorizerEnabled]
         [FileID(628)]
         [ObjectListIndex(0xD)]
-        MadamAromaCutscene = 0x29D, // Dm_Al
+        [GroundVariants(0)]
+        [VariantsWithRoomMax(max:0, variant:0)] // tposer
+        [UnkillableAllVariants]
+        //[PlacementWeight(10)]
+        MadamAromaEndingCutscene = 0x29D, // Dm_Al
 
         // Dm_Gm is a complete duplicate of this according to darkeye
         [FileID(629)]
@@ -7273,9 +7506,13 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         DressMannequin = 0x2A1, // En_Drs
 
-        //todo
+        [ActorizerEnabled]
         [FileID(633)]
         [ObjectListIndex(0x241)]
+        [GroundVariants(0)]
+        //[VariantsWithRoomMax(max:2, variant:0)] // boring
+        [UnkillableAllVariants]
+        [PlacementWeight(5)] // boring tposer, but unique
         MajorDotourAtWedding = 0x2A2, // En_Ending_Hero
         
         [FileID(634)]
@@ -7316,6 +7553,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)] // wedding
         [VariantsWithRoomMax(max:3, variant:0)]
         [UnkillableAllVariants]
+        [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [PlacementWeight(15)] // kinda boring until I can fix him
         ViscenMoonLeaveCutscene = 0x2A8, // En_Ending_Hero2 // captain
 
@@ -7331,7 +7569,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(641)]
         [ObjectListIndex(0x1B6)]
         [GroundVariants(0)]
-        [VariantsWithRoomMax(max:0, variant:0)]
+        [VariantsWithRoomMax(max:0, variant:0)] // boring copy of guards we already have
         [UnkillableAllVariants]
         [PlacementWeight(50)]
         SoldierMoonLeaveCutscene = 0x2AA, // En_Ending_Hero4
@@ -7373,7 +7611,7 @@ namespace MMR.Randomizer.GameObjects
             0x303 // stone tower inverted
         )]
         //wallvars
-        [SwitchFlagsPlacement(size: 0x7F, shift: 0)]
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x7F, shift: 0)]
         [UnkillableAllVariants]
         SpawnsItemFromSoil = 0x2AE, // Obj_Swprize
 
@@ -7414,10 +7652,10 @@ namespace MMR.Randomizer.GameObjects
             0x29, 0x2D, 0x30, 0x34, 0x38, 0x3C // romani ranch fence
         )] // todo search
         // TODO find one that is non-vanilla for wall
-        [SwitchFlagsPlacement(size: 0x3F, shift:2)] // 0x1FC
+        [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0x3F, shift:2)] // 0x1FC
         [OnlyOneActorPerRoom] // as they give items or money, limit to one
         [UnkillableAllVariants]
-        [RemovalChance(90), PlacementWeight(23)] // free stuff, make it more rare
+        [RemovalChance(5), PlacementWeight(23)] // free stuff, make it more rare
         En_Invisible_Ruppe = 0x2AF, // En_Invisible_Ruppe
         
         [FileID(647)]

@@ -77,6 +77,7 @@ namespace MMR.Randomizer.Utils
         public static void ReadExternalSceneFiles()
         {
             /// read new binary scenes from files in MMR/scenes
+            // scene injection
 
             // for now, the only metadata we have is fileid, just return instead of parsing more data
             int ParseMetaFile(string metaFile)
@@ -110,13 +111,6 @@ namespace MMR.Randomizer.Utils
 
             foreach (string filePath in GenerateExternalSceneFileList("scenes"))
             {
-                /*
-                if (filePath.Contains("SafeBoat.mmra")
-                    || filePath.Contains("Dinofos"))
-                {
-                    //throw new Exception("SafeBoat.mmra no longer works in actorizer 1.16, \n remove the file from MMR/actors and start a new seed.");
-                    continue;
-                } // */
 
                 try
                 {
@@ -149,11 +143,12 @@ namespace MMR.Randomizer.Utils
                             {
                                 throw new Exception($"BROKEN SCENE FILE [{filename}] had file id [{fileId}]");
                             }
-
-                            // inject ZZZ
-                            RomData.MMFileList[fileId].Data = overlayData;
-                            RomData.MMFileList[fileId].WasEdited = true;
-                            RomData.MMFileList[fileId].IsCompressed = false;
+                            var file = RomData.MMFileList[fileId];
+                            file.Data = overlayData;
+                            file.WasEdited = true;
+                            file.IsCompressed = true;
+                            // this could cause issues later with vrom overlapping, right now its not an issue?
+                            file.End = file.Addr + file.Data.Length;
 
                         } // foreach bin entry
 
@@ -246,7 +241,7 @@ namespace MMR.Randomizer.Utils
                     {
                         byte DoorCount = sceneFile[ptr + 1];
                         int DoorAddr = (int)ReadWriteUtils.Arr_ReadU32(sceneFile, ptr + 4) & 0xFFFFFF;
-                        //RomData.SceneList[i].Maps[j].ActorAddr = ActorAddr;
+                        //RomData.SceneList[i].Maps[j].AddressOfActorList = AddressOfActorList;
                         RomData.SceneList[i].Doors = ReadSceneDoors(sceneFile, DoorAddr, DoorCount, i);
                     }
                     else if (cmd == 0x14) // final header command, no more headers
@@ -325,7 +320,7 @@ namespace MMR.Randomizer.Utils
 
                 Actor a = new Actor();
                 ushort an = ReadWriteUtils.Arr_ReadU16(Map, Addr + (i * 16));
-                a.ActorIdFlags = an & 0xF000; // unused
+                a.ActorIdFlags = an & 0xF000;
                 a.ActorId = an & 0x0FFF;
                 a.ActorEnum = (GameObjects.Actor)a.ActorId;
                 a.OldActorEnum = a.ActorEnum;
@@ -464,8 +459,8 @@ namespace MMR.Randomizer.Utils
 
         private static void UpdateMap(Map map)
         {
-            WriteMapActors(RomData.MMFileList[map.File].Data, map.ActorAddr, map.Actors);
-            WriteMapObjects(RomData.MMFileList[map.File].Data, map.ObjAddr, map.Objects);
+            WriteMapActors(RomData.MMFileList[map.File].Data, map.AddressOfActorList, map.Actors);
+            WriteMapObjects(RomData.MMFileList[map.File].Data, map.AddressOfObjList, map.Objects);
         }
 
         public static void UpdateScene(Scene scene)
@@ -494,15 +489,15 @@ namespace MMR.Randomizer.Utils
                         if (cmd == 0x01)
                         {
                             byte ActorCount = RomData.MMFileList[f].Data[k + 1];
-                            int ActorAddr = (int)ReadWriteUtils.Arr_ReadU32(RomData.MMFileList[f].Data, k + 4) & 0xFFFFFF;
-                            RomData.SceneList[i].Maps[j].ActorAddr = ActorAddr;
-                            RomData.SceneList[i].Maps[j].Actors = ReadMapActors(RomData.MMFileList[f].Data, ActorAddr, ActorCount, i, j);
+                            int AddressOfActorList = (int)ReadWriteUtils.Arr_ReadU32(RomData.MMFileList[f].Data, k + 4) & 0xFFFFFF;
+                            RomData.SceneList[i].Maps[j].AddressOfActorList = AddressOfActorList;
+                            RomData.SceneList[i].Maps[j].Actors = ReadMapActors(RomData.MMFileList[f].Data, AddressOfActorList, ActorCount, i, j);
                         }
                         if (cmd == 0x0B)
                         {
                             byte ObjectCount = RomData.MMFileList[f].Data[k + 1];
                             int ObjectAddr = (int)ReadWriteUtils.Arr_ReadU32(RomData.MMFileList[f].Data, k + 4) & 0xFFFFFF;
-                            RomData.SceneList[i].Maps[j].ObjAddr = ObjectAddr;
+                            RomData.SceneList[i].Maps[j].AddressOfObjList = ObjectAddr;
                             RomData.SceneList[i].Maps[j].Objects = ReadMapObjects(RomData.MMFileList[f].Data, ObjectAddr, ObjectCount);
                         }
                         if (cmd == 0x14)
