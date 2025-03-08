@@ -1087,6 +1087,7 @@ namespace MMR.Randomizer
             FixInjuredKoume();
             BlockBabyGoronIfNoSFXRando();
             MoveTheISTTTunnelTransitionBack();
+            MoveThePFSTunnelTransitionBack();
 
             // reposition actors
             FixSouthernSwampDekuBaba();
@@ -1124,6 +1125,7 @@ namespace MMR.Randomizer
             DistinguishLogicRequiredDekuFlowers();
             ExtendGrottoDirectIndexByte();
             FixJPGrottos();
+            SwapSwampSpiderhouseRock();
 
             // scene/object list modified for variety or compatiblity
             RemoveSTTUnusedPoe();
@@ -1145,12 +1147,15 @@ namespace MMR.Randomizer
             AddExtraObjectToPiratesInterior();
             SwapShopActorsIfRandomized();
             FixSouthernSwampLensBehavior();
+            FixSouthernSwampGossipStoneObjectPlacement();
 
             // credits
             SwapIntroActors();
             SwapCreditsCremia();
             MoveCreditsPostmanPath();
             EnableAllCreditsCutScenes();
+            ChangeIkanaCanyonCreditsActors();
+
 
             Shinanigans();
 
@@ -2254,6 +2259,7 @@ namespace MMR.Randomizer
             MoveShopScrubsIfRandomized();
             MovePostmanIfRandomized(terminaField);
             MoveLaundryPoolBellTalkSpotIfRandomized();
+
         }
 
         private static void MoveLaundryPoolBellTalkSpotIfRandomized()
@@ -2604,6 +2610,29 @@ namespace MMR.Randomizer
             grottosScene.Maps[6].Actors[8].Position.y = 58; // dont want spawning in the ground, we want flying around
         }
 
+        private static void SwapSwampSpiderhouseRock()
+        {
+            // the swamp spiderhouse is the only place where we find the regular rock object with regular rocks to be randomized, these are used for bugs normally
+            if ( ! ACTORSENABLED) return;
+
+            var swampSpiderhouseScene = RomData.SceneList.Find(scene => scene.SceneEnum == GameObjects.Scene.SwampSpiderHouse);
+
+            void ChangeRockToReplacement(int map, int actorId)
+            {
+                swampSpiderhouseScene.Maps[map].Actors[actorId].ChangeActor(GameObjects.Actor.Nejiron, 0, modifyOld: true);
+                swampSpiderhouseScene.Maps[map].Actors[actorId].OldName = "BugRock";
+
+            }
+            ChangeRockToReplacement(0, 3); // entrance two rocks
+            ChangeRockToReplacement(0, 4);
+            ChangeRockToReplacement(4, 5); // pot room upper terrace
+
+            foreach (var m in swampSpiderhouseScene.Maps)
+            {
+                var index = m.Objects.FindIndex(obj => obj == 0x1F6); // object_ishi
+                m.Objects[index] = GameObjects.Actor.Nejiron.ObjectIndex();
+            }
+        }
 
         private static void EnablePoFusenAnywhere()
         {
@@ -3817,6 +3846,79 @@ namespace MMR.Randomizer
             // weirdly, its only the first room, the other rooms have regular lens behavior
         }
 
+        public static void FixSouthernSwampGossipStoneObjectPlacement()
+        {
+            /// When an object changes position between rooms, some actor code gets confused because it asumes the object will always be loaded
+            ///   in the same spot of the object list and memory locations are static
+            /// Southern swamp switches the last object spot for the witch room from the regular room with the gossip stone object
+            ///   this causes a lot of actors to glitch out if they were replacing dekubaba
+            var poisonSwampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwamp.FileID());
+            var witchMap = poisonSwampScene.Maps[2];
+            witchMap.Objects[23] = GameObjects.Actor.TallGrass.ObjectIndex();
+            witchMap.Objects[24] = GameObjects.Actor.GossipStone.ObjectIndex();
+
+            // similar mis-ordered stuff happens in clear swamp
+            // kotake object, which might not even be used at all, is last slot, but the gossip stone and torch object swap places at slot -5
+            var clearSwampScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SouthernSwampClear.FileID());
+            var mainRoom = clearSwampScene.Maps[0];
+            var witchRoom = clearSwampScene.Maps[1];
+            var backRoom = clearSwampScene.Maps[2];
+            mainRoom.Objects[14] = witchRoom.Objects[14] = backRoom.Objects[14] = GameObjects.Actor.KotakeOnBroom.ObjectIndex();
+            mainRoom.Objects[18] = backRoom.Objects[18] = GameObjects.Actor.Torch.ObjectIndex();
+            witchRoom.Objects[18] = GameObjects.Actor.GossipStone.ObjectIndex();
+
+            // and main area has tall grass and squaresign swapped
+            mainRoom.Objects[15] = GameObjects.Actor.SquareSign.ObjectIndex();
+            mainRoom.Objects[16] = GameObjects.Actor.TallGrass.ObjectIndex();
+        }
+
+
+
+        private static void ChangeIkanaCanyonCreditsActors()
+        {
+            /// there are extra dead trees in the credits when pamela and her father are playing
+            /// i want to change these
+
+            if (! VanillaEnemyList.Contains(GameObjects.Actor.IkanaCanyonHookshotStump)) return;
+
+            var ikanaCanyonScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.IkanaCanyon.FileID());
+
+            var creditsMainRoomLayer = ikanaCanyonScene.Maps[8];
+
+            foreach(var act in creditsMainRoomLayer.Actors.FindAll(a => a.ActorEnum == GameObjects.Actor.IkanaCanyonHookshotStump))
+            {
+                if (_seedRNG.Next(100) < 40) // chance to instead become a flying second actor
+                {
+                    act.ChangeActor(GameObjects.Actor.BlueBubble, vars: 0xFFFF, modifyOld: true);
+                    act.Position.y += 50;
+                    act.OldName = "CreditsBlueBubble(Changling)";
+
+                }
+                else  // stay ground
+                {
+                    act.ChangeActor(GameObjects.Actor.Bombiwa, vars: 0xE, modifyOld: true);
+                    act.OldName = "CreditsHookshotTree";
+                }
+            }
+
+            creditsMainRoomLayer.Actors[2].ChangeActor(GameObjects.Actor.IkanaGravestone, vars: 0xFF00, modifyOld: true);
+            creditsMainRoomLayer.Actors[2].OldName = "CreditsOwlStatue";
+
+            // change objects to match
+            creditsMainRoomLayer.Objects[3] = GameObjects.Actor.Bombiwa.ObjectIndex(); // from stump
+            creditsMainRoomLayer.Objects[1] = GameObjects.Actor.BlueBubble.ObjectIndex(); // from ice block object ( we cant shoot ice arrows here)
+            creditsMainRoomLayer.Objects[2] = GameObjects.Actor.IkanaGravestone.ObjectIndex(); // from owl object
+
+            // most of these stumps are out of camera shot, they literally are never seen
+            // move 9 to the north away from the castle
+            creditsMainRoomLayer.Actors[9].Position = new vec16(-242, 203, 3783);
+
+            // the three stumps on the upper terrace are not visible at all in any of the three camera shots
+            // move this one from the furthest upper terace to the tree on the right side of the third camera shot
+            creditsMainRoomLayer.Actors[10].Position = new vec16(-864, 600, 1933);
+        }
+
+
         public static void FixArmosSpawnPos()
         {
             /// for some reason armos changes its home and world position based on y rotation in init
@@ -3923,7 +4025,7 @@ namespace MMR.Randomizer
             // so other stuff doesnt shuffle around it
         }
 
-        public static void MoveTheISTTTunnelTransitionBack()
+        private static void MoveTheISTTTunnelTransitionBack()
         {
             /// the room tranition for the scene is very close to the edge of the dexihand
             /// this presents a problem for enemizer if playing no hit rules
@@ -3933,6 +4035,27 @@ namespace MMR.Randomizer
             var sceneClass = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.InvertedStoneTowerTemple.FileID());
             // move the switch a little up the hallway
             sceneClass.Maps[3].Actors[28].Position.x = 800;
+        }
+
+        private static void MoveThePFSTunnelTransitionBack()
+        {
+            /// the pirates fortress sewer transition, from the underwater maze to the mine tunnel, is too close to the mines and is dangerous for enemizer no-hit
+
+            // room 13, but the door is part of the scene
+            var piratesSewerData = RomData.MMFileList[GameObjects.Scene.PiratesFortressRooms.FileID()].Data;
+            // doors are E header, this is door #16
+            // we need to know where the door details are
+            piratesSewerData[0x253] = 0x5E; // from Z rot 300 (12C) to 350 (15E)
+
+            // we also want to move the mines a bit further back just a bit
+            var sewerScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.PiratesFortressRooms.FileID());
+            var mazeMap = sewerScene.Maps[12];
+            var tunnelMap = sewerScene.Maps[10];
+
+            mazeMap.Actors[0].Position.z -= 50; // both mines
+            mazeMap.Actors[1].Position.z -= 50;
+            tunnelMap.Actors[1].Position.z -= 50; // both mines
+            tunnelMap.Actors[2].Position.z -= 50;
         }
 
         private static void FixSwordSchoolPotRandomization()
@@ -4009,8 +4132,16 @@ namespace MMR.Randomizer
         {
             /// Secret shrine objects are WILD
             /// every single room has unnecessary objects, I want to change these to make replacement enemies more interesting
-
+            
             var secretShrineScene = RomData.SceneList.Find(scene => scene.File == GameObjects.Scene.SecretShrine.FileID());
+
+            int PopObject(List<Actor> candidates)
+            {
+                var randomIndex = _seedRNG.Next(candidates.Count());
+                var newObject = candidates[randomIndex].ObjectId;
+                candidates.RemoveAt(randomIndex);
+                return newObject;
+            }
 
             var possibleGroundActors = ReplacementCandidateList.FindAll(act => act.GetGroundVariants().Count > 0);
             var possibleWaterActors = ReplacementCandidateList.FindAll(act => act.GetWaterVariants().Count > 0);
@@ -4018,119 +4149,92 @@ namespace MMR.Randomizer
             var possibleFlyingActors = ReplacementCandidateList.FindAll(act => act.GetFlyingVariants().Count > 0);
             var possibleCeilingActors = ReplacementCandidateList.FindAll(act => act.GetCeilingVariants().Count > 0);
 
+            // WARNING: lots of actors crash if they exist in two rooms, but their objects have moved in ram position, so we need to juggle the ram too
+            // because of this, we're fundamentally changing some positions:
+            //   wooden crate and gold torch objects are completely unused, we can use those as always-loaded slots for the objects we need to keep between three rooms
+            //   spirit house object likely is likely not required to be loaded for every room
+            //   treasure chest could probably be moved around, as I dont see any static data references in the code
+            // meanwhile
+            //   the water drip and tall grass objects are always shuffled around but they are always loaded
+            //   real bombchu, dinofos exist in three rooms
+            //   dekubaba exists in main room and a sub-room
+            // having moved up two objects from every room, we should count 5 and 6 as new allways-loaded slots
+
+            // 5 and 6 objects
+            var alwaysGroundObject = PopObject(possibleGroundActors); 
+            var alwaysFlyingObject = PopObject(possibleFlyingActors);
+            
+
+            foreach (var map in secretShrineScene.Maps)
+            {
+                map.Objects[3] = GameObjects.Actor.CeilingSpawner.ObjectIndex(); // previously golden torch
+                map.Objects[4] = 0xF8; // previously wooden crate becomes tall-grass
+                map.Objects[5] = alwaysGroundObject; // slots 5 and 6 are available for re-using every room, just move one actor out of the way and were good
+                map.Objects[6] = alwaysFlyingObject;
+
+                // needs testing, but also not required right now?
+                //map.Objects[2] = 0xF8; // previously spirit house man
+            }
+
             // lobby
             if (ACTORSENABLED){
-                var randomIndex = _seedRNG.Next(possibleGroundActors.Count());
-                secretShrineScene.Maps[0].Objects[4] = possibleGroundActors[randomIndex].ObjectId; // wooden crate 
-                possibleGroundActors.RemoveAt(randomIndex);
 
-                randomIndex = _seedRNG.Next(possibleGroundActors.Count());
-                secretShrineScene.Maps[0].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // dinofos 
-                possibleGroundActors.RemoveAt(randomIndex);
+                // floating bean plant is only used in this room, move down to old lair grass object
+                var lobby = secretShrineScene.Maps[0];
+                lobby.Objects[10] = GameObjects.Actor.SoftSoilAndBeans.ObjectIndex();
 
-                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
-                secretShrineScene.Maps[0].Objects[6] = possibleFlyingActors[randomIndex].ObjectId; // water drip 
-                possibleFlyingActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
-                secretShrineScene.Maps[0].Objects[8] = possibleFlyingActors[randomIndex].ObjectId; // bombchu 
-                possibleFlyingActors.RemoveAt(randomIndex);
+                lobby.Objects[7] = PopObject(possibleGroundActors); // previously floating bean slot
+                lobby.Objects[8] = PopObject(possibleGroundActors); // real bombchu slot 
+                lobby.Objects[10] = PopObject(possibleFlyingActors); // previous tall grass slot
+                lobby.Objects[11] = PopObject(possibleFlyingActors); // previous deku nut slot
             }
 
             // center room
             if (ACTORSENABLED)
             {
-                var randomIndex = _seedRNG.Next(possibleWaterActors.Count());
-                secretShrineScene.Maps[1].Objects[5] = possibleWaterActors[randomIndex].ObjectId; // deku baba 
-                possibleWaterActors.RemoveAt(randomIndex);
+                var centerRoom = secretShrineScene.Maps[1];
 
-                randomIndex = _seedRNG.Next(possibleWaterBottomActors.Count());
-                secretShrineScene.Maps[1].Objects[6] = possibleWaterBottomActors[randomIndex].ObjectId; // dinofos 
-                possibleWaterBottomActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleWaterBottomActors.Count());
-                secretShrineScene.Maps[1].Objects[8] = possibleWaterBottomActors[randomIndex].ObjectId; // real bombchu
-                possibleWaterBottomActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
-                secretShrineScene.Maps[1].Objects[9] = possibleFlyingActors[randomIndex].ObjectId; // heart piece
-                possibleFlyingActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleCeilingActors.Count());
-                secretShrineScene.Maps[1].Objects[10] = possibleCeilingActors[randomIndex].ObjectId; // tall grass
-                possibleCeilingActors.RemoveAt(randomIndex);
-
+                centerRoom.Objects[7] = PopObject(possibleWaterActors); // previously water drip slot  
+                centerRoom.Objects[8] = PopObject(possibleWaterActors); // real bombchu slot 
+                centerRoom.Objects[9] = PopObject(possibleWaterBottomActors); // previous heart piece slot
+                centerRoom.Objects[10] = PopObject(possibleCeilingActors); // previous tall grass slot
             }
 
             // dinofos room
             {
-                var randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
-                secretShrineScene.Maps[2].Objects[6] = possibleFlyingActors[randomIndex].ObjectId; // deku baba
-                possibleFlyingActors.RemoveAt(randomIndex);
+                var dinoRoom = secretShrineScene.Maps[2];
 
-                randomIndex = _seedRNG.Next(possibleCeilingActors.Count());
-                secretShrineScene.Maps[2].Objects[7] = possibleCeilingActors[randomIndex].ObjectId; // skulltula
-                possibleCeilingActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleGroundActors.Count());
-                secretShrineScene.Maps[2].Objects[10] = possibleGroundActors[randomIndex].ObjectId; // real bombchu
-                possibleGroundActors.RemoveAt(randomIndex);
+                dinoRoom.Objects[7] = PopObject(possibleGroundActors); // skulltula slot  
+                dinoRoom.Objects[9] = PopObject(possibleGroundActors); // water drop slot 
+                dinoRoom.Objects[10] = PopObject(possibleFlyingActors); // real bombchu slot                
             }
 
             // wizrobe room
             {
-                var randomIndex = _seedRNG.Next(possibleGroundActors.Count());
-                secretShrineScene.Maps[3].Objects[6] = possibleGroundActors[randomIndex].ObjectId; // blue warp
-                possibleGroundActors.RemoveAt(randomIndex);
+                var wizrobeRoom = secretShrineScene.Maps[3];
 
-                randomIndex = _seedRNG.Next(possibleGroundActors.Count());
-                secretShrineScene.Maps[3].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // garo master
-                possibleGroundActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
-                secretShrineScene.Maps[3].Objects[8] = possibleFlyingActors[randomIndex].ObjectId; // garo master
-                possibleFlyingActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
-                secretShrineScene.Maps[3].Objects[4] = possibleFlyingActors[randomIndex].ObjectId; // wooden crate
-                possibleFlyingActors.RemoveAt(randomIndex);
-
+                wizrobeRoom.Objects[8] = PopObject(possibleGroundActors); // water drip slot  
+                wizrobeRoom.Objects[9] = PopObject(possibleGroundActors); // lair grass slot 
             }
 
             // wart room
             if (ACTORSENABLED)
             {
-                var randomIndex = _seedRNG.Next(possibleGroundActors.Count());
-                secretShrineScene.Maps[4].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // eygore ???
-                possibleGroundActors.RemoveAt(randomIndex);
+                var wartRoom = secretShrineScene.Maps[4];
 
-                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
-                secretShrineScene.Maps[4].Objects[6] = possibleFlyingActors[randomIndex].ObjectId; // blue warp ?
-                possibleFlyingActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleCeilingActors.Count());
-                secretShrineScene.Maps[4].Objects[7] = possibleCeilingActors[randomIndex].ObjectId; // dinofos
-                possibleCeilingActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleCeilingActors.Count());
-                secretShrineScene.Maps[4].Objects[10] = possibleCeilingActors[randomIndex].ObjectId; // tall grass
-                possibleCeilingActors.RemoveAt(randomIndex);
+                wartRoom.Objects[7] = PopObject(possibleGroundActors); // dinofos slot  
+                wartRoom.Objects[9] = PopObject(possibleGroundActors); // water drip slot 
+                wartRoom.Objects[10] = PopObject(possibleFlyingActors); // lair grass slot 
             }
 
             // garo master room
             if (ACTORSENABLED)
             {
-                /// not as much point, its only him and some grass, not much else to put here
-                var randomIndex = _seedRNG.Next(possibleGroundActors.Count());
-                secretShrineScene.Maps[5].Objects[5] = possibleGroundActors[randomIndex].ObjectId; // wizrobe
-                possibleGroundActors.RemoveAt(randomIndex);
-
-                randomIndex = _seedRNG.Next(possibleFlyingActors.Count());
-                secretShrineScene.Maps[5].Objects[8] = possibleFlyingActors[randomIndex].ObjectId; // blue warp ?
-                possibleFlyingActors.RemoveAt(randomIndex);
-
+                var garoRoom = secretShrineScene.Maps[5];
+                garoRoom.Objects[7] = PopObject(possibleGroundActors); // dinofos slot  
+                garoRoom.Objects[8] = PopObject(possibleGroundActors); // water drip slot 
+                garoRoom.Objects[10] = PopObject(possibleFlyingActors); // lair grass slot 
             }
-
         }
 
         private static void SwapIntroActors()
@@ -4988,16 +5092,16 @@ namespace MMR.Randomizer
             {
                 var testActor = thisSceneData.Actors[actorIndex];
 
-                var flyingVariants = testActor.GetFlyingVariants();
+                //var flyingVariants = testActor.GetFlyingVariants(); // BROKEN, we want the new actor this checks the old Variants list
+                var newVariantIsFlying = testActor.IsNewChoiceFlying();
                 var oldGroundVariants = testActor.GetGroundVariants();
                 var oldWaterSurfaceVariants = testActor.GetWaterTopVariants();
                 var oldPathVariants = testActor.GetPathingVariants();
                 // if previous spawn was ground and the replacement actor has an attribute, adjust height
                 // bug: type for bee in mountain spring is FLYING, should be ground, todo fix
-                if ((flyingVariants != null && flyingVariants.Contains(testActor.Variants[0])) && // chosen variant is flying
+                if (newVariantIsFlying && 
                     ((oldGroundVariants != null && oldGroundVariants.Contains(testActor.OldVariant)) // previous ground
                      || (oldPathVariants != null && oldPathVariants.Contains(testActor.OldVariant)) // previous pathing(ground)
-                     || (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Contains(testActor.OldVariant)) // water surface too
                      || (oldWaterSurfaceVariants != null && oldWaterSurfaceVariants.Contains(testActor.OldVariant)) // water surface too
                      || testActor.OldActorEnum == GameObjects.Actor.ClayPot // dungeon pots dont show up as ground types, need to be a special spot here
                      || testActor.OldActorEnum == GameObjects.Actor.TallGrass // field tall grass dont show up as ground types, need to be a special spot here
@@ -5039,7 +5143,7 @@ namespace MMR.Randomizer
                 }
 
                 var oldCeilingVariants = testActor.GetCeilingVariants();
-                if ((flyingVariants != null && flyingVariants.Contains(testActor.Variants[0])) && // chosen variant is flying
+                if (newVariantIsFlying && // chosen variant is flying
                     (oldCeilingVariants != null && oldCeilingVariants.Contains(testActor.OldVariant))) // previous ceiling 
                 {
                     short randomHeight = (short)(50 + (_seedRNG.Next() % 50));
@@ -5396,6 +5500,10 @@ namespace MMR.Randomizer
                     return false;
                 }
 
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GuruGuru)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.AnjuWeddingDress)) continue; // still broken
+                //if(TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.Peahat, GameObjects.Actor.ReDead)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Scarecrow)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.SkulltulaDummy, GameObjects.Actor.GBTFreezableWaterfall)) continue; // still broken
@@ -5416,7 +5524,6 @@ namespace MMR.Randomizer
 
                 //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.DragonFly)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.LikeLike, GameObjects.Actor.MagicSlab)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.Japas, GameObjects.Actor.MagicSlab)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.SunSwitch)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.TreasureChest)) continue;
@@ -6029,6 +6136,20 @@ namespace MMR.Randomizer
             } // end If Room has Actors with Variants we want to trim
         } // end TrimSpecificActor
 
+        private static GameObjects.Scene[] badRoomScenes =
+        {
+            /*
+            GameObjects.Scene.WoodfallTemple,
+            GameObjects.Scene.SnowheadTemple,
+            GameObjects.Scene.GreatBayTemple,
+            GameObjects.Scene.StoneTowerTemple,
+            GameObjects.Scene.InvertedStoneTowerTemple,
+            GameObjects.Scene.MountainVillageSpring,
+            GameObjects.Scene.DekuPalace
+            */
+        };
+
+
         public static List<List<int>> TrimObjectList(SceneEnemizerData thisSceneData, StringBuilder log)
         {
             /// this function generates our enemizer chosenReplacementObjectsPerMap from our chosenReplacementObjects
@@ -6057,25 +6178,31 @@ namespace MMR.Randomizer
                 // find all objects that have no duplicates
                 var uniqueObjects = objList.Distinct().ToList();
 
-                // if they are the same size, no duplicates, keep going to next map
-                if (objList.Count != uniqueObjects.Count)
+                // issue with dulpicate removal: it can throw off the order of other objects later in the list for this room
+
+                if ( ! badRoomScenes.Contains(thisSceneData.Scene.SceneEnum))
                 {
-                    // second pass: remove all duplicates
-                    for (int u = 0; u < uniqueObjects.Count; u++)
+                    // if they are the same size, no duplicates, keep going to next map
+                    if (objList.Count != uniqueObjects.Count)
                     {
-                        var uniqueObj = uniqueObjects[u];
-                        if (objList.Count(obj => obj == uniqueObj) > 1) // more than one exists, remove
+                        // second pass: remove all duplicates
+                        for (int u = 0; u < uniqueObjects.Count; u++)
                         {
-                            // just remove first one, not sure if there is an advantage of changing one over the other
-                            // consideration: if the object list order changes, the scene load hickups, but so long as wel always replace first...
-                            // we dont want the first we want to remove the last, as removing the first introduces more object list re-loads
-                            //var firstIndex = objList.FindIndex(obj => obj == uniqueObj);
-                            //objList[firstIndex] = SMALLEST_OBJ;
-                            var lastIndex = objList.FindLastIndex(obj => obj == uniqueObj);
-                            objList[lastIndex] = SMALLEST_OBJ;
+                            var uniqueObj = uniqueObjects[u];
+                            if (objList.Count(obj => obj == uniqueObj) > 1) // more than one exists, remove
+                            {
+                                // just remove first one, not sure if there is an advantage of changing one over the other
+                                // consideration: if the object list order changes, the scene load hickups, but so long as wel always replace first...
+                                // we dont want the first we want to remove the last, as removing the first introduces more object list re-loads
+                                //var firstIndex = objList.FindIndex(obj => obj == uniqueObj);
+                                //objList[firstIndex] = SMALLEST_OBJ;
+                                var lastIndex = objList.FindLastIndex(obj => obj == uniqueObj);
+                                objList[lastIndex] = SMALLEST_OBJ;
+                            }
                         }
                     }
                 }
+
 
                 objectsPerMap.Add(objList);
             }
@@ -6848,6 +6975,8 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
+            //if (scene.SceneEnum == GameObjects.Scene.Grottos) // force specific actor/variant for debugging
+            //{
             //if (scene.SceneEnum == GameObjects.Scene.ClockTowerInterior) // force specific actor/variant for debugging
             //{
                 // if you want to force object here, use ChosenReplacementObjectsPerMap
@@ -6859,6 +6988,8 @@ namespace MMR.Randomizer
                 // 23 to 25
                 //target.ChangeActor(GameObjects.Actor.ObjSwitch, vars: 0x7C14); // crashes
                 //target.ChangeActor(GameObjects.Actor.ObjSwitch, vars: 0x7C04); // 2 also crashes
+                //thisSceneData.Scene.Maps[13].Actors[0].ChangeActor(GameObjects.Actor.ReDead, vars: 0x7804);
+                //thisSceneData.Scene.Maps[13].Actors[3].ChangeActor(GameObjects.Actor.ReDead, vars: 0xF7FE);
             //if (scene.SceneEnum == GameObjects.Scene.LaundryPool) // force specific actor/variant for debugging
             //{
             //if (scene.SceneEnum == GameObjects.Scene.SouthClockTown) // force specific actor/variant for debugging
@@ -7694,7 +7825,7 @@ namespace MMR.Randomizer
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
                     sw.Write(_syncedLog.ToString());
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 86.0\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 88.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }
@@ -7839,36 +7970,14 @@ namespace MMR.Randomizer
         //public void SetNewActors(Scene scene, List<ValueSwap> newObjChanges)
         public void SetNewActors(Scene scene, List<List<int>> newObjects)
         {
-            // this is the slowest part of our bogo sort, we need to try speeding it up
-
             this.newMapList = new List<MapEnemiesCollection>();
             // I like foreach better but its waaaay slower
             for (int m = 0; m < scene.Maps.Count; ++m)
             {
                 var map = scene.Maps[m];
 
-                //if (newObjChanges == null)
-                //{
-                //    throw new Exception("SetNewActors: empty object list");
-                //}
-                {
-                    /*
-                    var newObjList = map.Objects.ToList(); // copy
-                    // probably a way to search for this with a lambda, can't think of it right now
-                    for (int valueSwap = 0; valueSwap < newObjChanges.Count; ++valueSwap)
-                    {
-                        for (int o = 0; o < newObjList.Count; ++o)
-                        {
-                            // if old object matches out value swap, swap
-                            if (map.Objects[o] == newObjChanges[valueSwap].OldV)
-                            {
-                                newObjList[o] = newObjChanges[valueSwap].NewV;
-                            }
-                        }
-                    } // */
-                    var newObjList = newObjects[m];
-                    this.newMapList.Add(new MapEnemiesCollection(map.Actors, newObjList, scene));
-                }
+                var newObjList = newObjects[m];
+                this.newMapList.Add(new MapEnemiesCollection(map.Actors, newObjList, scene));
             }
         }
 

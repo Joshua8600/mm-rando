@@ -18,6 +18,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Dexihand, Actor.LikeLike)] // hand can stop you talking to mother
         [EnemizerSceneEnemyReplacementBlock(Actor.Secretary,
             Actor.LikeLike)] // big one can block you from reaching mother, cycle 0 check
+        [EnemizerSceneEnemyReplacementBlock(Actor.MayorsResitenceGuard,
+            Actor.ClocktowerGearsAndOrgan)] // blocks escape
         [EnemizerSceneEnemyReplacementBlock(Actor.Gorman,
             Actor.ClocktowerGearsAndOrgan, // can block access to madam
             Actor.LikeLike)] // likelike can grab and spit you before you can face it
@@ -97,10 +99,10 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneBlockSensitive(Actor.Leever, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
         [EnemizerSceneBlockSensitive(Actor.Armos, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
         [EnemizerSceneBlockSensitive(Actor.LargeWoodenCrate, -1)] // standing next to the buisness scrub
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Wolfos,  Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Wolfos, Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper, Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Leever,  Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
-        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Armos,   Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Leever, Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Armos, Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
         /* ********************************* */
         [EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)] // chests under it in bomb grotto and hot spring grotto
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Peahat, // hidden or very weak enemies suck here, but they are very common in this slot
@@ -134,6 +136,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedFallingBridge, // might block ability to enter the grotto
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator // can get the player locked behind them near the grotto stones
         )]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BottleWaterDrop,
+            Actor.UnusedFallingBridge)] // can reach all the way to the entrance and block the player from landing
         Grottos = 0x0A,
 
         // Unused = 0x0B,
@@ -146,6 +150,8 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x08)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.HappyMaskSalesman,
             Actor.ImposterFrog, Actor.ClayPot, Actor.SmallWoodenBox, Actor.BadBat, // falls off camera
+            Actor.RosaSisters,
+            Actor.MajoraBalloonSewer, Actor.UnusedStoneTowerPlatform, // raises above camera
             Actor.IkanaGravestone // crashes on n64 because there is no floor below it to matrix rotate to
         )]
         [ActorizerSceneCreditsActor(Actor.HappyMaskSalesman)] // issue: this removes zelda
@@ -155,6 +161,14 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1165)]
         [SceneInternalId(0x13)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bombiwa,  // credits stump
+            Actor.Milkjar, Actor.TallGrass, Actor.LetterToPostman, Actor.SmallSnowball, Actor.BombFlower, Actor.MushroomCloud,
+            Actor.En_Invisible_Ruppe, Actor.HitSpot, Actor.Bo, // too small to see
+            Actor.Zubora, Actor.BedroomPostman, Actor.SoftSoilAndBeans, Actor.DekuFlower, Actor.GrottoHole // low to the ground, same issue
+        )]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BlueBubble,  // credits stump
+            Actor.En_Invisible_Ruppe, Actor.MothSwarm, Actor.Bo // too small to see in credits
+        )]
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
         //    Actor.IronKnuckle // getting a weird rsp/rdp crash when moving from maps 0->4 or 0->2, not convinced this is the culprit can't debug further
         //   // think this is a result of object list mangling, I changed kafei which affects iron knuckle object offset
@@ -209,6 +223,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block the breakable floor under them
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Hiploop,
         //    Actor.En_Ani, Actor.Bumper, Actor.Tijo)]
+        [EnemizerSceneBlockSensitive(Actor.Lightblock, -1)]
         [EnemizerSceneBlockSensitive(Actor.Hiploop, -1)]
         StoneTowerTemple = 0x13,
 
@@ -222,6 +237,7 @@ namespace MMR.Randomizer.GameObjects
         [FairyDroppingEnemies(roomNumber: 1, actorNumber: 1)] // wizrobe
         [EnemizerSceneBlockSensitive(Actor.BlueBubble, -1)]
         [EnemizerSceneBlockSensitive(Actor.Dexihand, -1)] // replacement needs to not block the floating rupee items
+        [EnemizerSceneBlockSensitive(Actor.Lightblock, -1)]
         [ClearEnemyPuzzleRooms(4)] // wizrobe room is a clear all room
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Poe,
            Actor.Bo)] // they just fall down to the "floor" and its awkward
@@ -286,6 +302,7 @@ namespace MMR.Randomizer.GameObjects
         [ClearEnemyPuzzleRooms(5)] // wizrobe room
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
         //    Actor.Bombiwa)] // can block jumping
+        [EnemizerSceneBlockSensitive(Actor.Lightblock, -1)]
         IkanaCastle = 0x1A,
 
         [FileID(1235)]
@@ -377,6 +394,8 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.Bombiwa, // blocking a few skulltulla
             Actor.RegularIceBlock, Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator,
             Actor.Bumper, Actor.ClocktowerGearsAndOrgan)]
+        [EnemizerSceneEnemyReplacementBlock(Actor.DragonSpawner, // blocking a few skulltulla
+            Actor.BigOcto)] // suck doesnt work right, softlock
         PinnacleRock = 0x22,
 
         [FileID(1278)]
@@ -501,7 +520,7 @@ namespace MMR.Randomizer.GameObjects
                         Actor.HappyMaskSalesman, Actor.ClayPot, Actor.GoronElder)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PostMan,
                         Actor.ClayPot, Actor.GoronElder, // not visible in credits because too far away and doesnt draw
-                        Actor.MadShrub
+                        Actor.MadShrub, Actor.Stalchild, Actor.MadShrub
         )]
         TerminaField = 0x2A, // keikoku, c800 dyna size
 
@@ -772,6 +791,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1388)]
         [SceneInternalId(0x4B)]
         [ClearEnemyPuzzleRooms(12)] // 12 is big poe
+        [EnemizerSceneBlockSensitive(Actor.Lightblock, -1)]
         BeneathTheWell = 0x48,
 
         [FileID(1403)]
@@ -798,10 +818,13 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1417)]
         [SceneInternalId(0x50)]
+        [DynaHeadroom(500, 400)] // 561 crashed with +3, but that was day 3
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SmallSnowball,
             Actor.RealBombchu, Actor.Snapper, Actor.Beamos)] // can hit you as you are climbing up blocking assension
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoGoron,
             Actor.RealBombchu)] // can hit you as you are climbing up blocking assension
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PottedPlant,
+            Actor.ClocktowerGearsAndOrgan)] // can block the door (during the day only but thats still annoying)
         MountainVillage = 0x4D,
 
         [FileID(1419)]
@@ -817,6 +840,8 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1431)]
         [SceneInternalId(0x53)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bombiwa,
+            Actor.LikeLike)] // can instant grab you on exit
         RoadToIkana = 0x50,
 
         [FileID(1433)]
@@ -882,13 +907,19 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneBlockSensitive(originalEnemy: Actor.Flagpole, -1)] // ice block can stop access to the whole dungeon
         [EnemizerSceneEnemyReplacementBlock(Actor.Bo,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block the twisted path into snowhead temple
+        [EnemizerSceneEnemyReplacementBlock(Actor.SmallSnowball,
+            Actor.UnusedStoneTowerStoneElevator)] // can block the whole thing
+        [EnemizerSceneEnemyReplacementBlock(Actor.LargeSnowball,
+            Actor.UnusedStoneTowerStoneElevator)] // can block the whole thing
         Snowhead = 0x59,
 
         [FileID(1453)]
         [SceneInternalId(0x5D)]
         [EnemizerSceneBlockSensitive(originalEnemy: Actor.SmallSnowball, -1)] // can block the grotto, TODO see about just moving them instead
         // todo test after snowball merge
-        [DynaHeadroom(126, 126)]  // limit not seed, but this is fine in spring
+        [DynaHeadroom(126, 126)]  // limit not seen, but this is fine in spring
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Tektite,
+            Actor.UnusedStoneTowerStoneElevator)] // can block the way
         TwinIslands = 0x5A, // winter
 
         [FileID(1455)]
@@ -914,6 +945,9 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1466)]
         [SceneInternalId(0x61)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PostMan,
+            Actor.WoodfallTempleWoodenFlower // so big it goes through the door into the thing
+            )]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.MysteryHand,
             Actor.StockpotBell // so big it goes through the back of the stairs and blocks the stairs
             )]
