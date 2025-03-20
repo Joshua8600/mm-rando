@@ -1839,6 +1839,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(GoldSkulltula, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F)]
         //[ForbidFromScene(Scene.SwampSpiderHouse )] // dont want to mess with this by accident until I know it has proper logic
+        [ForbidFromScene(Scene.TerminaField)]
         [PlacementWeight(65)]
         SoftSoilAndBeans = 0x91, // Obj_Bean
 
