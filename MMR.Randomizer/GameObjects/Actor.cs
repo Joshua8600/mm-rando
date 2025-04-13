@@ -2238,6 +2238,8 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.RomaniRanch, 0x3C, Item.CollectableRomaniRanchInvisibleItem6)]
         [CheckRestricted(Scene.MountainVillageSpring, variant: ActorConst.ANY_VARIANT,
             Item.CollectableMountainVillageWinterMountainVillageSpringItem1)]
+        //[CheckRestricted(Scene.SwampSpiderHouse, variant: ActorConst.ANY_VARIANT, // this is handled in enemies.cs, search "BugRock"
+        //    Item.AllSoilPositions, ...)]
         [CheckRestricted(Scene.GreatBayCoast, variant: 0x32,
             Item.CollectableGreatBayCoastSoftSoil1)]
         [CheckRestricted(Scene.IkanaGraveyard, variant: 0x4014, Item.CollectableIkanaGraveyardIkanaGraveyardUpperRock1)] // highest
@@ -2425,6 +2427,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled] // warp addresses are offsets, dangerous until we can hard code
         [FileID(167)]
         [ObjectListIndex(0x271)]
+        /* // needs object expansion for the room
         [CheckRestricted(
             Item.CollectableTheMoonLinkTrialEntrancePot1, Item.CollectableTheMoonLinkTrialEntrancePot2,
             Item.CollectableTheMoonLinkTrialEntrancePot3, Item.CollectableTheMoonLinkTrialEntrancePot4,
@@ -2444,15 +2447,15 @@ namespace MMR.Randomizer.GameObjects
             Item.CollectableTheMoonLinkTrialEntrancePot1,Item.CollectableTheMoonLinkTrialEntrancePot2,
             Item.CollectableTheMoonLinkTrialEntrancePot3,Item.CollectableTheMoonLinkTrialEntrancePot4,
             Item.ChestLinkTrialBombchu10
-        )]
+        )] // */
         //[WaterBottomVariants(0x11, 0x422, 0x833, 0xC44)] // think this would be funny if they werent pathing..
         [PathingVariants(0x11, 0x422, 0x833, 0xC44)]
         [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
         [VariantsWithRoomMax(max: 1, variant: 0x11, 0x422, 0x833, 0xC44)]
         [PathingKickoutAddrVarsPlacement(mask: 0x3F0, shift: 4)]
         [UnkillableAllVariants]
-        //[ForbidFromScene(Scene.TheMoon)] // all items behind them finished
-        [PlacementWeight(70)]
+        [ForbidFromScene(Scene.TheMoon)] // can't randomize them even if you wanted to randomize them, because majora child
+        [PlacementWeight(1)] // until you fix the wrong warp that can crash the game, you idiot, now everyone is posting the bug
         MoonChild = 0xBF, // En_Js
 
         EmptyC0 = 0xC0,
@@ -3167,6 +3170,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         [OnlyOneActorPerRoom]
         [EnemizerScenesPlacementBlock(//Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.StoneTower, // dyna crash
+            Scene.HoneyAndDarling, // crush loop
             Scene.TradingPost)]  // might block door?
         [PlacementWeight(40)] // waaay too common
         UnusedFallingBridge = 0x114, // Obj_Chikuwa
@@ -4180,8 +4184,9 @@ namespace MMR.Randomizer.GameObjects
         [ActorizerEnabled]
         [FileID(343)]
         [ObjectListIndex(0x107)]
-        [CheckRestricted(Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
-            Item.NotebookMeetPostman, Item.NotebookPostmansGame, Item.NotebookPostmansFreedom)]
+        // this version doesnt exist as a spawn in the postoffice, it gets spawned by Postman (EnPm)
+        //[CheckRestricted(Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
+        //    Item.NotebookMeetPostman, Item.NotebookPostmansGame, Item.NotebookPostmansFreedom)]
         [GroundVariants(0)] // no params
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
@@ -5074,9 +5079,10 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Scene.SouthClockTown, variant: 0,
             Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
             Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]
-        [CheckRestricted(Scene.PostOffice, variant: -1,
+        [CheckRestricted(Scene.PostOffice, variant: -1, // ZZZ
             Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
-            Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]
+            Item.NotebookMeetPostman, Item.NotebookPostmansFreedom,
+            Item.NotebookPostmansGame)]
         [CheckRestricted(Scene.StockPotInn, variant: -1,
             Item.HeartPieceNotebookPostman, Item.ItemBottleMadameAroma, Item.MaskPostmanHat,
             Item.NotebookMeetPostman, Item.NotebookPostmansFreedom)]

@@ -675,6 +675,7 @@ namespace MMR.Randomizer.GameObjects
         [SceneInternalId(0x41)]
         [EnemizerSceneEnemyReplacementBlock(Actor.ClayPot,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, // can fly above and block the chest
+            Actor.WoodfallTempleWoodenFlower,
             Actor.RegularIceBlock)] // the big one can reach through the ceiling into the chest, blocking the chest
         [EnemizerSceneEnemyReplacementBlock(Actor.SquareSign,
             Actor.ClocktowerGearsAndOrgan, // can block dogs in race
@@ -802,6 +803,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1409)]
         [SceneInternalId(0x4D)]
+        [DynaHeadroom(475, 400)] // poly:504 was crashing +2
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
             Actor.GibdoWell, Actor.GibdoWell)] // can stunlock at the door, doesnt stay down long enough
         [EnemizerSceneBlockSensitive(Actor.SquareSign, -1)] // long can block the small snowball, wide can block the door
@@ -1095,6 +1097,8 @@ namespace MMR.Randomizer.GameObjects
             /*Actor.UnusedStoneTowerPlatform,*/ Actor.UnusedStoneTowerStoneElevator)] // can hide the grass weirdly
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
             Actor.Beamos)] // can one shot the player as they leave the grotto with 1 heart
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.UglyTree,
+            Actor.OwlStatue)] // can hide the grass weirdly
         NorthClockTown = 0x6B,
 
         [FileID(1516)]
