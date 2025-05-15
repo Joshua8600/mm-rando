@@ -3120,11 +3120,15 @@ namespace MMR.Randomizer.GameObjects
             0x1F01, // I put this in peahat grotto
             0x300, 0x301)] // this drop table is unused according to mzxrules, but looks balanced
         [WaterBottomVariants( // they have special code for working under water anyway
-            0x01, 0x21, 0x31, 0x41, 0x11,  // same as above
-            0x400, 0x401, // ikana rocks, seems reasonable
-            0xF00, 0xF01, // tektite, weirdly this is the nost variable of all the drop tables
-            0x901, // chance of lots of money, as this is the drop table for money enemies
-            0x300, 0x301
+            0x8001, 0x8021, 0x8031, 0x8041, 0x8011,
+
+            0x8400, 0x8401,
+
+            0x8F00, 0x8F01,
+
+            0x8901,
+
+            0x8300, 0x8301
         )]
         [UnkillableAllVariants]
         [AlignedCompanionActor(Shot_Sun, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x41)] // fairies love grass
@@ -3539,6 +3543,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(282)]
         [ObjectListIndex(0x165)]
         [CheckRestricted(Scene.CuccoShack, variant: ActorConst.ANY_VARIANT, Item.CollectableCuccoShackPottedPlant1)]
+        [CheckRestricted(Scene.RoadToSouthernSwamp, variant: ActorConst.ANY_VARIANT, Item.HeartPieceSwampArchery, Item.UpgradeBiggestQuiver)]
         // 0xXX is the item to drop, 0x7X00 is collecable flag
         // thankfully if collectable flag is 00 it gets ignored and you can re-collect over and over again
         // A is hearts or green rup if full health
@@ -5987,12 +5992,19 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants]
         GBTFreezableWaterfall = 0x21C, // Bg_Dblue_Waterfall
 
-        //[EnemizerEnabled] // cutscene is broken without camera placement, player stuck in place
+        [EnemizerEnabled]
         [FileID(500)]
         [ObjectListIndex(0x204)]
-        //[GroundVariants(0x24B)] // 3 different versions
-        [GroundVariants(0x24B)]
-        //[ForbidFromScene(0x23)] // do not remove original, for now
+        // params: 0x3F at bottom is the exit address, top is switch flag
+        [GroundVariants(0x24B, 0x20B, 0x2CB)] // warning: these use Z rotation for the color/text actual type, 
+        [VariantsWithRoomMax(max:12, variant: 0x24B, 0x20B, 0x2CB)]
+        [SwitchFlagsPlacement(SwitchTrigger.SendsAndRecieves, size: 0x7F, shift: 6)]
+        [DifficultAllVariants]
+        //[PlacementWeight(40)]
+        [RemovalChance(0)] // room doors are switch flag not kill enemy rooms
+        [AlignedCompanionActor(TreasureChest, CompanionAlignment.OnTop, ourVariant: -1, variant:
+            0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
+            0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
         PirateColonel = 0x21D, // En_Kaizoku
 
         // TODO make the one that just looks at you a non-enemy type in the replacement
@@ -7533,14 +7545,14 @@ namespace MMR.Randomizer.GameObjects
         [CompanionActor(Flame, ourVariant: -1, variant: 0x7F4)] // red flames
         AnjuMotherWedding = 0x29F, // Dm_Ah
 
-        [ActorizerEnabled]
+        //[ActorizerEnabled] // we have a modified version now, use that instead
         [FileID(631)]
         [ObjectListIndex(0x4)]
         [GroundVariants(0x0)]
         [PerchingVariants(0)] // grandma pls
         [UnkillableAllVariants]
         [CompanionActor(Flame, ourVariant: -1, 0x7FE)] // blue flames
-        [PlacementWeight(40)] // until she does something this is a kinda boring actor
+        [PlacementWeight(60)] // set to decent chance for now
         AnjusGrandmaCredits = 0x2A0, // Dm_Nb
 
         //[ActorizerEnabled] // double or more objects required

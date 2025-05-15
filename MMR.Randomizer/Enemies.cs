@@ -2151,7 +2151,7 @@ namespace MMR.Randomizer
             var snowheadTempleFireArrowWiz = snowheadTempleScene.Maps[6].Actors[0];
             if (snowheadTempleFireArrowWiz.ActorEnum != GameObjects.Actor.Wizrobe)
             {
-                snowheadTempleFireArrowWiz.Position.x = -1140; // move back to center of the room, not sure why this guy is so close to the door normally
+                snowheadTempleFireArrowWiz.Position.x = -1300; // move back to center of the room, not sure why this guy is so close to the door normally
             }
             // if snowhead temple wizrobe the second is randomized, his spawn is in a bad spot for enemizer
             var snowheadSecondWizrobe = snowheadTempleScene.Maps[12].Actors[0];
@@ -4188,12 +4188,12 @@ namespace MMR.Randomizer
 
                 // floating bean plant is only used in this room, move down to old lair grass object
                 var lobby = secretShrineScene.Maps[0];
-                lobby.Objects[10] = GameObjects.Actor.SoftSoilAndBeans.ObjectIndex();
+                lobby.Objects[10] = GameObjects.Actor.SoftSoilAndBeans.ObjectIndex(); // previous tall grass slot
 
                 lobby.Objects[7] = PopObject(possibleGroundActors); // previously floating bean slot
                 lobby.Objects[8] = PopObject(possibleGroundActors); // real bombchu slot 
-                lobby.Objects[10] = PopObject(possibleFlyingActors); // previous tall grass slot
                 lobby.Objects[11] = PopObject(possibleFlyingActors); // previous deku nut slot
+                // was there another spot? I was accidentally blasting soils, need to find the map I made
             }
 
             // center room
@@ -5441,6 +5441,34 @@ namespace MMR.Randomizer
             }
         }
 
+        private static void FixKaizokuType(SceneEnemizerData thisSceneData)
+        {
+            /// Kaizoku actor colors are linked to their Z rotation instead of their params
+            var objSearch = thisSceneData.Actors.FindAll(act => act.ActorEnum == GameObjects.Actor.PirateColonel);
+            if (objSearch.Count > 0)
+            {
+                for (int i = 0; i < objSearch.Count; ++i)
+                {
+                    var targetActor = objSearch[i];
+                    if (targetActor.Variants[0] == 0x24B)
+                    {
+                        targetActor.ChangeZRotation(0);
+                        targetActor.Variants[0] &= ~0x3F; // clear the exit index
+                    }
+                    else if (targetActor.Variants[0] == 0x20B) {
+                        targetActor.ChangeZRotation(1);
+                        targetActor.Variants[0] &= ~0x3F;
+                    }
+                    else if (targetActor.Variants[0] == 0x2CB)
+                    {
+                        targetActor.ChangeZRotation(2);
+                        targetActor.Variants[0] &= ~0x3F;
+                    }
+                }
+            }
+        }
+
+
         private static void SetZerothAndFourthDayFlagsForAllActors(SceneEnemizerData thisSceneData)
         {
             for (int i = 0; i < thisSceneData.Actors.Count; i++){
@@ -5507,6 +5535,7 @@ namespace MMR.Randomizer
                     return false;
                 }
 
+                //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.PirateColonel)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GuruGuru)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.AnjuWeddingDress)) continue; // still broken
@@ -5530,7 +5559,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.DragonFly)) continue;
-                //if (TestHardSetObject(GameObjects.Scene.GreatBayCoast, GameObjects.Actor.LikeLike, GameObjects.Actor.MagicSlab)) continue;
+                if (TestHardSetObject(GameObjects.Scene.SecretShrine, GameObjects.Actor.Wart, GameObjects.Actor.PirateColonel)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.SunSwitch)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.TreasureChest)) continue;
@@ -7055,6 +7084,7 @@ namespace MMR.Randomizer
             FixSnowballActorSpawns(thisSceneData);
             FixNewGrottoZRotation(thisSceneData);
             EnsureOnlyOneKankyo(thisSceneData);
+            FixKaizokuType(thisSceneData);
             SetZerothAndFourthDayFlagsForAllActors(thisSceneData);
             // the following modify Variant which can confuse typing system
             FixPathingVars(thisSceneData); // any patrolling types need their vars fixed
@@ -7832,7 +7862,7 @@ namespace MMR.Randomizer
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
                     sw.Write(_syncedLog.ToString());
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 88.2\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 89.1\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

@@ -221,8 +221,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Shabom)] // get's stuck in the ceiling where you cannot kill them, TODO is this still true after ceiling to flying was dropped?
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DragonFly,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block the breakable floor under them
-        //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Hiploop,
-        //    Actor.En_Ani, Actor.Bumper, Actor.Tijo)]
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Nejiron,
+            Actor.PunchableStoneTowerPillars)]
         [EnemizerSceneBlockSensitive(Actor.Lightblock, -1)]
         [EnemizerSceneBlockSensitive(Actor.Hiploop, -1)]
         StoneTowerTemple = 0x13,
@@ -272,7 +272,7 @@ namespace MMR.Randomizer.GameObjects
         [FairyDroppingEnemies(roomNumber: 5, actorNumber: 22)] // east wing, beehive:22
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Dinofos, // weak enemies are kinda lame here
             Actor.Leever, Actor.ChuChu, Actor.DekuBabaWithered,
-            Actor.Hiploop)] // dies instantly in the water
+            Actor.Hiploop)] // dies instantly in the waterer:
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper,
             Actor.Hiploop)] // dies instantly in the water
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Skulltula,
@@ -285,6 +285,7 @@ namespace MMR.Randomizer.GameObjects
             /*Actor.RegularIceBlock, Actor.Bombiwa, Actor.ClocktowerGearsAndOrgan */)] // blocking
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DragonFly,
             Actor.GiantBeee)] // issue being that the one that spins around and doesnt agro hard requires a ranged weapon because the spawn is so high
+        [EnemizerSceneBlockSensitive(Actor.MothSwarm, -1)] // blocks torch in hana room
         [EnemizerSceneBlockSensitive(Actor.Bo, -1)]
         [EnemizerSceneBlockSensitive(Actor.CuttableIvyWall, -1)]
         //[EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper,
@@ -666,6 +667,9 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(Actor.MushroomCloud, // moved to the side of the tree
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator // could block the tree (through the tree
         )]
+        [EnemizerSceneEnemyReplacementBlock(Actor.BigOcto,
+            Actor.BigOcto // cannot put back it breaks the cutscene on boat kill, broken cutscene can even be a softlock
+        )]
         [EnemizerSceneBlockSensitive(Actor.BadBat, -1)] // giant ice block, unused stone stuff at least
         [EnemizerSceneBlockSensitive(Actor.PottedPlant, -1)] // right next to swamp shooting gallery door
         //[EnemizerSceneBlockSensitive(Actor.MushroomCloud, -1)] // there is one at the base of the tree funny enough : except I moved it
@@ -724,6 +728,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.ClocktowerGearsAndOrgan, Actor.RegularIceBlock)] // suspected too large and can block the owl
         [EnemizerSceneEnemyReplacementBlock(Actor.DekuBabaWithered,
             Actor.Hiploop)] // after moving the actors around, one of them just instantly explodes touching water, TODO move them to better spots to avoid instead
+        [EnemizerSceneBlockSensitive(Actor.DekuBabaWithered, -1)] // the one near the grass can block the grass
         [EnemizerSceneBlockSensitive(Actor.DragonFly, -1)]
         [EnemizerSceneBlockSensitive(Actor.En_Owl, -1)]
         [EnemizerSceneBlockSensitive(Actor.BigOcto, -1)]
@@ -774,6 +779,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.BigPoe)] // for some reason big poe in the first room can cause camera to lock, unknown reason
         [EnemizerSceneEnemyReplacementBlock(Actor.Dexihand,
             Actor.Keese, Actor.BadBat, // weird
+            Actor.SpiderWeb, // can block access to pots on bottom of river
             Actor.WoodenBarrel, // the wall version is the pirates fortress planks, can block the pots
             Actor.Bumper)] // can block the water channel
         [EnemizerSceneEnemyReplacementBlock(Actor.SkullFish,
@@ -1096,6 +1102,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Sakon,
             /*Actor.UnusedStoneTowerPlatform,*/ Actor.UnusedStoneTowerStoneElevator)] // can hide the grass weirdly
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
+            Actor.LikeLike, // exit loop
             Actor.Beamos)] // can one shot the player as they leave the grotto with 1 heart
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.UglyTree,
             Actor.OwlStatue)] // can hide the grass weirdly
