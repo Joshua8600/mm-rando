@@ -131,10 +131,13 @@ namespace MMR.Randomizer.GameObjects
         TreasureChest = 0x6, // En_Box
 
         // TODO dumb ass you forgot to finish this actor
+        [ActorizerEnabled]
         [FileID(45)]
         [ObjectListIndex(0x128)]
-        [RemovalChance(50)] // medium boss
-        PametFrog = 0x7, // En_Pammetfrog the frogminiboss
+        [GroundVariants(1)] // woodfall
+        [RemovalChance(25)] // medium boss
+        [PlacementWeight(0)] // wont spawn without snapper
+        Gekko = 0x7, // En_Pammetfrog the frog miniboss
 
         [EnemizerEnabled]
         [FileID(46)]
@@ -1576,7 +1579,7 @@ namespace MMR.Randomizer.GameObjects
             0xFE01, // deku shrine
             0x4D10, 0xFF04, 0x4D10,// mountain village spring
             0xC719, 0xC90E, 0xCB0E, 0xCD19, 0xCF0F, 0xD10F, 0xD30F, 0xD519, 0xC119, 0xC319, 0xC50F, 0xC709, // goron shrine
-            0x471E, 0x590E, 0x531E, 0x4114, 0x4314, 0x4B1E, 0x4D0A, 0x5D0A, 0x5F0A, 0x5F03, 0x5714, // beneath the graveyard
+            0x1180, 0x471E, 0x590E, 0x531E, 0x4114, 0x4314, 0x4B1E, 0x4D0A, 0x5D0A, 0x5F0A, 0x5F03, 0x5714, // beneath the graveyard
             0x0B01, 0x0D01, 0x0F1E, 0x110A, 0x1301, 0x151E, 0x1705, 0x191E, 0x1B1E, 0x1D0A, // damps house
             0x7C10, 0x7E0B, 0x800B, 0x820E, 0x840B, 0x9C10, 0x9E0E, 0xA010, 0xB40E, 0x860B, 0x8813, 0x8A0B, 0x8C0B,// ikana castle
             0x430A, 0x450E, 0x4710, 0x4B10, 0x4D14, 0x4F0A, 0x5114, 0x5314, 0x570A, 0x5910, 0x5B14, 0x5D0E, 0x5F1E, 0x610A, 0x630E, // stone tower
@@ -1589,7 +1592,8 @@ namespace MMR.Randomizer.GameObjects
         )]
         [WaterBottomVariants(
             0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF60E, 0xF410, // secret shrine
-            0x410E, 0x450A, 0x470A, 0x490A, 0x4B0A, 0x4D0E, 0x530A, 0x550A, 0x570E, 0x590A, 0x5B0E, // pinnacle rock
+            //0x550A, // pinnacle rock, but its shared with ground
+            0x410E, 0x450A, 0x470A, 0x490A, 0x4B0A, 0x4D0E, 0x530A,  0x570E, 0x590A, 0x5B0E, // pinnacle rock
             0xFF0F, 0xFF0B, 0xFF0E, 0xFF03 // non vanilla
         )]
         [VariantsWithRoomMax(max: 0, variant: 0x460B, 0x4610, 0x018D, // stone tower temple (dungeon keep)
@@ -2681,10 +2685,9 @@ namespace MMR.Randomizer.GameObjects
         [PathingVariants(0x019F, 0x0D9F, 0x03FF, 0x22BF,
             0x20, 0x40, 0x60, 0x80, 0x120)]
         [PathingTypeVarsPlacement(mask: 0xFC00, shift: 10)]
-        [UnkillableAllVariants]
+        [RespawningAllVariants] // WARNING: category enemy, can break kill-all-enemy rooms, mark respawning should mean it gets gets used in a kill enemy room
         [VariantsWithRoomMax(max: 1, variant: 0x20, 0x40, 0x60, 0x80, 0x120,
             0x22BF, 0x03FF, 0x019F, 0x02BF, 0xD9F)] // this many dogs is enough honestly
-        [VariantsWithRoomMax(max: 0, variant: 0x29F, 0xA9F)] // too high of a path
         [ForbidFromScene(//Scene.RanchBuildings,
             Scene.RomaniRanch)]//, Scene.SouthClockTown)]//, Scene.SwampSpiderHouse)]
         // dog safe areas: TF, roadtoSS, SS, SSC, deku palace, sspiderhouse
@@ -2693,7 +2696,8 @@ namespace MMR.Randomizer.GameObjects
         // these used to be banned, but we should be able to use them now:
         // DekuShrine RoadToIkana GoronVillage
         [EnemizerScenesPlacementBlock(Scene.ClockTowerInterior, // cursed if put on hms
-            Scene.Woodfall, // they fall off into the water and quietly swim, lame?
+            //Scene.Woodfall, // they fall off into the water and quietly swim, lame?
+            //Scene.SecretShrine, Scene.BeneathGraveyard, // these guys are actually enemies, you can get stuck in a room with them
             Scene.MountainVillageSpring, Scene.RanchBuildings)] // crash because not enough paths
         Dog = 0xE2, // En_Dg
 
@@ -3536,7 +3540,7 @@ namespace MMR.Randomizer.GameObjects
         [SwitchFlagsPlacement(SwitchTrigger.Sends, size: 0x7F, shift: 8)] // this SETS but does not read, is it passing info to a door?
         [UnkillableAllVariants]
         [CreditsBlockedAllVariants] // too big
-        [EnemizerScenesPlacementBlock(Scene.WoodsOfMystery)]
+        [EnemizerScenesPlacementBlock(Scene.WoodsOfMystery, Scene.DekuPalace, Scene.StockPotInn)]
         WoodfallTempleWoodenFlower = 0x13D, // Bg_Numa_Hana
 
         [ActorizerEnabled] // big object, collector flag, boring actor
@@ -4537,6 +4541,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
+        [BlockingVariantsAll]
         [AlignedCompanionActor(Fairy, CompanionAlignment.Above, ourVariant: -1,
             variant: 2, 9)]
         [ForbidFromScene(Scene.DekuPalace)] // do not remove original for now
@@ -6005,6 +6010,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(TreasureChest, CompanionAlignment.OnTop, ourVariant: -1, variant:
             0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
             0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
+        [EnemizerScenesPlacementBlock(Scene.DekuPalace)]
         PirateColonel = 0x21D, // En_Kaizoku
 
         // TODO make the one that just looks at you a non-enemy type in the replacement
