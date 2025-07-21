@@ -51,10 +51,14 @@ namespace MMR.Randomizer.GameObjects
             Actor.UnusedFallingBridge, // can void the player because it forces crushing with the ceiling
             Actor.UnusedStoneTowerPlatform, // same thing, should be disabled earlier but maybe it isnt
             Actor.UnusedStoneTowerStoneElevator, // can void the player because it forces crushing with the ceiling
+            Actor.PirateColonel,
             Actor.UnusedPirateElevator // can void the player because it forces crushing with the ceiling
         )]
         [EnemizerSceneEnemyReplacementBlock(Actor.Skulltula, // hanging near the ceiling
             Actor.GBTFreezableWaterfall // blocking platforming
+        )]
+        [EnemizerSceneEnemyReplacementBlock(Actor.ClayPot, // hanging near the ceiling
+            Actor.PirateColonel // can grab you mid jump over the day 1 platforms, causing you to fall into the void and softlock
         )]
         [EnemizerSceneEnemyReplacementBlock(Actor.IronKnuckle,
             Actor.Hiploop, // hiploop dies if he touches water? happens in day 2 iron knuckle
@@ -133,6 +137,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.Hiploop// water causes instant death
         )]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.BioDekuBaba,
+            Actor.BigOcto, // can softlock if the player actually gets sucked
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // they can extend so far they can block the door leading out
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoldSkulltula,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can get the player locked behind them near the grotto stones
@@ -765,6 +770,7 @@ namespace MMR.Randomizer.GameObjects
             Actor.ArcheryMiniGameMan, Actor.SwampTouristGuide,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator, // assume they will block deku flower pop-up
             Actor.RegularIceBlock,
+            Actor.Japas, Actor.Tijo, // can interupt ocarina pull out
             Actor.ClocktowerGearsAndOrgan // blocking the flower
         )]
         [EnemizerSceneEnemyReplacementBlock(Actor.Hiploop, // respawning bo can show up here, but I dont want to mark the whole room to not place respawning enemies
@@ -805,6 +811,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Desbreko)] // lag
         [EnemizerSceneEnemyReplacementBlock(Actor.Wart,
             Actor.Hiploop)] // instant kill on water
+        [EnemizerSceneEnemyReplacementBlock(Actor.SpikedMine,
+            Actor.BigOcto)] // instant kill on water
         [FairyDroppingEnemies(roomNumber: 8, actorNumber: 7)] // skulltula in first room
         [EnemizerSceneBlockSensitive(Actor.Dexihand, -1)]
         GreatBayTemple = 0x46,
@@ -973,6 +981,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(1466)]
         [SceneInternalId(0x61)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PostMan,
+            Actor.PirateColonel, // assumed: can grab the player while transitioning and break
             Actor.WoodfallTempleWoodenFlower // so big it goes through the door into the thing
             )]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.MysteryHand,
@@ -1082,6 +1091,7 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Jugglers,
                                                            Actor.UnusedStoneTowerPlatform)]
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Anju,
+            Actor.PirateColonel, // assumed: can grab the player while transitioning and break
             Actor.GaroMaster)] // if spawning in sct partial, can fall through the floor and dissapear but leave their annoying music
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Postbox,
             Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // Flying can block the roof leading to the chest
@@ -1125,6 +1135,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Beamos)] // can one shot the player as they leave the grotto with 1 heart
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.UglyTree,
             Actor.OwlStatue)] // can hide the grass weirdly
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.DekuFlower,
+            Actor.UnusedStoneTowerPlatform, Actor.UnusedStoneTowerStoneElevator)] // can block the fairy and deku playgrounds
         NorthClockTown = 0x6B,
 
         [FileID(1516)]
@@ -1143,6 +1155,8 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
             Actor.ClocktowerGearsAndOrgan, Actor.Bumper, Actor.RegularIceBlock,
             Actor.Bombiwa, Actor.LargeSnowball)] // can block climbing the ramp to the tower
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.PostMan,
+            Actor.PirateColonel)] // can grab the player while transitioning and break
         [ActorizerSceneCreditsActor(room: 3, Actor.Carpenter, Actor.Dog, Actor.GateSoldier, Actor.Postbox, Actor.BuisnessScrub,
                                             Actor.DekuBaba)] // used for seth replacement in the intro, we dont want invisible actors there thats lame
         [EnemizerSceneBlockSensitive(Actor.GateSoldier, -1)]

@@ -79,7 +79,7 @@ namespace MMR.UI.Forms
             #if DEBUG
             Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + DEBUG ON";
             #else
-            Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + Isghj's Actorizer Test 90.0";
+            Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + Isghj's Actorizer Test 90.1";
             #endif
 
             var args = Environment.GetCommandLineArgs();
@@ -2294,6 +2294,7 @@ namespace MMR.UI.Forms
                         newConfiguration = Configuration.FromJson(Req.ReadToEnd());
                     }
 
+                    Debug.Assert(newConfiguration.GameplaySettings != null); // bad file
                     if (newConfiguration.GameplaySettings.Logic != null)
                     {
                         newConfiguration.GameplaySettings.UserLogicFileName = path;

@@ -1377,7 +1377,7 @@ namespace MMR.Randomizer.GameObjects
             0x1F1, 0x1F4, // snowhead, really big at entrance?
             0x3F0, 0x3F3 // snowhead pushblockroom
         )]
-        [WaterBottomVariants(0x85, 0x107)] // pirates fortress sewer underwater maze
+        [WaterBottomVariants(0x7FF1, 0x7FF4, 0x7FF0, 0x7FF3)] // non-vanilla
         [BlockingVariantsAll] // untested, assumed mid size
         [UnkillableAllVariants]
         [ForbidFromScene(Scene.SnowheadTemple)]
@@ -2575,7 +2575,7 @@ namespace MMR.Randomizer.GameObjects
             Scene.AstralObservatory)] // re-disable this if playing Entrando
         Scarecrow = 0xCA, // En_Kakasi
 
-        // think these control the push blocks in the sewer zora push puzzle
+        // these are the push blocks in pirates fortress interior
         // 0x85, 0x107
         [FileID(173)]
         [ObjectListIndex(0x1)]
@@ -3274,10 +3274,13 @@ namespace MMR.Randomizer.GameObjects
         [FileID(259)]
         [ObjectListIndex(0x157)]
         [DynaAttributes(13, 10)]
-        // params are wack, 0x3, 0xFF00,
-        [GroundVariants(0x700, 0xD00, 0xA00, // greatbaytemple
+        // params:
+        // 0x3 is type,
+        //   0 and 3 are mite, 3 is fixed drop (0x7C) type 0 is random drop ( 0xFF00 param)
+        //   1/2 are tite, 2 is regrowing tite, 
+        [GroundVariants(0x700, 0xD00, 0xA00, // greatbay temple
                         0x003F, // goron trial
-                        0x1000, 0x0B00, 0x0C00, 0x600, 0x002B)] // snowheattemple
+                        0x1000, 0x0B00, 0x0C00, 0x600, 0x002B)] // snowhead temple
         [CeilingVariants(0xFF01, 0xFF00, 0xFF02)]
         //[EnemizerScenesPlacementBlock(Scene.GormanTrack, // dyna crash on trees
         //    Scene.IkanaGraveyard, Scene.SouthernSwamp, Scene.StoneTower)] // assumed same as above
@@ -5792,6 +5795,7 @@ namespace MMR.Randomizer.GameObjects
         [ForbidFromScene(Scene.SwordsmansSchool)] // object is also used for gong, messes with rupee rando
         SwordsmanSign = 0x209, // Obj_Kendo_Kanban
 
+        // bobble head cow
         //[ActorizerEnabled] // only the head not the whole cow, lame
         [FileID(481)]
         [ObjectListIndex(0x1F2)]
@@ -6002,15 +6006,18 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x204)]
         // params: 0x3F at bottom is the exit address, top is switch flag
         [GroundVariants(0x24B, 0x20B, 0x2CB)] // warning: these use Z rotation for the color/text actual type, 
-        [VariantsWithRoomMax(max:12, variant: 0x24B, 0x20B, 0x2CB)]
+        [VariantsWithRoomMax(max:1, variant: 0x24B, 0x20B, 0x2CB)]
         [SwitchFlagsPlacement(SwitchTrigger.SendsAndRecieves, size: 0x7F, shift: 6)]
         [DifficultAllVariants]
-        //[PlacementWeight(40)]
+        [PlacementWeight(30)]
         [RemovalChance(0)] // room doors are switch flag not kill enemy rooms
         [AlignedCompanionActor(TreasureChest, CompanionAlignment.OnTop, ourVariant: -1, variant:
             0x57BE, 0x59DD, 0x56BF, 0x5FDE, 0x5579, 0x561E, 0x5C79, 0x5991, 0x5B58,
             0x5080, 0x50CA, 0x50A1, 0x0AFB, 0x099C)]
-        [EnemizerScenesPlacementBlock(Scene.DekuPalace)]
+        [EnemizerScenesPlacementBlock(
+            Scene.DekuPalace,
+            Scene.OceanSpiderHouse, Scene.SwampSpiderHouse // if the player picks up and item at the same time they get grabbed its softlock, for now just block these areas
+        )]
         PirateColonel = 0x21D, // En_Kaizoku
 
         // TODO make the one that just looks at you a non-enemy type in the replacement
