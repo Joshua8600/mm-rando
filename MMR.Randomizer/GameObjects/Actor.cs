@@ -1846,6 +1846,7 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(GoldSkulltula, CompanionAlignment.OnTop, ourVariant: -1,
             variant: 0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F)]
         //[ForbidFromScene(Scene.SwampSpiderHouse )] // dont want to mess with this by accident until I know it has proper logic
+        [ForbidFromScene(Scene.TerminaField)] // Can be needed to get ISG and into the North.
         [PlacementWeight(65)]
         SoftSoilAndBeans = 0x91, // Obj_Bean
 
@@ -2573,8 +2574,8 @@ namespace MMR.Randomizer.GameObjects
         // until this gets fixed where the actor can softlock, make this actor much less common
         [RemovalChance(50), PlacementWeight(10)]
         [ForbidFromScene(//Scene.TradingPost, // he now hints song of time, would have to hard code check if hes missing
-            Scene.SnowheadTemple // difficult to identify if anything is important after, TODO
-        )]//, Scene.AstralObservatory)] // re-disable this if playing Entrando
+            Scene.SnowheadTemple, // difficult to identify if anything is important after, TODO
+            Scene.AstralObservatory)] // re-disable this if playing Entrando
         Scarecrow = 0xCA, // En_Kakasi
 
         // these are the push blocks in pirates fortress interior
@@ -3340,7 +3341,7 @@ namespace MMR.Randomizer.GameObjects
 
         // wont spawn if you place him outside of his observatory, needs modification
         // the astral observatory viewer
-        [ActorizerEnabled] // TODO randomize this only if casual logic too lazy to do that tonight tho
+        // [ActorizerEnabled] // TODO randomize this only if casual logic too lazy to do that tonight tho
         [FileID(264)]
         [ObjectListIndex(0xDE)]
         [CheckRestricted(Item.TradeItemMoonTear, Item.HeartPieceTerminaBusinessScrub, Item.CollectableTerminaFieldTelescopeGuay1)]
@@ -4878,7 +4879,7 @@ namespace MMR.Randomizer.GameObjects
         [PlacementWeight(80)]
         OOTPotionShopMan = 0x1C3, // En_Ds2n
 
-        [ActorizerEnabled]
+        // [ActorizerEnabled]
         [FileID(415)]
         [ObjectListIndex(0x1AB)]
         [CheckRestricted(Scene.CuriosityShop, variant: ActorConst.ANY_VARIANT,
@@ -6126,6 +6127,7 @@ namespace MMR.Randomizer.GameObjects
         // F is WCT, is also found in woodfall, cleared swamp?
         [GroundVariants(0, 1, 3, 2, 6, 5, 7, 8, 9, 0xF)]
         [WaterBottomVariants(0, 1, 3, 2, 6, 5, 7, 8, 9, 0xF)] // already have vanilla replacement blocked
+        [WallVariants(0xF)]
         [OnlyOneActorPerRoom]
         [UnkillableAllVariants]
         [BlockingVariantsAll]
