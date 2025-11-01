@@ -135,7 +135,7 @@ namespace MMR.Randomizer.GameObjects
         [FileID(45)]
         [ObjectListIndex(0x128)]
         [GroundVariants(1)] // woodfall
-        [RemovalChance(25)] // medium boss
+        [RemovalChance(40)] // medium boss
         [PlacementWeight(0)] // wont spawn without snapper
         Gekko = 0x7, // En_Pammetfrog the frog miniboss
 
@@ -940,6 +940,7 @@ namespace MMR.Randomizer.GameObjects
         [ActorInitVarOffset(0x3080)]
         [FileID(96)]
         [ObjectListIndex(0x20)]
+        // params: 0x3 is type, 
         // swamphouse: 0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F
         // ocean spiderhouse: 0xFF3F, 0x1B, 0x317, 0xFF3B, 0xFF5D, 0xFF61, 0xFF6D, 0x777, 0x57B, 0xFF0B, 0xFF0F, 0x223, 0x11F,
         // some spiders crash, probably because it follows a path, 223, 113, 1B, 909
@@ -950,9 +951,9 @@ namespace MMR.Randomizer.GameObjects
             0xFF3F, 0xFF3B, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B, 0xFF0F, 0xFFFC,
             0xFF2B // ocean spiderhouse
             )]
-        [PathingVariants(0xEF, 0x7F, 4, 0x55B, 0x637, 0x113, 0x91F, 0x909, 0xB0C, 0xC0F)]
         [GroundVariants(0xFF53, 0xFF5D, 0xFF61, 0xFF6D, 0xFF0B)] // pathing type with path disabled, why is this so rare?
-        [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)]
+        [PathingVariants(0xEF, 0x7F, 0x4, 0x55B, 0x637, 0x113, 0x91F, 0x909, 0xB0C, 0xC0F, 0x777, 0x57B)]
+        [PathingTypeVarsPlacement(mask: 0xFF00, shift: 8)] // 0xFFXX triggers no pathing behavior
         [VariantsWithRoomMax(max: 1,
             0xFF53, 0x55B, 0x637, 0xFF07, 0x113, 0x21B, 0x91F, 0xFF56, 0xFF62, 0xFF76, 0xFF03, 0x909, 0xB0C, 0xC0F,
             0xFF3F, 0x317, 0xFF3B, 0xFF5D, 0xFF61, 0xFF6D, 0x777, 0x57B, 0xFF0B, 0xFF0F, 0x11F)]
@@ -996,6 +997,8 @@ namespace MMR.Randomizer.GameObjects
         [AlignedCompanionActor(En_Ani, CompanionAlignment.InFront, ourVariant: 0xFF0B, variant: 0)]
         [AlignedCompanionActor(En_Ani, CompanionAlignment.InFront, ourVariant: 0xFF5D, variant: 0)]
         [AlignedCompanionActor(En_Ani, CompanionAlignment.InFront, ourVariant: 0xFF61, variant: 0)]
+        // 3FC >> 2 sometimes?
+        // oh this is weird: 3FC breaks into the pathing, but then it only reads up to 0x3F
         [TreasureFlagsPlacement(mask: 0x3F, shift: 2)] // for some reason it collides with path sometimes, TODO figure this out
         GoldSkulltula = 0x50, // En_Sw "Skullwalltulla"
 
@@ -2698,6 +2701,9 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerScenesPlacementBlock(Scene.ClockTowerInterior, // cursed if put on hms
             //Scene.Woodfall, // they fall off into the water and quietly swim, lame?
             //Scene.SecretShrine, Scene.BeneathGraveyard, // these guys are actually enemies, you can get stuck in a room with them
+            Scene.FishermansHut, // crash
+            Scene.Grottos, // crash in generic grotto, untested in others, few paths
+            Scene.AstralObservatory,
             Scene.MountainVillageSpring, Scene.RanchBuildings)] // crash because not enough paths
         Dog = 0xE2, // En_Dg
 
@@ -3193,6 +3199,7 @@ namespace MMR.Randomizer.GameObjects
         [UnkillableAllVariants] // assumption: need mirror shield
         SkeleKnight = 0x115, // En_Knight
 
+
         [ActorizerEnabled] // used in the moon
         [FileID(251)]
         [ObjectListIndex(3)] // 3 if you want the visible one, from Goron Trial
@@ -3492,6 +3499,7 @@ namespace MMR.Randomizer.GameObjects
             0x283, // goron village door goron
             0x8, // keg smith goron
             0x7F84, 0x7F94)] // outside of darmani's grave
+        //[PathingVariants()] // the one right outside of the door is rolling, path, snowball is part of the object, problem is its time based
         [VariantsWithRoomMax(max: 1,
             0x7FE2, 0x7F85, 0x7F86, 0x7F87,
             0x7F82, 0x7F92)]
@@ -3651,7 +3659,7 @@ namespace MMR.Randomizer.GameObjects
         [ObjectListIndex(0x16B)]
         [WaterVariants(0x0F00, 0x0300)]
         [OnlyOneActorPerRoom]
-        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.Woodfall, Scene.ZoraCape, Scene.GreatBayCoast, Scene.IkanaCanyon)] // massive lag
+        [EnemizerScenesPlacementBlock(Scene.SouthernSwamp, Scene.Woodfall, Scene.ZoraCape, Scene.GreatBayCoast, Scene.IkanaCanyon, Scene.PinnacleRock)] // massive lag
         Desbreko = 0x14B, // En_Pr (Pirana?)
 
         [FileID(298)]
@@ -3871,7 +3879,7 @@ namespace MMR.Randomizer.GameObjects
         [BlockingVariantsAll]
         // possible second switch at 0x3F8
         [SwitchFlagsPlacement(SwitchTrigger.Receives, size: 0x7F, shift: 0)]
-        [TreasureFlagsPlacement(mask: 0x1F, shift: 8)] // 0x3FC
+        [TreasureFlagsPlacement(mask: 0x1F, shift: 8)]
         [PlacementWeight(35)]
         CircleOfFire = 0x162, // Obj_Fireshield // tag: FireRing
 
@@ -4616,13 +4624,12 @@ namespace MMR.Randomizer.GameObjects
         [CheckRestricted(Item.MundaneItemPictographContestRedRupee)]
         [WaterBottomVariants(0, 1, 6)] // vanilla their spawn is at the bottom of the swamp
         [WaterTopVariants(7)] // but if you put them in water they work for water surface, with a weak swimming animation
-        // testing
-        //[GroundVariants(0xFF)] // 0xFF is special flag-less condition
         [SwitchFlagsPlacement(SwitchTrigger.Death, size: 0xFF, shift: 0)] // technically its all of params, but maybe in the future we want a byte for something else
-        [VariantsWithRoomMax(max: 2, variant: 0, 1, 6)]
-        [VariantsWithRoomMax(max: 5, variant: 7)]
+        [OnlyOneActorPerRoom]
+        //[VariantsWithRoomMax(max: 2, variant: 0, 1, 6)]
+        //[VariantsWithRoomMax(max: 5, variant: 7)]
         //[ForbidFromScene(Scene.SouthernSwamp, Scene.DekuPalace)]
-        [RemovalChance(20), PlacementWeight(60)]
+        [RemovalChance(20), PlacementWeight(30)]
         BigOcto = 0x1A8, // En_Bigokuta
 
         // requires ice surface type
@@ -4708,7 +4715,7 @@ namespace MMR.Randomizer.GameObjects
         [GroundVariants(0, // 0 is clocktower,
             0x2, //  2 is wiped out
             0x3)]  // in the cutscenes??
-        [FlyingVariants(0x3)]
+        [FlyingVariants(0x3)] // joke
         [VariantsWithRoomMax(max: 1, variant: 0x2)]
         [UnkillableAllVariants]
         [OnlyOneActorPerRoom]

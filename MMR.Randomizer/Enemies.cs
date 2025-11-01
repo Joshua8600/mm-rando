@@ -29,7 +29,9 @@ namespace MMR.Randomizer
     [System.Diagnostics.DebuggerDisplay("{OldV} -> {NewV}")]
     public class ValueSwap
     {
-        // these are indexes of objects
+        /// <summary>
+        ///  This class exists to keep track of objects we swap in the object list
+        /// </summary>
         public int OldV;
         public int NewV;
         public int ChosenV; // Copy of NewV, first pass result, but we might change NewV to something else if duplicate
@@ -54,7 +56,7 @@ namespace MMR.Randomizer
         public int ObjectId  = 0;
         public int fileID    = 0;
         public int ObjectFid = 0;
-        public (int poly, int vert) DynaLoad = (-1, -1);
+        public (int poly, int vert) DynaLoad = (-1, -1); // Does the actor use the dyna system, which is a limited buffer size we cannot overflow
 
         // if all new actor, we meed to know where the old vram start was when we shift VRAM for the actor
         public uint buildVramStart = 0;
@@ -90,8 +92,8 @@ namespace MMR.Randomizer
         private static List<Actor> ReplacementCandidateList { get; set; }
         private static List<Actor> FreeCandidateList { get; set; }
         private static List<Actor> FreeOnlyCandidateList { get; set; } // not worthy by themselves, only if object was already selected
-        // outer list is item.category, inner list is items
         private static List<GameObjects.ItemCategory> ActorizerKnownJunkCategories { get; set; }
+        // outer list is item.category indexed, inner list is items
         private static List<List<GameObjects.Item>> ActorizerKnownJunkItems { get; set; }
         private static Mutex _LogMutex = new Mutex();
         private static bool ACTORSENABLED = true;  // turn to 'false' for enemizer only
@@ -101,7 +103,7 @@ namespace MMR.Randomizer
         private static CosmeticSettings _cosmeticSettings;
         private static StringBuilder _syncedLog;
 
-        // these have to be separate from Actor Enum for now beacuse they are for special objects, not regular types
+        // these have to be separate from Actor Enum for now beacuse they are for special objects, not regular types, can't mix
         static int[] clayPotDungeonVariants = {
             0xB, // multiple
             0x1E, 0x5, // swamp spiderhouse spider pots
@@ -117,6 +119,7 @@ namespace MMR.Randomizer
             0xC00B, 0xC21E, 0xC40E, 0xFE0E, 0xFC0B, 0xFA1E, 0xF81E, 0xF81E, 0xF60E, 0xF410, // secret shrine,
             0xFE0F, 0xFE0B, 0xFE0E, 0xFE03 // non-vanilla
         };
+
         // params: 0x3 is type, 0,2,3 are field grass (1 is tall re-growing grass that requires object)
         //  type 0: 0x7F00 is item (random) collectable from table,
         //    0xC000 just disables item drop??
@@ -430,7 +433,7 @@ namespace MMR.Randomizer
             // for all items in list of items that are scoop types
             //   check if each and every one is an important item
             var scoopItems = _randomized.ItemList.FindAll(item => item.Item.ItemCategory() == GameObjects.ItemCategory.ScoopedItems);
-            List<ItemObject> unImportantScoopIOs = scoopItems.FindAll(scoop => importantBottleItems.Count(important => important.Location == scoop.Item.Name()) == 0);
+            List<ItemObject> unImportantScoopIOs = scoopItems.FindAll(scoop => importantBottleItems.Count(important => important.Item == scoop.Item.Name()) == 0);
             List<GameObjects.Item> unimportantScoops = unImportantScoopIOs.Select(itemObj => itemObj.Item).ToList();
 
             ActorizerKnownJunkItems[(int)GameObjects.ItemCategory.ScoopedItems].AddRange(unimportantScoops);
@@ -689,13 +692,13 @@ namespace MMR.Randomizer
                         {
 
                             #if DEBUG
-                            var itemText = $"blocked by item [{ itemRestriction }]";
+                            var itemText = $"[{ itemRestriction }]";
                             #else
-                            var itemText = $"blocked by item [{ (int) itemRestriction}]";
+                            var itemText = $"[{ (int) itemRestriction}]"; // hiding the item in case players need to glance the log they don't get to see the item by name
                             #endif
 
                             log.AppendLine($" in scene (O!) [{scene.SceneEnum}]m[{mapIndex}]r[{mapActor.RoomActorIndex}]v[{mapActor.OldVariant.ToString("X4")}]" +
-                                $" actor:[0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] removal " + itemText);
+                                $" actor:[0x{mapActor.OldVariant.ToString("X4")}][{mapActor.ActorEnum}] removal blocked by item " + itemText);
                             continue;
                         }
 
@@ -2537,8 +2540,8 @@ namespace MMR.Randomizer
         private static void FixJPGrottos()
         {
             /// JP grottos are unused, but we can summon them for actorizer
-            /// however, they have unique exists in the grotto scene exit table that always return to deku palace
-            ///   we can change the table to make some of the exists generic exists
+            /// however, they have unique exits in the grotto scene exit table that always return to deku palace
+            ///   we can change the table to make some of the exits generic exists
 
             // exit table starts at 234, 0:0xFFFF, 1:lens grotto
             // vanilla vines grotto is   50A0 <- (lower:1480) <=> (upper: 14F0) -> 5060
@@ -3000,7 +3003,7 @@ namespace MMR.Randomizer
 
         private static void RandomizeGrottoGossipStonesPerGrotto()
         {
-            /// each gossip stone grotto has enough object space to add or switch an object
+            /// each gossip grotto gossip stone has enough object space to add or switch an object
             /// and then randomize three of the gossip stones to something new and random
             /// should be doable without breaking the gossip stone quest
 
@@ -3551,8 +3554,6 @@ namespace MMR.Randomizer
             newPeahat.ChangeActor(GameObjects.Actor.Peahat, vars: 0, modifyOld: true);
             //newPeahat.Position = new vec16(5010, -20, 600); // move over near peahat one
             newPeahat.Position = new vec16(5010, -20, 600); // move over near peahat one
-
-            
 
             // biobaba grotto has a worthless dekubaba object, lets swap it for the ice block object so we can freeze the water
             grottosScene.Maps[11].Objects[3] = 0x1E7; // iceflowe
@@ -5402,6 +5403,8 @@ namespace MMR.Randomizer
                 if (usableTreasureFlags.Contains(treasureFlags))
                 {
                     usableTreasureFlags.Remove(treasureFlags);
+                    log.AppendLine($" +++ [{actorIndex}][{actor.ActorEnum}] had treasure flags that didn't collide, leaving alone with switch [{treasureFlags}] +++");
+
                 }
                 else // we have switch flag and we have a collision, we need to change it
                 {
@@ -5535,6 +5538,8 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.PirateColonel)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GuruGuru)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.HappyMaskSalesman, GameObjects.Actor.BeanSeller)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.Dodongo, GameObjects.Actor.PirateColonel)) continue; // still broken
+                //if(TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.Peahat, GameObjects.Actor.ReDead)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.AnjuWeddingDress)) continue; // still broken
                 //if(TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.Peahat, GameObjects.Actor.ReDead)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.Scarecrow)) continue;
@@ -5556,6 +5561,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.BuisnessScrub, GameObjects.Actor.BuisnessScrub)) continue;
 
                 //if (TestHardSetObject(GameObjects.Scene.ZoraHall, GameObjects.Actor.RegularZora, GameObjects.Actor.DragonFly)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.BeneathGraveyard, GameObjects.Actor.Keese, GameObjects.Actor.GoldSkulltula)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SecretShrine, GameObjects.Actor.Wart, GameObjects.Actor.PirateColonel)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthernSwamp, GameObjects.Actor.SquareSign, GameObjects.Actor.BeanSeller)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Clock, GameObjects.Actor.SunSwitch)) continue;
@@ -5585,6 +5591,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.PostMan, GameObjects.Actor.HoneyAndDarlingCredits)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.RosaSisters, GameObjects.Actor.)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.StockPotInn, GameObjects.Actor.Gorman, GameObjects.Actor.HookshotWallAndPillar)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.WoodfallTemple, GameObjects.Actor.DekuBaba, GameObjects.Actor.PirateColonel)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.SouthClockTown, GameObjects.Actor.Dog, GameObjects.Actor.Evan)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.PiratesFortress, GameObjects.Actor.PatrollingPirate, GameObjects.Actor.PatrollingPirate)) continue; 
                 //if (TestHardSetObject(GameObjects.Scene.TradingPost, GameObjects.Actor.ClayPot, GameObjects.Actor.DekuKing)) continue;
@@ -6584,6 +6591,7 @@ namespace MMR.Randomizer
         {
             AddAniObjectIfTerminaFieldTree(thisSceneData);
             RemoveScarecrowFromTradingPostIfSOTRandomized(thisSceneData);
+            RemoveStalagmiteFromSnowheadIfTrick(thisSceneData);
         }
 
         private static void AddAniObjectIfTerminaFieldTree(SceneEnemizerData thisSceneData)
@@ -6639,6 +6647,22 @@ namespace MMR.Randomizer
             }
 
         }
+
+        private static void RemoveStalagmiteFromSnowheadIfTrick(SceneEnemizerData thisSceneData)
+        {
+            // the boss key skip trick needs the objects to be there
+
+            if (thisSceneData.Scene.SceneEnum == GameObjects.Scene.SnowheadTemple)
+            {
+                var SHTBossKeySkipTrickEnabled = _randomized.Settings.EnabledTricks.Contains("SHT BK Skip");
+                if (SHTBossKeySkipTrickEnabled)
+                {
+                    thisSceneData.Actors.RemoveAll(act => act.ActorEnum == GameObjects.Actor.IceCavernStelagtite);
+                    thisSceneData.Objects.RemoveAll(obj => obj == GameObjects.Actor.IceCavernStelagtite.ObjectIndex());
+                }
+            }
+        }
+
 
 
         private static void TrimSceneAcceptableCandidateList(SceneEnemizerData thisSceneData)
@@ -7319,6 +7343,7 @@ namespace MMR.Randomizer
 
             foreach (string filePath in GenerateMMRAFileList(directory))
             {
+                // this is a list of broken actors that we cannot use, they have been removed but I don't trust users to remove the file and not just overwrite a previous directory
                 if (filePath.Contains("SafeBoat.mmra")
                  || filePath.Contains("FairySpot.mmra") // is missing a variant, and was not working, not even sure what it was doing, TODo
                  || filePath.Contains("BabaIsLoaded.mmra") // talk locking, lost the code, have to disable because no time to rewrite
@@ -7860,7 +7885,7 @@ namespace MMR.Randomizer
                     sw.WriteLine(""); // spacer from last flush
                     sw.WriteLine("Enemizer final completion time: " + ((DateTime.Now).Subtract(enemizerStartTime).TotalMilliseconds).ToString() + "ms ");
                     sw.Write(_syncedLog.ToString());
-                    sw.Write("Enemizer version: Isghj's Actorizer Test 90.1\n");
+                    sw.Write("Enemizer version: Isghj's Actorizer Test 90.5\n");
                     sw.Write("seed: [ " + seed + " ]");
                 }
             }

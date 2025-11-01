@@ -175,6 +175,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1165)]
         [SceneInternalId(0x13)]
+        [DynaHeadroom(30,30, room: 4)] // the sakon cave area crashed with 32/28 delta, crashscreen said only 1 over
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bombiwa,  // credits stump
             Actor.Milkjar, Actor.TallGrass, Actor.LetterToPostman, Actor.SmallSnowball, Actor.BombFlower, Actor.MushroomCloud,
             Actor.En_Invisible_Ruppe, Actor.HitSpot, Actor.Bo, // too small to see
@@ -471,6 +472,8 @@ namespace MMR.Randomizer.GameObjects
             Actor.Dexihand)] // if it grabs you as you fall into a grotto hole it can hardlock
         [EnemizerSceneEnemyReplacementBlock(Actor.Monkey,
             Actor.PalaceGuardDeku)] // if placed behind regular guards, they will pop up to look at you and the other guards will also rise
+        [EnemizerSceneEnemyReplacementBlock(Actor.BronzeBoulder,
+            Actor.GrottoHole)] // third one in the west side can get exit blocked by teh floating platform
         [EnemizerSceneEnemyReplacementBlock(Actor.SquareSign,
             Actor.En_Ani, Actor.GaboraBlacksmith, Actor.BomberHideoutGuard, // their talk box is so big they can dialogue block the flower to go back to top of flowers
             Actor.Takaraya, Actor.Secretary, Actor.DekuKing, Actor.InjuredKoume, Actor.GoronElder, Actor.GoronKid, Actor.MadamAroma,
@@ -567,8 +570,9 @@ namespace MMR.Randomizer.GameObjects
         // inside of the goron village main building, with the goron shop and merrygoround
         [FileID(1319)]
         [SceneInternalId(0x32)]
-        // 128,100 was fine
-        [DynaHeadroom(128, 100)]  // limit not found
+        // 128,100 was fine, once
+        // 56+44, 44+32 was a crash
+        [DynaHeadroom(88, 100)]  // limit not found
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.GoronSGoro,
                         Actor.GoronWithGeroMask)] // if the sirloin drops on top of him its broken
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Torch,
@@ -875,6 +879,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1431)]
         [SceneInternalId(0x53)]
+        [DynaHeadroom(220, 250)] // poly:246 was crashing +10
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Bombiwa,
             Actor.LikeLike)] // can instant grab you on exit
         RoadToIkana = 0x50,
@@ -884,6 +889,8 @@ namespace MMR.Randomizer.GameObjects
         //[DynaHeadroom(64, 64)]  // small scene, assume we have lots of budget until proven otherwise
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Clock,
             Actor.BadBat, Actor.GoldSkulltula, Actor.RealBombchu)] // z-targetable can be annoying in the sword test
+        [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper, // north gossip stone replacement in gossip stone grotto north
+            Actor.Hiploop)] // touching water
         [EnemizerSceneBlockSensitive(Actor.KendoSensei, Item.CollectableSwordsmanSSchoolPot1, Item.CollectableSwordsmanSSchoolPot2, Item.CollectableSwordsmanSSchoolPot3, Item.CollectableSwordsmanSSchoolPot4, Item.CollectableSwordsmanSSchoolPot5)]
         SwordsmansSchool = 0x51,
 
@@ -973,9 +980,9 @@ namespace MMR.Randomizer.GameObjects
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.CeilingSpawner,
             Actor.Shabom)] // report of them not spawning or falling out of bounds and softlock
         [EnemizerSceneEnemyReplacementBlock(Actor.Wart,
-            Actor.Hiploop)] // instant kill on water
+            Actor.Hiploop, Actor.RedBubble)] // instant kill on water
         [EnemizerSceneEnemyReplacementBlock(Actor.GaroMaster,
-            Actor.Hiploop)] // instant kill on water
+            Actor.Hiploop, Actor.RedBubble)] // instant kill on water
         SecretShrine = 0x5D,
 
         [FileID(1466)]
@@ -1132,6 +1139,7 @@ namespace MMR.Randomizer.GameObjects
             /*Actor.UnusedStoneTowerPlatform,*/ Actor.UnusedStoneTowerStoneElevator)] // can hide the grass weirdly
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.SquareSign,
             Actor.LikeLike, // exit loop
+            Actor.PirateColonel, // cutscene lock as you leave
             Actor.Beamos)] // can one shot the player as they leave the grotto with 1 heart
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.UglyTree,
             Actor.OwlStatue)] // can hide the grass weirdly
