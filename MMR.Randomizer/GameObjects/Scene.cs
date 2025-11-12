@@ -97,12 +97,13 @@ namespace MMR.Randomizer.GameObjects
         [ClearEnemyPuzzleRooms(7, 13)] // 7:dodongo, 13:peahat
         [EnemizerSceneBlockSensitive(Actor.DekuBabaWithered, -1)] // can block the chest
         [EnemizerSceneBlockSensitive(Actor.DekuBaba, -1)] // this this is required to keep it off of withered as well
+        [EnemizerSceneBlockSensitive(Actor.LargeWoodenCrate, -1)] // standing next to the buisness scrub
+        [EnemizerSceneBlockSensitive(Actor.Bombiwa, -1)] // hotspring grotto, can cover the chest
         /* ****** GOSSIP GROTTO ACTORS ***** */
         [EnemizerSceneBlockSensitive(Actor.Wolfos, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
         [EnemizerSceneBlockSensitive(Actor.Snapper, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
         [EnemizerSceneBlockSensitive(Actor.Leever, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
         [EnemizerSceneBlockSensitive(Actor.Armos, -1)] // if actorizer, one gossip stone is left alone the rest are randomized (this actor is used as placeholder)
-        [EnemizerSceneBlockSensitive(Actor.LargeWoodenCrate, -1)] // standing next to the buisness scrub
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Wolfos, Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Snapper, Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Leever, Actor.RealBombchu)] // can instantly hit the stones and cause them to be un-readable
@@ -467,7 +468,7 @@ namespace MMR.Randomizer.GameObjects
 
         [FileID(1304)]
         [SceneInternalId(0x2B)]
-        [DynaHeadroom(24, 20)]  // low default to start, untested
+        [DynaHeadroom(12, 12)]  // 10+22, 16+0 crashes in dual room swap
         [EnemizerSceneEnemyReplacementBlock(Actor.Torch, // too close to grotto
             Actor.Dexihand)] // if it grabs you as you fall into a grotto hole it can hardlock
         [EnemizerSceneEnemyReplacementBlock(Actor.Monkey,
@@ -594,8 +595,10 @@ namespace MMR.Randomizer.GameObjects
                         Actor.WoodfallTempleWoodenFlower, // can block the trading post its too big
                         Actor.Hiploop)] // water explosion
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.ClayPot,
+                        Actor.LikeLike, // In out for blood this can be instant death
                         Actor.DekuKing)] // if close to scarecrow can hardlock clock skip
         [EnemizerSceneEnemyReplacementBlock(originalEnemy: Actor.Scarecrow,
+                        Actor.LikeLike, // In out for blood this can be instant death
                         Actor.WoodfallTempleWoodenFlower)] // so large it can block the door
         TradingPost = 0x31,
 
