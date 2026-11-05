@@ -25,6 +25,7 @@ namespace MMR.Randomizer.Utils
     {
         const int FILE_TABLE = 0x1A500;
         const int SIGNATURE_ADDRESS = 0x1A4D0;
+        const int OVERLAY_TABLE = 0xC45510;
         public static void SetStrings(byte[] hack, string ver, string setting)
         {
             ResourceUtils.ApplyHack(hack);
@@ -35,7 +36,7 @@ namespace MMR.Randomizer.Utils
             #if DEBUG
             string settingstring = $"{setting} + DEBUG BUILD\x00";
             #else
-            string settingstring = $"{setting} + Isghj's Actorizer Test 91.0\x00";
+            string settingstring = $"{setting} + Isghj's Actorizer Test 102.0\x00";
             #endif
             int f = GetFileIndexForWriting(veraddr);
             var file = RomData.MMFileList[f];
@@ -107,12 +108,19 @@ namespace MMR.Randomizer.Utils
             }
         }
 
+        public static int VRAMToFile(uint vram)
+        {
+            return RomData.MMFileList.FindIndex(
+                file => vram >= file.VRamStart && vram < file.VRamEnd);
+        }
+
         public static void CheckCompressed(int fileIndex, List<MMFile> mmFileList = null)
         {
             if (mmFileList == null)
             {
                 mmFileList = RomData.MMFileList;
             }
+            if (fileIndex == -1) return;
             var file = mmFileList[fileIndex];
             if (file.Data == null || file.Data.Length == 0)
             {
@@ -148,11 +156,20 @@ namespace MMR.Randomizer.Utils
         public static int GetFileIndexForWriting(int rAddr)
         {
             int index = AddrToFile(rAddr);
+            if (index == -1)
+                throw new ObjectDisposedException($"Cannot find file for writing");
             CheckCompressed(index);
             if (RomData.MMFileList[index].IsReadOnly)
             {
                 throw new Exception($"Cannot write to read-only file {index}");
             }
+            return index;
+        }
+
+        public static int GetFileIndexForWritingVRAM(uint vram)
+        {
+            int index = VRAMToFile(vram);
+            CheckCompressed(index);
             return index;
         }
 
@@ -248,10 +265,10 @@ namespace MMR.Randomizer.Utils
             Parallel.ForEach(sortedCompressibleFiles.AsParallel().AsOrdered(), file =>
             {
                 //var yazTime = DateTime.Now;
-#if DEBUG
+                #if DEBUG
                 var decompressed_size = file.End - file.Addr;
                 var compressed_size = file.Cmp_End - file.Cmp_Addr;
-#endif
+                #endif
                 file.Data = Yaz.EncodeAndCopy(file.Data);
                 file.WasEdited = false;
                 //Debug.WriteLine($" size: [{file.Data.Length}] time to complete compression : [{(DateTime.Now).Subtract(yazTime).TotalMilliseconds} (ms)]");
@@ -268,19 +285,20 @@ namespace MMR.Randomizer.Utils
             Debug.WriteLine($" compress all files time : [{(DateTime.Now).Subtract(startTime).TotalMilliseconds} (ms)]");
         }
 
-        private static void SetFilesToRemainDecompressed(OutputSettings settings)
+        public static void SetFilesToRemainDecompressed(OutputSettings outputSettings, GameplaySettings gameplaySettings)
         {
             /// Now that files can remain uncompressed and be expected to work, lets leave some commonly accessed files de-compressed so they don't cost as much to load
 
-            if (settings.OutputVC)
+            if ( gameplaySettings.FasterCommonFileLoad == false
+              || outputSettings.OutputVC) // this does not work with wiivc right now
             {
-                return; // this does not work with wiivc right now
+                return; 
             }
-
 
             var listOfFiles = new List<int>()
             {
                 //scenes
+                // these were disabled because they messed with a power users settings, but they didn't do as much as some of the other files anyway
                 //GameObjects.Scene.TerminaField.FileID(),
                 //GameObjects.Scene.TerminaField.FileID() + 1, // room 0
                 //GameObjects.Scene.SouthClockTown.FileID(),
@@ -332,8 +350,6 @@ namespace MMR.Randomizer.Utils
 
         public static byte[] BuildROM(OutputSettings settings)
         {
-
-            SetFilesToRemainDecompressed(settings);
 
             CompressMMFiles();
 
@@ -489,6 +505,19 @@ namespace MMR.Randomizer.Utils
                 dmaId += 1;
             }
             ExtractAll(ROM);
+            for (int i = 0; i < 690; i++)
+            {
+                var vrom = (int) ReadWriteUtils.ReadU32(OVERLAY_TABLE + i * 0x20);
+                if (vrom == 0)
+                {
+                    continue;
+                }
+                var vramStart = ReadWriteUtils.ReadU32(OVERLAY_TABLE + i * 0x20 + 0x8);
+                var vramEnd = ReadWriteUtils.ReadU32(OVERLAY_TABLE + i * 0x20 + 0xC);
+                var fileIndex = GetFileIndexForWriting(vrom);
+                RomData.MMFileList[fileIndex].VRamStart = vramStart;
+                RomData.MMFileList[fileIndex].VRamEnd = vramEnd;
+            }
         }
 
         public static bool CheckOldCRC(BinaryReader ROM)

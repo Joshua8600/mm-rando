@@ -19,7 +19,7 @@ namespace MMR.Randomizer.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class mods {
@@ -183,16 +183,6 @@ namespace MMR.Randomizer.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] death_moon_crash {
-            get {
-                object obj = ResourceManager.GetObject("death_moon_crash", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
         internal static byte[] death_reduces_max_hearts {
             get {
                 object obj = ResourceManager.GetObject("death_reduces_max_hearts", resourceCulture);
@@ -233,9 +223,9 @@ namespace MMR.Randomizer.Resources {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
-        internal static byte[] dm_4 {
+        internal static byte[] dm_8x {
             get {
-                object obj = ResourceManager.GetObject("dm_4", resourceCulture);
+                object obj = ResourceManager.GetObject("dm_8x", resourceCulture);
                 return ((byte[])(obj));
             }
         }

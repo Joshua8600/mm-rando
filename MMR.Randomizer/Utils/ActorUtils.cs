@@ -8,7 +8,7 @@ using MMR.Randomizer.Models.Rom;
 using System.Diagnostics;
 
 using System.Runtime.CompilerServices;
-
+using MMR.Randomizer.Enemizer;
 
 namespace MMR.Randomizer.Utils
 {
@@ -115,11 +115,11 @@ namespace MMR.Randomizer.Utils
                 // no check compressed: user has to submit uncompressed actor binary
                 if (injectedActor.overlayBin != null) // new actor: read from binary
                 {
-                    return ReadWriteUtils.Arr_ReadU16(injectedActor.overlayBin, (int)injectedActor.initVarsLocation + 0xE);
+                    return ReadWriteUtils.Arr_ReadU16(injectedActor.overlayBin, (int)injectedActor.ProfileLocation + 0xE);
                 }
                 else // old actor replaced: we already overwrote the old binary, but use new data offsets
                 {
-                    return ReadWriteUtils.Arr_ReadU16(RomData.MMFileList[injectedActor.fileID].Data, (int)injectedActor.initVarsLocation + 0xE);
+                    return ReadWriteUtils.Arr_ReadU16(RomData.MMFileList[injectedActor.fileID].Data, (int)injectedActor.ProfileLocation + 0xE);
                 }
             }
 
@@ -152,13 +152,13 @@ namespace MMR.Randomizer.Utils
 
             // we have some of them hardcoded, if that exists return that instead because scanning files sucks
             var actor = (GameObjects.Actor)actorOvlTblIndex;
-            var actorAttr = actor.GetAttribute<ActorInitVarOffsetAttribute>();
+            var actorAttr = actor.GetAttribute<ActorProfileOffsetAttribute>();
             if (actorAttr != null)
             {
                 return actorAttr.Offset;
             }
 
-            // just look it up in the actor overlay table, initvars - vram start is the offset
+            // just look it up in the actor overlay table, profile - vram start is the offset
             var actorOvlTblFID = RomUtils.GetFileIndexForWriting(Constants.Addresses.ActorOverlayTable);
             // dont need to check for compression, code has been un-compressed for ages
             int actorOvlTblOffset = Constants.Addresses.ActorOverlayTable - RomData.MMFileList[actorOvlTblFID].Addr;
@@ -240,67 +240,56 @@ namespace MMR.Randomizer.Utils
         /// <param name="actor"> the whole actor</param>
         /// <param name="variant"> specify new or old variant</param>
         /// <returns> -1 if no switch flags, otherwise the flags</returns>
-        public static short GetActorSwitchFlags(Actor actor, short variant)
+        // todo move this to the actor code, it doesn't need to be in utils
+        public static short GetActorSwitchFlags(Actor actor)
         {
-            if (actor.ActorEnum.GetAttribute<SwitchFlagsPlacementXRotAttribute>() != null)
+            if (actor.SwitchFlags == null)
             {
-                // get x rotation, return
+                return -1;
+            }
+
+            var (size, shift, _, storage) = actor.SwitchFlags.Value;
+
+            if (storage == SwitchFlagStorage.XRotation)
+            {
                 return (short)(actor.Rotation.x >> 7);
             }
-            if (actor.ActorEnum.GetAttribute<SwitchFlagsPlacementZRotAttribute>() != null)
+            if (storage == SwitchFlagStorage.ZRotation)
             {
-                // get x rotation, return
                 return (short)(actor.Rotation.z >> 7);
             }
 
-            var flagsAttr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
-            if (flagsAttr != null)
-            {
-                return (short)((variant >> flagsAttr.Shift) & flagsAttr.Size);
-            }
-
-            return -1; // no switch flags
+            return (short)((actor.Variants[0] >> shift) & size);
         }
 
-        
         public static void SetActorSwitchFlags(Actor actor, short switchFlags)
         {
-
-            var flagsAttr = actor.ActorEnum.GetAttribute<SwitchFlagsPlacementAttribute>();
-            if (flagsAttr == null)
+            if (actor.SwitchFlags == null)
             {
                 throw new System.Exception("There be no switches here");
             }
 
+            // man c# nullable is weird
+            var (size, shift, _, storage) = actor.SwitchFlags.Value;
+
             // reminder: the actor init rotation cancel flags are NOT IN ORDER
             // Y X Z
-
-            // the flags are stored as actual rotation
-            if (actor.ActorEnum.GetAttribute<SwitchFlagsPlacementXRotAttribute>() != null)
+            if (storage == SwitchFlagStorage.XRotation)
             {
-                // wait what the fuck, have these been wrong this whole time??
-                //actor.Rotation.x = (short)MergeRotationAndFlags(switchFlags, flags: actor.Rotation.x);
                 actor.ChangeXRotation(switchFlags);
                 actor.ActorIdFlags |= 0x4000; // dont convert x rotation, it's a parameter
                 return;
             }
-            if (actor.ActorEnum.GetAttribute<SwitchFlagsPlacementZRotAttribute>() != null)
+            if (storage == SwitchFlagStorage.ZRotation)
             {
-                //actor.Rotation.z = (short)MergeRotationAndFlags(switchFlags, flags: actor.Rotation.z);
                 actor.ChangeZRotation(switchFlags);
                 actor.ActorIdFlags |= 0x2000; // dont convert z rotation, it's a parameter
                 return;
             }
-            // else: regular switch flags in vars
 
-            // clear the old switchflags from our newly chosen Variant
-            var deleteMask = flagsAttr.Size << flagsAttr.Shift;
+            var deleteMask = size << shift;
             var newVarsWithoutSwitchflags = actor.Variants[0] & ~deleteMask;
-
-            // shift the switchflags into the new location
-            var newSwitchflags = switchFlags << flagsAttr.Shift;
-
-            // set variant from cleaned old variant ORed against the new switchflags
+            var newSwitchflags = switchFlags << shift;
             actor.Variants[0] = newVarsWithoutSwitchflags | newSwitchflags;
         }
 
@@ -432,13 +421,13 @@ namespace MMR.Randomizer.Utils
 
         public static void DisableCombatMusicOnEnemy(GameObjects.Actor actor)
         {
-            int actorInitVarRomAddr = actor.GetAttribute<ActorInitVarOffsetAttribute>().Offset;
+            int actorProfileRomAddr = actor.GetAttribute<ActorProfileOffsetAttribute>().Offset;
             /// each enemy actor has actor init variables, 
             /// if they have combat music is determined if a flag is set in the seventh byte
             /// disabling combat music means disabling this bit for most enemies
             int actorFileID = actor.FileListIndex();
             RomUtils.CheckCompressed(actorFileID);
-            int actorFlagLocation = (actorInitVarRomAddr + 7);
+            int actorFlagLocation = (actorProfileRomAddr + 7);
             byte flagByte = RomData.MMFileList[actorFileID].Data[actorFlagLocation];
             RomData.MMFileList[actorFileID].Data[actorFlagLocation] = (byte)(flagByte & 0xFB);
 

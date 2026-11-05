@@ -10,6 +10,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using MMR.Randomizer.Attributes;
+using MMR.Randomizer.Enemizer;
 
 namespace MMR.Randomizer.Models.Rom
 {
@@ -33,6 +34,7 @@ namespace MMR.Randomizer.Models.Rom
         public List<int> Variants { get; private set; }
         //public List<int> Variants = new List<int> { 0 };
         public List<List<int>> SortedVariants = null;
+        public List<List<int>> NewSortedVariants = null;
         public int OldVariant;
         public bool MustNotRespawn = false;
         public ActorType Type; 
@@ -44,6 +46,9 @@ namespace MMR.Randomizer.Models.Rom
         public int ActorSize; // todo
         public int ObjectSize; // read by enemizer at scene actor reading
         public (int poly, int vert) DynaLoad =  (0, 0);  // dyna load per actor, can be overwritten by injected actor
+        // warning: this switch flags is current actor, not old actor
+        public (int size, int shift, SwitchTrigger flagType, SwitchFlagStorage storage)? SwitchFlags = null;
+        public short OldSwitchFlag = -1;
         public int Room;           // the room the actor is in in the scene
         public int RoomActorIndex; // the actor index of the room the actor is in
         public vec16 Position = new vec16();
@@ -68,6 +73,36 @@ namespace MMR.Randomizer.Models.Rom
 
         // TODO we should consolidate all of this actor constructor/update code
 
+        public void PopulateSwitchFlags(GameObjects.Actor? actor = null)
+        {
+            if (actor == null) actor = this.ActorEnum;
+
+            var switchFlagsAttr = actor.GetAttribute<SwitchFlagsPlacementAttribute>();
+            if (switchFlagsAttr == null) return;
+
+            if (switchFlagsAttr.flagType != SwitchTrigger.DoNotUse)
+            {
+                var storage = SwitchFlagStorage.Params;
+                if (actor.GetAttribute<SwitchFlagsPlacementZRotAttribute>() != null)
+                    storage = SwitchFlagStorage.ZRotation;
+                else if (actor.GetAttribute<SwitchFlagsPlacementXRotAttribute>() != null)
+                    storage = SwitchFlagStorage.XRotation;
+                this.SwitchFlags = (switchFlagsAttr.Size, switchFlagsAttr.Shift, switchFlagsAttr.flagType, storage);
+            }
+            else if (actor.GetAttribute<SwitchFlagsPlacementXRotAttribute>() != null)
+            {
+                this.SwitchFlags = (0x7F, 7, SwitchTrigger.Death, SwitchFlagStorage.XRotation);
+            }
+            else if (actor.GetAttribute<SwitchFlagsPlacementZRotAttribute>() != null)
+            {
+                this.SwitchFlags = (0x7F, 7, SwitchTrigger.Death, SwitchFlagStorage.ZRotation);
+            }
+            else // type: SwitchTrigger.DoNotUse
+            {
+                this.SwitchFlags = (switchFlagsAttr.Size, switchFlagsAttr.Shift, SwitchTrigger.DoNotUse, SwitchFlagStorage.Params);
+            }
+        }
+
         public Actor(GameObjects.Actor actor, InjectedActor injectedData = null)
         {
             // converted from enum, used for building replacement candidate actors
@@ -89,11 +124,13 @@ namespace MMR.Randomizer.Models.Rom
             this.UnplaceableVariants = actor.GetUnPlacableVariants();
 
             var dynaProperties = actor.GetAttribute<DynaAttributes>();
-            if (dynaProperties != null)
+            if (dynaProperties != null) 
             {
                 this.DynaLoad.poly = dynaProperties.Polygons;
                 this.DynaLoad.vert = dynaProperties.Verticies;
             }
+
+            PopulateSwitchFlags(actor);
 
             // missing injected actor stuff
             if (injectedData != null)
@@ -131,7 +168,12 @@ namespace MMR.Randomizer.Models.Rom
             this.UnplaceableVariants = this.ActorEnum.GetUnPlacableVariants();
             this.OnlyOnePerRoom = injected.onlyOnePerRoom;
             this.InjectedActor = injected;
-            
+
+            if (injected.SwitchFlags.size != -1)
+            {
+                this.SwitchFlags = (injected.SwitchFlags.size, injected.SwitchFlags.shift, injected.SwitchFlags.flagType, SwitchFlagStorage.Params);
+            }
+
             var dynaProperties = this.ActorEnum.GetAttribute<DynaAttributes>();
             if (dynaProperties != null)
             {
@@ -139,6 +181,7 @@ namespace MMR.Randomizer.Models.Rom
                 this.DynaLoad.vert = dynaProperties.Verticies;
             }
 
+            // todo does this need to be here or can we do the same thing we did for switch flags?
             if (injected.DynaLoad.poly != -1) // custom new dyna
             {
                 this.DynaLoad.poly = injected.DynaLoad.poly;
@@ -147,7 +190,6 @@ namespace MMR.Randomizer.Models.Rom
             {
                 this.DynaLoad.vert = injected.DynaLoad.vert;
             }
-
         }
 
         public static List<List<int>> BuildVariantList(GameObjects.Actor actor)
@@ -238,6 +280,7 @@ namespace MMR.Randomizer.Models.Rom
             newActor.UnplaceableVariants = this.UnplaceableVariants;
 
             newActor.DynaLoad = this.DynaLoad;
+            newActor.SwitchFlags = this.SwitchFlags;
 
             return newActor;
         }
@@ -289,6 +332,8 @@ namespace MMR.Randomizer.Models.Rom
                 Variants[0] = vars;
             }
 
+            this.NewSortedVariants = null;
+
             this.OnlyOnePerRoom = newActorType.GetAttribute<OnlyOneActorPerRoom>();
 
             // if the new is injected, pull from injected
@@ -330,6 +375,7 @@ namespace MMR.Randomizer.Models.Rom
             if (otherActor.InjectedActor != null)
                 this.UpdateActor(otherActor.InjectedActor);
 
+            this.SwitchFlags = otherActor.SwitchFlags;
             this.VariantsWithRoomMax = otherActor.VariantsWithRoomMax.ToList();
         }
 
@@ -366,6 +412,11 @@ namespace MMR.Randomizer.Models.Rom
                 this.DynaLoad.vert = injectedActor.DynaLoad.vert;
             }
 
+            if (injectedActor.SwitchFlags.size != -1)
+            {
+                this.SwitchFlags = (injectedActor.SwitchFlags.size, injectedActor.SwitchFlags.shift, injectedActor.SwitchFlags.flagType, SwitchFlagStorage.Params);
+            }
+
             void AddToSpecificSubtype(ActorType type, List<int> newList)
             {
                 var variantSubList = this.SortedVariants[(int)type - 1];
@@ -391,6 +442,7 @@ namespace MMR.Randomizer.Models.Rom
             this.OldVariant = this.Variants[0] = variant;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetVariants(List<int> variants)
         {
             // this is here so I can watch for variant corruption, because not sure how to breakpoint
@@ -735,6 +787,10 @@ namespace MMR.Randomizer.Models.Rom
             {
                 this.Variants = this.Variants.Where(var => ! blockingTypeVariants.Variants.Contains(var)).ToList();
             }
+            if (this.InjectedActor != null && this.InjectedActor.blockingVariants.Count > 0)
+            {
+                this.Variants = this.Variants.Where(var => !this.InjectedActor.blockingVariants.Contains(var)).ToList();
+            }
 
             return this.Variants;
         }
@@ -766,17 +822,20 @@ namespace MMR.Randomizer.Models.Rom
         }
 
 
-        public int GetPlacementWeight(int baseline = 100)
+        public int GetPlacementWeight()
         {
             /// returns a weight for a given actor to be placed in a scene
+
+            if (this.InjectedActor != null && this.InjectedActor.PlacementWeight != 100)
+            {
+                return this.InjectedActor.PlacementWeight;
+            }
 
             var weightAttribute = this.ActorEnum.GetAttribute<PlacementWeight>();
             if (weightAttribute != null)
             {
                 return weightAttribute.Weight;
             }
-
-            // if baseline is not 100, adjust values to 100
 
             return 100; // default percent: 100%
         }
@@ -823,10 +882,11 @@ namespace MMR.Randomizer.Models.Rom
                 {
                     foreach (var item in validCondition.BlockedChecks.ToList())
                     {
-                        if (Enemies.IsActorizerJunk(item))
-                        {
-                            validCondition.BlockedChecks.Remove(item);
-                        }
+                        // removed by request of beta testers: having actors block checks because the check is junk is too bug-like and annoying
+                        //if (Enemies.IsActorizerJunk(item))
+                        //{
+                        //    validCondition.BlockedChecks.Remove(item);
+                        //}
                     }
 
                     if (validCondition.BlockedChecks.Count == 0)
@@ -854,5 +914,39 @@ namespace MMR.Randomizer.Models.Rom
 
             this.Blockable = true; // no block reasons listed, all conditions cleared
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool ChangedToNewActor(GameObjects.Actor actor)
+        {
+            // is this actor changed to a new specific actor, and wasnt previously the same actor type
+            return this.ActorEnum == actor && this.OldActorEnum != actor;
+        }
+
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool CurrentVariantIsType(ActorType type)
+        {
+            // "is this actor, after randomization, of a certain type" is tested too much, might as well separate it
+
+            // TODO I couldn't find a faster way to build the specific type list, because list of attribute isn't working
+            //  realistic: undo this whole function and go back to hardcode list 
+
+            if (this.NewSortedVariants == null)
+                this.NewSortedVariants = BuildVariantList(this.ActorEnum); // the old sorted list is still for the old actor, quickly generate one for chosen replacement
+
+            var listOfVariantsThatMatchType = this.NewSortedVariants[ (int) type - 1]; // type list starts with "unset"
+            return listOfVariantsThatMatchType != null && listOfVariantsThatMatchType.Contains(this.Variants[0]);
+        }
+
+        public bool OldVariantIsType(ActorType type)
+        {
+            // "is this actor, before randomization, of a certain type" is tested too much, might as well separate it
+
+            var listOfVariantsThatMatchType = this.SortedVariants[(int)type - 1]; // type list starts with "unset"
+            return listOfVariantsThatMatchType != null && listOfVariantsThatMatchType.Contains(this.OldVariant);
+        }
+
+
     }
 }

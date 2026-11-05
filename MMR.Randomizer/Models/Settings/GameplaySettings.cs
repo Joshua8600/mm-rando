@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace MMR.Randomizer.Models.Settings
@@ -256,6 +257,13 @@ namespace MMR.Randomizer.Models.Settings
             set { this.AsmOptions.MiscConfig.Flags.BombchuDrops = value; }
         }
 
+        [Description("If you have found the Powder Keg, then any random Bomb drop or fixed non-randomized Bomb drop will drop a Powder Keg instead if you have 0 Powder Kegs. Logic will no longer require the ability to purchase Powder Kegs from the bomb shop goron.")]
+        public bool KegDrops
+        {
+            get { return this.AsmOptions.MiscConfig.Flags.KegDrops; }
+            set { this.AsmOptions.MiscConfig.Flags.KegDrops = value; }
+        }
+
         [Description("Transforming using Deku Mask, Goron Mask, Zora Mask and Fierce Deity's Mask will be almost instant. These items can no longer be used as \"cutscene items\".")]
         [SettingTab(SettingTabAttribute.Type.Gimmicks)]
         public bool InstantTransform
@@ -299,6 +307,13 @@ namespace MMR.Randomizer.Models.Settings
         {
             get { return this.AsmOptions.MiscConfig.Flags.SkulltulaTokenSounds; }
             set { this.AsmOptions.MiscConfig.Flags.SkulltulaTokenSounds = value; }
+        }
+
+        [Description("Pots, Grass, Snowballs, Rocks, Crates, Barrels, Beehives, Flower Pots and Butterflies with randomized items will emit a sparkle.")]
+        public bool MinorDropSparkle
+        {
+            get { return this.AsmOptions.MiscConfig.Flags.MinorDropSparkle; }
+            set { this.AsmOptions.MiscConfig.Flags.MinorDropSparkle = value; }
         }
 
         [Description("Instead of being immune to damage while riding Epona, Link will take damage and be thrown off.")]
@@ -373,8 +388,7 @@ namespace MMR.Randomizer.Models.Settings
             nameof(ProgressiveUpgrades),
             nameof(CustomJunkLocationsString),
             nameof(CustomItemListString),
-            nameof(RandomizeDungeonEntrances),
-            nameof(RandomizeBossRooms),
+            nameof(EntranceMode),
             nameof(StartingItemMode),
             nameof(RequiredBossRemains),
             nameof(VictoryMode),
@@ -412,6 +426,7 @@ namespace MMR.Randomizer.Models.Settings
             nameof(PreventDowngrades),
             nameof(FairyMaskShimmer),
             nameof(SkulltulaTokenSounds),
+            nameof(MinorDropSparkle),
             nameof(EnabledTricks)
         )]
         [SettingExclude(LogicMode.NoLogic, nameof(UserLogicFileName), nameof(EnabledTricks))]
@@ -437,23 +452,8 @@ namespace MMR.Randomizer.Models.Settings
         [Description("Enable songs being placed among items in the randomization pool.")]
         public bool AddSongs { get; set; }
 
-        /// <summary>
-        /// Randomize which dungeon you appear in when entering one
-        /// </summary>
-        [Description("Enable randomization of dungeon entrances. \n\nStone Tower Temple is always vanilla, but Inverted Stone Tower Temple is randomized.")]
-        public bool RandomizeDungeonEntrances { get; set; }
-
-        /// <summary>
-        /// Randomize which boss room you appear in when entering one
-        /// </summary>
-        [Description("Enable randomization of boss rooms. The boss door texture will match the boss behind the door.")]
-        public bool RandomizeBossRooms { get; set; }
-
-        /// <summary>
-        /// (Beta) Randomize enemies
-        /// </summary>
-        [Description("Enable randomization of enemies. May cause softlocks in some circumstances, use at your own risk.")]
-        public bool RandomizeEnemies { get; set; }
+        [Description("Enable randomization of Gibdo requirements. They can request ammo, bottle contents, quest and trade items, photos and masks.")]
+        public bool RandomizeGibdoRequirements { get; set; }
 
         /// <summary>
         /// Set how starting items are randomized
@@ -475,6 +475,10 @@ namespace MMR.Randomizer.Models.Settings
 
         public VictoryMode VictoryMode { get; set; }
 
+        public EntranceMode EntranceMode { get; set; }
+
+        public EnemyMode EnemyMode { get; set; }
+
 
         /// <summary>
         ///  Custom item list selections
@@ -491,7 +495,7 @@ namespace MMR.Randomizer.Models.Settings
         /// <summary>
         ///  Custom item list string
         /// </summary>
-        [SettingItemList(nameof(ItemUtils.AllLocations), true, true, nameof(ItemExtensions.ItemCategory), nameof(ItemExtensions.LocationCategory), nameof(ItemExtensions.ClassicCategory))]
+        [SettingItemList(nameof(ItemUtils.AllLocations), SettingItemListAttribute.LabelType.Location, SettingItemListAttribute.LabelType.Name, nameof(ItemExtensions.ItemCategory), nameof(ItemExtensions.LocationCategory), nameof(ItemExtensions.ClassicCategory))]
         public string CustomItemListString { get; set; } = "-------------------------40c-80000000----21ffff-ffffffff-ffffffff-f0000000-7bbeeffa-7fffffff-e6f1fffe-ffffffff";
 
         /// <summary>
@@ -503,8 +507,10 @@ namespace MMR.Randomizer.Models.Settings
         /// <summary>
         ///  Custom starting item list string
         /// </summary>
-        [SettingItemList(nameof(ItemUtils.CustomStartingItems), true, false, nameof(ItemExtensions.ItemCategory))]
-        public string CustomStartingItemListString { get; set; } = "--1fbfc-5800000-";
+        [SettingItemList(nameof(ItemUtils.CustomStartingItems), SettingItemListAttribute.LabelType.Name, SettingItemListAttribute.LabelType.None, nameof(ItemExtensions.ItemCategory))]
+        public string CustomStartingItemListString { get; set; } = "----1fbfc-5800000-";
+
+        public List<RandomStartingItemGroup> RandomStartingItemGroups { get; set; } = new List<RandomStartingItemGroup>();
 
         /// <summary>
         /// List of locations that must be randomized to junk
@@ -515,7 +521,7 @@ namespace MMR.Randomizer.Models.Settings
         /// <summary>
         ///  Custom junk location string
         /// </summary>
-        [SettingItemList(nameof(ItemUtils.AllLocations), false, true, nameof(ItemExtensions.Regions))]
+        [SettingItemList(nameof(ItemUtils.AllLocations), SettingItemListAttribute.LabelType.Location, SettingItemListAttribute.LabelType.None, nameof(ItemExtensions.Regions))]
         public string CustomJunkLocationsString { get; set; } = "------------------------------200000-----400000--f000";
 
         /// <summary>
@@ -529,6 +535,7 @@ namespace MMR.Randomizer.Models.Settings
         /// The weighting to give different types of traps.
         /// </summary>
         [SettingTab(SettingTabAttribute.Type.Gimmicks)]
+        [Range(0, int.MaxValue)]
         public Dictionary<TrapType, int> TrapWeights { get; set; } = new Dictionary<TrapType, int>();
 
         /// <summary>
@@ -545,7 +552,7 @@ namespace MMR.Randomizer.Models.Settings
         /// <summary>
         /// Modifies the damage value when Link is damaged
         /// </summary>
-        [Description("Select a damage mode, affecting how much damage Link takes:\n\n - Default: Link takes normal damage.\n - 2x: Link takes double damage.\n - 4x: Link takes quadruple damage.\n - 1-hit KO: Any damage kills Link.\n - Doom: Hardcore mode. Link's hearts are slowly being drained continuously.")]
+        [Description("Select a damage mode, affecting how much damage Link takes:\n\n - Default: Link takes normal damage.\n - 2x: Link takes double damage.\n - 4x: Link takes quadruple damage.\n - 8x: Link takes octuple damage.\n - 1-hit KO: Any damage kills Link.\n - Doom: Hardcore mode. Link's hearts are slowly being drained continuously.")]
         [SettingTab(SettingTabAttribute.Type.Gimmicks)]
         public DamageMode DamageMode { get; set; }
 
@@ -698,7 +705,7 @@ namespace MMR.Randomizer.Models.Settings
         public GossipHintStyle GossipHintStyle { get; set; } = GossipHintStyle.Competitive;
 
         [Description("Select a Garo hint style\n\n - Default: Vanilla Garo hints.\n - Random: Hints will contain locations of random items.\n - Relevant: Hints will contain locations of items loosely related to the vanilla hint or the area.\n - Competitive: Guaranteed hints about time-consuming checks, and hints regarding importance or non-importance of regions.")]
-        [SettingExclude(GossipHintStyle.Default, nameof(ClearHints),
+        [SettingExclude(GossipHintStyle.Default, nameof(ClearGaroHints),
             nameof(ImportanceCountGaro),
             nameof(OverrideNumberOfRequiredGaroHints),
             nameof(OverrideNumberOfNonRequiredGaroHints),
@@ -778,13 +785,14 @@ namespace MMR.Randomizer.Models.Settings
         [Range(0, 7)]
         public int? OverrideMaxNumberOfClockTownGaroHints { get; set; }
 
-        [SettingIgnore]
+        [SettingItemList(nameof(ItemUtils.AllLocations), SettingItemListAttribute.LabelType.Location, SettingItemListAttribute.LabelType.None, nameof(ItemExtensions.Regions))]
+        [Description("If any locations are provided, this list will be used exclusively for determining hint priorities. Settings are not taken into account, but non-randomized and junked locations will not be hinted. The higher a location appears in this list, the higher its priority. Locations with the same priority will be chosen randomly. If a location should combine with another location, all the combined locations should be added.")]
         public List<List<Item>> OverrideHintPriorities { get; set; }
 
-        [SettingIgnore]
+        [Description("Make chosen tiers of hints indicate their importance.")]
         public HashSet<int> OverrideImportanceIndicatorTiers { get; set; }
 
-        [SettingIgnore]
+        [Description("The number (if non-zero) indicates how many of the locations in the tier will be hinted, and the rest will be forced to be junk.")]
         public List<int> OverrideHintItemCaps { get; set; }
 
         /// <summary>
@@ -832,6 +840,10 @@ namespace MMR.Randomizer.Models.Settings
 
         [Description("Quest items will return to your inventory after Song of Time.")]
         public bool KeepQuestTradeThroughTime { get; set; }
+
+        [Range(1, 7)]
+        [Description("Number of zora eggs that must be brought to the lab for the eggs to grow.")]
+        public int RequiredZoraEggs { get; set; } = 7;
 
         #endregion
 
@@ -908,13 +920,37 @@ namespace MMR.Randomizer.Models.Settings
             {
                 return $"{nameof(RequiredBossRemains)} must be between 0 and 4.";
             }
+            if (RequiredZoraEggs < 1 || RequiredZoraEggs > 7)
+            {
+                return $"{nameof(RequiredZoraEggs)} must be between 1 and 7.";
+            }
             if (VictoryMode != VictoryMode.Default && VictoryMode < VictoryMode.Fairies)
             {
                 return "Must set some victory conditions or disable all victory modes.";
+            }
+            if (RandomStartingItemGroups.Any(g => g.Items.Count == 0 || g.Amount < 1 || g.Amount > g.Items.Count))
+            {
+                return "Invalid random starting item groups.";
             }
             return null;
         }
 
         #endregion
+
+
+        /// <summary>
+        /// Modifies the damage value when Link is damaged
+        /// </summary>
+        [Description("Select an actor mode.\n Actorizer randomizes all NPCs and enemies togther into one pool.\n Enemizer only randomizes enemies. \n Out For Blood removes NPCs and repalces them with enemies, making the world more hostile.")]
+        public ActorMode ActorMode { get; set; }
+
+        [Description("Unlocks the abilty for the player to use more items in certain forms. \n Example: Deku link can use stick, Goron link can use bombs. \n Not all items are enabled because some are broken and haven't been fixed yet.")]
+        public bool FormsItemRestrictionUnlocked { get; set; }
+
+        [Description("Suspends the law limiting link from using his sword and other weapons inside city buildings. Also allows soaring in deeper caves.")]
+        public bool LocationsItemRestrictionUnlocked { get; set; }
+
+        [Description("Speeds up some game loading of certain items by skipping their compression, allowing them to load without being decompressed on the fly. \n The biggest effect is on the pause menu opening and closing. More noticable on emulator. \n Turn off if the pause menu is moving too fast interferering with trick muscle memory.")]
+        public bool FasterCommonFileLoad { get; set; }
     }
 }

@@ -25,6 +25,7 @@ using System.Threading;
 using MMR.UI.Controls;
 using System.Linq.Expressions;
 using MMR.Randomizer.Attributes.Setting;
+using System.ComponentModel.DataAnnotations;
 
 namespace MMR.UI.Forms
 {
@@ -54,6 +55,7 @@ namespace MMR.UI.Forms
             InitializeHUDGroupBox();
             InitializeTransformationFormSettings();
             InitializeShortenCutsceneSettings();
+            InitalizeActorizerOptions();
             InitializeItemPoolSettings();
             InitializeDungeonModeSettings();
             InitializeTrapSettings();
@@ -79,21 +81,12 @@ namespace MMR.UI.Forms
             #if DEBUG
             Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + DEBUG ON";
             #else
-            Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + Isghj's Actorizer Test 91.0";
+            Text = $"Majora's Mask Randomizer v{Randomizer.AssemblyVersion} + Isghj's Actorizer Test 102.0";
             #endif
 
-            var args = Environment.GetCommandLineArgs();
-            if (args.Length > 1)
-            {
-                var openWithArg = args[1];
-                if (Path.GetExtension(openWithArg) == ".mmr")
-                {
-                    ttOutput.SelectedIndex = 1;
-                    TogglePatchSettings(false);
-                    _configuration.OutputSettings.InputPatchFilename = openWithArg;
-                    tPatch.Text = _configuration.OutputSettings.InputPatchFilename;
-                }
-            }
+            
+            lPatchVersion.Text = lPatchVersion.Text.Replace("v0.0.0", "v" + string.Join(".", MMR.Randomizer.Patch.Patcher.Version.Take(3)));
+
         }
 
         private void InitializeSimpleControls()
@@ -110,9 +103,7 @@ namespace MMR.UI.Forms
                 // Main Settings
                 { cMixSongs, cfg => cfg.GameplaySettings.AddSongs },
                 { cProgressiveUpgrades, cfg => cfg.GameplaySettings.ProgressiveUpgrades },
-                { cDEnt, cfg => cfg.GameplaySettings.RandomizeDungeonEntrances },
-                { cShuffleBosses, cfg => cfg.GameplaySettings.RandomizeBossRooms },
-                { cEnemy, cfg => cfg.GameplaySettings.RandomizeEnemies },
+                { cGibdoRequirements, cfg => cfg.GameplaySettings.RandomizeGibdoRequirements },
                 { cMode, cfg => cfg.GameplaySettings.LogicMode },
                 { cItemPlacement, cfg => cfg.GameplaySettings.ItemPlacement },
 
@@ -190,6 +181,7 @@ namespace MMR.UI.Forms
                 { cFasterBank, cfg => cfg.GameplaySettings.SpeedupBank },
                 { cDoubleArcheryRewards, cfg => cfg.GameplaySettings.DoubleArcheryRewards },
                 { cSpeedupBabyCucco, cfg => cfg.GameplaySettings.SpeedupBabyCuccos },
+                { nRequiredZoraEggs, cfg => cfg.GameplaySettings.RequiredZoraEggs },
                 { cFastPush, cfg => cfg.GameplaySettings.FastPush },
                 { cFreestanding, cfg => cfg.GameplaySettings.UpdateWorldModels },
                 { cArrowCycling, cfg => cfg.GameplaySettings.ArrowCycling },
@@ -203,8 +195,10 @@ namespace MMR.UI.Forms
                 { cInvisSparkle, cfg => cfg.GameplaySettings.HiddenRupeesSparkle },
                 { cSaferGlitches, cfg => cfg.GameplaySettings.SaferGlitches },
                 { cAddBombchuDrops, cfg => cfg.GameplaySettings.BombchuDrops },
+                { cAddKegDrops, cfg => cfg.GameplaySettings.KegDrops },
                 { cFairyMaskShimmer, cfg => cfg.GameplaySettings.FairyMaskShimmer },
                 { cSkulltulaTokenSounds, cfg => cfg.GameplaySettings.SkulltulaTokenSounds },
+                { cMinorDropSparkle, cfg => cfg.GameplaySettings.MinorDropSparkle },
                 { nMaxGossipWotH, cfg => cfg.GameplaySettings.OverrideNumberOfRequiredGossipHints },
                 { nMaxGossipFoolish, cfg => cfg.GameplaySettings.OverrideNumberOfNonRequiredGossipHints },
                 { nMaxGossipCT, cfg => cfg.GameplaySettings.OverrideMaxNumberOfClockTownGossipHints },
@@ -229,6 +223,12 @@ namespace MMR.UI.Forms
                 { cBombTrapTunicColors, cfg => cfg.CosmeticSettings.BombTrapsRandomizeTunicColor },
                 { cRainbowTunic, cfg => cfg.CosmeticSettings.RainbowTunic },
                 { cCameraStyle, cfg => cfg.CosmeticSettings.CameraStyle },
+
+                // actor
+                { cActorMode, cfg => cfg.GameplaySettings.ActorMode},
+                { cFormItemRestrictionUnlock, cfg => cfg.GameplaySettings.FormsItemRestrictionUnlocked},
+                { cLocationItemRestrictionUnlock, cfg => cfg.GameplaySettings.LocationsItemRestrictionUnlocked},
+                { cFasterCommonFileLoad, cfg => cfg.GameplaySettings.FasterCommonFileLoad},
             };
 
             foreach (var (control, expression) in simpleControls)
@@ -238,10 +238,10 @@ namespace MMR.UI.Forms
                 {
                     body = ((UnaryExpression)body).Operand;
                 }
-                var memberExpression = body as MemberExpression;
-                if (memberExpression != null)
+                var memberInfo = (body as MemberExpression)?.Member;
+                if (memberInfo != null)
                 {
-                    var description = memberExpression.Member.GetCustomAttribute<DescriptionAttribute>()?.Description;
+                    var description = memberInfo.GetCustomAttribute<DescriptionAttribute>()?.Description;
                     if (description != null)
                     {
                         TooltipBuilder.SetTooltip(control, description);
@@ -280,6 +280,20 @@ namespace MMR.UI.Forms
                     var newValueParameter = Expression.Parameter(typeof(decimal), "newValue");
                     var assignExpression = Expression.Assign(body, Expression.Convert(newValueParameter, body.Type));
                     var func = Expression.Lambda<Action<Configuration, decimal>>(assignExpression, expression.Parameters[0], newValueParameter).Compile();
+                    var rangeAttribute = memberInfo.GetAttribute<RangeAttribute>();
+                    if (rangeAttribute != null)
+                    {
+                        var minimum = (rangeAttribute.Minimum as double?) ?? (rangeAttribute.Minimum as int?);
+                        if (minimum.HasValue)
+                        {
+                            numericUpDown.Minimum = (decimal)minimum.Value;
+                        }
+                        var maximum = (rangeAttribute.Maximum as double?) ?? (rangeAttribute.Maximum as int?);
+                        if (maximum.HasValue)
+                        {
+                            numericUpDown.Maximum = (decimal)maximum.Value;
+                        }
+                    }
 
                     numericUpDown.ValueChanged += (object sender, EventArgs e) =>
                     {
@@ -350,6 +364,10 @@ namespace MMR.UI.Forms
                 { cTakeDamageGettingCaught, (typeof(GameplaySettings), nameof(GameplaySettings.TakeDamageGettingCaught))},
                 { cTakeDamageFromDog, (typeof(GameplaySettings), nameof(GameplaySettings.TakeDamageFromDog))},
                 { cTakeDamageFromDexihands, (typeof(GameplaySettings), nameof(GameplaySettings.TakeDamageFromDexihands))},
+                // actor
+                { cFormItemRestrictionUnlock, (typeof(GameplaySettings), nameof(GameplaySettings.FormsItemRestrictionUnlocked)) },
+                { cLocationItemRestrictionUnlock, (typeof(GameplaySettings), nameof(GameplaySettings.LocationsItemRestrictionUnlocked)) },
+                { cFasterCommonFileLoad, (typeof(GameplaySettings), nameof(GameplaySettings.FasterCommonFileLoad)) },
 
             };
 
@@ -377,8 +395,6 @@ namespace MMR.UI.Forms
             cHUDMagicComboBox.SelectedIndex = 0;
         }
 
-        Regex addSpacesRegex = new Regex("(?<!^)([A-Z])");
-
         private void InitializeTrapSettings()
         {
             var initialX = 7;
@@ -400,7 +416,7 @@ namespace MMR.UI.Forms
                     continue;
                 }
 
-                var labelText = addSpacesRegex.Replace(trapType.ToString(), " $1");
+                var labelText = trapType.ToString().AddSpaces();
 
                 var label = new Label
                 {
@@ -454,6 +470,8 @@ namespace MMR.UI.Forms
         private void InitializeDungeonModeSettings()
         {
             var properties = new List<PropertyInfo>();
+            properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.EnemyMode)));
+            properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.EntranceMode)));
             properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.VictoryMode)));
             properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.PriceMode)));
             properties.Add(typeof(GameplaySettings).GetProperty(nameof(GameplaySettings.BossRemainsMode)));
@@ -489,7 +507,7 @@ namespace MMR.UI.Forms
                     {
                         Tag = value,
                         Name = "cDungeonMode_" + value.ToString(),
-                        Text = addSpacesRegex.Replace(value.ToString(), " $1"),
+                        Text = value.ToString().AddSpaces(),
                         Location = new Point(currentX, currentY),
                         Size = new Size(width, height),
                     };
@@ -556,7 +574,7 @@ namespace MMR.UI.Forms
                 var checkbox = new InvertIndeterminateCheckBox();
                 var items = itemsByClassicCategory[classicCategory];
                 checkbox.Tag = items;
-                checkbox.Text = $"{addSpacesRegex.Replace(classicCategory.ToString(), " $1")}: +{items.Count}";
+                checkbox.Text = $"{classicCategory.ToString().AddSpaces()}: +{items.Count}";
                 var description = classicCategory.GetAttribute<DescriptionAttribute>()?.Description;
                 if (description != null)
                 {
@@ -588,9 +606,9 @@ namespace MMR.UI.Forms
             var locationCategoryLabel = new LocationCategoryLabel();
             locationCategoryLabel.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
             locationCategoryLabel.Location = new Point(locationCategoriesX + 24, 0);
-            locationCategoryLabel.Width = 714;
+            locationCategoryLabel.Width = 740;
             locationCategoryLabel.Height = 105;
-            locationCategoryLabel.Lines = Enum.GetValues<LocationCategory>().Where(c => c > 0).Select(c => $"{addSpacesRegex.Replace(c.ToString(), " $1")}: +{itemsByLocationCategory[c].Count}").ToList();
+            locationCategoryLabel.Lines = Enum.GetValues<LocationCategory>().Where(c => c > 0).Select(c => $"{c.ToString().AddSpaces()}: +{itemsByLocationCategory[c].Count}").ToList();
 
             pLocationCategories.Controls.Add(locationCategoryLabel);
 
@@ -645,7 +663,7 @@ namespace MMR.UI.Forms
                         checkbox = new InvertIndeterminateCheckBox();
                         var items = itemsByItemCategory[itemCategory];
                         checkbox.Tag = items;
-                        checkbox.Text = $"{addSpacesRegex.Replace(itemCategory.ToString(), " $1")}: +{items.Count}";
+                        checkbox.Text = $"{itemCategory.ToString().AddSpaces()}: +{items.Count}";
                         checkbox.CheckAlign = ContentAlignment.MiddleRight;
                         checkbox.TextAlign = ContentAlignment.MiddleRight;
                         checkbox.Width = 148;
@@ -764,7 +782,7 @@ namespace MMR.UI.Forms
                 var tabPage = new TabPage
                 {
                     Tag = shortenCutsceneGroup,
-                    Text = addSpacesRegex.Replace(shortenCutsceneGroup.Name, " $1"),
+                    Text = shortenCutsceneGroup.Name.AddSpaces(),
                     UseVisualStyleBackColor = true,
                 };
                 tShortenCutscenes.TabPages.Add(tabPage);
@@ -787,7 +805,7 @@ namespace MMR.UI.Forms
                     {
                         Tag = value,
                         Name = "cShortenCutscene_" + value.ToString(),
-                        Text = addSpacesRegex.Replace(value.ToString(), " $1"),
+                        Text = value.ToString().AddSpaces(),
                         Location = new Point(currentX, currentY),
                         Size = new Size(width, height),
                     };
@@ -806,6 +824,11 @@ namespace MMR.UI.Forms
                     }
                 }
             }
+        }
+
+        private void InitalizeActorizerOptions()
+        {
+            // todo
         }
 
         private void InitalizeLowHealthSFXOptions()
@@ -830,6 +853,22 @@ namespace MMR.UI.Forms
             UpdateSingleSetting(() => propertyInfo.SetValue(_configuration.GameplaySettings.ShortenCutsceneSettings, newValue));
         }
 
+        private void cHyperEnemies_CheckedChanged(object sender, EventArgs e)
+        {
+            // EnemyMode was turned into a bit field, for now just do this
+            var checkBox = (CheckBox)sender;
+            if (checkBox.Checked)
+            {
+                _configuration.GameplaySettings.EnemyMode = EnemyMode.Hyper;
+            }
+            else
+            {
+                _configuration.GameplaySettings.EnemyMode = EnemyMode.Default;
+            }
+
+            UpdateSingleSetting(null);
+        }
+
         private void InitializeTransformationFormSettings()
         {
             foreach (var form in Enum.GetValues<TransformationForm>())
@@ -837,7 +876,7 @@ namespace MMR.UI.Forms
                 var tabPage = new TabPage
                 {
                     Tag = form,
-                    Text = addSpacesRegex.Replace(form.ToString(), " $1"),
+                    Text = form.ToString().AddSpaces(),
                     UseVisualStyleBackColor = true,
                 };
                 var bTunic = CreateTunicColorButton(form);
@@ -1022,7 +1061,7 @@ namespace MMR.UI.Forms
 
         private ComboBox CreateInstrumentComboBox(TransformationForm transformationForm)
         {
-            var data = Enum.GetValues(typeof(Instrument)).Cast<Instrument>().ToDictionary(x => x, x => addSpacesRegex.Replace(x.ToString() + (x == transformationForm.DefaultInstrument() ? " *" : ""), " $1"));
+            var data = Enum.GetValues(typeof(Instrument)).Cast<Instrument>().ToDictionary(x => x, x => x.ToString() + (x == transformationForm.DefaultInstrument() ? " *" : "").AddSpaces());
             var comboBox = new ComboBox
             {
                 Tag = transformationForm,
@@ -1391,10 +1430,8 @@ namespace MMR.UI.Forms
             cItemPlacement.SelectedIndex = (int)_configuration.GameplaySettings.ItemPlacement;
             cMixSongs.Checked = _configuration.GameplaySettings.AddSongs;
             cProgressiveUpgrades.Checked = _configuration.GameplaySettings.ProgressiveUpgrades;
-            cDEnt.Checked = _configuration.GameplaySettings.RandomizeDungeonEntrances;
-            cShuffleBosses.Checked = _configuration.GameplaySettings.RandomizeBossRooms;
             cSFX.Checked = _configuration.CosmeticSettings.RandomizeSounds;
-            cEnemy.Checked = _configuration.GameplaySettings.RandomizeEnemies;
+            cGibdoRequirements.Checked = _configuration.GameplaySettings.RandomizeGibdoRequirements;
             if (_configuration.GameplaySettings.ShortenCutsceneSettings == null)
             {
                 _configuration.GameplaySettings.ShortenCutsceneSettings = new ShortenCutsceneSettings();
@@ -1477,7 +1514,10 @@ namespace MMR.UI.Forms
             cDoubleArcheryRewards.Checked = _configuration.GameplaySettings.DoubleArcheryRewards;
             cSpeedupBabyCucco.Checked = _configuration.GameplaySettings.SpeedupBabyCuccos;
             cGiantMaskAnywhere.Checked = _configuration.GameplaySettings.GiantMaskAnywhere;
-
+            nRequiredZoraEggs.Value = _configuration.GameplaySettings.RequiredZoraEggs;
+            cFormItemRestrictionUnlock.Checked = _configuration.GameplaySettings.FormsItemRestrictionUnlocked;
+            cLocationItemRestrictionUnlock.Checked = _configuration.GameplaySettings.LocationsItemRestrictionUnlocked;
+            cFasterCommonFileLoad.Checked = _configuration.GameplaySettings.FasterCommonFileLoad;
             cDMult.SelectedIndex = (int)_configuration.GameplaySettings.DamageMode;
             cDeathMode.SelectedIndex = (int)_configuration.GameplaySettings.DeathMode;
             cDType.SelectedIndex = (int)_configuration.GameplaySettings.DamageEffect;
@@ -1485,6 +1525,8 @@ namespace MMR.UI.Forms
             cLink.SelectedIndex = (int)_configuration.GameplaySettings.Character;
             cTatl.SelectedIndex = (int)_configuration.CosmeticSettings.TatlColorSchema;
             cCameraStyle.SelectedIndex = (int)_configuration.CosmeticSettings.CameraStyle;
+            cActorMode.SelectedIndex = (int)_configuration.GameplaySettings.ActorMode;
+            
             cGravity.SelectedIndex = (int)_configuration.GameplaySettings.MovementMode;
             cLowHealthSFXComboBox.SelectedIndex = cLowHealthSFXComboBox.Items.IndexOf(_configuration.CosmeticSettings.LowHealthSFX.ToString());
             cNutAndStickDrops.SelectedIndex = (int)_configuration.GameplaySettings.NutandStickDrops;
@@ -1573,12 +1615,14 @@ namespace MMR.UI.Forms
             cInvisSparkle.Checked = _configuration.GameplaySettings.HiddenRupeesSparkle;
             cSaferGlitches.Checked = _configuration.GameplaySettings.SaferGlitches;
             cAddBombchuDrops.Checked = _configuration.GameplaySettings.BombchuDrops;
+            cAddKegDrops.Checked = _configuration.GameplaySettings.KegDrops;
             cInstantTransformations.Checked = _configuration.GameplaySettings.InstantTransform;
             cBombArrows.Checked = _configuration.GameplaySettings.BombArrows;
             cVanillaMoonTrials.Checked = _configuration.GameplaySettings.VanillaMoonTrialAccess;
             cChestGameMinimap.SelectedIndex = (int)_configuration.GameplaySettings.ChestGameMinimap;
             cFairyMaskShimmer.Checked = _configuration.GameplaySettings.FairyMaskShimmer;
             cSkulltulaTokenSounds.Checked = _configuration.GameplaySettings.SkulltulaTokenSounds;
+            cMinorDropSparkle.Checked = _configuration.GameplaySettings.MinorDropSparkle;
 
             foreach (var trapType in Enum.GetValues<TrapType>())
             {
@@ -1599,9 +1643,9 @@ namespace MMR.UI.Forms
             nMaxGaroFoolish.Value = _configuration.GameplaySettings.OverrideNumberOfNonRequiredGaroHints ?? 2;
             nMaxGaroCT.Value = _configuration.GameplaySettings.OverrideMaxNumberOfClockTownGaroHints ?? 0;
 
-            cCustomGossipWoth.Checked = _configuration.GameplaySettings.OverrideNumberOfRequiredGossipHints.HasValue
-                || _configuration.GameplaySettings.OverrideNumberOfNonRequiredGossipHints.HasValue
-                || _configuration.GameplaySettings.OverrideMaxNumberOfClockTownGossipHints.HasValue;
+            cCustomGossipWoth.Checked = _configuration.GameplaySettings.OverrideNumberOfRequiredGossipHints.HasValue;
+            // Hyper Enemies checkbox sync - simplified to only check EnemyMode.Hyper now that actorMode handles actor/enemizer
+            cHyperEnemies.Checked = _configuration.GameplaySettings.EnemyMode == EnemyMode.Hyper;
 
             cCustomGaroWoth.Checked = _configuration.GameplaySettings.OverrideNumberOfRequiredGaroHints.HasValue
                 || _configuration.GameplaySettings.OverrideNumberOfNonRequiredGaroHints.HasValue
@@ -1882,8 +1926,6 @@ namespace MMR.UI.Forms
             {
                 control.Enabled = !vanillaMode;
             }
-            cDEnt.Enabled = !vanillaMode;
-            cShuffleBosses.Enabled = !vanillaMode;
             cSpoiler.Enabled = !vanillaMode;
             cHTMLLog.Enabled = !vanillaMode;
             cGossipHints.Enabled = !vanillaMode;
@@ -1942,6 +1984,17 @@ namespace MMR.UI.Forms
             cHintImportance.Enabled = _configuration.GameplaySettings.GaroHintStyle == GossipHintStyle.Competitive || _configuration.GameplaySettings.GossipHintStyle == GossipHintStyle.Competitive;
             bCustomizeHintPriorities.Enabled = cHintImportance.Enabled;
 
+            var amount = _configuration.GameplaySettings.RandomStartingItemGroups.Sum(x => x.Amount);
+            var total = _configuration.GameplaySettings.RandomStartingItemGroups.Sum(x => x.Items.Count);
+            if (total != 0)
+            {
+                bRandomStartingItems.Text = $"+ {amount}/{total} Random Starting Item{((amount != 1 || total != 1) ? "s" : "")}";
+            }
+            else
+            {
+                bRandomStartingItems.Text = "+ Random Starting Items";
+            }
+
             tLuckRollPercentage.Enabled = _configuration.CosmeticSettings.Music == Music.Random;
 
             cQuestItemKeep.Enabled = _configuration.GameplaySettings.QuestItemStorage;
@@ -1982,13 +2035,10 @@ namespace MMR.UI.Forms
             bJunkLocationsEditor.Enabled = v;
             tJunkLocationsList.Enabled = v;
 
-            cDEnt.Enabled = v;
-            cShuffleBosses.Enabled = v;
             cStartingItems.Enabled = v;
             cRequiredBossRemains.Enabled = v;
             cMixSongs.Enabled = v;
             cProgressiveUpgrades.Enabled = v;
-            cEnemy.Enabled = v;
             cItemPlacement.Enabled = v;
 
             //bHumanTunic.Enabled = v;
@@ -2017,6 +2067,10 @@ namespace MMR.UI.Forms
             cHintImportance.Enabled = v;
 
             cCameraStyle.Enabled = v;
+            cActorMode.Enabled = v;
+            cFormItemRestrictionUnlock.Enabled = v;
+            cLocationItemRestrictionUnlock.Enabled = v;
+            cFasterCommonFileLoad.Enabled = v;
             cTargettingStyle.Enabled = v;
             cInstantPictobox.Enabled = v;
             cRainbowTunic.Enabled = v;
@@ -2058,6 +2112,7 @@ namespace MMR.UI.Forms
             cFasterBank.Enabled = v;
             cDoubleArcheryRewards.Enabled = v;
             cSpeedupBabyCucco.Enabled = v;
+            nRequiredZoraEggs.Enabled = v;
 
             cDMult.Enabled = v;
             cDeathMode.Enabled = v;
@@ -2147,7 +2202,8 @@ namespace MMR.UI.Forms
                 CosmeticSettings = new CosmeticSettings(),
             };
 
-            tSeed.Text = Math.Abs(Environment.TickCount).ToString();
+            //tSeed.Text = Math.Abs(Environment.TickCount).ToString(); // old, poor range, keeps opening with similar range seeds
+            tSeed.Text = (new Random(Environment.TickCount)).Next(2147483647).ToString();
 
             tbUserLogic.Enabled = false;
             bLoadLogic.Enabled = false;
@@ -2226,6 +2282,7 @@ namespace MMR.UI.Forms
                     tSettings.TabPages.Insert(2, tabGimmicks);
                     tSettings.TabPages.Insert(3, tabComfort);
                     tSettings.TabPages.Insert(4, tabShortenCutscenes);
+                    tSettings.TabPages.Insert(5, tabActorizer);
                 }
             }
             else
@@ -2235,6 +2292,7 @@ namespace MMR.UI.Forms
                 tSettings.TabPages.Remove(tabGimmicks);
                 tSettings.TabPages.Remove(tabComfort);
                 tSettings.TabPages.Remove(tabShortenCutscenes);
+                tSettings.TabPages.Remove(tabActorizer);
             }
 
             // Other..?
@@ -2550,6 +2608,33 @@ namespace MMR.UI.Forms
                     _configuration.GameplaySettings.OverrideHintPriorities = dialog.Result;
                     _configuration.GameplaySettings.OverrideImportanceIndicatorTiers = dialog.ResultTiersIndicateImportance;
                     _configuration.GameplaySettings.OverrideHintItemCaps = dialog.ResultTiersCap;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void bRandomStartingItems_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var dialog = new RandomStartingItemsForm(_configuration.GameplaySettings.RandomStartingItemGroups);
+                var result = dialog.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    var amount = dialog.Result.Sum(x => x.Amount);
+                    var total = dialog.Result.Sum(x => x.Items.Count);
+                    if (total != 0)
+                    {
+                        bRandomStartingItems.Text = $"+ {amount}/{total} Random Starting Item{((amount != 1 || total != 1) ? "s" : "")}";
+                    }
+                    else
+                    {
+                        bRandomStartingItems.Text = "+ Random Starting Items";
+                    }
+                    _configuration.GameplaySettings.RandomStartingItemGroups = dialog.Result;
                 }
             }
             catch (Exception ex)

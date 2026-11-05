@@ -343,7 +343,7 @@ namespace MMR.Randomizer.Extensions
 
         public static int ActorInitOffset(this Actor actor)
         {
-            return actor.GetAttribute<ActorInitVarOffsetAttribute>()?.Offset ?? -1;
+            return actor.GetAttribute<ActorProfileOffsetAttribute>()?.Offset ?? -1;
         }
 
         public static bool IsBlockingActor(this Actor actor, int variant = 0xFFFFF)
@@ -380,5 +380,6 @@ namespace MMR.Randomizer.Extensions
 
             return new List<int> { }; // non are blocking
         }
+
     }
 }

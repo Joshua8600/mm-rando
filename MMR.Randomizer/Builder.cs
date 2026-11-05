@@ -20,27 +20,32 @@ using System.Diagnostics;
 using Color = System.Drawing.Color;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using SixLabors.ImageSharp.Formats.Png;
 using System.Security.Cryptography;
 using MMR.Common.Utils;
+using MMR.Randomizer.Attributes.Gibdo;
+using MMR.Randomizer.Attributes.Entrance;
 
 namespace MMR.Randomizer
 {
     public class Builder
     {
         private RandomizedResult _randomized;
+        private GameplaySettings _gameplaySettings;
         private CosmeticSettings _cosmeticSettings;
+        private WebSettings _webSettings;
         private ExtendedObjects _extendedObjects;
         private List<MessageEntry> _extraMessages;
         private Dictionary<int, ItemGraphic> _graphicOverrides;
 
-        public Builder(RandomizedResult randomized, CosmeticSettings cosmeticSettings)
+        public Builder(RandomizedResult randomized, GameplaySettings gameplaySettings, CosmeticSettings cosmeticSettings, WebSettings webSettings = null)
         {
             _randomized = randomized;
+            _gameplaySettings = gameplaySettings;
             _cosmeticSettings = cosmeticSettings;
+            _webSettings = webSettings;
             _extendedObjects = null;
             _extraMessages = new List<MessageEntry>();
             _graphicOverrides = new Dictionary<int, ItemGraphic>();
@@ -149,8 +154,22 @@ namespace MMR.Randomizer
                 return;
             }
 
+            if (!settings.GenerateROM && !settings.OutputVC && !settings.GenerateCosmeticsPatch)
+            {
+                return;
+            }
+
             RomData.PointerizedSequences = new List<SequenceInfo>();
-            SequenceUtils.ReadSequenceInfo();
+
+            if (settings.GenerateCosmeticsPatch)
+            {
+                SequenceUtils.ReadSequenceInfo(true, _cosmeticSettings.Music == Music.Random && _webSettings != null ? _webSettings.SequencesAvailable : null);
+            }
+            else
+            {
+                SequenceUtils.ReadSequenceInfo();
+            }
+
             SequenceUtils.ReadInstrumentSetList();
             SequenceUtils.ResetFreeBankIndex();
             if (_cosmeticSettings.Music == Music.Random)
@@ -161,11 +180,15 @@ namespace MMR.Randomizer
             }
 
             ResourceUtils.ApplyHack(Resources.mods.fix_music);
-            SequenceUtils.RebuildAudioSeq(RomData.SequenceList,
-                _cosmeticSettings.AsmOptions.MusicConfig.SequenceMaskFileIndex,
-                _cosmeticSettings.AsmOptions.MusicConfig.SequenceNamesFileIndex);
-            SequenceUtils.WriteNewSoundSamples(RomData.InstrumentSetList, settings);
-            SequenceUtils.RebuildAudioBank(RomData.InstrumentSetList);
+
+            if (settings.GenerateROM || settings.OutputVC)
+            {
+                SequenceUtils.RebuildAudioSeq(RomData.SequenceList,
+                    _cosmeticSettings.AsmOptions.MusicConfig.SequenceMaskFileIndex,
+                    _cosmeticSettings.AsmOptions.MusicConfig.SequenceNamesFileIndex);
+                SequenceUtils.WriteNewSoundSamples(RomData.InstrumentSetList, settings);
+                SequenceUtils.RebuildAudioBank(RomData.InstrumentSetList);
+            }
         }
 
         private void WriteMuteMusic()
@@ -173,8 +196,12 @@ namespace MMR.Randomizer
             if (_cosmeticSettings.Music == Music.None)
             {
                 /// mute all music by setting their master volume to zero
+
+                SequenceUtils.muteMusic = true;
+
                 // Traverse the audioseq index table to get the locations of all sequences
                 // the audioseq index table is not its own file, its buried within the code file, we need the offset to the table
+
                 var codeFile = RomData.MMFileList[RomUtils.GetFileIndexForWriting(Addresses.SeqTable)];
                 var audioseqIndexTable = codeFile.Data;
                 int audioseqIndexTableAddr = Addresses.SeqTable - codeFile.Addr;
@@ -553,7 +580,7 @@ namespace MMR.Randomizer
             );
         }
 
-        private void WriteMoonChildDenialTextAndHack(MessageTable table)
+        private void WriteMoonChildDenialText(MessageTable table)
         {
             table.UpdateMessages(new MessageEntryBuilder()
                 .Id(0x21FD)
@@ -574,13 +601,18 @@ namespace MMR.Randomizer
                 })
                 .Build()
             );
+        }
 
+        private void WriteMoonChildDenialHack()
+        {
             RomUtils.CheckCompressed(1501); // The Moon - Room 00
             var data = RomData.MMFileList[1501].Data.ToList();
             data.RemoveRange(0x194, 4); // Reduce end padding from actor list. 8 bytes remaining
             data.InsertRange(0x44, new byte[] { 0x01, 0xBE, 0x00, 0x00 }); // Add extra objects
             data[0x29] += 1; // Increase object count by 1. 1 object slot remaining before needing to increase available space.
             data[0x37] += 4; // Add 4 to the actor list address
+            var room = RomData.SceneList.SelectMany(scene => scene.Setups).SelectMany(setup => setup.Rooms).Single(room => room.File == 1501);
+            room.ActorListAddress += 4;
             RomData.MMFileList[1501].Data = data.ToArray();
 
             ResourceUtils.ApplyHack(Resources.mods.fix_object_stk2_zbuffer);
@@ -944,49 +976,44 @@ namespace MMR.Randomizer
             }
         }
 
-        private void WriteDungeons()
+        private void WriteEntrances()
         {
             if (_randomized.Settings.LogicMode == LogicMode.Vanilla)
             {
                 return;
             }
 
-            if (!_randomized.Settings.RandomizeDungeonEntrances && !_randomized.Settings.RandomizeBossRooms)
+            if (_randomized.Settings.EntranceMode == EntranceMode.Default)
             {
                 return;
             }
 
-            SceneUtils.ReadSceneTable();
-            SceneUtils.GetMaps();
-
             var entrances = new List<Item>();
-            if (_randomized.Settings.RandomizeDungeonEntrances)
+            if (_randomized.Settings.EntranceMode.HasFlag(EntranceMode.DungeonEntrances))
             {
-                entrances.Add(Item.AreaWoodFallTempleAccess);
-                entrances.Add(Item.AreaWoodFallTempleClear);
-                entrances.Add(Item.AreaSnowheadTempleAccess);
-                entrances.Add(Item.AreaSnowheadTempleClear);
-                entrances.Add(Item.AreaGreatBayTempleAccess);
-                entrances.Add(Item.AreaGreatBayTempleClear);
-                entrances.Add(Item.AreaInvertedStoneTowerTempleAccess);
-                entrances.Add(Item.AreaStoneTowerClear);
+                entrances.AddRange(Enum.GetValues<Item>().Where(item => item.EntranceType() == EntranceType.Dungeon));
+                entrances.AddRange(Enum.GetValues<Item>().Where(item => item.EntranceType() == EntranceType.DungeonExit));
             }
-            if (_randomized.Settings.RandomizeBossRooms)
+            if (_randomized.Settings.EntranceMode.HasFlag(EntranceMode.BossRooms))
             {
-                entrances.Add(Item.AreaWoodFallTempleClear);
-                entrances.Add(Item.AreaSnowheadTempleClear);
-                entrances.Add(Item.AreaGreatBayTempleClear);
-                entrances.Add(Item.AreaStoneTowerClear);
-                entrances.Add(Item.AreaOdolwasLair);
-                entrances.Add(Item.AreaGohtsLair);
-                entrances.Add(Item.AreaGyorgsLair);
-                entrances.Add(Item.AreaTwinmoldsLair);
+                entrances.AddRange(Enum.GetValues<Item>().Where(item => item.EntranceType() == EntranceType.Boss));
+                entrances.AddRange(Enum.GetValues<Item>().Where(item => item.EntranceType() == EntranceType.DungeonExit));
             }
+            if (_randomized.Settings.EntranceMode.HasFlag(EntranceMode.Grottos))
+            {
+                entrances.AddRange(Enum.GetValues<Item>().Where(item => item.EntranceType() == EntranceType.Grotto));
+                ReadWriteUtils.WriteU16ToROM(0xD5A95A, Entrance.EntranceGrottoDekuPlayground.SpawnId().Value); // Replace a JP grotto entrance with deku playground.
+            }
+            if (_randomized.Settings.EntranceMode.HasFlag(EntranceMode.SimpleInteriors))
+            {
+                entrances.AddRange(Enum.GetValues<Item>().Where(item => item.EntranceType() == EntranceType.Interior));
+            }
+
 
             foreach (var entrance in entrances.Distinct())
             {
-                var newSpawns = entrance.DungeonEntrances();
-                var exits = _randomized.ItemList[entrance].NewLocation.Value.DungeonEntrances();
+                var newSpawns = entrance.Entrances();
+                var exits = _randomized.ItemList[entrance].NewLocation.Value.Entrances();
 
                 var mainExit = exits[0];
                 var mainSpawn = newSpawns[0];
@@ -1000,6 +1027,11 @@ namespace MMR.Randomizer
 
                     EntranceSwapUtils.WriteNewEntrance(pairExit, pairSpawn);
                 }
+            }
+
+            if (!_randomized.Settings.EntranceMode.HasFlag(EntranceMode.DungeonEntrances) && !_randomized.Settings.EntranceMode.HasFlag(EntranceMode.BossRooms))
+            {
+                return;
             }
 
             var clears = new List<Item>
@@ -1043,7 +1075,7 @@ namespace MMR.Randomizer
                     (byte)(Values.DCFlagMasks[newIndex] & 0xFF) });
             }
 
-            if (_randomized.Settings.RandomizeBossRooms)
+            if (_randomized.Settings.EntranceMode.HasFlag(EntranceMode.BossRooms))
             {
                 var bosses = new List<Item>
                 {
@@ -1104,21 +1136,29 @@ namespace MMR.Randomizer
                     var palette = paletteDict.Keys.ToArray();
                     var ci8 = bossDoorTexturePixels.Select(pix => (byte)Array.IndexOf(palette, pix)).ToArray();
 
+                    var sceneFileAddr = 0x020CF000;
+
                     // STT Room 8
                     ReadWriteUtils.WriteToROM(0x0211D000 + 0x4428, ci8);
                     var f = RomUtils.GetFileIndexForWriting(0x0211D000);
-                    ReadWriteUtils.Arr_Insert(new byte[] { 0x03, 0x00, 0x4C, 0x40 }, 0, 4, RomData.MMFileList[f].Data, 0x3D4);
+                    ReadWriteUtils.Arr_Insert(new byte[] { 0x03, 0x00, 0x4C, 0x50 }, 0, 4, RomData.MMFileList[f].Data, 0x3D4);
                     var data = RomData.MMFileList[f].Data.ToList();
-                    data.InsertRange(0x4C40, palette.SelectMany(s => new byte[] { (byte)(s >> 8), (byte)(s & 0xFF) }));
+                    data.InsertRange(0x4C50, palette.SelectMany(s => new byte[] { (byte)(s >> 8), (byte)(s & 0xFF) }));
                     RomData.MMFileList[f].Data = data.ToArray();
+                    RomData.MMFileList[f].End = RomData.MMFileList[f].Addr + RomData.MMFileList[f].Data.Length;
+
+                    ReadWriteUtils.WriteU32ToROM(sceneFileAddr + 0x178 + 8 * 8 + 4, (uint)RomData.MMFileList[f].End);
 
                     // STT Room 10
                     ReadWriteUtils.WriteToROM(0x0212B000 + 0x4220, ci8);
                     f = RomUtils.GetFileIndexForWriting(0x0212B000);
-                    ReadWriteUtils.Arr_Insert(new byte[] { 0x03, 0x00, 0x4A, 0x20 }, 0, 4, RomData.MMFileList[f].Data, 0x2434);
+                    ReadWriteUtils.Arr_Insert(new byte[] { 0x03, 0x00, 0x4A, 0x30 }, 0, 4, RomData.MMFileList[f].Data, 0x2434);
                     data = RomData.MMFileList[f].Data.ToList();
-                    data.InsertRange(0x4A20, palette.SelectMany(s => new byte[] { (byte)(s >> 8), (byte)(s & 0xFF) }));
+                    data.InsertRange(0x4A30, palette.SelectMany(s => new byte[] { (byte)(s >> 8), (byte)(s & 0xFF) }));
                     RomData.MMFileList[f].Data = data.ToArray();
+                    RomData.MMFileList[f].End = RomData.MMFileList[f].Addr + RomData.MMFileList[f].Data.Length;
+
+                    ReadWriteUtils.WriteU32ToROM(sceneFileAddr + 0x178 + 8 * 10 + 4, (uint)RomData.MMFileList[f].End);
                 }
             }
         }
@@ -1243,13 +1283,13 @@ namespace MMR.Randomizer
             int damageMultiplier = (int)_randomized.Settings.DamageMode;
             if (damageMultiplier > 0)
             {
-                ResourceUtils.ApplyIndexedHack(damageMultiplier-1, Resources.mods.dm_1, Resources.mods.dm_2, Resources.mods.dm_3, Resources.mods.dm_4);
+                ResourceUtils.ApplyIndexedHack(damageMultiplier-1, Resources.mods.dm_1, Resources.mods.dm_2, Resources.mods.dm_8x, Resources.mods.dm_3, Resources.asm.DamageModeDoom);
             }
 
             int deathMode = (int)_randomized.Settings.DeathMode;
             if (deathMode > 0)
             {
-                ResourceUtils.ApplyIndexedHack(deathMode - 1, Resources.mods.death_moon_crash, Resources.mods.death_reduces_max_hearts);
+                ResourceUtils.ApplyIndexedHack(deathMode - 1, Resources.asm.DeathMoonCrash, Resources.mods.death_reduces_max_hearts);
             }
 
             int damageEffect = (int)_randomized.Settings.DamageEffect;
@@ -1329,6 +1369,13 @@ namespace MMR.Randomizer
             {
                 ResourceUtils.ApplyHack(Resources.mods.fix_moon_trial_access);
             }
+
+            /// return MM swimming on B button mash to OOT levels
+            RomUtils.CheckCompressed(38);
+            var playerData = RomData.MMFileList[38].Data;
+            // weirdly, if you use 6.0 the animation glitches? non-devisible value maybe? 10.0 messes with the water ripples somehow and is not faster
+            ReadWriteUtils.Arr_WriteU16(playerData, 0x19D94 + 2, 0x40A0); // change the float 4020 (2.5f) to 40A0 (5.0f)
+
         }
 
         private void WriteSunsSong(MessageTable messageTable)
@@ -1464,6 +1511,32 @@ namespace MMR.Randomizer
                 }
             }
 
+            #if DEBUG
+            // testing SFX
+            var debugSFX = SoundEffect.SwordForgeClang;
+            Debug.WriteLine(debugSFX.ToString() + " is a debug sfx");
+            // intro splash summon used to be used, not sure what I named it
+            //shuffledSoundEffects[SoundEffect.CuccoMorning] = debugSFX; // morning chicken crow
+            ////shuffledSoundEffects[replacableSounds[29]] = debugSFX; // low health beep, was moved cannot set here
+            //shuffledSoundEffects[SoundEffect.FileSelectCursor] = debugSFX;
+            //shuffledSoundEffects[SoundEffect.DogBark] = debugSFX; // dog
+            //shuffledSoundEffects[SoundEffect.ChuchuJumpAttack] = debugSFX; // this one is sometimes quiet for sfx, reason not known yet
+            // LOOPING TEST
+            //shuffledSoundEffects[SoundEffect.KotakeSleepSnore] = debugSFX;
+            //shuffledSoundEffects[SoundEffect.DodongoInhale] = debugSFX;
+
+            // modify sct entrance list so the tower takes me to kotake for loop testing
+            /*
+            RomUtils.CheckCompressed(1516);
+            ushort targetTestEntrance = 0x0400; // potion shop
+            var sct = RomData.MMFileList[1516].Data;// GameObjects.Scene.SouthClockTown.FileID());
+            // sct has three separate exit lists, for different scene layers, 0xC10 tower entrance is first entry of all of them
+            ReadWriteUtils.Arr_WriteU16(sct, 0x0184, targetTestEntrance);
+            ReadWriteUtils.Arr_WriteU16(sct, 0x564C, targetTestEntrance);
+            ReadWriteUtils.Arr_WriteU16(sct, 0x69DC, targetTestEntrance);
+            // */
+            #endif
+
             shuffledSoundEffects.Remove(SoundEffect.LowHealthBeep); // handled in the WriteLowHealthSound function
 
             foreach (var sounds in shuffledSoundEffects)
@@ -1476,6 +1549,9 @@ namespace MMR.Randomizer
                 Debug.WriteLine($"Writing SFX {newSound} --> {oldSound}");
             }
 
+
+
+            // Sound effects can be encoded directly into text, apply
             messageTable.ApplyRandomSoundEffects(shuffledSoundEffects);
 
             MessageTable.WriteDefault(messageTable, false);
@@ -1514,7 +1590,7 @@ namespace MMR.Randomizer
         private void ReadEnemies(OutputSettings outputSettings)
         {
             // split from WriteEnemies because some work needs to happen before itemizer actor fixes
-            if (_randomized.Settings.RandomizeEnemies)
+            if (_randomized.Settings.ActorMode != ActorMode.Default)
             {
                 Enemies.ReadActors(outputSettings, _cosmeticSettings, _randomized);
             }
@@ -1522,11 +1598,23 @@ namespace MMR.Randomizer
 
         private void WriteEnemies()
         {
-            if (_randomized.Settings.RandomizeEnemies)
+            //if (_randomized.Settings.EnemyMode.HasFlag(EnemyMode.Randomized))
+            if (_randomized.Settings.ActorMode != ActorMode.Default)
             {
                 Enemies.ShuffleEnemies();
 
-                Enemies.UpdateActorOverlayTable();
+                Enemizer.ActorInjection.UpdateActorOverlayTable();
+            }
+
+            // should probably be in a better place, but for now this is actorizer branch only, this is a safe place to not merge conflict
+            if (_randomized.Settings.LocationsItemRestrictionUnlocked)
+            {
+                Enemies.DisableAllLocationRestrictions();
+            }
+
+            if (_randomized.Settings.LocationsItemRestrictionUnlocked)
+            { 
+                Enemies.EnableAllFormItems(); // let players use items in odd places to fight new nemanies
             }
         }
 
@@ -1592,6 +1680,11 @@ namespace MMR.Randomizer
                 itemList.AddRange(_randomized.BlitzExtraItems);
             }
 
+            if (_randomized.RandomStartingItems != null)
+            {
+                itemList.AddRange(_randomized.RandomStartingItems);
+            }
+
             itemList = itemList.Distinct().ToList();
 
             itemList.Add(Item.StartingHeartContainer1);
@@ -1619,6 +1712,8 @@ namespace MMR.Randomizer
                 .ToList();
 
             _randomized.Settings.AsmOptions.MMRConfig.ExtraStartingMaps = TingleMap.None;
+            _randomized.Settings.AsmOptions.MMRConfig.ExtraStartingSwampSkullTokens = 0;
+            _randomized.Settings.AsmOptions.MMRConfig.ExtraStartingOceanSkullTokens = 0;
             _randomized.Settings.AsmOptions.MMRConfig.ExtraStartingItemIds.Clear();
             foreach (var item in itemList)
             {
@@ -1626,6 +1721,22 @@ namespace MMR.Randomizer
                 if (startingTingleMap != null)
                 {
                     _randomized.Settings.AsmOptions.MMRConfig.ExtraStartingMaps |= startingTingleMap.TingleMap;
+                    continue;
+                }
+                if (item.HasAttribute<StartingItemSkullAttribute>())
+                {
+                    if (ItemUtils.OceanSkulltulaTokens().Contains(item))
+                    {
+                        _randomized.Settings.AsmOptions.MMRConfig.ExtraStartingOceanSkullTokens++;
+                    }
+                    else if (ItemUtils.SwampSkulltulaTokens().Contains(item))
+                    {
+                        _randomized.Settings.AsmOptions.MMRConfig.ExtraStartingSwampSkullTokens++;
+                    }
+                    else
+                    {
+                        throw new Exception($@"Invalid {nameof(StartingItemSkullAttribute)} for item ""{item}""");
+                    }
                     continue;
                 }
                 if (item.HasAttribute<StartingItemIdAttribute>())
@@ -1667,6 +1778,7 @@ namespace MMR.Randomizer
         private void WriteMiscHacks()
         {
             var hacks = new List<byte[]>();
+            var moreHacks = new List<(uint address, byte[] data)>();
 
             if (_randomized.Settings.SmallKeyMode.HasFlag(SmallKeyMode.DoorsOpen))
             {
@@ -1754,6 +1866,16 @@ namespace MMR.Randomizer
                 hacks.Add(hack);
             }
 
+            if (_randomized.Settings.RequiredZoraEggs < 7)
+            {
+                byte numBaselineEggs = (byte)(7 - _randomized.Settings.RequiredZoraEggs);
+                ushort incrementCorrection = (ushort)(1 - numBaselineEggs);
+                hacks.Add(Resources.asm.ZoraEgg);
+                var zoraEggSymbols = Symbols.FromJSON(Resources.asm.ZoraEgg_symbols);
+                moreHacks.Add((zoraEggSymbols["ZORA_EGG_BASELINE_ADD"] + 3, new byte[] { numBaselineEggs }));
+                moreHacks.Add((zoraEggSymbols["ZORA_EGG_BASELINE_SUBTRACT"] + 2, ConvertUtils.UShortToBytes(incrementCorrection)));
+            }
+
             if (_randomized.Settings.TakeDamageWhileShielding)
             {
                 hacks.Add(Resources.mods.take_damage_while_shielding);
@@ -1796,10 +1918,12 @@ namespace MMR.Randomizer
 
             foreach (var hack in hacks)
             {
-                if (hack != null)
-                {
-                    ResourceUtils.ApplyHack(hack);
-                }
+                ResourceUtils.ApplyHack(hack);
+            }
+
+            foreach (var hack in moreHacks)
+            {
+                ReadWriteUtils.WriteToROM((int)hack.address, hack.data);
             }
         }
 
@@ -3290,6 +3414,195 @@ namespace MMR.Randomizer
             }
         }
 
+        private void WriteVictoryConditionText(List<MessageEntry> newMessages)
+        {
+            var flavorTexts = new List<string>();
+            var settingVictoryMode = _randomized.Settings.VictoryMode;
+            if (settingVictoryMode.HasFlag(VictoryMode.FourBossRemains))
+            {
+                settingVictoryMode &= ~(VictoryMode.OneBossRemains | VictoryMode.TwoBossRemains | VictoryMode.ThreeBossRemains);
+            }
+            else if (settingVictoryMode.HasFlag(VictoryMode.ThreeBossRemains))
+            {
+                settingVictoryMode &= ~(VictoryMode.OneBossRemains | VictoryMode.TwoBossRemains);
+            }
+            else if (settingVictoryMode.HasFlag(VictoryMode.TwoBossRemains))
+            {
+                settingVictoryMode &= ~(VictoryMode.OneBossRemains);
+            }
+            foreach (var victoryMode in Enum.GetValues<VictoryMode>())
+            {
+                if (settingVictoryMode.HasFlag(victoryMode))
+                {
+                    var flavorTextAttribute = victoryMode.GetAttribute<VictoryModeFlavorTextAttribute>();
+                    if (flavorTextAttribute == null)
+                    {
+                        continue;
+                    }
+
+                    flavorTexts.Add(flavorTextAttribute.Text);
+                }
+            }
+            if (flavorTexts.Any())
+            {
+                var flavorTexts2 = flavorTexts.ToList();
+                if (!settingVictoryMode.HasFlag(VictoryMode.DirectToCredits))
+                {
+                    flavorTexts.Add("get [RED]Majora's Mask[WHITE] back");
+                    flavorTexts2.Add("recover [RED]Majora's Mask[WHITE]");
+                }
+                var flavorTextsPast = flavorTexts2.Select(text => text
+                    .Replace("recover", "recovered")
+                    .Replace("gather", "gathered")
+                    .Replace("collect", "collected")
+                    .Replace("maximize", "maximized")
+                    .Replace("find", "found")
+                ).ToList();
+                newMessages.Add(new MessageEntryBuilder()
+                    .Id(0x1FC9)
+                    .Message(it =>
+                    {
+                        it.CompileTimeWrap(wrapped =>
+                        {
+                            wrapped.Text("Were you able to ");
+                            for (var i = 0; i < flavorTexts.Count; i++)
+                            {
+                                var text = flavorTexts[i].Replace("[RED]", TextCommands.ColorRed.ToString()).Replace("[WHITE]", TextCommands.ColorWhite.ToString());
+                                wrapped.Text(text);
+                                if (i < flavorTexts.Count - 2)
+                                {
+                                    wrapped.Text(", ");
+                                }
+                                else if (i < flavorTexts.Count - 1)
+                                {
+                                    wrapped.Text(" and ");
+                                }
+                            }
+                            wrapped.Text("?");
+                        })
+                        .DisableTextSkip2()
+                        .EndFinalTextBox();
+                    })
+                    .Build()
+                );
+                newMessages.Add(new MessageEntryBuilder()
+                    .Id(0x1FCA)
+                    .Message(it =>
+                    {
+                        it.QuickText(() => it.Text("You still haven't done it!"))
+                        .EndTextBox()
+                        .Text("I keep telling you that if you don't").NewLine()
+                        .Text("get it done soon, terrible things").NewLine()
+                        .Text("will happen!!!")
+                        .DisableTextSkip2()
+                        .EndFinalTextBox();
+                    })
+                    .Build()
+                );
+                newMessages.Add(new MessageEntryBuilder()
+                    .Id(0x1FCD)
+                    .Message(it =>
+                    {
+                        it.CompileTimeWrap((wrapped) =>
+                        {
+                            wrapped.Text("You'll do fine. Surely you will be able to ");
+                            for (var i = 0; i < flavorTexts2.Count; i++)
+                            {
+                                var text = flavorTexts2[i].Replace("[RED]", TextCommands.ColorRed.ToString()).Replace("[WHITE]", TextCommands.ColorWhite.ToString());
+                                wrapped.Text(text);
+                                if (i < flavorTexts2.Count - 2)
+                                {
+                                    wrapped.Text(", ");
+                                }
+                                else if (i < flavorTexts2.Count - 1)
+                                {
+                                    wrapped.Text(" and ");
+                                }
+                            }
+                            wrapped.Text(".");
+                        })
+                        .EndTextBox()
+                        .Text("Only ").Red("\xE7 ").Text("remain.").NewLine()
+                        .Text("But time is not eternal.").NewLine()
+                        .Text("Please make the most of your").NewLine()
+                        .Text("time.")
+                        .EndTextBox()
+                        .Text("I believe in you.").NewLine()
+                        .Text("I will be waiting here for you.").NewLine()
+                        .PlaySoundEffect(0x697F).Text("Ho, ho, ho.")
+                        .EndFinalTextBox()
+                        ;
+                    })
+                    .Build()
+                );
+                newMessages.Add(new MessageEntryBuilder()
+                    .Id(0x1FCF)
+                    .Message(it =>
+                    {
+                        it.CompileTimeWrap((wrapped) =>
+                        {
+                            wrapped.Text("So then...").NewLine()
+                            .Text("Have you ");
+                            for (var i = 0; i < flavorTextsPast.Count; i++)
+                            {
+                                var text = flavorTextsPast[i].Replace("[RED]", TextCommands.ColorRed.ToString()).Replace("[WHITE]", TextCommands.ColorWhite.ToString());
+                                wrapped.Text(text);
+                                if (i < flavorTextsPast.Count - 2)
+                                {
+                                    wrapped.Text(", ");
+                                }
+                                else if (i < flavorTextsPast.Count - 1)
+                                {
+                                    wrapped.Text(" and ");
+                                }
+                            }
+                            wrapped.Text("?");
+                        })
+                        .DisableTextSkip2()
+                        .EndFinalTextBox()
+                        ;
+                    })
+                    .Build()
+                );
+                newMessages.Add(new MessageEntryBuilder()
+                    .Id(0x2006)
+                    .Message(it =>
+                    {
+                        it.CompileTimeWrap((wrapped) =>
+                        {
+                            wrapped.Text("You'll be fine. Surely you should be able to ");
+                            for (var i = 0; i < flavorTexts2.Count; i++)
+                            {
+                                var text = flavorTexts2[i].Replace("[RED]", TextCommands.ColorRed.ToString()).Replace("[WHITE]", TextCommands.ColorWhite.ToString());
+                                wrapped.Text(text);
+                                if (i < flavorTexts2.Count - 2)
+                                {
+                                    wrapped.Text(", ");
+                                }
+                                else if (i < flavorTexts2.Count - 1)
+                                {
+                                    wrapped.Text(" and ");
+                                }
+                            }
+                            wrapped.Text(".");
+                        })
+                        .EndTextBox()
+                        .Text("Yet there's no time left.")
+                        .EndTextBox()
+                        .Text("But time is not eternal.").NewLine()
+                        .Text("Please value your time.").NewLine()
+                        .Text("I believe in you. I'll be").NewLine()
+                        .Text("waiting here for you.")
+                        .EndTextBox()
+                        .Text("Ho, ho, ho.")
+                        .EndFinalTextBox()
+                        ;
+                    })
+                    .Build()
+                );
+            }
+        }
+
         private void WriteOathHintText(List<MessageEntry> newMessages)
         {
             var oathItem = _randomized.ItemList[Item.SongOath];
@@ -3388,7 +3701,7 @@ namespace MMR.Randomizer
                         }
                         else
                         {
-                            return remainLocation.RegionArea(_randomized.ItemList).Value.ToString();
+                            return remainLocation.RegionAreaOfTemple(_randomized.ItemList).Value.ToString();
                         }
                     })
                     .Distinct()
@@ -3555,6 +3868,7 @@ namespace MMR.Randomizer
                             };
                         }
                     })
+                    .Where(x => x.Region != Region.Misc)
                     .GroupBy(x => x.Region)
                     .ToDictionary(g2 => g2.Key, g2 => g2.Select(x => x.Location).ToArray())
                 );
@@ -5624,6 +5938,59 @@ namespace MMR.Randomizer
             }
         }
 
+        private void WriteGibdoRequirements()
+        {
+            for (var i = 0; i < _randomized.GibdoRequirements.Count; i++)
+            {
+                var gibdoRequirement = _randomized.GibdoRequirements[i];
+                var gibdoItemAttribute = gibdoRequirement.ItemRequired.GetAttribute<ItemGibdoAttribute>();
+                var messageId = gibdoItemAttribute.MessageId;
+                var defaultAmount = gibdoRequirement.ItemRequired.GetAttribute<ItemGibdoAmountAttribute>()?.DefaultAmount ?? 1;
+                if (gibdoItemAttribute.CustomMessage != default && (messageId == default || gibdoRequirement.Amount != defaultAmount))
+                {
+                    if (!_extraMessages.Any())
+                    {
+                        throw new Exception("Extra Message unexpectedly empty.");
+                    }
+                    messageId = (ushort)(_extraMessages.Max(me => me.Id) + 1);
+                    _extraMessages.Add(new MessageEntryBuilder()
+                        .Id(messageId)
+                        .Message((it) =>
+                        {
+                            it.CompileTimeWrap((wrap) =>
+                            {
+                                var customMessage = gibdoItemAttribute.CustomMessage;
+                                if (customMessage.Contains("[AMOUNT]"))
+                                {
+                                    customMessage = customMessage.Replace("[AMOUNT]", MessageUtils.NumberToWords(gibdoRequirement.Amount));
+                                    wrap.Text(customMessage);
+                                }
+                                else
+                                {
+                                    wrap.Text(customMessage);
+
+                                    if (gibdoRequirement.Amount > 1)
+                                    {
+                                        wrap.Text($" Preferably {MessageUtils.NumberToWords(gibdoRequirement.Amount)} of them...");
+                                    }
+                                }
+                            });
+
+                            it.DisableTextSkip2()
+                            .EndFinalTextBox();
+                        })
+                        .Build()
+                    );
+                }
+                ReadWriteUtils.WriteToROM(0xF666B8 + i * 8, gibdoRequirement.ToByteArray(messageId));
+
+                // Update spawn params for Gibdos in Well
+                ReadWriteUtils.WriteToROM(0x029B0000 + 0xDA, 0x28C);
+                ReadWriteUtils.WriteToROM(0x029D2000 + 0xB6, 0x22A);
+                ReadWriteUtils.WriteToROM(0x029DC000 + 0xD6, 0x1FB);
+            }
+        }
+
         private void WritePrices(MessageTable messageTable, List<MessageEntry> newMessages)
         {
             // TODO if costs randomized
@@ -5708,12 +6075,19 @@ namespace MMR.Randomizer
             }
 
             //write free item (start item default = Deku Mask)
-            freeItems.Add(_randomized.ItemList.Find(u => u.NewLocation == Item.MaskDeku).Item);
-            freeItems.Add(_randomized.ItemList.Find(u => u.NewLocation == Item.SongHealing).Item);
-            freeItems.Add(_randomized.ItemList.Find(u => u.NewLocation == Item.StartingSword).Item);
-            freeItems.Add(_randomized.ItemList.Find(u => u.NewLocation == Item.StartingShield).Item);
-            freeItems.Add(_randomized.ItemList.Find(u => u.NewLocation == Item.StartingHeartContainer1).Item);
-            freeItems.Add(_randomized.ItemList.Find(u => u.NewLocation == Item.StartingHeartContainer2).Item);
+            var startingSlots = new List<Item>
+            {
+                Item.MaskDeku,
+                Item.SongHealing,
+                Item.StartingSword,
+                Item.StartingShield,
+                Item.StartingHeartContainer1,
+                Item.StartingHeartContainer2,
+            };
+            var startingItems = startingSlots
+                .Where(location => !ItemUtils.IsLocationJunk(location, _randomized.Settings))
+                .Select(location => _randomized.ItemList.Find(u => u.NewLocation == location).Item);
+            freeItems.AddRange(startingItems);
             WriteFreeItems(freeItems.ToArray());
 
             //write everything else
@@ -5756,7 +6130,7 @@ namespace MMR.Randomizer
                     continue;
                 }
 
-                if (item.Item.DungeonEntrances() != null)
+                if (item.Item.Entrances() != null)
                 {
                     continue;
                 }
@@ -5797,6 +6171,10 @@ namespace MMR.Randomizer
                             path.Pop();
                         }
                     }
+                    if ((item.Item.ItemCategory() == ItemCategory.StrayFairies || item.Item.ItemCategory() == ItemCategory.SkulltulaTokens || item.Item.ItemCategory() == ItemCategory.Frogs) && !itemIsUsed((int)item.Item, new Stack<int>()))
+                    {
+                        overrideChestType = ChestTypeAttribute.ChestType.SmallWooden;
+                    }
                     if ((item.Item.Name().Contains("Bombchu") || item.Item.Name().Contains("Shield")) && itemIsUsed((int)item.Item, new Stack<int>()))
                     {
                         overrideChestType = item.Item.IsTemporary() ? ChestTypeAttribute.ChestType.SmallGold : ChestTypeAttribute.ChestType.LargeGold;
@@ -5821,7 +6199,7 @@ namespace MMR.Randomizer
                     {
                         overrideChestType = ChestTypeAttribute.ChestType.LargeGold;
                     }
-                    ItemSwapUtils.WriteNewItem(item, newMessages, _randomized.Settings, item.Mimic?.ChestType ?? overrideChestType, messageTable, _extendedObjects);
+                    ItemSwapUtils.WriteNewItem(item, _randomized.ItemList, newMessages, _randomized.Settings, item.Mimic?.ChestType ?? overrideChestType, messageTable, _extendedObjects);
                 }
             }
 
@@ -5865,6 +6243,8 @@ namespace MMR.Randomizer
 
             WriteMiscItemText(newMessages);
 
+            WriteVictoryConditionText(newMessages);
+
             var itemsWithCustomMessage = new List<Item>
             {
                 Item.CollectableIkanaGraveyardDay2Bats1,
@@ -5905,6 +6285,8 @@ namespace MMR.Randomizer
             WriteDungeonItemText(newMessages);
 
             WritePrices(messageTable, newMessages);
+
+            WriteGibdoRequirements();
 
             messageTable.UpdateMessages(newMessages);
 
@@ -5956,7 +6338,7 @@ namespace MMR.Randomizer
 
         private void CheckEnemizerFreeGaroHints()
         {
-            if (_randomized.Settings.FreeGaroHints && _randomized.Settings.RandomizeEnemies) // bandaid
+            if (_randomized.Settings.FreeGaroHints && _randomized.Settings.ActorMode != ActorMode.Default) // bandaid
             {
                 throw new Exception("Free garo hints and this version of Enemizer/Actorizer is broken, disable one");
             } // */
@@ -6391,6 +6773,27 @@ namespace MMR.Randomizer
             _extraMessages.Add(new MessageEntry(Item.Nothing.ExclusiveItemEntry().Message, Item.Nothing.ExclusiveItemMessage()));
         }
 
+        private void WriteSmithyTextureFixes(AsmContext asm)
+        {
+            var smithyFiles = new List<int> { 958 };
+            var extObjectsFileTableAddr = (int)asm.Symbols["EXT_OBJECTS"];
+            var extObjectsFileAddr = ReadWriteUtils.ReadU32(extObjectsFileTableAddr + 8);
+            if (extObjectsFileAddr > 0)
+            {
+                var extObjectsFile = RomUtils.GetFileIndexForWriting((int)extObjectsFileAddr);
+                smithyFiles.Add(extObjectsFile);
+            }
+            foreach (var file in smithyFiles)
+            {
+                RomUtils.CheckCompressed(file);
+                RomData.MMFileList[file].Data = RomData.MMFileList[file].Data
+                    .FindAndReplace(
+                        new byte[] { 0xFC, 0x27, 0x2C, 0x40, 0x21, 0x0E, 0x92, 0xFF },
+                        new byte[] { 0xFC, 0x27, 0x2C, 0x03, 0x21, 0x0C, 0x92, 0xFF }
+                    );
+            }
+        }
+
         public void MakeROM(OutputSettings outputSettings, IProgressReporter progressReporter)
         {
             using (BinaryReader OldROM = new BinaryReader(File.OpenRead(outputSettings.InputROMFilename)))
@@ -6398,10 +6801,13 @@ namespace MMR.Randomizer
                 RomUtils.ReadFileTable(OldROM);
             }
 
-            RomData.SceneList = null;
+            SceneUtils.ReadSceneTable();
+            SceneUtils.GetMaps();
 
             var originalMMFileList = RomData.MMFileList.Select(file => file.Clone()).ToList();
             List<MMFile> cosmeticMMFileList;
+
+            var shouldApplyCosmetics = outputSettings.GenerateROM || outputSettings.OutputVC || outputSettings.GenerateCosmeticsPatch;
 
             byte[] hash;
             AsmContext asm;
@@ -6475,15 +6881,12 @@ namespace MMR.Randomizer
                 WriteArcheryDoubleRewardText(messageTable);
                 WriteBankPostRewardText(messageTable);
                 WriteRoyalWalletText(messageTable);
-                WriteMoonChildDenialTextAndHack(messageTable);
+                WriteMoonChildDenialText(messageTable);
 
                 progressReporter.ReportProgress(61, "Writing quick text...");
                 WriteQuickText();
 
-                progressReporter.ReportProgress(62, "Writing dungeons...");
-                WriteDungeons();
-
-                progressReporter.ReportProgress(63, "Writing speedups...");
+                progressReporter.ReportProgress(62, "Writing speedups...");
                 WriteSpeedUps(messageTable);
 
                 //Enemies used to be here
@@ -6491,16 +6894,21 @@ namespace MMR.Randomizer
                 progressReporter.ReportProgress(64, "Writing items...");
                 WriteItems(messageTable);
 
-                progressReporter.ReportProgress(65, "Reading Enemies ...");
-                CheckEnemizerFreeGaroHints();
+                progressReporter.ReportProgress(65, "Writing entrances...");
+                WriteEntrances();
+
+                progressReporter.ReportProgress(66, "Reading Enemies ...");
+                //CheckEnemizerFreeGaroHints(); // testing
                 ReadEnemies(outputSettings);
 
-                progressReporter.ReportProgress(66, "Writing cutscenes...");
+                progressReporter.ReportProgress(67, "Writing cutscenes...");
                 WriteCutscenes(messageTable);
 
                 progressReporter.ReportProgress(67, "Writing gimmicks...");
                 WriteGimmicks(messageTable);
                 WriteMiscHacks();
+
+                WriteMoonChildDenialHack();
 
                 progressReporter.ReportProgress(68, "Writing messages...");
                 WriteGossipQuotes(messageTable);
@@ -6542,8 +6950,11 @@ namespace MMR.Randomizer
 
                 cosmeticMMFileList = RomData.MMFileList.Select(file => file.Clone()).ToList();
 
-                // Write subset of Asm config post-patch
-                WriteAsmConfig(asm, hash);
+                if (shouldApplyCosmetics)
+                {
+                    // Write subset of Asm config post-patch
+                    WriteAsmConfig(asm, hash);
+                }
 
                 if (_randomized.Settings.DrawHash || outputSettings.GeneratePatch)
                 {
@@ -6560,37 +6971,134 @@ namespace MMR.Randomizer
                 }
             }
 
-            WriteMiscellaneousChanges();
+            if (shouldApplyCosmetics)
+            {
+                WriteMiscellaneousChanges();
 
-            progressReporter.ReportProgress(72, "Writing cosmetics...");
-            WriteTatlColour(new Random(BitConverter.ToInt32(hash, 0)));
-            //MakeItRain();
-            WriteInstruments(new Random(BitConverter.ToInt32(hash, 0)));
+                progressReporter.ReportProgress(72, "Writing cosmetics...");
+                WriteTatlColour(new Random(BitConverter.ToInt32(hash, 0)));
+                WriteInstruments(new Random(BitConverter.ToInt32(hash, 0)));
 
-            progressReporter.ReportProgress(73, "Writing sound effects...");
-            WriteSoundEffects(new Random(BitConverter.ToInt32(hash, 0)));
-            WriteLowHealthSound(new Random(BitConverter.ToInt32(hash, 0)));
+                progressReporter.ReportProgress(73, "Writing sound effects...");
+                WriteSoundEffects(new Random(BitConverter.ToInt32(hash, 0)));
+                WriteLowHealthSound(new Random(BitConverter.ToInt32(hash, 0)));
 
-            progressReporter.ReportProgress(74, "Writing music...");
-            SequenceUtils.MoveAudioBankTable();
-            WriteMuteMusic();
-            WriteEnemyCombatMusicMute();
-            WriteRemoveMinorMusic();
-            WriteDisableFanfares();
+                progressReporter.ReportProgress(74, "Writing music...");
+                SequenceUtils.MoveAudioBankTable();
+                WriteMuteMusic();
+                WriteEnemyCombatMusicMute();
+                WriteRemoveMinorMusic();
+                WriteDisableFanfares();
+            }
+
+            WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
 
             if (outputSettings.GenerateCosmeticsPatch)
             {
+                if (outputSettings.IsPatchForVC)
+                {
+                    WriteSmithyTextureFixes(asm);
+                }
                 var directory = Path.GetDirectoryName(outputSettings.OutputROMFilename);
                 var filename = Path.GetFileNameWithoutExtension(outputSettings.OutputROMFilename);
 
                 Patch.Patcher.CreatePatch(Path.Combine(directory, filename + "_Cosmetics.mmr"), cosmeticMMFileList);
             }
 
-            WriteAudioSeq(new Random(BitConverter.ToInt32(hash, 0)), outputSettings);
+            if (outputSettings.GenerateRandomizedMusicInfoJson && _cosmeticSettings.Music == Music.Random)
+            {
+                var randomMusic = RomData.SequenceList;
+                var gameSequences = RomData.TargetSequences;
+
+                Dictionary<string, string> seqReplacements = new Dictionary<string, string>();
+                Dictionary<string, SequenceInfo> extraSequences = new Dictionary<string, SequenceInfo>();
+
+                foreach (var randomSeq in randomMusic)
+                {
+                    var replacedSeq = gameSequences.Find(u => u.Replaces == randomSeq.Replaces);
+
+                    if (replacedSeq != null)
+                    {
+                        seqReplacements.Add(replacedSeq.Name, randomSeq.Name);
+                    }
+                    else if (randomSeq.Name == nameof(Properties.Resources.mmr_f_sot))
+                    {
+                        if (outputSettings.GenerateCosmeticsPatch)
+                        {
+                            byte[] data = Properties.Resources.mmr_f_sot;
+                            // I think this checks if the sequence type is correct for MM
+                            //  because DB ripped sequences from SF64/SM64/MK64 without modifying them
+                            if (data[1] != 0x20)
+                            {
+                                data[1] = 0x20;
+                            }
+
+                            randomSeq.SequenceBinaryList = new List<SequenceBinaryData>();
+
+                            var binData = new SequenceBinaryData();
+                            binData.SequenceBinary = data;
+                            binData.InstrumentSet = null;
+                            binData.FormMask = null;
+                            randomSeq.SequenceBinaryList.Add(binData);
+
+                            //Sanitize directory name
+                            randomSeq.Directory = "";
+
+                            extraSequences.Add(randomSeq.Name, randomSeq);
+                            seqReplacements.Add(randomSeq.Name, randomSeq.Name);
+                        }
+                    }
+                }
+
+                //Dump to JSON
+                var directory = Path.GetDirectoryName(outputSettings.OutputROMFilename);
+                var filename = $"{Path.GetFileNameWithoutExtension(outputSettings.OutputROMFilename)}";
+
+                File.WriteAllText(Path.Combine(directory, filename + "_RandomizedMusicInfo.json"), JsonSerializer.Serialize(seqReplacements));
+
+                //Also dump extra sequences, pointerized sequences and music related file indices
+                if (outputSettings.GenerateCosmeticsPatch)
+                {
+                    File.WriteAllText(Path.Combine(directory, filename + "_RandomizedMusicExtraSeqs.json"), JsonSerializer.Serialize(extraSequences));
+
+                    Dictionary<string, string> pointerizedSequences = new Dictionary<string, string>();
+                    foreach (var seq in RomData.PointerizedSequences)
+                    {
+                        var substituteSeq = gameSequences.Find(u => u.Replaces == seq.Replaces);
+                        string seqName = seq.Name;
+
+                        if (seqName.Length < 1)
+                        {
+                            var originalSeq = gameSequences.Find(u => u.Replaces == seq.PreviousSlot);
+                            seqName = originalSeq.Name;
+                        }
+
+                        pointerizedSequences.Add(seqName, substituteSeq != null ? substituteSeq.Name : seq.Replaces.ToString());
+                    }
+                    File.WriteAllText(Path.Combine(directory, filename + "_RandomizedMusicPointerizedSeqs.json"), JsonSerializer.Serialize(pointerizedSequences));
+
+                    Dictionary<string, int> musicFileIndices = new Dictionary<string, int>();
+                    musicFileIndices.Add("formMask", _cosmeticSettings.AsmOptions.MusicConfig.SequenceMaskFileIndex ?? -1);
+                    musicFileIndices.Add("seqDisplayNames", _cosmeticSettings.AsmOptions.MusicConfig.SequenceNamesFileIndex ?? -1);
+                    File.WriteAllText(Path.Combine(directory, filename + "_RandomizedMusicFileIDs.json"), JsonSerializer.Serialize(musicFileIndices));
+                }
+            }
+
+            if (outputSettings.GenerateCompressionInfoJson)
+            {
+                var directory = Path.GetDirectoryName(outputSettings.OutputROMFilename);
+                var filename = $"{Path.GetFileNameWithoutExtension(outputSettings.OutputROMFilename)}";
+
+                var compressionInfo = RomData.MMFileList.Select(x => x.IsCompressed).ToList();
+
+                File.WriteAllText(Path.Combine(directory, filename + "_CompressionInfo.json"), JsonSerializer.Serialize(compressionInfo));
+            }
 
             if (outputSettings.GenerateROM || outputSettings.OutputVC)
             {
                 progressReporter.ReportProgress(75, "Building ROM...");
+
+                RomUtils.SetFilesToRemainDecompressed(outputSettings, _gameplaySettings);
 
                 byte[] ROM = null;
                 if (outputSettings.GenerateROM)
@@ -6606,23 +7114,7 @@ namespace MMR.Randomizer
 
                 if (outputSettings.OutputVC)
                 {
-                    var smithyFiles = new List<int> { 958 };
-                    var extObjectsFileTableAddr = (int)asm.Symbols["EXT_OBJECTS"];
-                    var extObjectsFileAddr = ReadWriteUtils.ReadU32(extObjectsFileTableAddr + 8);
-                    if (extObjectsFileAddr > 0)
-                    {
-                        var extObjectsFile = RomUtils.GetFileIndexForWriting((int)extObjectsFileAddr);
-                        smithyFiles.Add(extObjectsFile);
-                    }
-                    foreach (var file in smithyFiles)
-                    {
-                        RomUtils.CheckCompressed(file);
-                        RomData.MMFileList[file].Data = RomData.MMFileList[file].Data
-                            .FindAndReplace(
-                                new byte[] { 0xFC, 0x27, 0x2C, 0x40, 0x21, 0x0E, 0x92, 0xFF },
-                                new byte[] { 0xFC, 0x27, 0x2C, 0x03, 0x21, 0x0C, 0x92, 0xFF }
-                            );
-                    }
+                    WriteSmithyTextureFixes(asm);
 
                     if (ROM == null) // wasnt previously run for n64 rom
                     {
