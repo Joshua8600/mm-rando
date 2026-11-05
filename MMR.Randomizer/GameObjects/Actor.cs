@@ -6416,7 +6416,7 @@ namespace MMR.Randomizer.GameObjects
         [BlockingVariantsAll]
         [AlignedCompanionActor(GrassRockCluster, CompanionAlignment.OnTop, ourVariant: -1, variant: 0x702, 0xC02, 0x802, 0x902, 0x0402, 0x1F02)]
         [AlignedCompanionActor(GiantBeee, CompanionAlignment.OnTop, ourVariant: -1, variant: 0, 1, 2, 3, 4, 5)]
-        [ForbidFromScene(Scene.SouthClockTown, Scene.MilkRoad, Scene.WestClockTown,
+        [ForbidFromScene(Scene.SouthClockTown, Scene.MilkRoad, Scene.WestClockTown, Scene.ClocktowerInterior,
              Scene.Woodfall, Scene.SouthernSwamp, Scene.SouthernSwampClear, Scene.MountainVillage, Scene.MountainVillageSpring, Scene.Snowhead,
              Scene.GreatBayCoast, Scene.ZoraCape, Scene.IkanaCanyon, Scene.StoneTower, Scene.InvertedStoneTower)]
         [PlacementWeight(70)]
