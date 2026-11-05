@@ -3700,7 +3700,7 @@ namespace MMR.Randomizer
                 thisSceneData.Scene.Maps[1].Actors[0].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
             }
             /////////////////////////////
-            // #endif
+            #endif
             /////////////////////////////
             #endregion
 
