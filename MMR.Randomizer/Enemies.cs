@@ -2276,7 +2276,7 @@ namespace MMR.Randomizer
                 //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.DekuBabaWithered, GameObjects.Actor.En_Boj_04)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.CuriosityShop, GameObjects.Actor.Clock, GameObjects.Actor.RealBombchu)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.MountainVillage, GameObjects.Actor.PottedPlant, GameObjects.Actor.BeanSeller)) continue;
-                if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
+                //if (TestHardSetObject(GameObjects.Scene.Grottos, GameObjects.Actor.GoldSkulltula, GameObjects.Actor.OwlStatue)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.En_Owl)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.GoronKid)) continue;
                 //if (TestHardSetObject(GameObjects.Scene.TerminaField, GameObjects.Actor.Leever, GameObjects.Actor.MilkbarChairs)) continue;
@@ -3688,17 +3688,17 @@ namespace MMR.Randomizer
             ////////////////////////////////////////////
             ///////   DEBUGGING: force an actor  ///////
             ////////////////////////////////////////////
-            if (scene.SceneEnum == GameObjects.Scene.Grottos) // force specific actor/variant for debugging
-            {
-                //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
-                //thisSceneData.Scene.Maps[0].Actors[5].ChangeActor(GameObjects.Actor.BeanSeller, vars: 0); // was not commented out on isghj branch
-                //thisSceneData.Scene.Maps[0].Actors[22].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
-                //thisSceneData.Scene.Maps[0].Actors[9].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
-                //thisSceneData.Scene.Maps[0].Actors[2].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
-                //thisSceneData.Scene.Maps[11].Actors[4].ChangeActor(GameObjects.Actor.Fish, vars: 0); // was not commented out on isghj branch
-                //thisSceneData.Scene.Maps[0].Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
-                thisSceneData.Scene.Maps[1].Actors[0].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
-            }
+            // if (scene.SceneEnum == GameObjects.Scene.Grottos) // force specific actor/variant for debugging
+            // {
+            //     //thisSceneData.Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
+            //     //thisSceneData.Scene.Maps[0].Actors[5].ChangeActor(GameObjects.Actor.BeanSeller, vars: 0); // was not commented out on isghj branch
+            //     //thisSceneData.Scene.Maps[0].Actors[22].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
+            //     //thisSceneData.Scene.Maps[0].Actors[9].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
+            //     //thisSceneData.Scene.Maps[0].Actors[2].ChangeActor(GameObjects.Actor.Clock, vars: 0x907F); // was not commented out on isghj branch
+            //     //thisSceneData.Scene.Maps[11].Actors[4].ChangeActor(GameObjects.Actor.Fish, vars: 0); // was not commented out on isghj branch
+            //     //thisSceneData.Scene.Maps[0].Actors[12].ChangeActor(GameObjects.Actor.Empty, vars: 0x000); // first torc
+            //     thisSceneData.Scene.Maps[1].Actors[0].ChangeActor(GameObjects.Actor.OwlStatue, vars: 0xF);
+            // }
             /////////////////////////////
             #endif
             /////////////////////////////
